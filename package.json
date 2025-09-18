@@ -5,6 +5,7 @@
   "main": "index.js",
   "types": "src/index.ts",
   "bin": {
+    "versatil": "./bin/versatil.js",
     "versatil-sdlc": "./index.js"
   },
   "scripts": {
