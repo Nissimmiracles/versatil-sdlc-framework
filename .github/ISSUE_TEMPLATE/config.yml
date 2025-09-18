@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Community Discussions
+    url: https://github.com/MiraclesGIT/versatil-sdlc-framework/discussions
+    about: Ask questions, share ideas, and connect with the VERSATIL community
+  - name: 📖 Documentation
+    url: https://github.com/MiraclesGIT/versatil-sdlc-framework#readme
+    about: Read the complete framework documentation and setup guides
+  - name: 🔗 MCP Integration Guide
+    url: https://github.com/MiraclesGIT/versatil-sdlc-framework/blob/main/docs/mcp-integration.md
+    about: Learn how to integrate VERSATIL with Claude Desktop via MCP
+  - name: 🤖 BMAD Methodology
+    url: https://github.com/MiraclesGIT/versatil-sdlc-framework/blob/main/CLAUDE.md
+    about: Understand the Business-Managed Agile Development methodology
+  - name: 🆘 Emergency Support
+    url: https://github.com/MiraclesGIT/versatil-sdlc-framework/discussions/categories/emergency-support
+    about: Get immediate help for critical framework issues

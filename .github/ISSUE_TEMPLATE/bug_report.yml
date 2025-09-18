@@ -1,0 +1,103 @@
+name: 🐛 Bug Report
+description: Report a bug in the VERSATIL SDLC Framework
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug in the VERSATIL SDLC Framework!
+        Please fill out this form to help us understand and fix the issue.
+
+  - type: checkboxes
+    id: framework-components
+    attributes:
+      label: Affected Components
+      description: Which parts of the VERSATIL framework are affected?
+      options:
+        - label: Agent Dispatcher (Auto-agent activation)
+        - label: BMAD Agents (Maria, James, Marcus, Sarah, Alex, Dr.AI)
+        - label: Quality Gates System
+        - label: Emergency Response Protocol
+        - label: Version Management
+        - label: Changelog Generation
+        - label: Git Backup System
+        - label: MCP Integration (Claude Desktop)
+        - label: CLI Tools (versatil, versatil-mcp)
+        - label: Context Validation
+        - label: Documentation
+
+  - type: input
+    id: version
+    attributes:
+      label: Framework Version
+      description: What version of VERSATIL are you using?
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where are you running VERSATIL?
+      options:
+        - macOS
+        - Windows
+        - Linux
+        - Claude Desktop
+        - VS Code
+        - Cursor
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe what happened and what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Run command '...'
+        2. Activate agent '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: Please copy and paste any relevant log output or error messages.
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here.
+      placeholder: |
+        - Did this work in a previous version?
+        - Are there any workarounds?
+        - Related configuration details?
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues for similar problems
+          required: true
+        - label: I have tried the latest version of VERSATIL
+          required: true
+        - label: I have included relevant error logs and context
+          required: true

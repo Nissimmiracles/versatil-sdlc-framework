@@ -1,108 +1,85 @@
-# VERSATIL SDLC Framework - Pull Request
+# Pull Request
 
 ## 📋 Description
 
-Brief description of what this PR does.
+Brief description of the changes in this PR.
 
-Fixes #(issue)
+## 🎯 Type of Change
 
-## 🤖 Agent Changes
+- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
+- [ ] ✨ New feature (non-breaking change which adds functionality)
+- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] 📚 Documentation update
+- [ ] 🔧 Refactoring (no functional changes)
+- [ ] 🧪 Tests (adding or updating tests)
+- [ ] 🤖 Agent enhancement (improving BMAD agent capabilities)
+- [ ] 🔗 MCP integration (Model Context Protocol related)
 
-Which VERSATIL agents are affected by this change:
-- [ ] Maria-QA (Quality Assurance)
-- [ ] James-Frontend (Frontend)
-- [ ] Marcus-Backend (Backend)
-- [ ] Sarah-PM (Project Management)
-- [ ] Alex-BA (Business Analysis)
-- [ ] Dr.AI-ML (AI/ML)
-- [ ] Framework Core
-- [ ] Chrome MCP Integration
+## 🤖 Affected BMAD Agents
 
-## 🔄 Type of Change
+- [ ] Maria (QA Lead)
+- [ ] James (Frontend)
+- [ ] Marcus (Backend)
+- [ ] Sarah (PM)
+- [ ] Alex (BA)
+- [ ] Dr.AI (ML)
+- [ ] Agent Dispatcher
+- [ ] Not agent-specific
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
-- [ ] Performance improvement
-- [ ] Refactoring (no functional changes)
-- [ ] Test improvements
+## 🧪 Testing
 
-## 🧪 Testing Checklist
+- [ ] All existing tests pass
+- [ ] New tests added for new functionality
+- [ ] Manual testing completed
+- [ ] Quality gates pass (`versatil health`)
+- [ ] MCP integration tested (if applicable)
 
-### Maria-QA Quality Gates
-- [ ] All tests pass (`npm run test`)
-- [ ] Code coverage meets requirements (≥80%)
-- [ ] Linting passes (`npm run lint`)
-- [ ] Type checking passes (`npm run type-check`)
-- [ ] Security scan clean (`npm run security-audit`)
+## 📝 Checklist
 
-### Chrome MCP Testing (if applicable)
-- [ ] Visual regression tests pass
-- [ ] Performance tests pass
-- [ ] Accessibility tests pass
-- [ ] Cross-browser compatibility verified
+### Code Quality
+- [ ] Code follows the project's style guidelines
+- [ ] Self-review of code completed
+- [ ] Code is properly commented
+- [ ] No console.log statements left in production code
+- [ ] TypeScript types are properly defined
 
-### Manual Testing
-- [ ] Feature works as expected
-- [ ] No console errors
-- [ ] Responsive design tested (if UI changes)
-- [ ] Agent activation works correctly
+### VERSATIL Framework Standards
+- [ ] Changes align with BMAD methodology
+- [ ] Agent interactions are well-defined
+- [ ] Error handling is comprehensive
+- [ ] Context validation is implemented where needed
+- [ ] Emergency response considerations addressed
 
-## 📊 Performance Impact
-
-- [ ] No performance impact
-- [ ] Performance improved
-- [ ] Performance impact assessed and acceptable
-- [ ] Performance tests updated
-
-## 📚 Documentation
-
-- [ ] Code is self-documenting
-- [ ] Inline comments added where necessary
-- [ ] README updated (if needed)
+### Documentation
 - [ ] Documentation updated (if needed)
-- [ ] Examples updated (if needed)
+- [ ] CLAUDE.md updated (if BMAD methodology affected)
+- [ ] API documentation updated (if applicable)
+- [ ] MCP integration docs updated (if applicable)
 
-## 🔗 Dependencies
+## 🔗 Related Issues
 
-List any dependencies that are required for this change:
-- [ ] No new dependencies
-- [ ] New dependencies added (list below)
-- [ ] Dependencies updated (list below)
+Closes #(issue number)
 
-**New Dependencies:**
-- dependency-name@version - reason for adding
+## 📸 Screenshots/Examples
 
-**Updated Dependencies:**
-- dependency-name: old-version → new-version - reason for update
+If applicable, add screenshots or code examples.
 
-## 📱 Screenshots/Videos
+## 🚀 Deployment Impact
 
-If applicable, add screenshots or videos to help explain your changes.
+- [ ] No deployment changes needed
+- [ ] Requires NPM package update
+- [ ] Requires documentation deployment
 
-## 🚀 Deployment Notes
+## 📋 Additional Notes
 
-Any special deployment considerations:
-- [ ] No special deployment needed
-- [ ] Database migrations required
-- [ ] Environment variables needed
-- [ ] Configuration changes required
-
-## ✅ Final Checklist
-
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published
-
-## 🤝 Review Notes
-
-Additional information for reviewers:
+Any additional information for reviewers.
 
 ---
 
-**🤖 Generated with VERSATIL SDLC Framework**
+**For Reviewers:**
+- [ ] Code quality and style
+- [ ] BMAD methodology compliance
+- [ ] Agent interaction patterns
+- [ ] Documentation completeness
+
+/cc @maintainers

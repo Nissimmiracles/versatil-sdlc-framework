@@ -1,0 +1,216 @@
+name: 🤖 New Agent Request
+description: Request a new specialized agent for the BMAD methodology
+title: "[Agent] "
+labels: ["agent-request", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🎯 **BMAD Agent Creation Request**
+
+        The VERSATIL framework currently includes 6 core BMAD agents:
+        - **Maria** (QA Lead) - Testing, quality assurance, bug detection
+        - **James** (Frontend) - UI/UX, React/Vue, responsive design
+        - **Marcus** (Backend) - APIs, databases, server-side logic
+        - **Sarah** (PM) - Project management, documentation, coordination
+        - **Alex** (BA) - Business analysis, requirements, user stories
+        - **Dr.AI** (ML) - Machine learning, AI features, data science
+
+        Request a new specialized agent to expand BMAD capabilities!
+
+  - type: input
+    id: agent-name
+    attributes:
+      label: Agent Name & Role
+      description: What should this agent be called and what's their primary role?
+      placeholder: "e.g., DevOps-Dan (Infrastructure & Deployment)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: specialization
+    attributes:
+      label: Specialization Area
+      description: What domain should this agent specialize in?
+      options:
+        - DevOps & Infrastructure
+        - Security & Compliance
+        - Mobile Development
+        - Data Engineering
+        - UI/UX Design
+        - Performance Optimization
+        - API Design & Integration
+        - Database Administration
+        - Cloud Architecture
+        - Blockchain Development
+        - IoT Development
+        - Game Development
+        - Accessibility (a11y)
+        - Technical Writing
+        - Other (specify below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: responsibilities
+    attributes:
+      label: Agent Responsibilities
+      description: What specific tasks and responsibilities should this agent handle?
+      placeholder: |
+        Primary responsibilities:
+        - Task 1
+        - Task 2
+        - Task 3
+
+        Secondary responsibilities:
+        - Additional task A
+        - Additional task B
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: activation-triggers
+    attributes:
+      label: Auto-Activation Triggers
+      description: When should this agent automatically activate?
+      options:
+        - label: Specific file patterns (specify below)
+        - label: Keyword detection in code/comments
+        - label: Error patterns and emergency situations
+        - label: Git commit analysis
+        - label: Quality gate failures
+        - label: Performance issues detected
+        - label: Security vulnerabilities found
+        - label: Deployment scenarios
+        - label: Manual activation only
+
+  - type: textarea
+    id: file-patterns
+    attributes:
+      label: File Patterns & Keywords
+      description: What file patterns, keywords, or technologies should trigger this agent?
+      placeholder: |
+        File patterns:
+        - *.dockerfile, docker-compose.yml
+        - *.tf, *.tfvars (Terraform)
+        - .github/workflows/*.yml
+
+        Keywords:
+        - deploy, infrastructure, container
+        - kubernetes, docker, helm
+
+        Technologies:
+        - Docker, Kubernetes, Terraform
+        - AWS, Azure, GCP
+
+  - type: checkboxes
+    id: collaboration
+    attributes:
+      label: Agent Collaboration
+      description: Which existing agents should this new agent collaborate with?
+      options:
+        - label: Maria (QA) - For testing and validation
+        - label: James (Frontend) - For UI/UX coordination
+        - label: Marcus (Backend) - For server-side integration
+        - label: Sarah (PM) - For project coordination
+        - label: Alex (BA) - For requirements validation
+        - label: Dr.AI (ML) - For AI/ML integration
+
+  - type: textarea
+    id: mcp-tools
+    attributes:
+      label: MCP Tools & Integrations
+      description: What MCP tools should this agent have access to?
+      placeholder: |
+        Suggested MCP tools:
+        - Docker MCP (container management)
+        - AWS MCP (cloud services)
+        - Kubernetes MCP (orchestration)
+        - Security Scanner MCP (vulnerability detection)
+
+  - type: textarea
+    id: quality-gates
+    attributes:
+      label: Quality Gates
+      description: What quality checks should this agent enforce?
+      placeholder: |
+        Quality gates this agent should validate:
+        - Infrastructure as Code validation
+        - Security compliance checks
+        - Performance benchmarks
+        - Deployment readiness checks
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How critical is this agent for your workflow?
+      options:
+        - Low (Would be nice to have)
+        - Medium (Would improve efficiency)
+        - High (Needed for current projects)
+        - Critical (Blocking adoption)
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Real-World Use Cases
+      description: Provide specific scenarios where this agent would be valuable.
+      placeholder: |
+        Use case 1: Deploying microservices to Kubernetes
+        - Agent detects kubernetes/*.yml files
+        - Validates deployment configurations
+        - Runs security scans on container images
+        - Coordinates with Marcus for API deployment
+
+        Use case 2: [Describe another scenario]
+
+  - type: textarea
+    id: emergency-scenarios
+    attributes:
+      label: Emergency Response
+      description: What emergency situations should this agent handle?
+      placeholder: |
+        Emergency scenarios:
+        - Production deployment failures
+        - Security breach detection
+        - Performance degradation alerts
+        - Infrastructure outages
+
+  - type: checkboxes
+    id: framework-integration
+    attributes:
+      label: Framework Integration
+      description: How should this agent integrate with VERSATIL features?
+      options:
+        - label: Should appear in `versatil agents` list
+        - label: Needs CLI command integration
+        - label: Should support emergency response protocol
+        - label: Requires context validation before activation
+        - label: Should integrate with version management
+        - label: Needs backup system integration
+        - label: Should work with MCP server
+
+  - type: textarea
+    id: implementation-notes
+    attributes:
+      label: Implementation Suggestions
+      description: Any specific implementation details or suggestions?
+      placeholder: |
+        Implementation considerations:
+        - Agent personality/communication style
+        - Integration with existing tools
+        - Configuration requirements
+        - Training data or knowledge base needs
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution Interest
+      options:
+        - label: I would help test this agent once implemented
+        - label: I have domain expertise in this area
+        - label: I can contribute to agent development
+        - label: I can help with documentation and examples

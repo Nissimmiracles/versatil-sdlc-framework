@@ -1,363 +1,313 @@
-# Contributing to VERSATIL SDLC Framework
+# 🤝 Contributing to VERSATIL SDLC Framework
 
-Thank you for your interest in contributing to the VERSATIL SDLC Framework! This document provides guidelines and information for contributors.
+Welcome to the VERSATIL SDLC Framework community! We're excited that you're interested in contributing to the future of AI-native development.
 
-## 🤖 Agent-Driven Development
+## 🎯 Ways to Contribute
 
-This project follows the **BMAD (Business-Managed Agile Development)** methodology with specialized AI agents. Understanding our agent system will help you contribute effectively.
+### 🐛 Bug Reports
+- Use our [bug report template](https://github.com/MiraclesGIT/versatil-sdlc-framework/issues/new?template=bug_report.yml)
+- Include detailed reproduction steps
+- Specify framework version and environment
+- Attach relevant logs and error messages
 
-### Our AI Agents:
-- 🧪 **Maria-QA** - Quality Assurance Lead
-- 🎨 **James-Frontend** - Frontend Specialist
-- ⚙️ **Marcus-Backend** - Backend Expert
-- 📋 **Sarah-PM** - Project Manager
-- 📊 **Alex-BA** - Business Analyst
-- 🤖 **Dr.AI-ML** - AI/ML Specialist
+### ✨ Feature Requests
+- Use our [feature request template](https://github.com/MiraclesGIT/versatil-sdlc-framework/issues/new?template=feature_request.yml)
+- Describe the problem and proposed solution
+- Include real-world use cases
+- Consider implementation complexity
+
+### 🤖 New Agent Requests
+- Use our [agent request template](https://github.com/MiraclesGIT/versatil-sdlc-framework/issues/new?template=agent_request.yml)
+- Define agent specialization and responsibilities
+- Specify auto-activation triggers
+- Describe collaboration with existing agents
+
+### 📖 Documentation Improvements
+- Fix typos and clarify instructions
+- Add examples and use cases
+- Improve setup and installation guides
+- Create tutorials and best practices
+
+### 💻 Code Contributions
+- Fix bugs and implement features
+- Add new BMAD agents
+- Enhance MCP integration
+- Improve CLI tools and automation
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Node.js 16.0.0 or higher
-- npm 7.0.0 or higher
-- Git
-- Cursor IDE (recommended for optimal agent experience)
-
-### Setup Development Environment
-
+### 1. Fork and Clone
 ```bash
-# Fork and clone the repository
+# Fork the repository on GitHub
 git clone https://github.com/your-username/versatil-sdlc-framework.git
 cd versatil-sdlc-framework
-
-# Install dependencies
-npm install
-
-# Run setup validation
-npm run versatil:validate
-
-# Start development
-npm run dev
 ```
 
-## 📋 Contribution Types
-
-### 🐛 Bug Fixes
-1. Search existing issues to avoid duplicates
-2. Create a detailed bug report using our template
-3. Reference the issue in your PR
-4. Ensure Maria-QA quality gates pass
-
-### ✨ New Features
-1. Discuss the feature in an issue first
-2. Follow our feature request template
-3. Consider which agents will be affected
-4. Update documentation and tests
-
-### 📚 Documentation
-1. Keep documentation up-to-date with changes
-2. Follow our documentation style guide
-3. Update agent reference guides when needed
-
-### 🧪 Testing
-1. Maintain 80%+ test coverage
-2. Use Chrome MCP for browser testing
-3. Include accessibility and performance tests
-4. Follow Maria-QA testing standards
-
-## 🔄 Development Workflow
-
-### Branch Naming Convention
-```
-feature/agent-name/feature-description
-bugfix/agent-name/bug-description
-docs/section-being-updated
-chore/maintenance-task
-```
-
-Examples:
-- `feature/maria-qa/enhanced-visual-testing`
-- `bugfix/james-frontend/component-optimization`
-- `docs/agent-reference-update`
-
-### Commit Message Format
-```
-<type>(agent): <description>
-
-[optional body]
-
-🤖 Generated with VERSATIL SDLC Framework
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
-
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes
-- `refactor`: Code refactoring
-- `test`: Test additions/modifications
-- `chore`: Maintenance tasks
-
-Examples:
-```
-feat(maria-qa): add visual regression baseline update command
-
-Adds new command to update visual test baselines after legitimate
-UI changes, improving developer workflow.
-
-🤖 Generated with VERSATIL SDLC Framework
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
-
-## 🧪 Quality Standards (Maria-QA)
-
-### Code Quality Requirements
-- ✅ ESLint and Prettier compliance
-- ✅ TypeScript strict mode (where applicable)
-- ✅ Test coverage ≥ 80%
-- ✅ No security vulnerabilities
-- ✅ Performance budget compliance
-
-### Testing Requirements
+### 2. Install Dependencies
 ```bash
-# Run all quality checks
-npm run maria:test
+npm install
+```
 
-# Individual checks
+### 3. Build and Test
+```bash
+# Build the framework
+npm run build
+
+# Run linting
 npm run lint
-npm run test
-npm run test:coverage
-npm run maria:visual
-npm run maria:performance
-npm run maria:accessibility
-npm run marcus:security
+
+# Run tests
+npm test
+
+# Full validation
+npm run validate
 ```
 
-### Chrome MCP Testing
-All UI changes must pass:
-- Visual regression tests
-- Performance budgets
-- Accessibility compliance (WCAG 2.1 AA)
-- Cross-browser compatibility
+### 4. Set Up Development Environment
+```bash
+# Link for local testing
+npm link
 
-## 🎨 Frontend Guidelines (James-Frontend)
-
-### Component Development
-- Use TypeScript for all React components
-- Follow atomic design principles
-- Implement responsive design (mobile-first)
-- Ensure accessibility compliance
-- Include Storybook stories for complex components
-
-### Performance Standards
-- First Contentful Paint < 1.8s
-- Largest Contentful Paint < 2.5s
-- Cumulative Layout Shift < 0.1
-- Bundle size limits enforced
-
-### Code Style
-```typescript
-// Good component example
-import React, { memo } from 'react';
-import type { ComponentProps } from './types';
-
-interface Props extends ComponentProps {
-  variant?: 'primary' | 'secondary';
-}
-
-export const Component = memo<Props>(({
-  children,
-  variant = 'primary',
-  ...props
-}) => {
-  return (
-    <div className={`component component--${variant}`} {...props}>
-      {children}
-    </div>
-  );
-});
-
-Component.displayName = 'Component';
+# Test CLI commands
+versatil health
+versatil-mcp --help
 ```
 
-## ⚙️ Backend Guidelines (Marcus-Backend)
+## 🏗️ Development Workflow
 
-### API Development
-- Follow RESTful principles
-- Include comprehensive OpenAPI documentation
-- Implement proper error handling
-- Use TypeScript for type safety
-- Include integration tests
+### Branch Naming
+- `feature/agent-name` - New agent implementations
+- `feature/mcp-enhancement` - MCP integration improvements
+- `fix/bug-description` - Bug fixes
+- `docs/topic` - Documentation updates
+- `refactor/component` - Code refactoring
 
-### Security Requirements
-- Input validation and sanitization
-- Authentication and authorization
-- SQL injection prevention
-- XSS protection
-- CORS configuration
-- Security headers implementation
+### Commit Messages
+We use [Conventional Commits](https://www.conventionalcommits.org/):
 
-### Database Guidelines
-- Use migrations for schema changes
-- Include rollback procedures
-- Optimize queries for performance
-- Implement proper indexing
-
-## 📊 Business Logic (Alex-BA)
-
-### Requirements Documentation
-- Use Gherkin syntax for user stories
-- Include acceptance criteria
-- Provide business value justification
-- Map features to user personas
-
-### User Story Format
-```gherkin
-Feature: User Authentication
-  As a registered user
-  I want to log into the application
-  So that I can access my personalized dashboard
-
-  Scenario: Successful login
-    Given I have valid credentials
-    When I submit the login form
-    Then I should be redirected to my dashboard
+```bash
+feat(agents): add DevOps-Dan agent for infrastructure management
+fix(mcp): resolve Claude Desktop connection issues
+docs(readme): update installation instructions
+refactor(quality-gates): improve error handling
 ```
-
-## 🤖 AI/ML Guidelines (Dr.AI-ML)
-
-### Model Development
-- Document model architecture and decisions
-- Include training and evaluation scripts
-- Provide model performance metrics
-- Implement model versioning
-- Include data validation pipelines
 
 ### Code Standards
-```python
-# Good ML code example
-import pandas as pd
-from sklearn.base import BaseEstimator, TransformerMixin
+- **TypeScript**: All new code must be TypeScript
+- **ESLint**: Follow existing linting rules
+- **Testing**: Include tests for new features
+- **Documentation**: Update relevant docs
 
-class VersatilDataProcessor(BaseEstimator, TransformerMixin):
-    """Data preprocessing pipeline for VERSATIL models."""
+### Quality Gates
+All contributions must pass:
+- ✅ TypeScript compilation
+- ✅ ESLint validation
+- ✅ Test suite
+- ✅ Build process
+- ✅ Framework health check
 
-    def __init__(self, feature_columns: List[str]):
-        self.feature_columns = feature_columns
+## 🧪 Testing Guidelines
 
-    def fit(self, X: pd.DataFrame, y=None):
-        # Fit preprocessing parameters
-        return self
+### Unit Tests
+```bash
+# Run specific test
+npm test -- --testNamePattern="Agent Dispatcher"
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        # Apply transformations
-        return X
+# Run with coverage
+npm run test:coverage
 ```
 
-## 📋 Project Management (Sarah-PM)
+### Integration Testing
+```bash
+# Test framework integration
+npm run test:integration
 
-### Documentation Standards
-- Keep README.md current
-- Update CHANGELOG.md for releases
-- Maintain agent reference documentation
-- Include migration guides for breaking changes
+# Test CLI commands
+versatil init --dry-run
+versatil health
+```
 
-### Issue Management
-- Use appropriate labels
-- Assign to relevant agents
-- Link related issues and PRs
-- Update project boards
+### MCP Integration Testing
+```bash
+# Test MCP server
+versatil-mcp /path/to/test/project
 
-## 🔍 Code Review Process
+# Test with Claude Desktop
+# (Configure Claude Desktop and test functionality)
+```
 
-### Review Checklist
-- [ ] Code follows project conventions
-- [ ] Tests pass and coverage is maintained
-- [ ] Documentation is updated
-- [ ] Breaking changes are documented
-- [ ] Performance impact is acceptable
-- [ ] Security considerations are addressed
-- [ ] Accessibility requirements are met
+## 🤖 Agent Development
 
-### Agent-Specific Reviews
-- **Maria-QA**: Quality and testing standards
-- **James-Frontend**: UI/UX and performance
-- **Marcus-Backend**: Security and architecture
-- **Sarah-PM**: Documentation and process
-- **Alex-BA**: Business logic and requirements
-- **Dr.AI-ML**: Model quality and data handling
+### Creating New Agents
 
-## 🚀 Release Process
+1. **Define Agent Specification**
+   ```typescript
+   interface NewAgentSpec {
+     name: string;
+     role: string;
+     specialization: string;
+     triggers: AgentTrigger;
+     collaborators: string[];
+     mcpTools: string[];
+   }
+   ```
 
-### Version Numbering
-We follow Semantic Versioning (SemVer):
-- **MAJOR**: Breaking changes
-- **MINOR**: New features (backward compatible)
-- **PATCH**: Bug fixes (backward compatible)
+2. **Implement Agent Class**
+   ```typescript
+   export class NewAgent extends BaseAgent {
+     constructor() {
+       super('new-agent', 'Specialization');
+     }
 
-### Release Checklist
-- [ ] All tests pass
-- [ ] Documentation updated
-- [ ] CHANGELOG.md updated
-- [ ] Version number bumped
-- [ ] GitHub release created
-- [ ] NPM package published
-- [ ] Docker images updated (if applicable)
+     async activate(context: AgentActivationContext) {
+       // Implementation
+     }
+   }
+   ```
 
-## 🤝 Community Guidelines
+3. **Add Auto-Activation Rules**
+   Update `.cursorrules` with file patterns and keywords
 
-### Code of Conduct
-- Be respectful and inclusive
-- Focus on constructive feedback
-- Help newcomers get started
-- Celebrate contributions
+4. **Register with Dispatcher**
+   Add agent to `agent-dispatcher.ts`
 
-### Communication Channels
-- **GitHub Issues**: Bug reports and feature requests
-- **GitHub Discussions**: Questions and general discussion
-- **Pull Requests**: Code contributions and reviews
+5. **Add Quality Gates**
+   Define agent-specific quality checks
 
-## 📚 Resources
+6. **Create Documentation**
+   Document agent capabilities and usage
 
-### Documentation
-- [Getting Started Guide](docs/getting-started.md)
-- [Agent Reference](docs/agent-reference.md)
-- [Chrome MCP Integration](docs/mcp-integration.md)
+### Agent Guidelines
+- **Single Responsibility**: Each agent should have a clear specialization
+- **Collaboration**: Define how agents work together
+- **Context Awareness**: Use enhanced context validation
+- **Emergency Response**: Handle critical situations appropriately
+- **Quality Focus**: Maintain high standards for deliverables
 
-### Tools and Setup
-- [Cursor IDE](https://cursor.sh/) - Recommended IDE
-- [Chrome MCP](https://github.com/modelcontextprotocol/chrome) - Testing framework
-- [Playwright](https://playwright.dev/) - E2E testing
+## 🔗 MCP Integration Development
 
-### Learning Resources
-- [BMAD Methodology](CLAUDE.md)
-- [Agent Collaboration Patterns](docs/agent-reference.md#collaboration-patterns)
-- [Quality Gates](docs/getting-started.md#quality-gates)
+### Adding New MCP Tools
+1. Define tool schema in `mcp-server.ts`
+2. Implement tool handler
+3. Add resource access if needed
+4. Update documentation
+5. Test with Claude Desktop
 
-## ❓ Getting Help
+### MCP Best Practices
+- **Resource Efficiency**: Limit file access appropriately
+- **Security**: Validate all inputs and paths
+- **Error Handling**: Provide clear error messages
+- **Documentation**: Include usage examples
 
-### Before Asking for Help
-1. Check existing documentation
-2. Search GitHub issues
-3. Review the troubleshooting guide
-4. Run `npm run versatil:validate`
+## 📋 Pull Request Process
 
-### How to Ask for Help
-1. Provide clear problem description
-2. Include environment details
-3. Share relevant error messages
-4. Mention which agents are involved
+### Before Submitting
+- [ ] Run `npm run validate` successfully
+- [ ] Update documentation for new features
+- [ ] Add tests for new functionality
+- [ ] Follow commit message conventions
+- [ ] Rebase on latest main branch
 
-### Response Time Expectations
-- Bug reports: 1-3 business days
-- Feature requests: 1 week
-- Questions: 1-2 business days
-- Security issues: Same day
+### PR Template
+Your pull request should include:
+- **Description**: What does this PR do?
+- **Motivation**: Why is this change needed?
+- **Testing**: How was this tested?
+- **Screenshots**: For UI/UX changes
+- **Breaking Changes**: Any breaking changes?
+- **Checklist**: Complete the PR checklist
+
+### Review Process
+1. **Automated Checks**: CI/CD pipeline validation
+2. **Code Review**: At least one maintainer review
+3. **Testing**: Manual testing if needed
+4. **Documentation**: Review of docs updates
+5. **Merge**: Squash and merge when approved
+
+## 🎖️ Recognition
+
+### Contributors
+All contributors are recognized in:
+- `CONTRIBUTORS.md` file
+- GitHub contributors page
+- Release notes for significant contributions
+
+### Maintainers
+Active contributors may be invited to become maintainers with:
+- Commit access to repository
+- Ability to review and merge PRs
+- Participation in framework roadmap decisions
+
+## 📞 Getting Help
+
+### Community Support
+- **Discussions**: [GitHub Discussions](https://github.com/MiraclesGIT/versatil-sdlc-framework/discussions)
+- **Discord**: Join our community chat
+- **Office Hours**: Weekly maintainer availability
+
+### Development Questions
+- **Technical Issues**: Create detailed GitHub issues
+- **Architecture Decisions**: Start a discussion thread
+- **Implementation Help**: Ask in community discussions
+
+### Emergency Support
+For critical issues affecting production deployments:
+- **Emergency Issues**: Use priority labels
+- **Security Vulnerabilities**: Email security@versatil-platform.com
+- **Urgent Fixes**: Tag maintainers directly
+
+## 🎯 Project Roadmap
+
+### Current Focus
+- Expanding BMAD agent ecosystem
+- Enhanced MCP integration capabilities
+- Enterprise-grade security features
+- Performance optimization
+
+### Future Plans
+- AI-powered code generation agents
+- Multi-repository project support
+- Advanced analytics and metrics
+- Cloud-native deployment options
+
+### How to Contribute to Roadmap
+- **Feature Discussions**: Participate in roadmap discussions
+- **User Research**: Share your use cases and needs
+- **Prototype Development**: Build proof-of-concept features
+- **Community Feedback**: Provide input on proposed features
+
+## 📜 Code of Conduct
+
+### Our Standards
+- **Be Respectful**: Treat all community members with respect
+- **Be Inclusive**: Welcome diverse perspectives and backgrounds
+- **Be Constructive**: Provide helpful feedback and suggestions
+- **Be Professional**: Maintain professional communication
+
+### Unacceptable Behavior
+- Harassment or discrimination
+- Trolling or inflammatory comments
+- Sharing others' private information
+- Other unprofessional conduct
+
+### Enforcement
+- **First Offense**: Warning and education
+- **Repeat Offenses**: Temporary restrictions
+- **Serious Violations**: Permanent bans
+
+Report issues to conduct@versatil-platform.com
+
+## 🏆 Thank You!
+
+The VERSATIL SDLC Framework exists because of amazing contributors like you. Whether you're:
+- Reporting bugs
+- Suggesting features
+- Writing code
+- Improving documentation
+- Helping other users
+
+**You're making AI-native development better for everyone!**
 
 ---
 
-**Thank you for contributing to VERSATIL SDLC Framework!**
-
-Your contributions help advance AI-native development practices and benefit the entire developer community.
-
-🤖 Generated with VERSATIL SDLC Framework
+🤖 **Ready to contribute? Start by exploring our [open issues](https://github.com/MiraclesGIT/versatil-sdlc-framework/issues) or join our [community discussions](https://github.com/MiraclesGIT/versatil-sdlc-framework/discussions)!**

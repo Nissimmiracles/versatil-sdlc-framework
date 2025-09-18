@@ -1,0 +1,126 @@
+name: 🤖 Agent Feedback
+description: Provide feedback on BMAD agent performance or behavior
+title: "[AGENT] "
+labels: ["agent-feedback", "bmad"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve the BMAD agents! Your feedback on agent performance, accuracy, and helpfulness is valuable.
+
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Which Agent?
+      description: Which BMAD agent is this feedback about?
+      options:
+        - Maria (QA Lead)
+        - James (Frontend)
+        - Marcus (Backend)
+        - Sarah (PM)
+        - Alex (BA)
+        - Dr.AI (ML)
+        - Agent Dispatcher System
+        - Multiple Agents
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feedback-type
+    attributes:
+      label: Feedback Type
+      description: What type of feedback are you providing?
+      options:
+        - Positive - Agent worked well
+        - Improvement Suggestion
+        - Performance Issue
+        - Incorrect Behavior
+        - Missing Capability
+        - Integration Problem
+    validations:
+      required: true
+
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Scenario Description
+      description: Describe the situation where you interacted with the agent.
+      placeholder: "I was working on... and asked the agent to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: agent-response
+    attributes:
+      label: Agent Response/Behavior
+      description: What did the agent do? How did it respond?
+      placeholder: "The agent..."
+
+  - type: dropdown
+    id: expectation-vs-reality
+    attributes:
+      label: Did the agent meet expectations?
+      options:
+        - Exceeded expectations
+        - Met expectations
+        - Partially met expectations
+        - Did not meet expectations
+        - Caused confusion/problems
+
+  - type: textarea
+    id: improvement-suggestion
+    attributes:
+      label: Improvement Suggestions
+      description: How could the agent be improved for this scenario?
+      placeholder: "The agent could be improved by..."
+
+  - type: dropdown
+    id: context-clarity
+    attributes:
+      label: Context Understanding
+      description: How well did the agent understand your request?
+      options:
+        - Perfect understanding
+        - Good understanding
+        - Adequate understanding
+        - Poor understanding
+        - Misunderstood completely
+
+  - type: checkboxes
+    id: agent-collaboration
+    attributes:
+      label: Agent Collaboration (if applicable)
+      description: If multiple agents were involved, how was the collaboration?
+      options:
+        - Agents worked well together
+        - Some coordination issues
+        - Agents conflicted with each other
+        - Good handoffs between agents
+        - Clear role separation
+
+  - type: textarea
+    id: quality-impact
+    attributes:
+      label: Quality Impact
+      description: How did this agent interaction affect your project quality?
+      placeholder: "This interaction helped/hindered by..."
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other feedback, suggestions, or context about the agent interaction.
+      placeholder: "Additional thoughts..."
+
+  - type: checkboxes
+    id: recommendation
+    attributes:
+      label: Would you recommend this agent?
+      description: Based on this interaction
+      options:
+        - label: I would recommend this agent to other developers
+        - label: This agent improved my development workflow
+        - label: This agent saved me time
+        - label: This agent helped maintain code quality
