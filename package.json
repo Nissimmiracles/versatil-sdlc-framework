@@ -4,7 +4,7 @@
   "description": "AI-Native Software Development Lifecycle Framework with BMAD Methodology and Specialized Agents",
   "main": "index.js",
   "bin": {
-    "versatil-sdlc": "./scripts/install.sh"
+    "versatil-sdlc": "./index.js"
   },
   "scripts": {
     "init": "node scripts/setup-agents.js",
