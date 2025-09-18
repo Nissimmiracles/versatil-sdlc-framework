@@ -1,0 +1,396 @@
+/**
+ * VERSATIL SDLC Framework - Enhanced Agent Registry
+ *
+ * Central registry for all BMAD agents with enhanced capabilities
+ * based on the Enhanced Maria analysis and configuration validation requirements
+ */
+
+import { BaseAgent } from './base-agent';
+import { EnhancedMaria } from './enhanced-maria';
+import { EnhancedJames } from './enhanced-james';
+import { EnhancedMarcus } from './enhanced-marcus';
+import { DevOpsDan } from './devops-dan';
+import { SecuritySam } from './security-sam';
+
+export interface AgentMetadata {
+  id: string;
+  name: string;
+  specialization: string;
+  version: string;
+  capabilities: string[];
+  triggers: {
+    filePatterns: string[];
+    keywords: string[];
+    errorPatterns: string[];
+  };
+  dependencies: string[];
+  priority: number;
+  autoActivate: boolean;
+  collaborators: string[];
+  mcpTools: string[];
+}
+
+export class AgentRegistry {
+  private agents: Map<string, BaseAgent> = new Map();
+  private metadata: Map<string, AgentMetadata> = new Map();
+
+  constructor() {
+    this.registerAllAgents();
+  }
+
+  private registerAllAgents(): void {
+    console.log('🤖 Registering Enhanced BMAD Agents...');
+
+    // Enhanced Maria - Advanced QA Lead with Configuration Validation
+    this.registerAgent(new EnhancedMaria(), {
+      id: 'enhanced-maria',
+      name: 'Enhanced Maria',
+      specialization: 'Advanced QA Lead & Configuration Validator',
+      version: '2.0.0',
+      capabilities: [
+        'Configuration consistency validation',
+        'Cross-file dependency checking',
+        'Navigation integrity testing',
+        'Production code cleanliness verification',
+        'Real-time quality dashboard',
+        'Performance monitoring',
+        'Accessibility auditing',
+        'Security basic validation'
+      ],
+      triggers: {
+        filePatterns: [
+          '*.test.*', '*.spec.*', 'tests/**/*', 'cypress/**/*',
+          '*.config.*', 'package.json', 'tsconfig.json',
+          '*.tsx', '*.jsx', '*.ts', '*.js' // Now monitors all code for quality
+        ],
+        keywords: [
+          'test', 'bug', 'error', 'validation', 'quality', 'debug',
+          'config', 'configuration', 'route', 'navigation', 'context'
+        ],
+        errorPatterns: [
+          'test.*failed', 'assertion.*error', 'timeout.*error',
+          'console.*error', 'warning.*detected', 'configuration.*error',
+          'route.*not.*found', 'navigation.*error', 'context.*error'
+        ]
+      },
+      dependencies: [
+        '@testing-library/*', 'jest', 'vitest', 'cypress', 'playwright',
+        'eslint', 'typescript'
+      ],
+      priority: 1, // Highest priority for quality enforcement
+      autoActivate: true,
+      collaborators: ['enhanced-james', 'enhanced-marcus', 'security-sam', 'devops-dan'],
+      mcpTools: ['Chrome MCP', 'Playwright MCP', 'Testing MCP']
+    });
+
+    // Enhanced James - Advanced Frontend Specialist with Route-Navigation Validation
+    this.registerAgent(new EnhancedJames(), {
+      id: 'enhanced-james',
+      name: 'Enhanced James',
+      specialization: 'Advanced Frontend Specialist & Navigation Validator',
+      version: '2.0.0',
+      capabilities: [
+        'Route-navigation consistency validation',
+        'Cross-component dependency checking',
+        'Context flow validation',
+        'Profile context navigation integrity',
+        'Component-route mapping verification',
+        'Accessibility validation',
+        'Frontend performance monitoring'
+      ],
+      triggers: {
+        filePatterns: [
+          '*.tsx', '*.jsx', '*.css', '*.scss', 'components/**/*',
+          'pages/**/*', 'src/App.*', '*router*', '*navigation*'
+        ],
+        keywords: [
+          'UI', 'component', 'styling', 'responsive', 'design',
+          'router', 'navigation', 'route', 'context', 'profile'
+        ],
+        errorPatterns: [
+          'No routes matched location', 'component.*not.*found',
+          'styling.*error', 'CSS.*error', 'import.*component.*failed',
+          'navigation.*error', 'route.*mismatch'
+        ]
+      },
+      dependencies: [
+        'react', 'react-router', 'react-router-dom', '@types/react',
+        'antd', '@tremor/react', 'styled-components'
+      ],
+      priority: 2,
+      autoActivate: true,
+      collaborators: ['enhanced-marcus', 'enhanced-maria', 'security-sam'],
+      mcpTools: ['Chrome MCP', 'Shadcn MCP', 'Storybook MCP']
+    });
+
+    // Enhanced Marcus - Advanced Backend Specialist with API-Frontend Integration
+    this.registerAgent(new EnhancedMarcus(), {
+      id: 'enhanced-marcus',
+      name: 'Enhanced Marcus',
+      specialization: 'Advanced Backend Specialist & Integration Validator',
+      version: '2.0.0',
+      capabilities: [
+        'API-frontend integration validation',
+        'Configuration drift detection',
+        'Service consistency checking',
+        'Cross-service dependency validation',
+        'Backend-frontend contract verification',
+        'Database schema validation',
+        'Security pattern validation'
+      ],
+      triggers: {
+        filePatterns: [
+          '*.ts', 'src/services/**/*', '*.sql', 'supabase/**/*',
+          'api/**/*', 'server/**/*', '*.api.*', '*config*'
+        ],
+        keywords: [
+          'API', 'database', 'backend', 'Edge Function', 'auth',
+          'server', 'service', 'integration', 'configuration'
+        ],
+        errorPatterns: [
+          'Failed to resolve import', 'dependency.*not.*found',
+          'module.*not.*found', 'API.*error', 'database.*error',
+          'auth.*error', 'service.*error', 'integration.*failed'
+        ]
+      },
+      dependencies: [
+        '@supabase/supabase-js', '@refinedev/core', 'supabase',
+        'express', 'fastify', 'prisma', 'typeorm'
+      ],
+      priority: 2,
+      autoActivate: true,
+      collaborators: ['enhanced-james', 'enhanced-maria', 'security-sam', 'devops-dan'],
+      mcpTools: ['GitHub MCP', 'Database MCP', 'API MCP']
+    });
+
+    // DevOps-Dan - Infrastructure & Deployment Specialist
+    this.registerAgent(new DevOpsDan(), {
+      id: 'devops-dan',
+      name: 'DevOps Dan',
+      specialization: 'Infrastructure & Deployment Specialist',
+      version: '1.0.0',
+      capabilities: [
+        'Docker containerization analysis',
+        'Kubernetes orchestration validation',
+        'CI/CD pipeline optimization',
+        'Infrastructure as Code validation',
+        'Cloud deployment analysis',
+        'Performance monitoring setup',
+        'Security infrastructure validation'
+      ],
+      triggers: {
+        filePatterns: [
+          'Dockerfile', 'docker-compose.*', '*.tf', '*.tfvars',
+          '.github/workflows/*', 'kubernetes/**/*', 'k8s/**/*',
+          '*.yml', '*.yaml', 'ansible/**/*'
+        ],
+        keywords: [
+          'docker', 'kubernetes', 'terraform', 'infrastructure',
+          'deployment', 'CI/CD', 'pipeline', 'cloud', 'monitoring'
+        ],
+        errorPatterns: [
+          'docker.*build.*failed', 'kubernetes.*error', 'terraform.*error',
+          'deployment.*failed', 'pipeline.*error'
+        ]
+      },
+      dependencies: [
+        'docker', 'kubernetes', 'terraform', 'ansible'
+      ],
+      priority: 3,
+      autoActivate: true,
+      collaborators: ['enhanced-marcus', 'security-sam', 'enhanced-maria'],
+      mcpTools: ['Docker MCP', 'AWS MCP', 'Kubernetes MCP']
+    });
+
+    // Security-Sam - Security & Compliance Specialist
+    this.registerAgent(new SecuritySam(), {
+      id: 'security-sam',
+      name: 'Security Sam',
+      specialization: 'Security & Compliance Specialist',
+      version: '1.0.0',
+      capabilities: [
+        'Vulnerability detection and analysis',
+        'Authentication and authorization validation',
+        'Input validation verification',
+        'Secure coding practice enforcement',
+        'Compliance checking',
+        'Security configuration validation',
+        'Penetration testing coordination'
+      ],
+      triggers: {
+        filePatterns: [
+          '*auth*', '*security*', '*login*', '*password*',
+          '*.env*', '*config*', '*secret*', '*key*'
+        ],
+        keywords: [
+          'auth', 'authentication', 'authorization', 'security',
+          'vulnerability', 'encryption', 'password', 'token', 'jwt'
+        ],
+        errorPatterns: [
+          'security.*error', 'auth.*failed', 'unauthorized',
+          'vulnerability.*detected', 'security.*breach'
+        ]
+      },
+      dependencies: [
+        'bcrypt', 'jsonwebtoken', 'helmet', 'express-rate-limit'
+      ],
+      priority: 1, // High priority for security
+      autoActivate: true,
+      collaborators: ['enhanced-marcus', 'enhanced-james', 'devops-dan', 'enhanced-maria'],
+      mcpTools: ['Security Scanner MCP', 'Vault MCP']
+    });
+
+    console.log(`✅ Registered ${this.agents.size} Enhanced BMAD Agents`);
+    this.printAgentSummary();
+  }
+
+  private registerAgent(agent: BaseAgent, metadata: AgentMetadata): void {
+    this.agents.set(metadata.id, agent);
+    this.metadata.set(metadata.id, metadata);
+    console.log(`   🤖 ${metadata.name} (${metadata.version}) - ${metadata.specialization}`);
+  }
+
+  private printAgentSummary(): void {
+    console.log('\n📊 Enhanced BMAD Agent Capabilities Summary:');
+    console.log('━'.repeat(80));
+
+    for (const [id, metadata] of this.metadata) {
+      console.log(`\n🤖 ${metadata.name}`);
+      console.log(`   Specialization: ${metadata.specialization}`);
+      console.log(`   Key Capabilities: ${metadata.capabilities.slice(0, 3).join(', ')}...`);
+      console.log(`   Auto-Activate: ${metadata.autoActivate ? '✅' : '❌'}`);
+      console.log(`   Priority: ${metadata.priority} | Collaborators: ${metadata.collaborators.length}`);
+    }
+
+    console.log('\n🎯 Key Enhancements Based on Enhanced Maria Analysis:');
+    console.log('   ✅ Configuration consistency validation across all agents');
+    console.log('   ✅ Cross-file dependency checking');
+    console.log('   ✅ Navigation integrity testing (James)');
+    console.log('   ✅ API-frontend integration validation (Marcus)');
+    console.log('   ✅ Real-time quality dashboard (Maria)');
+    console.log('   ✅ Production code cleanliness verification');
+    console.log('   ✅ Enhanced collaboration between agents');
+    console.log('━'.repeat(80));
+  }
+
+  // Public API methods
+  public getAgent(id: string): BaseAgent | undefined {
+    return this.agents.get(id);
+  }
+
+  public getAgentMetadata(id: string): AgentMetadata | undefined {
+    return this.metadata.get(id);
+  }
+
+  public getAllAgents(): Map<string, BaseAgent> {
+    return new Map(this.agents);
+  }
+
+  public getAllMetadata(): Map<string, AgentMetadata> {
+    return new Map(this.metadata);
+  }
+
+  public getAgentsByCapability(capability: string): [string, BaseAgent][] {
+    const result: [string, BaseAgent][] = [];
+
+    for (const [id, metadata] of this.metadata) {
+      if (metadata.capabilities.some(cap =>
+        cap.toLowerCase().includes(capability.toLowerCase())
+      )) {
+        const agent = this.agents.get(id);
+        if (agent) {
+          result.push([id, agent]);
+        }
+      }
+    }
+
+    return result;
+  }
+
+  public getAgentsForFilePattern(filePath: string): [string, BaseAgent][] {
+    const result: [string, BaseAgent][] = [];
+    const fileName = filePath.split('/').pop() || '';
+
+    for (const [id, metadata] of this.metadata) {
+      if (!metadata.autoActivate) continue;
+
+      const matches = metadata.triggers.filePatterns.some(pattern => {
+        if (pattern.includes('*')) {
+          const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+          return regex.test(fileName) || regex.test(filePath);
+        }
+        return fileName.includes(pattern) || filePath.includes(pattern);
+      });
+
+      if (matches) {
+        const agent = this.agents.get(id);
+        if (agent) {
+          result.push([id, agent]);
+        }
+      }
+    }
+
+    // Sort by priority
+    return result.sort((a, b) => {
+      const priorityA = this.metadata.get(a[0])?.priority || 999;
+      const priorityB = this.metadata.get(b[0])?.priority || 999;
+      return priorityA - priorityB;
+    });
+  }
+
+  public getAgentsForKeywords(keywords: string[]): [string, BaseAgent][] {
+    const result: [string, BaseAgent][] = [];
+
+    for (const [id, metadata] of this.metadata) {
+      const hasMatchingKeyword = keywords.some(keyword =>
+        metadata.triggers.keywords.some(trigger =>
+          trigger.toLowerCase().includes(keyword.toLowerCase()) ||
+          keyword.toLowerCase().includes(trigger.toLowerCase())
+        )
+      );
+
+      if (hasMatchingKeyword) {
+        const agent = this.agents.get(id);
+        if (agent) {
+          result.push([id, agent]);
+        }
+      }
+    }
+
+    return result.sort((a, b) => {
+      const priorityA = this.metadata.get(a[0])?.priority || 999;
+      const priorityB = this.metadata.get(b[0])?.priority || 999;
+      return priorityA - priorityB;
+    });
+  }
+
+  public getCollaborators(agentId: string): BaseAgent[] {
+    const metadata = this.metadata.get(agentId);
+    if (!metadata) return [];
+
+    return metadata.collaborators
+      .map(id => this.agents.get(id))
+      .filter((agent): agent is BaseAgent => agent !== undefined);
+  }
+
+  public getAgentHealth(): Record<string, any> {
+    const health: Record<string, any> = {};
+
+    for (const [id, metadata] of this.metadata) {
+      health[id] = {
+        name: metadata.name,
+        version: metadata.version,
+        capabilities: metadata.capabilities.length,
+        collaborators: metadata.collaborators.length,
+        autoActivate: metadata.autoActivate,
+        priority: metadata.priority
+      };
+    }
+
+    return health;
+  }
+}
+
+// Export singleton instance
+export const agentRegistry = new AgentRegistry();
+export default agentRegistry;
