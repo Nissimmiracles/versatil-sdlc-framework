@@ -1,0 +1,96 @@
+MIT License
+
+Copyright (c) 2024 VERSATIL Development Team
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+
+VERSATIL SDLC Framework - Additional Terms and Acknowledgments
+
+This software includes the following components and methodologies:
+
+1. BMAD (Business-Managed Agile Development) Methodology
+   - Developed by the VERSATIL team
+   - Licensed under MIT License
+
+2. Agent-Based Development Framework
+   - Six specialized AI agents: Maria-QA, James-Frontend, Marcus-Backend,
+     Sarah-PM, Alex-BA, and Dr.AI-ML
+   - Licensed under MIT License
+
+3. Chrome MCP Integration
+   - Integration with Model Context Protocol for browser testing
+   - Chrome MCP is subject to its own licensing terms
+
+4. Quality Gates Framework
+   - Automated quality assurance and testing protocols
+   - Licensed under MIT License
+
+5. Context Preservation System
+   - Zero-context-loss agent handoff system
+   - Licensed under MIT License
+
+Third-party dependencies are subject to their respective licenses:
+- Node.js and npm packages used in this project
+- Browser testing frameworks (Playwright, Chrome MCP)
+- Development tools and utilities
+
+For questions regarding licensing or commercial use, please contact:
+support@versatil-platform.com
+
+================================================================================
+
+ATTRIBUTION REQUIREMENTS:
+
+If you use this software in your project, please include the following
+attribution in your documentation or application:
+
+"Powered by VERSATIL SDLC Framework - AI-Native Development with BMAD Methodology"
+Website: https://github.com/versatil-platform/versatil-sdlc-framework
+
+================================================================================
+
+DISCLAIMER:
+
+The VERSATIL SDLC Framework is provided as an open-source development tool.
+While it incorporates AI-assisted development patterns and methodologies,
+users are responsible for:
+
+1. Code quality and security in their implementations
+2. Testing and validation of their applications
+3. Compliance with relevant regulations and standards
+4. Proper configuration and usage of the framework
+
+The framework's AI agents are designed to assist development workflows but
+should not replace human oversight and decision-making in critical areas
+such as security, performance, and business logic validation.
+
+================================================================================
+
+VERSION INFORMATION:
+
+VERSATIL SDLC Framework v1.0.0
+Released: January 2024
+Maintained by: VERSATIL Development Team
+
+For the latest version and updates, visit:
+https://github.com/versatil-platform/versatil-sdlc-framework
+
+================================================================================

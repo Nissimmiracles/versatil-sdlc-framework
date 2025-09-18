@@ -1,0 +1,59 @@
+{
+  "name": "versatil-sdlc-framework",
+  "version": "1.0.0",
+  "description": "AI-Native Software Development Lifecycle Framework with BMAD Methodology and Specialized Agents",
+  "main": "index.js",
+  "bin": {
+    "versatil-sdlc": "./scripts/install.sh"
+  },
+  "scripts": {
+    "init": "node scripts/setup-agents.js",
+    "validate": "node scripts/validate-setup.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ai-native",
+    "sdlc",
+    "development-framework",
+    "agents",
+    "bmad",
+    "cursor-ai",
+    "mcp",
+    "quality-assurance",
+    "automation"
+  ],
+  "author": "VERSATIL Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/versatil-platform/versatil-sdlc-framework.git"
+  },
+  "bugs": {
+    "url": "https://github.com/versatil-platform/versatil-sdlc-framework/issues"
+  },
+  "homepage": "https://github.com/versatil-platform/versatil-sdlc-framework#readme",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "inquirer": "^9.2.12",
+    "fs-extra": "^11.1.1",
+    "commander": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "scripts/",
+    "templates/",
+    "docs/",
+    "examples/",
+    ".versatil/",
+    ".cursorrules",
+    "CLAUDE.md",
+    "README.md",
+    "LICENSE"
+  ]
+}

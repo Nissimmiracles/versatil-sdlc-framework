@@ -1,0 +1,396 @@
+# VERSATIL SDLC Framework - Cursor AI Auto-Agent Activation Rules
+# This file configures automatic agent activation based on file patterns and keywords
+
+# =====================================
+# BMAD METHODOLOGY - AGENT ACTIVATION
+# =====================================
+
+# Maria-QA (Quality Assurance Lead)
+# Activates for: Testing files, quality control, bug detection
+test_files:
+  - "*.test.js"
+  - "*.test.ts"
+  - "*.spec.js"
+  - "*.spec.ts"
+  - "*.test.jsx"
+  - "*.test.tsx"
+  - "__tests__/**"
+  - "test/**"
+  - "tests/**"
+  - "**/test/**"
+  - "cypress/**"
+  - "e2e/**"
+  - "*.e2e.js"
+  - "*.e2e.ts"
+
+quality_keywords:
+  - "test"
+  - "spec"
+  - "describe"
+  - "it("
+  - "expect("
+  - "assert"
+  - "should"
+  - "coverage"
+  - "quality"
+  - "bug"
+  - "error"
+  - "fix"
+  - "debug"
+
+agent_maria_context: |
+  You are Maria, the QA Lead. Focus on:
+  - Writing comprehensive test suites
+  - Ensuring code quality and coverage
+  - Implementing quality gates
+  - Bug detection and prevention
+  - Test automation strategies
+  - Performance testing
+  - Security testing
+  - Chrome MCP testing integration
+
+# James-Frontend (Frontend Specialist)
+# Activates for: React, Vue, UI/UX, frontend performance
+frontend_files:
+  - "*.jsx"
+  - "*.tsx"
+  - "*.vue"
+  - "*.svelte"
+  - "components/**"
+  - "src/components/**"
+  - "ui/**"
+  - "src/ui/**"
+  - "pages/**"
+  - "src/pages/**"
+  - "views/**"
+  - "layouts/**"
+  - "*.css"
+  - "*.scss"
+  - "*.sass"
+  - "*.less"
+  - "*.styled.js"
+  - "*.styled.ts"
+
+frontend_keywords:
+  - "component"
+  - "react"
+  - "vue"
+  - "useState"
+  - "useEffect"
+  - "props"
+  - "state"
+  - "render"
+  - "jsx"
+  - "tsx"
+  - "css"
+  - "style"
+  - "responsive"
+  - "mobile"
+  - "ui"
+  - "ux"
+  - "accessibility"
+  - "a11y"
+
+agent_james_context: |
+  You are James, the Frontend Specialist. Focus on:
+  - React/Vue component development
+  - UI/UX implementation
+  - Frontend performance optimization
+  - Responsive design
+  - Accessibility (a11y) compliance
+  - Modern CSS techniques
+  - State management
+  - Component reusability
+  - Browser compatibility
+
+# Marcus-Backend (Backend Expert)
+# Activates for: APIs, databases, server-side logic
+backend_files:
+  - "*.api.js"
+  - "*.api.ts"
+  - "server/**"
+  - "src/server/**"
+  - "backend/**"
+  - "src/backend/**"
+  - "controllers/**"
+  - "models/**"
+  - "routes/**"
+  - "middleware/**"
+  - "database/**"
+  - "db/**"
+  - "migrations/**"
+  - "seeds/**"
+  - "package.json"
+  - "docker-compose.yml"
+  - "Dockerfile"
+  - "*.sql"
+  - "*.prisma"
+
+backend_keywords:
+  - "server"
+  - "express"
+  - "fastify"
+  - "koa"
+  - "nest"
+  - "api"
+  - "endpoint"
+  - "route"
+  - "controller"
+  - "model"
+  - "database"
+  - "sql"
+  - "nosql"
+  - "mongodb"
+  - "postgres"
+  - "mysql"
+  - "redis"
+  - "middleware"
+  - "authentication"
+  - "authorization"
+  - "security"
+
+agent_marcus_context: |
+  You are Marcus, the Backend Expert. Focus on:
+  - API design and implementation
+  - Database architecture and optimization
+  - Server-side performance
+  - Security implementations
+  - Authentication/authorization
+  - Microservices architecture
+  - Docker containerization
+  - CI/CD pipeline setup
+  - Scalability planning
+
+# Sarah-PM (Project Manager)
+# Activates for: Documentation, planning, project coordination
+management_files:
+  - "README.md"
+  - "*.md"
+  - "docs/**"
+  - "documentation/**"
+  - ".github/**"
+  - "CONTRIBUTING.md"
+  - "CHANGELOG.md"
+  - "LICENSE"
+  - "package.json"
+  - "tsconfig.json"
+  - "webpack.config.js"
+  - "vite.config.js"
+  - ".gitignore"
+  - ".env.example"
+
+management_keywords:
+  - "project"
+  - "plan"
+  - "roadmap"
+  - "milestone"
+  - "deadline"
+  - "requirement"
+  - "specification"
+  - "documentation"
+  - "readme"
+  - "setup"
+  - "installation"
+  - "deployment"
+  - "release"
+  - "version"
+  - "changelog"
+
+agent_sarah_context: |
+  You are Sarah, the Project Manager. Focus on:
+  - Project planning and coordination
+  - Documentation creation and maintenance
+  - Requirement gathering and analysis
+  - Team communication facilitation
+  - Milestone tracking
+  - Risk management
+  - Quality assurance oversight
+  - Stakeholder management
+  - Process improvement
+
+# Alex-BA (Business Analyst)
+# Activates for: Requirements, user stories, business logic
+business_files:
+  - "requirements/**"
+  - "specs/**"
+  - "specifications/**"
+  - "user-stories/**"
+  - "business/**"
+  - "*.feature"
+  - "*.user-story"
+  - "*.requirement"
+  - "*.spec.md"
+  - "PRD.md"
+  - "BRD.md"
+
+business_keywords:
+  - "requirement"
+  - "user story"
+  - "acceptance criteria"
+  - "business logic"
+  - "stakeholder"
+  - "feature"
+  - "epic"
+  - "backlog"
+  - "priority"
+  - "value"
+  - "roi"
+  - "kpi"
+  - "metric"
+  - "analytics"
+  - "conversion"
+
+agent_alex_context: |
+  You are Alex, the Business Analyst. Focus on:
+  - Requirements gathering and analysis
+  - User story creation and refinement
+  - Business logic documentation
+  - Stakeholder communication
+  - Feature prioritization
+  - Acceptance criteria definition
+  - Process mapping
+  - Data analysis
+  - ROI calculations
+
+# Dr.AI-ML (ML/AI Specialist)
+# Activates for: Machine learning, data science, AI features
+ml_files:
+  - "*.py"
+  - "ml/**"
+  - "ai/**"
+  - "machine-learning/**"
+  - "data-science/**"
+  - "models/**"
+  - "notebooks/**"
+  - "*.ipynb"
+  - "requirements.txt"
+  - "environment.yml"
+  - "Pipfile"
+  - "poetry.lock"
+  - "*.pkl"
+  - "*.h5"
+  - "*.joblib"
+
+ml_keywords:
+  - "machine learning"
+  - "artificial intelligence"
+  - "neural network"
+  - "deep learning"
+  - "tensorflow"
+  - "pytorch"
+  - "scikit-learn"
+  - "pandas"
+  - "numpy"
+  - "jupyter"
+  - "algorithm"
+  - "model"
+  - "prediction"
+  - "classification"
+  - "regression"
+  - "clustering"
+  - "feature"
+  - "dataset"
+
+agent_dr_ai_context: |
+  You are Dr.AI, the ML/AI Specialist. Focus on:
+  - Machine learning model development
+  - Data preprocessing and analysis
+  - Feature engineering
+  - Model training and evaluation
+  - AI integration into applications
+  - Performance optimization
+  - MLOps implementation
+  - Data visualization
+  - Research and experimentation
+
+# =====================================
+# COLLABORATION RULES
+# =====================================
+
+agent_collaboration:
+  primary_handoffs:
+    - "James-Frontend -> Marcus-Backend": API integration
+    - "Marcus-Backend -> Maria-QA": Backend testing
+    - "James-Frontend -> Maria-QA": UI testing
+    - "Alex-BA -> James-Frontend": UI requirements
+    - "Alex-BA -> Marcus-Backend": API requirements
+    - "Sarah-PM -> *": Project coordination
+    - "Dr.AI-ML -> Marcus-Backend": Model deployment
+    - "Dr.AI-ML -> James-Frontend": AI feature integration
+
+  quality_gates:
+    - "Maria-QA reviews all code changes"
+    - "Sarah-PM approves major architectural decisions"
+    - "Alex-BA validates business requirements"
+
+# =====================================
+# CONTEXT PRESERVATION
+# =====================================
+
+context_preservation:
+  enabled: true
+  auto_save: true
+  handoff_summary: true
+  decision_trail: true
+  knowledge_transfer: true
+
+# =====================================
+# EMERGENCY PROTOCOLS
+# =====================================
+
+emergency_activation:
+  critical_keywords:
+    - "urgent"
+    - "critical"
+    - "emergency"
+    - "hotfix"
+    - "production issue"
+    - "security vulnerability"
+    - "data breach"
+    - "system down"
+
+  emergency_agent: "Maria-QA"
+  escalation_enabled: true
+  team_notification: true
+
+# =====================================
+# QUALITY ENFORCEMENT
+# =====================================
+
+quality_gates:
+  code_review: true
+  test_coverage: 80
+  performance_budget: true
+  security_scan: true
+  documentation_required: true
+
+chrome_mcp_testing:
+  enabled: true
+  primary_browser: "chrome"
+  visual_regression: true
+  accessibility_audit: true
+  performance_monitoring: true
+  cross_browser_testing: true
+
+# =====================================
+# AGENT ACTIVATION PRIORITY
+# =====================================
+
+activation_priority:
+  1: "Maria-QA"      # Quality first
+  2: "Sarah-PM"      # Project coordination
+  3: "Alex-BA"       # Business requirements
+  4: "James-Frontend" # UI implementation
+  5: "Marcus-Backend" # Backend logic
+  6: "Dr.AI-ML"      # AI/ML features
+
+# =====================================
+# PERFORMANCE MONITORING
+# =====================================
+
+performance_tracking:
+  agent_switch_time: true
+  context_accuracy: true
+  task_completion_rate: true
+  user_satisfaction: true
+  code_quality_metrics: true

@@ -1,0 +1,145 @@
+# VERSATIL SDLC Framework - Git Ignore Configuration
+
+# Node.js Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime Data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage Directory
+coverage/
+*.lcov
+.nyc_output
+
+# ESLint Cache
+.eslintcache
+
+# TypeScript Cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+test-results/
+playwright-report/
+screenshots/
+videos/
+traces/
+
+# VERSATIL Framework Specific
+.versatil/reports/
+.versatil/cache/
+.versatil/temp/
+.versatil/logs/
+.versatil/diagnostics.json
+
+# Chrome MCP Testing
+tests/visual/diffs/
+tests/visual/screenshots/
+chrome-mcp-cache/
+
+# Build Outputs
+dist/
+build/
+out/
+
+# Logs
+logs
+*.log
+
+# Temporary Files
+tmp/
+temp/
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package Managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Backup Files
+*.backup
+*.bak
+*.orig
+
+# Documentation Build
+docs/_build/
+docs/site/
+
+# Security
+.secrets
+*.pem
+*.key
+*.crt
+
+# Development
+.cache/
+.webpack/
+
+# Docker
+.dockerignore
+
+# NPM Package Files (for development)
+*.tgz
+
+# VERSATIL Agent Outputs
+.versatil/agents/*/logs/
+.versatil/agents/*/cache/
+.versatil/agents/*/temp/
+
+# Maria-QA Generated Reports
+reports/
+test-reports/
+coverage-reports/
+quality-reports/
+
+# Performance Monitoring
+performance-reports/
+lighthouse-reports/
+
+# Security Scans
+security-reports/
+vulnerability-reports/
+
+# CI/CD Artifacts
+artifacts/
+.github/workflows/artifacts/
