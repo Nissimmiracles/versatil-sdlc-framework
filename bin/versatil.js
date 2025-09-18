@@ -88,6 +88,15 @@ async function main() {
       await versionManager.autoVersion(releaseConfig);
       break;
 
+    case 'mcp':
+      console.log('🔗 Starting VERSATIL MCP Server...\n');
+      const projectPath = process.argv[3] || process.cwd();
+      console.log(`📁 Project: ${projectPath}`);
+      console.log('🚀 MCP Server ready for Claude Desktop connection');
+      console.log('\nConfiguration for Claude Desktop:');
+      console.log('{"mcpServers": {"versatil": {"command": "versatil-mcp", "args": ["' + projectPath + '"]}}}');
+      break;
+
     case 'health':
       console.log('🏥 VERSATIL Framework Health Check\n');
       console.log('✅ Framework Status: OPERATIONAL');
@@ -123,6 +132,7 @@ COMMANDS:
   version      Auto version bump or manual (major|minor|patch|prerelease)
   backup       Git backup management (create|status|sync)
   release      Create full release with changelog and tagging
+  mcp          Start MCP server for Claude Desktop integration
   health       Check framework status and configuration
   help         Show this help message
 
@@ -136,6 +146,7 @@ EXAMPLES:
   versatil backup create            # Create backup
   versatil backup status            # Check backup status
   versatil release --github         # Create release with GitHub release
+  versatil mcp /path/to/project     # Start MCP server for Claude Desktop
   versatil health                   # Verify installation
 
 For more information, visit:
