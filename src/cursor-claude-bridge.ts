@@ -494,7 +494,7 @@ class CursorClaudeBridge {
       cursorRulesParsed: this.cursorRules.size > 0,
       queueProcessing: this.isActive,
       agentInvocation: false,
-      overallHealth: 'failed' as const
+      overallHealth: 'failed' as 'healthy' | 'degraded' | 'failed'
     };
 
     try {

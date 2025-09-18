@@ -385,6 +385,108 @@ activation_priority:
   6: "Dr.AI-ML"      # AI/ML features
 
 # =====================================
+# NEW: AUTOMATION FEATURES
+# =====================================
+
+# Automated Changelog & Versioning
+changelog_versioning:
+  auto_changelog: true
+  semantic_versioning: true
+  conventional_commits: true
+  auto_tagging: true
+  release_notes: true
+
+changelog_triggers:
+  - "CHANGELOG.md"
+  - "package.json" # version changes
+  - "feat(" # feature commits
+  - "fix(" # bug fix commits
+  - "BREAKING CHANGE" # breaking changes
+
+# Git Backup & Protection
+git_automation:
+  auto_backup: true
+  branch_protection: true
+  emergency_backup: true
+  remote_sync: true
+  backup_schedule: "daily"
+
+backup_triggers:
+  - "before_merge"
+  - "before_deploy"
+  - "pre_release"
+  - "emergency_detected"
+
+# Adaptive Agent Creation
+adaptive_agents:
+  auto_detection: true
+  confidence_threshold: 0.9
+  available_templates:
+    - "DevOps-Dan" # Docker, K8s, Terraform
+    - "Security-Sam" # Auth, security, encryption
+    - "Data-Diana" # SQL, ETL, analytics
+    - "Mobile-Mike" # React Native, Flutter
+
+agent_creation_triggers:
+  - "docker-compose.yml"
+  - "Dockerfile"
+  - "*.tf" # Terraform
+  - "*auth*" # Security patterns
+  - "*.sql" # Database patterns
+  - "react-native" # Mobile patterns
+
+# Auto-Documentation
+auto_documentation:
+  enabled: true
+  jsdoc_extraction: true
+  api_docs: true
+  readme_generation: true
+  knowledge_base: true
+
+documentation_triggers:
+  - "/**" # JSDoc comments
+  - "@param" # Function documentation
+  - "@returns" # Return documentation
+  - "swagger.yaml" # API documentation
+  - "openapi.yml" # API specification
+
+# Interactive Onboarding
+onboarding_wizard:
+  auto_launch: true # for new projects
+  bmad_customization: true
+  mcp_configuration: true
+  project_analysis: true
+
+onboarding_triggers:
+  - "versatil init"
+  - "first_time_setup"
+  - "new_project_detected"
+
+# =====================================
+# AUTOMATION WORKFLOWS
+# =====================================
+
+automation_workflows:
+  pre_commit:
+    - run_quality_gates
+    - update_documentation
+    - check_version_consistency
+    - create_backup_if_needed
+
+  pre_release:
+    - generate_changelog
+    - bump_version
+    - create_release_notes
+    - create_emergency_backup
+    - run_full_test_suite
+
+  post_deployment:
+    - sync_remote_backup
+    - update_monitoring
+    - validate_deployment
+    - notify_stakeholders
+
+# =====================================
 # PERFORMANCE MONITORING
 # =====================================
 
@@ -394,3 +496,6 @@ performance_tracking:
   task_completion_rate: true
   user_satisfaction: true
   code_quality_metrics: true
+  automation_efficiency: true
+  backup_success_rate: true
+  documentation_coverage: true

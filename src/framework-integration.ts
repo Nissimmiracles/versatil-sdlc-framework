@@ -249,7 +249,7 @@ class VERSATILFrameworkIntegration {
   /**
    * Run Quality Gates
    */
-  private async runQualityGates(context: any): Promise<QualityGateResult> {
+  async runQualityGates(context: any): Promise<QualityGateResult> {
     const combinedResult: QualityGateResult = {
       passed: true,
       issues: [],

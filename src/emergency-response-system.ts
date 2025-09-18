@@ -33,7 +33,7 @@ interface EmergencyContext {
   businessImpact: 'none' | 'low' | 'medium' | 'high' | 'critical';
 }
 
-type EmergencyType =
+export type EmergencyType =
   | 'build_failure'
   | 'runtime_error'
   | 'dependency_conflict'
@@ -47,7 +47,7 @@ type EmergencyType =
   | 'memory_leak'
   | 'infinite_loop';
 
-type EmergencySeverity = 'low' | 'medium' | 'high' | 'critical' | 'catastrophic';
+export type EmergencySeverity = 'low' | 'medium' | 'high' | 'critical' | 'catastrophic';
 
 interface EmergencyResponse {
   responseId: string;

@@ -7,9 +7,9 @@
 
 import { EventEmitter } from 'events';
 import { watch } from 'fs';
-import path from 'path';
+import * as path from 'path';
 
-interface AgentTrigger {
+export interface AgentTrigger {
   agent: string;
   priority: number;
   triggers: {
@@ -24,16 +24,23 @@ interface AgentTrigger {
   collaborators: string[];
 }
 
-interface AgentActivationContext {
+export interface AgentActivationContext {
   trigger: AgentTrigger;
   filePath?: string;
   errorMessage?: string;
   userRequest?: string;
   contextClarity: 'clear' | 'ambiguous' | 'missing';
   requiredClarifications?: string[];
+  matchedKeywords?: string[];
+  emergency?: boolean;
+  testing?: boolean;
+  urgency?: 'low' | 'medium' | 'high' | 'emergency';
+  emergencyType?: string;
+  emergencySeverity?: string;
+  bridgeInvoked?: boolean;
 }
 
-interface AgentResponse {
+export interface AgentResponse {
   agent: string;
   status: 'activated' | 'clarification_needed' | 'delegated' | 'completed';
   message: string;
@@ -294,7 +301,10 @@ class VERSATILAgentDispatcher extends EventEmitter {
     this.activeAgents.add(agentKey);
 
     // Validate context clarity if user request provided
-    let contextValidation = { clarity: 'clear' as const, clarifications: [] };
+    let contextValidation: { clarity: 'clear' | 'ambiguous' | 'missing'; clarifications: string[] } = {
+      clarity: 'clear',
+      clarifications: []
+    };
     if (context.userRequest) {
       contextValidation = await this.contextValidator.validateContext(context.userRequest);
     }
@@ -538,7 +548,8 @@ class ContextValidator {
   }
 }
 
-// Export singleton instance
+// Export classes and singleton instance
+export { VERSATILAgentDispatcher, ContextValidator };
 export const versatilDispatcher = new VERSATILAgentDispatcher();
 
 // Start monitoring immediately in development

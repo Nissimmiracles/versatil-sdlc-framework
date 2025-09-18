@@ -21,7 +21,7 @@ import { versatilDevIntegration } from './development-integration';
 import { cursorClaudeBridge, handleUserRequestViaBridge } from './cursor-claude-bridge';
 import { qualityGateEnforcer, validateQualityGates } from './quality-gate-enforcer';
 import { enhancedContextValidator, validateEnhancedContext } from './enhanced-context-validator';
-import { emergencyResponseSystem, handleEmergencyResponse } from './emergency-response-system';
+import { emergencyResponseSystem, handleEmergencyResponse, EmergencyType, EmergencySeverity } from './emergency-response-system';
 import { frameworkIntegrationTester, runFrameworkTests } from './framework-integration-tester';
 
 interface VERSATILFrameworkStatus {
@@ -156,7 +156,7 @@ class VERSATILFramework {
 
       return {
         requestId,
-        contextClarity: contextValidation.overall,
+        contextClarity: contextValidation.overall === 'conflicting' ? 'ambiguous' : contextValidation.overall,
         clarifications: contextValidation.requiredClarifications.map(c => c.question),
         recommendedAgents: contextValidation.recommendedAgents,
         activatedAgents: [],
@@ -262,8 +262,8 @@ class VERSATILFramework {
    */
   private detectEmergency(request: string): {
     detected: boolean;
-    type?: string;
-    severity?: string;
+    type?: EmergencyType;
+    severity?: EmergencySeverity;
   } {
     const requestLower = request.toLowerCase();
 
@@ -279,7 +279,7 @@ class VERSATILFramework {
 
     if (hasEmergencyKeywords) {
       // Determine emergency type
-      let type = 'runtime_error';
+      let type: EmergencyType = 'runtime_error';
       if (requestLower.includes('build') || requestLower.includes('compilation')) {
         type = 'build_failure';
       } else if (requestLower.includes('router') || requestLower.includes('navigation')) {
@@ -289,7 +289,7 @@ class VERSATILFramework {
       }
 
       // Determine severity
-      let severity = 'medium';
+      let severity: EmergencySeverity = 'medium';
       if (requestLower.includes('critical') || requestLower.includes('urgent')) {
         severity = 'critical';
       } else if (requestLower.includes('emergency') || requestLower.includes('asap')) {

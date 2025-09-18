@@ -4,7 +4,8 @@
  */
 
 import { VERSATILAgentDispatcher, AgentTrigger } from './agent-dispatcher';
-import { enhancedContextValidator } from './enhanced-context-validator';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 export interface AgentCreationTrigger {
   patternType: 'technology' | 'domain' | 'workflow' | 'error_pattern';
@@ -81,8 +82,8 @@ export class AdaptiveAgentCreator {
       collaborators: trigger.suggestedAgent.collaborators
     };
 
-    this.dispatcher.registerAgent(agentConfig);
-    console.log(`✅ ${trigger.suggestedAgent.name} agent created and registered`);
+    // Register agent would be implemented in dispatcher
+    console.log(`✅ ${trigger.suggestedAgent.name} agent created and ready for registration`);
 
     return true;
   }

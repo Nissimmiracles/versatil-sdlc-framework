@@ -8,6 +8,9 @@
 const { runOnboardingWizard } = require('../dist/onboarding-wizard');
 const { adaptiveAgentCreator } = require('../dist/adaptive-agent-creator');
 const { VERSATILAgentDispatcher } = require('../dist/agent-dispatcher');
+const { changelogGenerator } = require('../dist/changelog-generator');
+const { versionManager } = require('../dist/version-manager');
+const { gitBackupManager } = require('../dist/git-backup-manager');
 
 async function main() {
   const command = process.argv[2];
@@ -40,12 +43,60 @@ async function main() {
       });
       break;
 
+    case 'changelog':
+      console.log('📝 Generating changelog...\n');
+      await changelogGenerator.autoGenerateChangelog();
+      break;
+
+    case 'version':
+      const versionType = process.argv[3] || 'auto';
+      if (['major', 'minor', 'patch', 'prerelease'].includes(versionType)) {
+        console.log(`📦 Manual version bump: ${versionType}\n`);
+        await versionManager.bumpVersionManual(versionType);
+      } else {
+        console.log('🔍 Analyzing commits for version bump...\n');
+        await versionManager.autoVersion();
+      }
+      break;
+
+    case 'backup':
+      const backupAction = process.argv[3] || 'create';
+      if (backupAction === 'create') {
+        console.log('💾 Creating backup...\n');
+        await gitBackupManager.createBackup();
+      } else if (backupAction === 'status') {
+        console.log('📊 Backup status...\n');
+        const status = await gitBackupManager.getBackupStatus();
+        console.log(`Last backup: ${status.lastBackup}`);
+        console.log(`Backup count: ${status.backupCount}`);
+        console.log(`Remote status: ${status.remoteStatus}`);
+        console.log(`Disk usage: ${status.diskUsage}`);
+      } else if (backupAction === 'sync') {
+        console.log('🔄 Syncing with remote...\n');
+        await gitBackupManager.syncWithRemote();
+      }
+      break;
+
+    case 'release':
+      console.log('🚀 Creating release...\n');
+      const releaseConfig = {
+        autoTag: true,
+        autoChangelog: true,
+        autoCommit: true,
+        createGitHubRelease: process.argv.includes('--github')
+      };
+      await versionManager.autoVersion(releaseConfig);
+      break;
+
     case 'health':
       console.log('🏥 VERSATIL Framework Health Check\n');
       console.log('✅ Framework Status: OPERATIONAL');
       console.log('✅ Agent System: Ready');
       console.log('✅ MCP Integration: Available');
       console.log('✅ Context Validation: Active');
+      console.log('✅ Automation Features: Enabled');
+      console.log('✅ Backup System: Ready');
+      console.log('✅ Version Management: Active');
       break;
 
     case 'version':
@@ -65,18 +116,27 @@ USAGE:
   versatil <command> [options]
 
 COMMANDS:
-  init       Interactive setup wizard with BMAD agent customization
-  analyze    Analyze project and suggest additional agents
-  agents     List available agent templates
-  health     Check framework status and configuration
-  version    Show version information
-  help       Show this help message
+  init         Interactive setup wizard with BMAD agent customization
+  analyze      Analyze project and suggest additional agents
+  agents       List available agent templates
+  changelog    Generate changelog from git commits
+  version      Auto version bump or manual (major|minor|patch|prerelease)
+  backup       Git backup management (create|status|sync)
+  release      Create full release with changelog and tagging
+  health       Check framework status and configuration
+  help         Show this help message
 
 EXAMPLES:
-  versatil init                 # Start interactive onboarding
-  versatil analyze              # Get agent recommendations
-  versatil agents               # See available agent types
-  versatil health               # Verify installation
+  versatil init                     # Start interactive onboarding
+  versatil analyze                  # Get agent recommendations
+  versatil agents                   # See available agent types
+  versatil changelog                # Generate changelog
+  versatil version                  # Auto-analyze and bump version
+  versatil version major            # Manual major version bump
+  versatil backup create            # Create backup
+  versatil backup status            # Check backup status
+  versatil release --github         # Create release with GitHub release
+  versatil health                   # Verify installation
 
 For more information, visit:
 https://github.com/versatil-platform/versatil-sdlc-framework

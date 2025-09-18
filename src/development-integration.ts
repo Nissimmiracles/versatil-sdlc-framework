@@ -14,6 +14,7 @@ import { versatilIntegration } from './framework-integration';
 import { spawn, exec } from 'child_process';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { EventEmitter } from 'events';
 
 interface DevelopmentContext {
   projectRoot: string;
@@ -27,12 +28,13 @@ interface DevelopmentContext {
  * Development Environment Integration Service
  * Bridges VERSATIL framework with actual development tools
  */
-class VERSATILDevelopmentIntegration {
+class VERSATILDevelopmentIntegration extends EventEmitter {
   private context: DevelopmentContext;
   private isInitialized: boolean = false;
   private qualityGateResults: Map<string, any> = new Map();
 
   constructor() {
+    super();
     this.context = {
       projectRoot: process.cwd(),
       nodeEnv: process.env.NODE_ENV || 'development',
