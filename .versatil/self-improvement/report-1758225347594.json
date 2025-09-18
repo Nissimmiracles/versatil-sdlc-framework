@@ -1,0 +1,384 @@
+{
+  "timestamp": "2025-09-18T19:55:47.593Z",
+  "totalIssues": 53,
+  "issuesBySeverity": {
+    "critical": 0,
+    "high": 2,
+    "medium": 26,
+    "low": 25
+  },
+  "qualityScore": 0,
+  "issues": [
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/bin/versatil.js",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/index.js",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "urgent-todo",
+      "severity": "high",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/scripts/self-improve.js",
+      "message": "Urgent TODO/FIXME found",
+      "fix": "Address urgent technical debt"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/adaptive-agent-creator.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/agent-dispatcher.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/agent-registry.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/enhanced-james.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/enhanced-marcus.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/enhanced-maria.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/analytics/performance-monitor.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/changelog-generator.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/cursor-claude-bridge.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/development-integration.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/emergency-response-system.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/enhanced-context-validator.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/framework-integration.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/git-backup-manager.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/index.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/mcp-executor.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/mcp-integration.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/onboarding-wizard.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/quality-gate-enforcer.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/version-manager.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/templates/basic-project-setup/server.js",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/templates/basic-project-setup/src/index.js",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "debugging-code",
+      "severity": "medium",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/templates/qa-monitoring-agent.ts",
+      "message": "Console.log detected in production code",
+      "fix": "Replace with proper logging mechanism"
+    },
+    {
+      "type": "version-inconsistency",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/agent-registry.ts",
+      "message": "Hardcoded version 2.0.0 may be inconsistent",
+      "fix": "Use package.json version or environment variable"
+    },
+    {
+      "type": "version-inconsistency",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/agent-registry.ts",
+      "message": "Hardcoded version 2.0.0 may be inconsistent",
+      "fix": "Use package.json version or environment variable"
+    },
+    {
+      "type": "version-inconsistency",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/agent-registry.ts",
+      "message": "Hardcoded version 2.0.0 may be inconsistent",
+      "fix": "Use package.json version or environment variable"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/cursor-claude-bridge.ts",
+      "message": "Potentially unused import: promises as fs",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/development-integration.ts",
+      "message": "Potentially unused import: spawn",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/development-integration.ts",
+      "message": "Potentially unused import: promises as fs",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/emergency-response-system.ts",
+      "message": "Potentially unused import: qualityGateEnforcer",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/emergency-response-system.ts",
+      "message": "Potentially unused import: enhancedContextValidator",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/emergency-response-system.ts",
+      "message": "Potentially unused import: cursorClaudeBridge",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/emergency-response-system.ts",
+      "message": "Potentially unused import: spawn",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/emergency-response-system.ts",
+      "message": "Potentially unused import: promises as fs",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/enhanced-context-validator.ts",
+      "message": "Potentially unused import: versatilDispatcher",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/enhanced-context-validator.ts",
+      "message": "Potentially unused import: cursorClaudeBridge",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/enhanced-context-validator.ts",
+      "message": "Potentially unused import: qualityGateEnforcer",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/enhanced-context-validator.ts",
+      "message": "Potentially unused import: promises as fs",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/framework-integration-tester.ts",
+      "message": "Potentially unused import: versatilDevIntegration",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/framework-integration-tester.ts",
+      "message": "Potentially unused import: promises as fs",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/onboarding-wizard.ts",
+      "message": "Potentially unused import: VERSATILAgentDispatcher",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/onboarding-wizard.ts",
+      "message": "Potentially unused import: AgentTrigger",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/onboarding-wizard.ts",
+      "message": "Potentially unused import: AdaptiveAgentCreator",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/quality-gate-enforcer.ts",
+      "message": "Potentially unused import: cursorClaudeBridge",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/quality-gate-enforcer.ts",
+      "message": "Potentially unused import: promises as fs",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/quality-gate-enforcer.ts",
+      "message": "Potentially unused import: spawn",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/testing/agent-testing-framework.ts",
+      "message": "Potentially unused import: BaseAgent",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "unused-import",
+      "severity": "low",
+      "file": "/Users/nissimmenashe/VERSATIL SDLC FW/src/testing/agent-testing-framework.ts",
+      "message": "Potentially unused import: ValidationResults",
+      "fix": "Remove unused import"
+    },
+    {
+      "type": "low-test-coverage",
+      "severity": "high",
+      "file": "test coverage",
+      "message": "Test coverage appears low: 7%",
+      "fix": "Add more comprehensive tests"
+    },
+    {
+      "type": "missing-config-file",
+      "severity": "medium",
+      "file": ".env.example",
+      "message": "Missing configuration file: .env.example",
+      "fix": "Create .env.example with proper configuration"
+    }
+  ]
+}

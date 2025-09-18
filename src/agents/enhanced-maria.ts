@@ -1,4 +1,4 @@
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../agent-dispatcher';
+import { BaseAgent, AgentActivationContext, AgentResponse } from './base-agent';
 import * as fs from 'fs';
 import * as path from 'path';
 

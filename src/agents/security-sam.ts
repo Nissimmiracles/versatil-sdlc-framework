@@ -158,7 +158,7 @@ export class SecuritySam extends BaseAgent {
         message: 'Insecure random number generation'
       },
       pathTraversal: {
-        pattern: /\.\./|\.\.\/|\.\.\\|\.\.\%2f/i,
+        pattern: /\.\./i,
         severity: 'high',
         message: 'Path traversal vulnerability detected'
       },

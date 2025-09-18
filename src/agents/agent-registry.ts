@@ -11,6 +11,7 @@ import { EnhancedJames } from './enhanced-james';
 import { EnhancedMarcus } from './enhanced-marcus';
 import { DevOpsDan } from './devops-dan';
 import { SecuritySam } from './security-sam';
+import { log } from '../utils/logger';
 
 export interface AgentMetadata {
   id: string;
@@ -373,11 +374,11 @@ export class AgentRegistry {
       .filter((agent): agent is BaseAgent => agent !== undefined);
   }
 
-  public getAgentHealth(): Record<string, any> {
-    const health: Record<string, any> = {};
+  public getAgentHealth(): Record<string, unknown> {
+    const health: Record<string, unknown> = {};
 
-    for (const [id, metadata] of this.metadata) {
-      health[id] = {
+    for (const [agentId, metadata] of this.metadata) {
+      health[agentId] = {
         name: metadata.name,
         version: metadata.version,
         capabilities: metadata.capabilities.length,
