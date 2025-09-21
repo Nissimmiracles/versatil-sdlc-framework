@@ -42,8 +42,8 @@ async function startServer() {
     logger.info('Server module loaded successfully', {}, 'main');
   } catch (error) {
     logger.error('Failed to start server', {
-      error: error.message,
-      stack: error.stack
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
     }, 'main');
     process.exit(1);
   }
@@ -69,7 +69,7 @@ async function runHealthCheck() {
     }
   } catch (error) {
     logger.error('Health check error', {
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     }, 'main');
     process.exit(1);
   }

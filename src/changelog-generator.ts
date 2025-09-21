@@ -134,25 +134,38 @@ export class ChangelogGenerator {
     const conventionalRegex = /^(\w+)(?:\(([^)]+)\))?: (.+)$/;
     const match = message.match(conventionalRegex);
 
-    if (match) {
+    if (match && hash) {
       const [, type, scope, subject] = match;
-      return {
+      if (!type || !subject) {
+        return this.createFallbackCommit(hash, message);
+      }
+      const commitInfo: CommitInfo = {
         hash: hash.substring(0, 7),
         type,
-        scope,
+        scope: scope || '',
         subject,
         breaking: message.includes('BREAKING CHANGE') || subject.includes('!:'),
         author: this.getCommitAuthor(hash),
-        date: this.getCommitDate(hash),
-        pr: this.extractPRNumber(subject)
+        date: this.getCommitDate(hash)
       };
+
+      const prNumber = this.extractPRNumber(subject);
+      if (prNumber) {
+        commitInfo.pr = prNumber;
+      }
+
+      return commitInfo;
     }
 
     // Fallback for non-conventional commits
+    return this.createFallbackCommit(hash || '', message);
+  }
+
+  private createFallbackCommit(hash: string, message: string): CommitInfo {
     return {
       hash: hash.substring(0, 7),
       type: 'chore',
-      subject: message,
+      subject: message || 'No commit message',
       breaking: false,
       author: this.getCommitAuthor(hash),
       date: this.getCommitDate(hash)

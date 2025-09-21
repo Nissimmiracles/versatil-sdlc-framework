@@ -306,7 +306,8 @@ class EmergencyResponseSystem {
     for (const agentName of agents) {
       try {
         // Find agent trigger
-        const agentKey = agentName.toLowerCase().split('(')[0].trim();
+        if (!agentName) continue;
+        const agentKey = agentName.toLowerCase().split('(')[0]!.trim();
         const agentTrigger = versatilDispatcher['agents']?.get(agentKey);
 
         if (agentTrigger) {
@@ -342,7 +343,7 @@ class EmergencyResponseSystem {
           agent: agentName,
           action: 'Agent activation failed',
           result: 'failure',
-          details: error.message
+          details: error instanceof Error ? error.message : String(error)
         });
       }
     }
@@ -352,6 +353,8 @@ class EmergencyResponseSystem {
    * Activate Emergency MCP Tools
    */
   private async activateEmergencyMCPTools(agentName: string, context: EmergencyContext, response: EmergencyResponse): Promise<void> {
+    if (!agentName) return;
+
     const emergencyMCPMap: Record<string, string[]> = {
       'james': ['chrome', 'shadcn'], // Frontend issues need browser debugging
       'marcus': ['github'], // Backend issues need repository analysis
@@ -359,7 +362,7 @@ class EmergencyResponseSystem {
       'dr-ai': ['github'] // AI issues need code analysis
     };
 
-    const agentKey = agentName.toLowerCase().split('(')[0].trim();
+    const agentKey = agentName.toLowerCase().split('(')[0]!.trim();
     const mcpTools = emergencyMCPMap[agentKey] || [];
 
     for (const tool of mcpTools) {
@@ -447,7 +450,7 @@ class EmergencyResponseSystem {
         agent: 'Emergency System',
         action: 'Diagnostics failed',
         result: 'failure',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   }
@@ -492,7 +495,7 @@ class EmergencyResponseSystem {
         agent: 'Emergency System',
         action: 'Build diagnostics failed',
         result: 'failure',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   }
@@ -553,7 +556,7 @@ class EmergencyResponseSystem {
             agent: 'Emergency System',
             action: 'Index.tsx analysis failed',
             result: 'failure',
-            details: error.message
+            details: error instanceof Error ? error.message : String(error)
           });
         }
       }
@@ -564,7 +567,7 @@ class EmergencyResponseSystem {
         agent: 'Emergency System',
         action: 'Router diagnostics failed',
         result: 'failure',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   }
@@ -596,7 +599,7 @@ class EmergencyResponseSystem {
         agent: 'Emergency System',
         action: 'Dependency diagnostics failed',
         result: 'failure',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   }
@@ -704,7 +707,7 @@ class EmergencyResponseSystem {
         agent: 'Emergency Validator',
         action: 'Fix validation failed',
         result: 'failure',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       });
 
       response.escalationRequired = true;

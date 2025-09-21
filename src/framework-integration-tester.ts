@@ -379,13 +379,13 @@ class FrameworkIntegrationTester {
         } catch (error) {
           failed++;
           totalTests++;
-          console.log(`    ❌ FAILED: ${error.message}`);
+          console.log(`    ❌ FAILED: ${error instanceof Error ? error.message : String(error)}`);
 
           suiteResults.push({
             passed: false,
             duration: test.timeout,
-            details: `Test failed with error: ${error.message}`,
-            errors: [error.message]
+            details: `Test failed with error: ${error instanceof Error ? error.message : String(error)}`,
+            errors: [error instanceof Error ? error.message : String(error)]
           });
         }
       }
@@ -440,7 +440,7 @@ class FrameworkIntegrationTester {
       this.frameworkHealth.push({
         component: 'Agent Dispatcher',
         status: 'failed',
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
         metrics: {},
         recommendations: ['Restart agent dispatcher', 'Check agent configuration']
       });
@@ -462,7 +462,7 @@ class FrameworkIntegrationTester {
       this.frameworkHealth.push({
         component: 'Quality Gate Enforcer',
         status: 'failed',
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
         metrics: {}
       });
     }
@@ -483,7 +483,7 @@ class FrameworkIntegrationTester {
       this.frameworkHealth.push({
         component: 'Context Validator',
         status: 'failed',
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
         metrics: {}
       });
     }
@@ -504,7 +504,7 @@ class FrameworkIntegrationTester {
       this.frameworkHealth.push({
         component: 'Emergency Response System',
         status: 'failed',
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
         metrics: {}
       });
     }
@@ -525,7 +525,7 @@ class FrameworkIntegrationTester {
       this.frameworkHealth.push({
         component: 'Cursor-Claude Bridge',
         status: 'failed',
-        details: error.message,
+        details: error instanceof Error ? error.message : String(error),
         metrics: {}
       });
     }
@@ -561,7 +561,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'File change detection failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -595,7 +595,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Agent pattern matching failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -631,7 +631,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Agent activation pipeline failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -660,7 +660,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Dependency validation test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -689,7 +689,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'TypeScript error detection failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -718,7 +718,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Security validation test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -747,7 +747,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Auto-fix functionality test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -780,7 +780,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Ambiguity detection test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -808,7 +808,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Clarification generation test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -839,7 +839,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Context completeness test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -875,7 +875,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Agent recommendation test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -906,7 +906,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Emergency classification test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -937,7 +937,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Emergency agent cascade test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -964,7 +964,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Emergency MCP activation test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -996,7 +996,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Emergency resolution workflow test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -1017,7 +1017,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Cursor rules parsing test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -1045,7 +1045,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Agent invocation bridge test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -1069,7 +1069,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Bridge message queue test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -1090,7 +1090,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'MCP tool detection test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -1110,7 +1110,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Chrome MCP priority test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -1137,7 +1137,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Agent-MCP mapping test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -1185,7 +1185,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Complete development workflow test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -1216,7 +1216,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Framework effectiveness assessment failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }
@@ -1258,7 +1258,7 @@ class FrameworkIntegrationTester {
         passed: false,
         duration: 0,
         details: 'Real-world scenario test failed',
-        errors: [error.message]
+        errors: [error instanceof Error ? error.message : String(error)]
       };
     }
   }

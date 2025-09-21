@@ -52,8 +52,8 @@ export class EnhancedMarcus extends BaseAgent {
   }
 
   private async runBackendValidation(context: AgentActivationContext) {
-    const issues = [];
-    const warnings = [];
+    const issues: any[] = [];
+    const warnings: any[] = [];
     let score = 100;
 
     if (!context.content) {
@@ -112,7 +112,7 @@ export class EnhancedMarcus extends BaseAgent {
   }
 
   private async validateAPIIntegration(context: AgentActivationContext) {
-    const issues = [];
+    const issues: any[] = [];
     let score = 100;
 
     if (!context.content) {
@@ -152,7 +152,7 @@ export class EnhancedMarcus extends BaseAgent {
   }
 
   private async checkConfigurationConsistency(context: AgentActivationContext) {
-    const issues = [];
+    const issues: any[] = [];
     let score = 100;
 
     if (!context.content || !context.filePath) {
@@ -200,7 +200,7 @@ export class EnhancedMarcus extends BaseAgent {
   }
 
   private async validateServiceConsistency(context: AgentActivationContext) {
-    const issues = [];
+    const issues: any[] = [];
     let score = 100;
 
     if (!context.content) {
@@ -275,7 +275,7 @@ export class EnhancedMarcus extends BaseAgent {
   }
 
   private detectAPIContractMismatches(content: string) {
-    const issues = [];
+    const issues: any[] = [];
 
     // Look for inconsistent API parameter naming
     const parameterPatterns = content.match(/\{\s*(\w+)\s*\}/g);
@@ -352,7 +352,7 @@ export class EnhancedMarcus extends BaseAgent {
 
   private detectMissingEnvironmentVariables(content: string): string[] {
     const envVarMatches = content.match(/process\.env\.(\w+)/g);
-    const missing = [];
+    const missing: any[] = [];
 
     if (envVarMatches) {
       const envVars = envVarMatches.map(match => match.replace('process.env.', ''));
@@ -423,7 +423,7 @@ export class EnhancedMarcus extends BaseAgent {
   }
 
   private generateActionableRecommendations(issues: any[]): any[] {
-    const recommendations = [];
+    const recommendations: any[] = [];
 
     const securityIssues = issues.filter(i =>
       i.type.includes('insecure') || i.type.includes('security') || i.severity === 'critical'
@@ -477,7 +477,7 @@ export class EnhancedMarcus extends BaseAgent {
   }
 
   private determineHandoffs(issues: any[]): string[] {
-    const handoffs = [];
+    const handoffs: any[] = [];
 
     if (issues.some(i => i.type.includes('security') || i.type.includes('insecure'))) {
       handoffs.push('security-sam');

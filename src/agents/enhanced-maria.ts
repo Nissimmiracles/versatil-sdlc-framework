@@ -74,7 +74,7 @@ export class EnhancedMaria extends BaseAgent {
         results.issues.push({
           type: 'validator-error',
           severity: 'high',
-          message: `Validator ${validator.constructor.name} failed: ${error.message}`,
+          message: `Validator ${validator.constructor.name} failed: ${error instanceof Error ? error.message : String(error)}`,
           file: context.filePath || 'unknown'
         });
       }
@@ -157,27 +157,27 @@ export class EnhancedMaria extends BaseAgent {
     }
 
     // Performance Insights
-    if (Object.keys(results.performanceMetrics).length > 0) {
+    if (results.performanceMetrics && Object.keys(results.performanceMetrics).length > 0) {
       report += `⚡ **Performance Insights**\n`;
-      Object.entries(results.performanceMetrics).forEach(([metric, value]) => {
+      Object.entries(results.performanceMetrics || {}).forEach(([metric, value]) => {
         report += `${metric}: ${value}\n`;
       });
       report += `\n`;
     }
 
     // Accessibility Review
-    if (results.accessibilityIssues.length > 0) {
+    if (results.accessibilityIssues && results.accessibilityIssues.length > 0) {
       report += `♿ **Accessibility Issues**\n`;
-      results.accessibilityIssues.forEach(issue => {
+      (results.accessibilityIssues || []).forEach(issue => {
         report += `- ${issue}\n`;
       });
       report += `\n`;
     }
 
     // Security Concerns
-    if (results.securityConcerns.length > 0) {
+    if (results.securityConcerns && results.securityConcerns.length > 0) {
       report += `🔒 **Security Concerns**\n`;
-      results.securityConcerns.forEach(concern => {
+      (results.securityConcerns || []).forEach(concern => {
         report += `- ${concern}\n`;
       });
       report += `\n`;
@@ -187,7 +187,7 @@ export class EnhancedMaria extends BaseAgent {
   }
 
   private generateActionableRecommendations(results: EnhancedValidationResults): Recommendation[] {
-    const recommendations = [];
+    const recommendations: Recommendation[] = [];
 
     // High-priority fixes
     const criticalIssues = results.issues.filter(i => i.severity === 'critical');
@@ -262,7 +262,7 @@ export class EnhancedMaria extends BaseAgent {
       'integration-gap': 'Add missing integration tests for the affected flow'
     };
 
-    return fixes[issue.type] || 'Review and fix the identified issue manually';
+    return fixes[issue.type as keyof typeof fixes] || 'Review and fix the identified issue manually';
   }
 
   private generatePreventionStrategy(issue: Issue): string {
@@ -276,7 +276,7 @@ export class EnhancedMaria extends BaseAgent {
       'integration-gap': 'Mandate integration tests for navigation changes'
     };
 
-    return strategies[issue.type] || 'Implement monitoring for this issue type';
+    return strategies[issue.type as keyof typeof strategies] || 'Implement monitoring for this issue type';
   }
 
   private mergeResults(target: EnhancedValidationResults, source: Partial<ValidationResults>): void {
@@ -297,10 +297,10 @@ export class EnhancedMaria extends BaseAgent {
   }
 
   private determineHandoffs(results: EnhancedValidationResults): string[] {
-    const handoffs = [];
+    const handoffs: string[] = [];
 
     // Security issues -> Security-Sam
-    if (results.securityConcerns.length > 0) {
+    if (results.securityConcerns && results.securityConcerns.length > 0) {
       handoffs.push('security-sam');
     }
 

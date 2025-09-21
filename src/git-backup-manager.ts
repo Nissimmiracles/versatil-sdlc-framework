@@ -386,7 +386,7 @@ fi
         cwd: this.projectPath,
         encoding: 'utf-8'
       });
-      return output.split('\t')[0];
+      return output.split('\t')[0] || 'unknown';
     } catch {
       return 'unknown';
     }
@@ -494,7 +494,7 @@ fi
         .sort()
         .reverse();
 
-      if (backupDirs.length > 0) {
+      if (backupDirs.length > 0 && backupDirs[0]) {
         const metadataPath = path.join(this.backupDir, backupDirs[0], 'metadata.json');
         const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf-8'));
         return new Date(metadata.timestamp);
@@ -520,7 +520,7 @@ fi
       const output = execSync(`du -sh "${this.backupDir}"`, {
         encoding: 'utf-8'
       });
-      return output.split('\t')[0];
+      return output.split('\t')[0] || 'unknown';
     } catch {
       return '0B';
     }
@@ -546,7 +546,7 @@ fi
     const remoteUrl = await this.getRemoteUrl();
     const match = remoteUrl.match(/github\.com[:/]([^/]+)\/([^/.]+)/);
 
-    if (match) {
+    if (match && match[1] && match[2]) {
       return [match[1], match[2]];
     }
 

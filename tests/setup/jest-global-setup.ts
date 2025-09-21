@@ -8,11 +8,11 @@ module.exports = async function jestGlobalSetup() {
   console.log('👩‍🔬 Enhanced Maria-QA Unit Testing Initialization');
 
   // Set global test environment variables
-  process.env.NODE_ENV = 'test';
-  process.env.JEST_WORKER_ID = process.env.JEST_WORKER_ID || '1';
+  process.env['NODE_ENV'] = 'test';
+  process.env['JEST_WORKER_ID'] = process.env['JEST_WORKER_ID'] || '1';
 
   // BMAD methodology configuration
-  global.bmadJestConfig = {
+  (global as any).bmadJestConfig = {
     agent: 'Enhanced Maria-QA',
     framework: 'VERSATIL SDLC',
     testType: 'unit',

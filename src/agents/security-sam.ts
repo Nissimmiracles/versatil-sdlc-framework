@@ -10,8 +10,8 @@ export class SecuritySam extends BaseAgent {
   }
 
   protected async runAgentSpecificValidation(context: AgentActivationContext): Promise<Partial<ValidationResults>> {
-    const securityAnalysis = this.analyzeSecurityPatterns(context.content || '', context.filePath);
-    const vulnerabilities = this.detectVulnerabilities(context.content || '', context.filePath);
+    const securityAnalysis = this.analyzeSecurityPatterns(context.content || '', context.filePath || '');
+    const vulnerabilities = this.detectVulnerabilities(context.content || '', context.filePath || '');
 
     return {
       issues: vulnerabilities.map(v => ({
@@ -30,8 +30,8 @@ export class SecuritySam extends BaseAgent {
     const { trigger, filePath, content, matchedKeywords = [], emergency = false } = context;
 
     // Analyze security patterns and vulnerabilities
-    const securityAnalysis = this.analyzeSecurityPatterns(content, filePath);
-    const vulnerabilities = this.detectVulnerabilities(content, filePath);
+    const securityAnalysis = this.analyzeSecurityPatterns(content || '', filePath || '');
+    const vulnerabilities = this.detectVulnerabilities(content || '', filePath || '');
     const recommendations = this.generateSecurityRecommendations(securityAnalysis, vulnerabilities);
 
     return {
@@ -39,7 +39,7 @@ export class SecuritySam extends BaseAgent {
       message: this.generateResponse(securityAnalysis, vulnerabilities, recommendations, emergency),
       suggestions: recommendations,
       priority: emergency ? 'critical' : this.calculatePriority(securityAnalysis, vulnerabilities),
-      handoffTo: this.determineHandoffs(securityAnalysis, vulnerabilities),
+      handoffTo: this.determineHandoffs(securityAnalysis, vulnerabilities) || [],
       context: {
         securityLevel: securityAnalysis.level,
         vulnerabilities: vulnerabilities.length,
@@ -143,7 +143,7 @@ export class SecuritySam extends BaseAgent {
   }
 
   private detectVulnerabilities(content: string, filePath?: string) {
-    const vulnerabilities = [];
+    const vulnerabilities: any[] = [];
 
     if (!content) return vulnerabilities;
 
@@ -224,7 +224,7 @@ export class SecuritySam extends BaseAgent {
         const vulnPackages = ['lodash@<4.17.21', 'axios@<0.21.2', 'express@<4.17.3'];
         vulnPackages.forEach(pkg => {
           const [name, version] = pkg.split('@');
-          if (content.includes(name)) {
+          if (name && content.includes(name)) {
             vulnerabilities.push({
               type: 'vulnerablePackage',
               severity: 'high',
@@ -240,7 +240,7 @@ export class SecuritySam extends BaseAgent {
   }
 
   private generateSecurityRecommendations(analysis: any, vulnerabilities: any[]) {
-    const recommendations = [];
+    const recommendations: any[] = [];
 
     // Authentication recommendations
     if (!analysis.authentication) {
@@ -320,7 +320,7 @@ export class SecuritySam extends BaseAgent {
     response += `**Compliance Status**: ${analysis.compliance}\n\n`;
 
     // Security features detected
-    const features = [];
+    const features: any[] = [];
     if (analysis.authentication) features.push('Authentication');
     if (analysis.authorization) features.push('Authorization');
     if (analysis.encryption) features.push('Encryption');
@@ -382,7 +382,7 @@ export class SecuritySam extends BaseAgent {
   }
 
   private determineHandoffs(analysis: any, vulnerabilities: any[]): string[] {
-    const handoffs = [];
+    const handoffs: string[] = [];
 
     // Always coordinate with PM for security planning
     handoffs.push('sarah-pm');

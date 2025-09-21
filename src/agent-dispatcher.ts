@@ -287,7 +287,10 @@ class VERSATILAgentDispatcher extends EventEmitter {
    * Activate Agent with Context
    */
   async activateAgent(trigger: AgentTrigger, context: Partial<AgentActivationContext> = {}): Promise<AgentResponse> {
-    const agentKey = trigger.agent.toLowerCase().split('(')[0].trim();
+    if (!trigger.agent) {
+      throw new Error('Agent name is required');
+    }
+    const agentKey = (trigger.agent as string).toLowerCase().split('(')[0]!.trim();
 
     // Check if agent is already active
     if (this.activeAgents.has(agentKey)) {
@@ -442,7 +445,10 @@ class VERSATILAgentDispatcher extends EventEmitter {
    * Deactivate agent
    */
   deactivateAgent(agentName: string): void {
-    const agentKey = agentName.toLowerCase().split('(')[0].trim();
+    if (!agentName) {
+      throw new Error('Agent name is required');
+    }
+    const agentKey = (agentName as string).toLowerCase().split('(')[0]!.trim();
     this.activeAgents.delete(agentKey);
 
     this.emit('agent-deactivated', {
@@ -553,6 +559,6 @@ export { VERSATILAgentDispatcher, ContextValidator };
 export const versatilDispatcher = new VERSATILAgentDispatcher();
 
 // Start monitoring immediately in development
-if (process.env.NODE_ENV !== 'test') {
+if (process.env['NODE_ENV'] !== 'test') {
   console.log('🚀 VERSATIL Auto-Agent System: ONLINE');
 }

@@ -186,7 +186,7 @@ export class AdaptiveLearningEngine extends EventEmitter {
     const patterns: LearningPattern[] = [];
     const successfulInteractions = interactions.filter(i =>
       i.outcome?.problemSolved &&
-      i.outcome?.userSatisfaction >= 4
+      (i.outcome?.userSatisfaction ?? 0) >= 4
     );
 
     // Group by file type
@@ -228,7 +228,7 @@ export class AdaptiveLearningEngine extends EventEmitter {
     const patterns: LearningPattern[] = [];
     const failedInteractions = interactions.filter(i =>
       !i.outcome?.problemSolved ||
-      i.outcome?.userSatisfaction < 3 ||
+      (i.outcome?.userSatisfaction ?? 5) < 3 ||
       i.context.issue?.wasAccurate === false
     );
 
@@ -307,13 +307,13 @@ export class AdaptiveLearningEngine extends EventEmitter {
     }
 
     // Adapt to user preferences
-    if (userPreferences.preferredSeverityLevel) {
+    if (userPreferences['preferredSeverityLevel']) {
       adaptations.push({
         agentId,
         adaptationType: 'priority_weighting',
         changes: {
-          adjustSeverityWeights: userPreferences.preferredSeverityLevel,
-          personalizeAlerts: userPreferences.alertPreferences
+          adjustSeverityWeights: userPreferences['preferredSeverityLevel'],
+          personalizeAlerts: userPreferences['alertPreferences']
         },
         confidence: 0.9,
         expectedImprovement: 0.1
@@ -387,7 +387,7 @@ export class AdaptiveLearningEngine extends EventEmitter {
       this.logger.error('Failed to apply agent adaptation', {
         agentId,
         adaptationType: adaptation.adaptationType,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       }, 'adaptive-learning');
 
       return false;
@@ -451,7 +451,7 @@ export class AdaptiveLearningEngine extends EventEmitter {
         this.patterns = new Map(Object.entries(data));
       }
     } catch (error) {
-      this.logger.error('Failed to load learning data', { error: error.message }, 'adaptive-learning');
+      this.logger.error('Failed to load learning data', { error: error instanceof Error ? error.message : String(error) }, 'adaptive-learning');
     }
   }
 
@@ -464,7 +464,7 @@ export class AdaptiveLearningEngine extends EventEmitter {
 
   private handleInteraction(interaction: UserInteraction): void {
     // Real-time learning from interactions
-    if (interaction.outcome?.problemSolved && interaction.outcome.userSatisfaction >= 4) {
+    if (interaction.outcome?.problemSolved && interaction.outcome.userSatisfaction && interaction.outcome.userSatisfaction >= 4) {
       this.reinforceSuccessfulBehavior(interaction);
     } else if (interaction.context.issue?.wasAccurate === false) {
       this.adjustForFalsePositive(interaction);

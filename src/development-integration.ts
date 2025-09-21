@@ -37,7 +37,7 @@ class VERSATILDevelopmentIntegration extends EventEmitter {
     super();
     this.context = {
       projectRoot: process.cwd(),
-      nodeEnv: process.env.NODE_ENV || 'development',
+      nodeEnv: process.env['NODE_ENV'] || 'development',
       activeServices: [],
       runningTests: false
     };
@@ -193,7 +193,7 @@ class VERSATILDevelopmentIntegration extends EventEmitter {
       switch (mcpName) {
         case 'chrome':
           // Check if running in Claude Code environment
-          return process.env.CLAUDE_CODE_ENV === 'true' ||
+          return process.env['CLAUDE_CODE_ENV'] === 'true' ||
                  typeof global.window !== 'undefined';
 
         case 'playwright':
@@ -227,7 +227,7 @@ class VERSATILDevelopmentIntegration extends EventEmitter {
           return false;
       }
     } catch (error) {
-      console.log(`⚠️ MCP ${mcpName} test failed:`, error.message);
+      console.log(`⚠️ MCP ${mcpName} test failed:`, error instanceof Error ? error.message : String(error));
       return false;
     }
   }
@@ -246,7 +246,7 @@ class VERSATILDevelopmentIntegration extends EventEmitter {
     });
 
     process.on('unhandledRejection', (reason, promise) => {
-      this.handleDevelopmentError('unhandledRejection', new Error(reason.toString()));
+      this.handleDevelopmentError('unhandledRejection', new Error(reason instanceof Error ? reason.message : String(reason)));
     });
 
     console.log('🔄 Development lifecycle hooks: ACTIVE');
@@ -306,7 +306,7 @@ class VERSATILDevelopmentIntegration extends EventEmitter {
         passed: false,
         issues: [],
         warnings: [],
-        blockers: [`Quality gate execution failed: ${error.message}`]
+        blockers: [`Quality gate execution failed: ${error instanceof Error ? error.message : String(error)}`]
       };
     }
   }

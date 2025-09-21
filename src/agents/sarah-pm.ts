@@ -3,19 +3,23 @@
  * Project Manager & Coordination Specialist
  */
 
-import { BaseAgent } from './base-agent';
+import { BaseAgent, ValidationResults } from './base-agent';
 import { AgentActivationContext, AgentResponse } from '../types/agent-types';
 
 export class SarahPM extends BaseAgent {
-  id = 'sarah-pm';
-  name = 'Sarah PM';
-  specialization = 'Project Management & Team Coordination';
+  override id = 'sarah-pm';
+  override name = 'Sarah PM';
+  override specialization = 'Project Management & Team Coordination';
 
   override async activate(context: AgentActivationContext): Promise<AgentResponse> {
     const projectManagementResults = await this.runProjectManagementValidation(context);
 
     return {
       agentId: this.id,
+      message: 'Project management analysis completed successfully',
+      priority: 'medium',
+      handoffTo: [],
+      context: projectManagementResults,
       result: projectManagementResults,
       suggestions: [
         ...projectManagementResults.suggestions,
@@ -24,20 +28,21 @@ export class SarahPM extends BaseAgent {
     };
   }
 
-  override async runAgentSpecificValidation(context: AgentActivationContext) {
+  override async runAgentSpecificValidation(context: AgentActivationContext): Promise<Partial<ValidationResults>> {
     return {
-      suggestions: [
+      recommendations: [
         {
           type: 'info',
+          priority: 'medium',
           message: 'Project coordination analysis initiated',
-          fix: 'Reviewing team collaboration patterns and milestone progress'
+          actions: ['Review team collaboration patterns and milestone progress']
         }
       ]
     };
   }
 
   private async runProjectManagementValidation(context: AgentActivationContext) {
-    const suggestions = [];
+    const suggestions: any[] = [];
 
     // Project timeline analysis
     suggestions.push({

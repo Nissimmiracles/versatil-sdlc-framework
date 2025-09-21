@@ -455,7 +455,7 @@ export class IntrospectiveAgent extends BaseAgent {
 
     return improvements.sort((a, b) => {
       const priorityWeight = { high: 3, medium: 2, low: 1 };
-      return (priorityWeight[b.priority] * b.confidence) - (priorityWeight[a.priority] * a.confidence);
+      return (priorityWeight[b.priority as keyof typeof priorityWeight] * b.confidence) - (priorityWeight[a.priority as keyof typeof priorityWeight] * a.confidence);
     });
   }
 
@@ -544,7 +544,7 @@ export class IntrospectiveAgent extends BaseAgent {
       const { stdout } = await execAsync('npm test -- --coverage --silent --passWithNoTests');
       // Parse coverage percentage from output (simplified)
       const coverageMatch = stdout.match(/All files\s+\|\s+([\d.]+)/);
-      const coverage = coverageMatch ? parseFloat(coverageMatch[1]) / 100 : 0;
+      const coverage = coverageMatch && coverageMatch[1] ? parseFloat(coverageMatch[1]) / 100 : 0;
       return { coverage };
     } catch {
       return { coverage: 0 };
@@ -621,7 +621,7 @@ export class IntrospectiveAgent extends BaseAgent {
     const match = sizeStr.match(/([\d.]+)([KMGT]?)/);
     if (!match) return 0;
 
-    const value = parseFloat(match[1]);
+    const value = parseFloat(match[1] || '0');
     const unit = match[2];
 
     const multipliers: { [key: string]: number } = {
@@ -632,7 +632,7 @@ export class IntrospectiveAgent extends BaseAgent {
       'T': 1024 * 1024 * 1024 * 1024
     };
 
-    return value * (multipliers[unit] || 1);
+    return value * (multipliers[unit || ''] || 1);
   }
 
   private async optimizeBuildConfig(): Promise<void> {

@@ -52,8 +52,8 @@ export class EnhancedJames extends BaseAgent {
   }
 
   private async runFrontendValidation(context: AgentActivationContext) {
-    const issues = [];
-    const warnings = [];
+    const issues: any[] = [];
+    const warnings: any[] = [];
     let score = 100;
 
     if (!context.content) {
@@ -100,7 +100,7 @@ export class EnhancedJames extends BaseAgent {
   }
 
   private async validateNavigationIntegrity(context: AgentActivationContext) {
-    const issues = [];
+    const issues: any[] = [];
     let score = 100;
 
     if (!context.content) {
@@ -128,7 +128,7 @@ export class EnhancedJames extends BaseAgent {
   }
 
   private async checkRouteConsistency(context: AgentActivationContext) {
-    const issues = [];
+    const issues: any[] = [];
     let score = 100;
 
     if (!context.content || !context.filePath) {
@@ -156,7 +156,7 @@ export class EnhancedJames extends BaseAgent {
   }
 
   private async validateContextFlow(context: AgentActivationContext) {
-    const issues = [];
+    const issues: any[] = [];
     let score = 100;
 
     if (!context.content) {
@@ -228,7 +228,7 @@ export class EnhancedJames extends BaseAgent {
   }
 
   private detectNavigationMismatches(content: string) {
-    const issues = [];
+    const issues: any[] = [];
 
     // Look for route paths that don't match expected patterns
     const routeMatches = content.match(/<Route\s+path=["']([^"']+)["']/g);
@@ -239,7 +239,7 @@ export class EnhancedJames extends BaseAgent {
           const path = pathMatch[1];
 
           // Check for inconsistent naming patterns
-          if (path.includes('brain') && !this.hasMatchingNavItem(content, path)) {
+          if (path?.includes('brain') && !this.hasMatchingNavItem(content, path)) {
             issues.push({
               type: 'navigation-route-mismatch',
               severity: 'high',
@@ -282,17 +282,17 @@ export class EnhancedJames extends BaseAgent {
     const paths = routePaths.map(match => {
       const pathMatch = match.match(/path=["']([^"']+)["']/);
       return pathMatch ? pathMatch[1] : '';
-    }).filter(path => path.length > 0);
+    }).filter(path => path && path.length > 0);
 
     // Check for mixed naming conventions
-    const hasKebabCase = paths.some(path => path.includes('-'));
-    const hasCamelCase = paths.some(path => /[A-Z]/.test(path));
+    const hasKebabCase = paths.some(path => path?.includes('-'));
+    const hasCamelCase = paths.some(path => path && /[A-Z]/.test(path));
 
     return hasKebabCase && hasCamelCase;
   }
 
   private detectMissingRouteComponents(content: string) {
-    const issues = [];
+    const issues: any[] = [];
 
     // Look for routes without proper component references
     const routeMatches = content.match(/<Route[^>]+>/g);
@@ -355,7 +355,7 @@ export class EnhancedJames extends BaseAgent {
   }
 
   private generateActionableRecommendations(issues: any[]): any[] {
-    const recommendations = [];
+    const recommendations: any[] = [];
 
     const criticalIssues = issues.filter(i => i.severity === 'critical');
     if (criticalIssues.length > 0) {
@@ -393,7 +393,7 @@ export class EnhancedJames extends BaseAgent {
   }
 
   private determineHandoffs(issues: any[]): string[] {
-    const handoffs = [];
+    const handoffs: any[] = [];
 
     if (issues.some(i => i.type.includes('route') || i.type.includes('backend'))) {
       handoffs.push('enhanced-marcus');

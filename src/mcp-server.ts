@@ -627,7 +627,7 @@ This backup includes:
     const validation = {
       clarity: Math.random() > 0.3 ? 'clear' : 'ambiguous',
       confidence: Math.floor(Math.random() * 40) + 60,
-      clarifications: [],
+      clarifications: [] as string[],
     };
 
     if (validation.clarity === 'ambiguous') {

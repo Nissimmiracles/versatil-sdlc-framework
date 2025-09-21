@@ -294,7 +294,7 @@ export class MCPToolManager {
 
     // Default component detection
     const matches = filePath.match(/([A-Z][a-zA-Z]+)\.tsx?$/);
-    return matches ? matches[1] : 'UnknownComponent';
+    return matches && matches[1] ? matches[1] : 'UnknownComponent';
   }
 
   /**

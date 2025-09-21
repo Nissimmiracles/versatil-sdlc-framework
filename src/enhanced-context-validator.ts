@@ -108,7 +108,14 @@ class EnhancedContextValidator {
     const taskContext: TaskContext = {
       userRequest,
       urgency: 'medium',
-      projectContext: this.projectContext,
+      projectContext: this.projectContext || {
+        framework: 'unknown',
+        language: 'unknown',
+        dependencies: [],
+        architecture: 'unknown',
+        currentFeatures: [],
+        knownIssues: []
+      },
       previousConversation: this.conversationHistory.slice(-10), // Last 10 interactions
       ...additionalContext
     };
@@ -484,7 +491,7 @@ class EnhancedContextValidator {
       if (relatedConversations.length > 0) {
         const lastRelated = relatedConversations[relatedConversations.length - 1];
 
-        if (lastRelated.outcome === 'clarification_needed') {
+        if (lastRelated && lastRelated.outcome === 'clarification_needed') {
           assessment.issues.push({
             type: 'missing_context',
             severity: 'major',

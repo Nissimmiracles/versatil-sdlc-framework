@@ -389,7 +389,7 @@ export class IntrospectiveScheduler extends EventEmitter {
       executionTime: number;
       improvements: number;
     }>;
-    health: ReturnType<typeof this.getHealthStatus>;
+    health: any;
     nextActions: string[];
   } {
     const recentActivity = this.runHistory.slice(-10).map(run => ({

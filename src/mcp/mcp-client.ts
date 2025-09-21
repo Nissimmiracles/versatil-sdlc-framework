@@ -5,7 +5,7 @@
 
 import { AgentRegistry } from '../agents/agent-registry';
 import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator';
-import { Logger } from '../utils/logger';
+import { VERSATILLogger } from '../utils/logger';
 
 // Mock interfaces for compilation
 interface MockAgentActivationContext {
@@ -50,7 +50,7 @@ export interface MCPToolResponse {
 export class VERSATILMCPClient {
   private agentRegistry: AgentRegistry;
   private sdlcOrchestrator: SDLCOrchestrator;
-  private logger: Logger;
+  private logger: VERSATILLogger;
   private config: MCPClientConfig;
 
   constructor(config: Partial<MCPClientConfig> = {}) {
@@ -62,9 +62,9 @@ export class VERSATILMCPClient {
       ...config
     };
 
+    this.logger = new VERSATILLogger();
     this.agentRegistry = new AgentRegistry();
-    this.sdlcOrchestrator = new SDLCOrchestrator();
-    this.logger = new Logger('MCP-Client');
+    this.sdlcOrchestrator = new SDLCOrchestrator(this.agentRegistry, this.logger);
   }
 
   /**
@@ -227,7 +227,7 @@ export class VERSATILMCPClient {
     const qualityResult = {
       passed: true,
       score: 89.5,
-      checkResults: checks.map(check => ({
+      checkResults: checks.map((check: any) => ({
         check,
         status: 'passed',
         score: 85 + Math.random() * 15

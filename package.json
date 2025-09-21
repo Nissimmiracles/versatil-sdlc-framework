@@ -2,8 +2,7 @@
   "name": "versatil-sdlc-framework",
   "version": "1.0.0",
   "description": "🚀 World's first AI-Native SDLC framework achieving ZERO CONTEXT LOSS through intelligent agent orchestration. Enhanced BMAD methodology with 6 specialized agents, 85%+ test coverage, enterprise security, and Chrome MCP integration.",
-  "main": "index.js",
-  "types": "src/index.ts",
+  "main": "versatil-mcp-server.js",
   "bin": {
     "versatil": "./bin/versatil.js",
     "versatil-mcp": "./bin/versatil-mcp.js",
@@ -118,6 +117,7 @@
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@playwright/test": "^1.55.0",
+    "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.0",
     "@types/node": "^24.5.2",
     "@typescript-eslint/eslint-plugin": "^6.0.0",

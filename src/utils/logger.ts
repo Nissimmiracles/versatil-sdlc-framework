@@ -30,7 +30,7 @@ export class VERSATILLogger {
 
   constructor() {
     this.logLevel = this.getLogLevelFromEnv();
-    this.enableConsole = process.env.NODE_ENV === 'development' || process.env.DEBUG_MODE === 'true';
+    this.enableConsole = process.env['NODE_ENV'] === 'development' || process.env['DEBUG_MODE'] === 'true';
   }
 
   public static getInstance(): VERSATILLogger {
@@ -41,7 +41,7 @@ export class VERSATILLogger {
   }
 
   private getLogLevelFromEnv(): LogLevel {
-    const level = process.env.LOG_LEVEL?.toLowerCase();
+    const level = process.env['LOG_LEVEL']?.toLowerCase();
     switch (level) {
       case 'error': return LogLevel.ERROR;
       case 'warn': return LogLevel.WARN;
@@ -69,11 +69,12 @@ export class VERSATILLogger {
     const logEntry: LogEntry = {
       timestamp: new Date().toISOString(),
       level,
-      message,
-      context,
-      component,
-      agentId
+      message
     };
+
+    if (context) logEntry.context = context;
+    if (component) logEntry.component = component;
+    if (agentId) logEntry.agentId = agentId;
 
     this.logs.push(logEntry);
 

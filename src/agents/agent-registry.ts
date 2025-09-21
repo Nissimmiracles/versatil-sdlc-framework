@@ -286,7 +286,7 @@ export class AgentRegistry {
     });
 
     // Architecture-Dan - System Architecture & Design Patterns Specialist
-    this.registerAgent(new ArchitectureDan(log), {
+    this.registerAgent(new ArchitectureDan(), {
       id: 'architecture-dan',
       name: 'Architecture Dan',
       specialization: 'System Architecture & Design Patterns Specialist',
@@ -326,7 +326,7 @@ export class AgentRegistry {
     });
 
     // Deployment Orchestrator - Enhanced Deployment Pipeline Manager
-    this.registerAgent(new DeploymentOrchestrator(log), {
+    this.registerAgent(new DeploymentOrchestrator(), {
       id: 'deployment-orchestrator',
       name: 'Deployment Orchestrator',
       specialization: 'Advanced Deployment Pipeline & Release Management',

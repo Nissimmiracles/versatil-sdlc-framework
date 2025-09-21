@@ -423,7 +423,7 @@ const processUserInput = (input) => {
         recommendations: [],
         score: 0,
         executionTime: Date.now() - startTime,
-        errors: [`Test execution failed: ${error.message}`]
+        errors: [`Test execution failed: ${error instanceof Error ? error.message : String(error)}`]
       };
     }
   }
@@ -435,7 +435,7 @@ const processUserInput = (input) => {
     if (response.message && typeof response.message === 'string') {
       const issueMatches = response.message.match(/\*\*([^*]+)\*\*/g);
       if (issueMatches) {
-        issues.push(...issueMatches.map(match => match.replace(/\*\*/g, '')));
+        issues.push(...issueMatches.map((match: string) => match.replace(/\*\*/g, '')));
       }
     }
 
@@ -551,9 +551,10 @@ const processUserInput = (input) => {
       if (!stats[result.agent]) {
         stats[result.agent] = { total: 0, passed: 0, totalScore: 0 };
       }
-      stats[result.agent].total++;
-      if (result.passed) stats[result.agent].passed++;
-      stats[result.agent].totalScore += result.score;
+      const agentStats = stats[result.agent]!;
+      agentStats.total++;
+      if (result.passed) agentStats.passed++;
+      agentStats.totalScore += result.score;
     });
 
     return stats;

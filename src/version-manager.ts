@@ -229,7 +229,9 @@ export class VersionManager {
    */
   private bumpVersion(version: string, bumpType: VersionBumpType): string {
     const parts = version.split('.').map(Number);
-    const [major, minor, patch] = parts;
+    const major = parts[0] || 0;
+    const minor = parts[1] || 0;
+    const patch = parts[2] || 0;
 
     switch (bumpType) {
       case 'major':
@@ -255,11 +257,11 @@ export class VersionManager {
     if (version.includes('-')) {
       // Already a prerelease, increment the number
       const [base, prerelease] = version.split('-');
-      const [prereleaseId, prereleaseNumber] = prerelease.split('.');
-      return `${base}-${prereleaseId}.${parseInt(prereleaseNumber) + 1}`;
+      const [prereleaseId, prereleaseNumber] = prerelease?.split('.') || ['beta', '0'];
+      return `${base}-${prereleaseId}.${parseInt(prereleaseNumber || '0') + 1}`;
     } else {
       // Create new prerelease
-      return `${major}.${minor}.${parseInt(patch) + 1}-${identifier}.1`;
+      return `${major}.${minor}.${parseInt(patch || '0') + 1}-${identifier}.1`;
     }
   }
 
@@ -394,7 +396,9 @@ Co-Authored-By: Claude <noreply@anthropic.com>"`, {
         encoding: 'utf-8'
       });
 
-      const [ahead, behind] = status.trim().split('\t').map(Number);
+      const parts = status.trim().split('\t').map(Number);
+      const ahead = parts[0] || 0;
+      const behind = parts[1] || 0;
       return { ahead, behind };
     } catch {
       return { ahead: 0, behind: 0 };
@@ -413,6 +417,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>"`, {
 
       return output.trim().split('\n').map(line => {
         const [tag, dateStr] = line.split(' ');
+        if (!tag || !dateStr) {
+          return {
+            version: tag || 'unknown',
+            date: new Date(),
+            tag: tag || 'unknown'
+          };
+        }
         return {
           version: tag.replace(/^v/, ''),
           date: new Date(dateStr),

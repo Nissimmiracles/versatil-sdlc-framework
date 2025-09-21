@@ -26,7 +26,11 @@ interface QualityGateResult {
  * Bridges between VERSATIL framework and actual development tools
  */
 class VERSATILFrameworkIntegration {
-  private environment: DevelopmentEnvironment;
+  private environment: DevelopmentEnvironment = {
+    tool: 'vscode',
+    mcpSupport: false,
+    agentSupport: false
+  };
   private qualityGates: Map<string, (context: any) => Promise<QualityGateResult>> = new Map();
   private mcpConnections: Map<string, any> = new Map();
 
@@ -42,7 +46,7 @@ class VERSATILFrameworkIntegration {
    */
   private detectEnvironment(): void {
     // Check for Claude Code environment
-    if (process.env.CLAUDE_CODE_ENV || global.window?.navigator?.userAgent?.includes('Claude')) {
+    if (process.env['CLAUDE_CODE_ENV'] || global.window?.navigator?.userAgent?.includes('Claude')) {
       this.environment = {
         tool: 'claude-code',
         mcpSupport: true,
@@ -50,7 +54,7 @@ class VERSATILFrameworkIntegration {
       };
     }
     // Check for Cursor environment
-    else if (process.env.CURSOR_ENV || process.env.VSCODE_PID) {
+    else if (process.env['CURSOR_ENV'] || process.env['VSCODE_PID']) {
       this.environment = {
         tool: 'cursor',
         mcpSupport: false, // Cursor uses .cursorrules instead

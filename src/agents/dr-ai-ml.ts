@@ -4,86 +4,66 @@
  */
 
 import { BaseAgent } from './base-agent';
-import { AgentActivationContext, AgentResponse } from '../types/agent-types';
+import { AgentActivationContext, AgentResponse, ValidationResults, Recommendation } from '../types/agent-types';
 
 export class DrAIML extends BaseAgent {
-  id = 'dr-ai-ml';
-  name = 'Dr. AI-ML';
-  specialization = 'Machine Learning & Artificial Intelligence';
+  override name = 'Dr. AI-ML';
+
+  constructor() {
+    super('dr-ai-ml', 'Machine Learning & Artificial Intelligence');
+  }
 
   override async activate(context: AgentActivationContext): Promise<AgentResponse> {
     const mlAnalysisResults = await this.runMLAnalysisValidation(context);
+    const insights = await this.generateMLInsights(context);
 
     return {
       agentId: this.id,
+      message: 'Machine learning analysis completed successfully',
+      priority: 'medium',
+      handoffTo: ['enhanced-marcus', 'enhanced-james'],
+      context: mlAnalysisResults,
       result: mlAnalysisResults,
       suggestions: [
         ...mlAnalysisResults.suggestions,
-        ...await this.generateMLInsights(context)
+        ...insights
       ]
     };
   }
 
-  override async runAgentSpecificValidation(context: AgentActivationContext) {
+  override async runAgentSpecificValidation(context: AgentActivationContext): Promise<Partial<ValidationResults>> {
     return {
       suggestions: [
         {
           type: 'info',
-          message: 'AI/ML analysis initiated',
-          fix: 'Reviewing data pipelines and model architecture'
+          priority: 'medium',
+          message: 'Machine learning validation initiated',
+          actions: ['Review model architecture', 'Validate data pipeline']
         }
       ]
     };
   }
 
   private async runMLAnalysisValidation(context: AgentActivationContext) {
-    const suggestions = [];
+    const suggestions: Recommendation[] = [];
 
-    // Data quality assessment
     suggestions.push({
       type: 'info',
-      message: 'Analyzing data quality and preprocessing',
-      fix: 'Ensure data validation and cleaning procedures are in place'
-    });
-
-    // Model architecture review
-    suggestions.push({
-      type: 'info',
-      message: 'Reviewing model architecture and performance',
-      fix: 'Validate model design matches problem requirements'
-    });
-
-    // Training pipeline check
-    suggestions.push({
-      type: 'suggestion',
-      message: 'Evaluating training and validation processes',
-      fix: 'Implement proper train/validation/test splits and monitoring'
+      priority: 'medium',
+      message: 'Analyzing ML model configuration',
+      actions: ['Review model parameters', 'Validate training data']
     });
 
     return { suggestions };
   }
 
-  private async generateMLInsights(context: AgentActivationContext) {
+  private async generateMLInsights(context: AgentActivationContext): Promise<Recommendation[]> {
     return [
       {
-        type: 'suggestion',
-        message: 'Implement model versioning and experiment tracking',
-        fix: 'Use MLflow or similar tools for model lifecycle management'
-      },
-      {
-        type: 'suggestion',
-        message: 'Set up automated model validation pipelines',
-        fix: 'Create automated tests for model accuracy and drift detection'
-      },
-      {
         type: 'optimization',
-        message: 'Optimize model inference performance',
-        fix: 'Consider model quantization, caching, and batch processing'
-      },
-      {
-        type: 'ml',
-        message: 'Establish continuous learning workflows',
-        fix: 'Implement feedback loops for model improvement over time'
+        priority: 'medium',
+        message: 'Optimize model performance',
+        actions: ['Implement model versioning', 'Add performance monitoring']
       }
     ];
   }

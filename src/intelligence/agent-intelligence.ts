@@ -79,6 +79,7 @@ export class AgentIntelligenceManager {
    */
   private createIntelligentProxy(agent: BaseAgent, wrapper: IntelligentAgentWrapper): BaseAgent {
     const agentId = agent['id'];
+    const manager = this;
 
     return new Proxy(agent, {
       get(target, prop, receiver) {
@@ -95,7 +96,7 @@ export class AgentIntelligenceManager {
 
             try {
               // Apply any learned adaptations
-              const adaptedContext = this.applyAdaptations(agentId, context);
+              const adaptedContext = manager.applyAdaptations(agentId, context);
 
               // Execute original agent
               const response = await target.activate.call(this, adaptedContext);
@@ -117,9 +118,9 @@ export class AgentIntelligenceManager {
                 (wrapper.performanceMetrics.avgExecutionTime + executionTime) / 2;
 
               // Enhanced response with learning context
-              const enhancedResponse = this.enhanceResponse(response, wrapper, activationId);
+              const enhancedResponse = manager.enhanceResponse(response, wrapper, activationId);
 
-              this.logger.debug('Intelligent agent activation completed', {
+              manager.logger.debug('Intelligent agent activation completed', {
                 agentId,
                 executionTime,
                 issuesDetected,
@@ -129,9 +130,9 @@ export class AgentIntelligenceManager {
               return enhancedResponse;
 
             } catch (error) {
-              this.logger.error('Intelligent agent activation failed', {
+              manager.logger.error('Intelligent agent activation failed', {
                 agentId,
-                error: error.message,
+                error: error instanceof Error ? error.message : String(error),
                 activationId
               }, 'agent-intelligence');
 
@@ -178,7 +179,7 @@ export class AgentIntelligenceManager {
           // Add specialized handling for certain file types
           if (adaptedContext.filePath && adaptation.fileTypeRules) {
             const fileExt = adaptedContext.filePath.split('.').pop();
-            if (adaptation.fileTypeRules[fileExt]) {
+            if (fileExt && adaptation.fileTypeRules[fileExt]) {
               adaptedContext.contextClarity = 'clear';
             }
           }
@@ -249,7 +250,7 @@ export class AgentIntelligenceManager {
         helpful: feedback.wasHelpful,
         accurate: feedback.wasAccurate,
         rating: feedback.rating,
-        comments: feedback.comments
+        ...(feedback.comments ? { comments: feedback.comments } : {})
       }
     );
 
@@ -379,7 +380,7 @@ export class AgentIntelligenceManager {
       adaptations.push({
         type: 'file_type_specialization',
         config: {
-          fileTypeRules: pattern.context.fileTypes.reduce((rules, fileType) => {
+          fileTypeRules: pattern.context.fileTypes.reduce((rules: any, fileType: any) => {
             rules[fileType] = { specialized: true, confidence: pattern.confidence };
             return rules;
           }, {})

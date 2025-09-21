@@ -427,12 +427,12 @@ export class SDLCOrchestrator {
       this.logger.error('❌ SDLC phase transition failed', {
         fromPhase,
         toPhase,
-        error: error.message
+        error: error instanceof Error ? error.message : String(error)
       }, 'sdlc-orchestrator');
 
       return {
         success: false,
-        message: `Phase transition failed: ${error.message}`,
+        message: `Phase transition failed: ${error instanceof Error ? error.message : String(error)}`,
         error: error
       };
     }
@@ -507,7 +507,7 @@ export class SDLCOrchestrator {
         totalScore += gateResult.score;
         gateCount++;
       } catch (error) {
-        failures.push(`Quality gate ${gate.id} execution failed: ${error.message}`);
+        failures.push(`Quality gate ${gate.id} execution failed: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
@@ -569,7 +569,7 @@ export class SDLCOrchestrator {
       } catch (error) {
         this.logger.error('Failed to process feedback loop', {
           feedbackId: feedback.id,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         }, 'sdlc-orchestrator');
       }
     }
@@ -624,37 +624,33 @@ export class SDLCOrchestrator {
 
     for (const agentId of phaseObj.agents) {
       try {
-        const agent = this.agentRegistry.getAgentById(agentId);
+        const agent = this.agentRegistry.getAgent(agentId);
         if (agent) {
           const activationContext: AgentActivationContext = {
             filePath: context.filePath || '',
             trigger: `phase-transition-${phase}`,
             content: context.content || '',
-            metadata: {
-              phase,
-              orchestrated: true,
-              timestamp: new Date().toISOString()
-            }
+            userRequest: `Phase transition: ${phase}`
           };
 
           const result = await agent.activate(activationContext);
           activatedAgents.push({
             agentId,
-            success: result.success,
+            success: result.message && result.suggestions.length > 0,
             suggestions: result.suggestions?.length || 0
           });
 
           this.logger.debug('Agent activated for phase', {
             agentId,
             phase,
-            success: result.success
+            success: result.message && result.suggestions.length > 0
           }, 'sdlc-orchestrator');
         }
       } catch (error) {
         this.logger.error('Failed to activate agent for phase', {
           agentId,
           phase,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         }, 'sdlc-orchestrator');
       }
     }
@@ -723,7 +719,7 @@ export class SDLCOrchestrator {
   private async getMetricValue(metric: string, phase: string): Promise<any> {
     // Implementation would fetch actual metrics
     // For now, return realistic mock values
-    const mockMetrics = {
+    const mockMetrics: Record<string, number> = {
       'test-coverage': 85,
       'lint-errors': 0,
       'user-stories-count': 8,

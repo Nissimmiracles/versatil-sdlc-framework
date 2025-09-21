@@ -99,7 +99,7 @@ export class PerformanceMonitor extends EventEmitter {
         this.agentPerformance = new Map(Object.entries(data.agentPerformance || {}));
       }
     } catch (error) {
-      console.warn('Could not load historical performance data:', error.message);
+      console.warn('Could not load historical performance data:', error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -154,40 +154,46 @@ export class PerformanceMonitor extends EventEmitter {
     const timestamp = Date.now();
 
     // Record execution time metric
-    this.recordMetric({
+    const execMetric: PerformanceMetric = {
       id: `${agentId}-exec-${timestamp}`,
       timestamp,
       agentId,
       metricType: 'execution_time',
       value: executionTime,
-      context,
-      threshold: this.alertThresholds.get('execution_time'),
       status: this.getMetricStatus('execution_time', executionTime)
-    });
+    };
+    if (context) execMetric.context = context;
+    const execThreshold = this.alertThresholds.get('execution_time');
+    if (execThreshold !== undefined) execMetric.threshold = execThreshold;
+    this.recordMetric(execMetric);
 
     // Record issues detected metric
-    this.recordMetric({
+    const issuesMetric: PerformanceMetric = {
       id: `${agentId}-issues-${timestamp}`,
       timestamp,
       agentId,
       metricType: 'issue_detection',
       value: issuesDetected,
-      context,
-      threshold: this.alertThresholds.get('issue_detection'),
       status: this.getMetricStatus('issue_detection', issuesDetected)
-    });
+    };
+    if (context) issuesMetric.context = context;
+    const issuesThreshold = this.alertThresholds.get('issue_detection');
+    if (issuesThreshold !== undefined) issuesMetric.threshold = issuesThreshold;
+    this.recordMetric(issuesMetric);
 
     // Record quality score metric
-    this.recordMetric({
+    const qualityMetric: PerformanceMetric = {
       id: `${agentId}-quality-${timestamp}`,
       timestamp,
       agentId,
       metricType: 'quality_score',
       value: qualityScore,
-      context,
-      threshold: this.alertThresholds.get('quality_score'),
       status: this.getMetricStatus('quality_score', qualityScore)
-    });
+    };
+    if (context) qualityMetric.context = context;
+    const qualityThreshold = this.alertThresholds.get('quality_score');
+    if (qualityThreshold !== undefined) qualityMetric.threshold = qualityThreshold;
+    this.recordMetric(qualityMetric);
 
     // Update agent performance data
     this.updateAgentPerformance(agentId, executionTime, issuesDetected, qualityScore, success);
@@ -206,28 +212,33 @@ export class PerformanceMonitor extends EventEmitter {
 
     // Get memory usage
     const memoryUsage = process.memoryUsage();
-    this.recordMetric({
+    const memoryValue = memoryUsage.heapUsed / 1024 / 1024; // MB
+    const memoryMetric: PerformanceMetric = {
       id: `system-memory-${timestamp}`,
       timestamp,
       agentId: 'system',
       metricType: 'memory_usage',
-      value: memoryUsage.heapUsed / 1024 / 1024, // MB
-      threshold: this.alertThresholds.get('memory_usage'),
-      status: this.getMetricStatus('memory_usage', memoryUsage.heapUsed / 1024 / 1024)
-    });
+      value: memoryValue,
+      status: this.getMetricStatus('memory_usage', memoryValue)
+    };
+    const memoryThreshold = this.alertThresholds.get('memory_usage');
+    if (memoryThreshold !== undefined) memoryMetric.threshold = memoryThreshold;
+    this.recordMetric(memoryMetric);
 
     // Get CPU usage (approximation)
     const cpuUsage = process.cpuUsage();
     const cpuPercent = (cpuUsage.user + cpuUsage.system) / 1000000; // Convert to percentage
-    this.recordMetric({
+    const cpuMetric: PerformanceMetric = {
       id: `system-cpu-${timestamp}`,
       timestamp,
       agentId: 'system',
       metricType: 'cpu_usage',
       value: cpuPercent,
-      threshold: this.alertThresholds.get('cpu_usage'),
       status: this.getMetricStatus('cpu_usage', cpuPercent)
-    });
+    };
+    const cpuThreshold = this.alertThresholds.get('cpu_usage');
+    if (cpuThreshold !== undefined) cpuMetric.threshold = cpuThreshold;
+    this.recordMetric(cpuMetric);
   }
 
   /**
@@ -563,7 +574,7 @@ export class PerformanceMonitor extends EventEmitter {
       const metricsFile = path.join(this.metricsStorePath, 'metrics.json');
       fs.writeFileSync(metricsFile, JSON.stringify(data, null, 2));
     } catch (error) {
-      console.error('Failed to save performance metrics:', error.message);
+      console.error('Failed to save performance metrics:', error instanceof Error ? error.message : String(error));
     }
   }
 

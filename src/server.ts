@@ -20,10 +20,10 @@ const app = express();
 const server = createServer(app);
 
 // Environment configuration
-const PORT = process.env.PORT || 3000;
-const NODE_ENV = process.env.NODE_ENV || 'development';
-const ENHANCED_AGENTS_ENABLED = process.env.ENHANCED_AGENTS_ENABLED === 'true';
-const PERFORMANCE_MONITORING = process.env.PERFORMANCE_MONITORING === 'true';
+const PORT = process.env['PORT'] || 3000;
+const NODE_ENV = process.env['NODE_ENV'] || 'development';
+const ENHANCED_AGENTS_ENABLED = process.env['ENHANCED_AGENTS_ENABLED'] === 'true';
+const PERFORMANCE_MONITORING = process.env['PERFORMANCE_MONITORING'] === 'true';
 
 // Middleware
 app.use(express.json());
@@ -36,7 +36,7 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     memory: process.memoryUsage(),
-    version: process.env.npm_package_version || '1.0.0',
+    version: process.env['npm_package_version'] || '1.0.0',
     environment: NODE_ENV,
     enhancedAgents: ENHANCED_AGENTS_ENABLED,
     performanceMonitoring: PERFORMANCE_MONITORING
@@ -77,7 +77,7 @@ app.get('/metrics', (req, res) => {
 
   const metrics = performanceMonitor.getPrometheusMetrics();
   res.set('Content-Type', 'text/plain');
-  res.send(metrics);
+  return res.send(metrics);
 });
 
 // Enhanced BMAD agent status endpoint
@@ -96,7 +96,7 @@ app.get('/agents/status', (req, res) => {
   };
 
   logger.info('Agent status requested', agentStatus, 'server');
-  res.status(200).json(agentStatus);
+  return res.status(200).json(agentStatus);
 });
 
 // Analytics endpoint
@@ -114,17 +114,17 @@ app.get('/analytics', (req, res) => {
   try {
     const analytics = JSON.parse(fs.readFileSync(analyticsPath, 'utf8'));
     logger.info('Analytics data requested', { timestamp: analytics.timestamp }, 'server');
-    res.status(200).json(analytics);
+    return res.status(200).json(analytics);
   } catch (error) {
-    logger.error('Failed to read analytics data', { error: error.message }, 'server');
-    res.status(500).json({ error: 'Failed to read analytics data' });
+    logger.error('Failed to read analytics data', { error: error instanceof Error ? error.message : String(error) }, 'server');
+    return res.status(500).json({ error: 'Failed to read analytics data' });
   }
 });
 
 // Error handling middleware
 app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   logger.error('Server error', {
-    error: error.message,
+    error: error instanceof Error ? error.message : String(error),
     stack: error.stack,
     path: req.path,
     method: req.method
@@ -153,7 +153,7 @@ function checkFilesystem(): { status: string; message?: string } {
     fs.unlinkSync(testFile);
     return { status: 'ok' };
   } catch (error) {
-    return { status: 'error', message: error.message };
+    return { status: 'error', message: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -200,7 +200,7 @@ function checkBMADAgents(): { status: string; message?: string } {
 
     return { status: 'ok' };
   } catch (error) {
-    return { status: 'error', message: error.message };
+    return { status: 'error', message: error instanceof Error ? error.message : String(error) };
   }
 }
 
@@ -224,7 +224,7 @@ function checkAgentHealth(agentId: string): { status: string; lastSeen?: string;
       return { status: 'inactive', lastSeen: lastModified, message: 'Agent not seen recently' };
     }
   } catch (error) {
-    return { status: 'error', message: error.message };
+    return { status: 'error', message: error instanceof Error ? error.message : String(error) };
   }
 }
 

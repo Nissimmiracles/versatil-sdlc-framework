@@ -366,13 +366,13 @@ export class VERSATILMCPServer {
       } catch (error) {
         this.config.logger.error('MCP tool execution failed', {
           tool: name,
-          error: error.message,
+          error: error instanceof Error ? error.message : String(error),
           args
         }, 'versatil-mcp-server');
 
         throw new McpError(
           ErrorCode.InternalError,
-          `Tool execution failed: ${error.message}`
+          `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`
         );
       }
     });
@@ -384,7 +384,7 @@ export class VERSATILMCPServer {
   private async handleActivateAgent(args: any): Promise<any> {
     const { agentId, filePath, content = '', trigger = 'mcp-call' } = args;
 
-    const agent = this.config.agents.getAgentById(agentId);
+    const agent = this.config.agents.getAgent(agentId);
     if (!agent) {
       throw new McpError(ErrorCode.InvalidParams, `Agent not found: ${agentId}`);
     }
@@ -403,7 +403,7 @@ export class VERSATILMCPServer {
 
     this.config.logger.info('MCP agent activation completed', {
       agentId,
-      success: result.success,
+      success: result && result.priority !== 'critical',
       suggestions: result.suggestions?.length || 0
     }, 'versatil-mcp-server');
 
@@ -413,7 +413,7 @@ export class VERSATILMCPServer {
           type: 'text',
           text: JSON.stringify({
             agentId,
-            success: result.success,
+            success: result && result.priority !== 'critical',
             suggestions: result.suggestions || [],
             context: result.context,
             timestamp: new Date().toISOString()
@@ -441,7 +441,7 @@ export class VERSATILMCPServer {
           type: 'text',
           text: JSON.stringify({
             transition: `${fromPhase} → ${toPhase}`,
-            success: result.success,
+            success: result && result.priority !== 'critical',
             newPhase: result.newPhase,
             qualityScore: result.qualityScore,
             agentsActivated: result.agentsActivated,
@@ -460,7 +460,7 @@ export class VERSATILMCPServer {
     const { phase, filePath, strictMode = true } = args;
 
     // Get Enhanced Maria for quality validation
-    const mariaAgent = this.config.agents.getAgentById('enhanced-maria');
+    const mariaAgent = this.config.agents.getAgent('enhanced-maria');
     if (!mariaAgent) {
       throw new McpError(ErrorCode.InternalError, 'Enhanced Maria agent not available');
     }
@@ -484,10 +484,10 @@ export class VERSATILMCPServer {
           type: 'text',
           text: JSON.stringify({
             phase,
-            qualityGatesPassed: result.success,
-            issues: result.suggestions?.filter(s => s.type === 'error') || [],
-            warnings: result.suggestions?.filter(s => s.type === 'warning') || [],
-            recommendations: result.suggestions?.filter(s => s.type === 'info') || [],
+            qualityGatesPassed: result && result.priority !== 'critical',
+            issues: result.suggestions?.filter((s: any) => s.type === 'error') || [],
+            warnings: result.suggestions?.filter((s: any) => s.type === 'warning') || [],
+            recommendations: result.suggestions?.filter((s: any) => s.type === 'info') || [],
             strictMode,
             timestamp: new Date().toISOString()
           }, null, 2)
@@ -539,7 +539,7 @@ export class VERSATILMCPServer {
   private async handleAnalyzeArchitecture(args: any): Promise<any> {
     const { filePath, analysisType, generateADR = false } = args;
 
-    const architectureAgent = this.config.agents.getAgentById('architecture-dan');
+    const architectureAgent = this.config.agents.getAgent('architecture-dan');
     if (!architectureAgent) {
       throw new McpError(ErrorCode.InternalError, 'Architecture Dan agent not available');
     }
@@ -566,7 +566,7 @@ export class VERSATILMCPServer {
             filePath,
             architecturalFindings: result.suggestions || [],
             adrGenerated: generateADR,
-            recommendations: result.context?.architectural || {},
+            recommendations: result.context?.['architectural'] || {},
             timestamp: new Date().toISOString()
           }, null, 2)
         }
@@ -580,7 +580,7 @@ export class VERSATILMCPServer {
   private async handleManageDeployment(args: any): Promise<any> {
     const { action, environment, strategy = 'rolling' } = args;
 
-    const deploymentAgent = this.config.agents.getAgentById('deployment-orchestrator');
+    const deploymentAgent = this.config.agents.getAgent('deployment-orchestrator');
     if (!deploymentAgent) {
       throw new McpError(ErrorCode.InternalError, 'Deployment Orchestrator not available');
     }
@@ -607,8 +607,8 @@ export class VERSATILMCPServer {
             action,
             environment,
             strategy,
-            success: result.success,
-            deploymentStatus: result.context?.deployment || {},
+            success: result && result.priority !== 'critical',
+            deploymentStatus: result.context?.['deployment'] || {},
             suggestions: result.suggestions || [],
             timestamp: new Date().toISOString()
           }, null, 2)
@@ -630,10 +630,11 @@ export class VERSATILMCPServer {
     };
 
     if (include.includes('agents')) {
+      const allAgents = Array.from(this.config.agents.getAllAgents().values());
       status.agents = {
-        total: this.config.agents.getRegisteredAgents().length,
-        active: this.config.agents.getRegisteredAgents().filter(a => a.name).length,
-        list: this.config.agents.getRegisteredAgents().map(a => ({
+        total: allAgents.length,
+        active: allAgents.filter((a: any) => a.name).length,
+        list: allAgents.map((a: any) => ({
           id: a.id,
           name: a.name,
           specialization: a.specialization
@@ -646,7 +647,7 @@ export class VERSATILMCPServer {
     }
 
     if (include.includes('performance')) {
-      status.performance = this.config.performanceMonitor.getPerformanceSnapshot();
+      status.performance = this.config.performanceMonitor.getPerformanceDashboard();
     }
 
     return {
@@ -698,9 +699,10 @@ export class VERSATILMCPServer {
     const results = [];
 
     if (autoActivate) {
-      // Get appropriate agent for file
-      const agent = this.config.agents.getAgentForFile(filePath);
-      if (agent) {
+      // Get appropriate agents for file
+      const agents = this.config.agents.getAgentsForFilePattern(filePath);
+      if (agents.length > 0 && agents[0]) {
+        const [agentId, agent] = agents[0]; // Use the first (highest priority) agent
         const activationContext = {
           filePath,
           trigger: 'file-analysis',
@@ -710,8 +712,8 @@ export class VERSATILMCPServer {
 
         const result = await agent.activate(activationContext);
         results.push({
-          agentId: agent.id,
-          agentName: agent.name,
+          agentId: agentId,
+          agentName: agentId,
           suggestions: result.suggestions || []
         });
       }
@@ -738,7 +740,7 @@ export class VERSATILMCPServer {
   private async handlePerformanceReport(args: any): Promise<any> {
     const { metric, format = 'summary' } = args;
 
-    const report = this.config.performanceMonitor.getPerformanceSnapshot();
+    const report = this.config.performanceMonitor.getPerformanceDashboard();
 
     if (format === 'markdown') {
       const markdown = this.generateMarkdownReport(report, metric);
@@ -798,7 +800,7 @@ Generated at: ${new Date().toISOString()}
   private setupErrorHandling(): void {
     this.server.onerror = (error) => {
       this.config.logger.error('MCP Server error', {
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         stack: error.stack
       }, 'versatil-mcp-server');
     };

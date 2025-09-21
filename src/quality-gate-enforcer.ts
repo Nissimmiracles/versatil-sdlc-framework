@@ -288,7 +288,7 @@ class QualityGateEnforcer {
         console.error(`❌ Quality gate ${ruleName} failed:`, error);
         combinedResult.blockers.push({
           severity: 'blocker',
-          message: `Quality gate execution failed: ${error.message}`,
+          message: `Quality gate execution failed: ${error instanceof Error ? error.message : String(error)}`,
           file: context.filePath,
           rule: ruleName
         });
@@ -452,15 +452,16 @@ class QualityGateEnforcer {
         const errors = this.parseTypeScriptErrors(stdout + stderr);
 
         for (const error of errors) {
-          result.blockers.push({
+          const qualityIssue: any = {
             severity: 'blocker',
-            message: error.message,
+            message: error instanceof Error ? error.message : String(error),
             file: error.file || context.filePath,
-            line: error.line,
-            column: error.column,
             rule: 'typescript-errors',
             fixSuggestion: 'Fix TypeScript compilation errors'
-          });
+          };
+          if (error.line !== undefined) qualityIssue.line = error.line;
+          if (error.column !== undefined) qualityIssue.column = error.column;
+          result.blockers.push(qualityIssue);
         }
 
         if (errors.length > 0) {
@@ -738,11 +739,12 @@ class QualityGateEnforcer {
 
     while ((match = importRegex.exec(fileContent)) !== null) {
       const importPath = match[1];
+      if (!importPath) continue;
       if (!importPath.startsWith('.') && !importPath.startsWith('/')) {
         const packageName = importPath.split('/')[0];
-        if (packageName.startsWith('@')) {
+        if (packageName && packageName.startsWith('@')) {
           imports.push(packageName + '/' + importPath.split('/')[1]);
-        } else {
+        } else if (packageName) {
           imports.push(packageName);
         }
       }
@@ -766,10 +768,10 @@ class QualityGateEnforcer {
         const match = line.match(/(.+?)\((\d+),(\d+)\): error (.+)/);
         if (match) {
           errors.push({
-            file: match[1],
-            line: parseInt(match[2]),
-            column: parseInt(match[3]),
-            message: match[4]
+            file: match[1] || '',
+            line: parseInt(match[2] || '0'),
+            column: parseInt(match[3] || '0'),
+            message: match[4] || ''
           });
         } else {
           errors.push({ message: line });

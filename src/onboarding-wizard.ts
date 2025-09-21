@@ -103,7 +103,7 @@ What type of project are you working on?
 
 Detected: ${detectedType || 'Unknown'} - Press Enter to confirm, or choose (1-6): `);
 
-    this.responses.projectType = this.parseProjectType(projectType || detectedType);
+    this.responses.projectType = this.parseProjectType(projectType || detectedType || 'web');
     this.responses.technologies = detectedTech;
 
     console.log(`✅ Project configured as: ${this.responses.projectType}`);
@@ -369,7 +369,7 @@ Happy coding with VERSATIL! 🚀
       '1': 'Speed', '2': 'Quality', '3': 'Testing',
       '4': 'Security', '5': 'Performance', '6': 'Collaboration'
     };
-    return input.split(',').map(i => map[i.trim()]).filter(Boolean);
+    return input.split(',').map(i => map[i.trim()]).filter((item): item is string => Boolean(item));
   }
 
   private parseMCPPreferences(input: string): string[] {
@@ -378,7 +378,7 @@ Happy coding with VERSATIL! 🚀
     const map: { [key: string]: string } = {
       '1': 'chrome_mcp', '2': 'shadcn_mcp', '3': 'github_mcp', '4': 'playwright_mcp'
     };
-    return input.split(',').map(i => map[i.trim()]).filter(Boolean);
+    return input.split(',').map(i => map[i.trim()]).filter((item): item is string => Boolean(item));
   }
 
   // Auto-detection methods

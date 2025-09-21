@@ -6,7 +6,7 @@
  * making the BMAD methodology work consistently across both tools
  */
 
-import { versatilDispatcher } from './agent-dispatcher';
+import { versatilDispatcher, AgentActivationContext } from './agent-dispatcher';
 import { versatilDevIntegration } from './development-integration';
 import path from 'path';
 import { promises as fs } from 'fs';
@@ -411,18 +411,25 @@ class CursorClaudeBridge {
       console.log(`   Urgency: ${request.urgency}`);
 
       // Find the corresponding agent trigger in the dispatcher
-      const agentName = request.ruleName.toLowerCase().split('(')[0].trim();
+      const agentName = request.ruleName.toLowerCase().split('(')[0]!.trim();
       const agentTrigger = versatilDispatcher['agents']?.get(agentName);
 
       if (agentTrigger) {
         // Activate the agent through the dispatcher
-        const response = await versatilDispatcher.activateAgent(agentTrigger, {
-          userRequest: request.context.userRequest,
-          filePath: request.context.filePath,
+        const activationContext: Partial<AgentActivationContext> = {
           matchedKeywords: request.context.matchedKeywords,
           urgency: request.urgency,
           bridgeInvoked: true // Mark as invoked via bridge
-        });
+        };
+
+        if (request.context.userRequest) {
+          activationContext.userRequest = request.context.userRequest;
+        }
+        if (request.context.filePath) {
+          activationContext.filePath = request.context.filePath;
+        }
+
+        const response = await versatilDispatcher.activateAgent(agentTrigger, activationContext);
 
         console.log(`✅ Claude agent ${request.ruleName} invoked:`, response.status);
 

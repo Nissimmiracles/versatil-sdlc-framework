@@ -143,13 +143,7 @@ export class UsageAnalytics extends EventEmitter {
       timestamp: Date.now(),
       agentId,
       eventType: 'activated',
-      context: {
-        filePath,
-        fileExtension: filePath ? this.extractFileExtension(filePath) : undefined,
-        projectType: this.detectProjectType(filePath, context),
-        codebase: this.analyzeCodebase(context),
-        user: this.extractUserInfo(context)
-      },
+      context: this.buildEventContext(filePath, context),
       data: {}
     };
 
@@ -172,9 +166,7 @@ export class UsageAnalytics extends EventEmitter {
       agentId,
       eventType: wasAccepted ? 'suggestion_accepted' : 'suggestion_dismissed',
       context: {},
-      data: {
-        userFeedback
-      }
+      data: userFeedback ? { userFeedback } : {}
     };
 
     this.trackEvent(event);
@@ -219,16 +211,17 @@ export class UsageAnalytics extends EventEmitter {
       timestamp: Date.now(),
       agentId,
       eventType: 'false_positive',
-      context: {
-        filePath,
-        fileExtension: filePath ? this.extractFileExtension(filePath) : undefined
-      },
+      context: this.buildSimpleContext(filePath),
       data: {
-        userFeedback: {
+        userFeedback: userComments ? {
           helpful: false,
           accurate: false,
           rating: 1,
           comments: userComments
+        } : {
+          helpful: false,
+          accurate: false,
+          rating: 1
         }
       }
     };
@@ -315,31 +308,20 @@ export class UsageAnalytics extends EventEmitter {
       timestamp: event.timestamp,
       agentId: event.agentId,
       actionType,
-      context: {
-        filePath: event.context.filePath,
-        fileType: event.context.fileExtension,
-        projectType: event.context.projectType,
-        userRole: event.context.user?.role,
-        issue: event.eventType === 'false_positive' ? {
-          type: 'unknown',
-          severity: 'medium',
-          wasAccurate: false,
-          userVerified: true
-        } : undefined,
-        suggestion: event.eventType.includes('suggestion') ? {
-          id: event.id,
-          type: 'general',
-          wasFollowed: event.eventType === 'suggestion_accepted',
-          wasHelpful: event.data.userFeedback?.helpful || false,
-          userRating: event.data.userFeedback?.rating
-        } : undefined
-      },
-      outcome: {
-        problemSolved: event.eventType === 'suggestion_accepted',
-        timeToResolution: event.data.executionTime,
-        userSatisfaction: event.data.userFeedback?.rating,
-        agentAccuracy: event.eventType === 'false_positive' ? 0 : 1
-      }
+      context: this.buildInteractionContext(event, actionType),
+      outcome: ((): any => {
+        const outcome: any = {
+          problemSolved: event.eventType === 'suggestion_accepted',
+          agentAccuracy: event.eventType === 'false_positive' ? 0 : 1
+        };
+        if (event.data.executionTime !== undefined) {
+          outcome.timeToResolution = event.data.executionTime;
+        }
+        if (event.data.userFeedback?.rating !== undefined) {
+          outcome.userSatisfaction = event.data.userFeedback.rating;
+        }
+        return outcome;
+      })()
     };
 
     // Send to adaptive learning engine
@@ -519,6 +501,81 @@ export class UsageAnalytics extends EventEmitter {
 
   private getImprovementOpportunities(): string[] {
     return ['Better context awareness', 'Personalized suggestions', 'Faster execution'];
+  }
+
+  private buildEventContext(filePath?: string, context?: any): any {
+    const eventContext: any = {
+      projectType: this.detectProjectType(filePath, context)
+    };
+
+    if (filePath) {
+      eventContext.filePath = filePath;
+      eventContext.fileExtension = this.extractFileExtension(filePath);
+    }
+
+    const codebase = this.analyzeCodebase(context);
+    if (codebase) {
+      eventContext.codebase = codebase;
+    }
+
+    const user = this.extractUserInfo(context);
+    if (user) {
+      eventContext.user = user;
+    }
+
+    return eventContext;
+  }
+
+  private buildSimpleContext(filePath?: string): any {
+    const context: any = {};
+
+    if (filePath) {
+      context.filePath = filePath;
+      context.fileExtension = this.extractFileExtension(filePath);
+    }
+
+    return context;
+  }
+
+  private buildInteractionContext(event: AgentUsageEvent, actionType: string): any {
+    const context: any = {};
+
+    if (event.context.filePath) {
+      context.filePath = event.context.filePath;
+    }
+    if (event.context.fileExtension) {
+      context.fileType = event.context.fileExtension;
+    }
+    if (event.context.projectType) {
+      context.projectType = event.context.projectType;
+    }
+    if (event.context.user?.role) {
+      context.userRole = event.context.user.role;
+    }
+
+    if (event.eventType === 'false_positive') {
+      context.issue = {
+        type: 'unknown',
+        severity: 'medium',
+        wasAccurate: false,
+        userVerified: true
+      };
+    }
+
+    if (event.eventType.includes('suggestion')) {
+      const suggestion: any = {
+        id: event.id,
+        type: 'general',
+        wasFollowed: event.eventType === 'suggestion_accepted',
+        wasHelpful: event.data.userFeedback?.helpful || false
+      };
+      if (event.data.userFeedback?.rating !== undefined) {
+        suggestion.userRating = event.data.userFeedback.rating;
+      }
+      context.suggestion = suggestion;
+    }
+
+    return context;
   }
 }
 
