@@ -1,0 +1,59 @@
+{
+  "name": "versatil-sdlc-framework",
+  "version": "1.0.0",
+  "description": "VERSATIL SDLC Framework MCP Server - Complete BMAD methodology with adaptive agents",
+  "author": "VERSATIL Development Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MiraclesGIT/versatil-sdlc-framework.git"
+  },
+  "mcp": {
+    "server": {
+      "command": "node",
+      "args": ["versatil-mcp-server.js"],
+      "cwd": ".",
+      "env": {
+        "NODE_ENV": "production",
+        "VERSATIL_MCP_MODE": "true"
+      }
+    },
+    "tools": [
+      {
+        "name": "versatil_activate_agent",
+        "description": "Activate specific BMAD agents (Enhanced Maria, James, Marcus, Architecture Dan, etc.)",
+        "category": "agent-management"
+      },
+      {
+        "name": "versatil_orchestrate_sdlc",
+        "description": "Manage SDLC phases and transitions with 91.3% adaptive flywheel",
+        "category": "workflow-management"
+      },
+      {
+        "name": "versatil_quality_gate",
+        "description": "Execute quality gates and validation checks",
+        "category": "quality-assurance"
+      },
+      {
+        "name": "versatil_framework_status",
+        "description": "Get framework status, health metrics, and agent performance",
+        "category": "monitoring"
+      }
+    ],
+    "capabilities": [
+      "Plan-to-Production Workflow",
+      "Cross-Project Intelligence",
+      "Adaptive Agent Behavior",
+      "Real-time Quality Gates",
+      "Emergency Response System",
+      "BMAD Methodology Implementation",
+      "Context Preservation"
+    ],
+    "requirements": {
+      "node": ">=16.0.0",
+      "dependencies": [
+        "@modelcontextprotocol/sdk"
+      ]
+    }
+  }
+}
