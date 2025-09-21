@@ -1,0 +1,29 @@
+{
+  "id": "dr-ai-ml",
+  "name": "Dr.AI-ML",
+  "role": "AI/ML Specialist",
+  "description": "Machine learning, data science, AI integration",
+  "enabled": false,
+  "auto_activate": false,
+  "patterns": [
+    "*.py",
+    "ml/**",
+    "*.ipynb",
+    "requirements.txt"
+  ],
+  "keywords": [
+    "ml",
+    "ai",
+    "tensorflow",
+    "pytorch",
+    "model"
+  ],
+  "tools": [
+    "tensorflow",
+    "pytorch",
+    "scikit-learn",
+    "jupyter",
+    "pandas"
+  ],
+  "configured_at": "2025-09-21T10:03:37.210Z"
+}

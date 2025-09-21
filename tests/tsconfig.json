@@ -1,0 +1,51 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    // Test-specific overrides
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+
+    // Enhanced types for testing
+    "types": [
+      "node",
+      "jest",
+      "@playwright/test",
+      "@types/jest"
+    ],
+
+    // Module resolution for test files
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+
+    // Enhanced path mapping for tests
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/types/*": ["./src/types/*"],
+      "@/agents/*": ["./src/agents/*"],
+      "@/services/*": ["./src/services/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/testing/*": ["./src/testing/*"],
+      "@/intelligence/*": ["./src/intelligence/*"],
+      "@/analytics/*": ["./src/analytics/*"],
+      "@/tests/*": ["./tests/*"],
+      "@/playwright/*": ["./tests/playwright/*"],
+      "@/e2e/*": ["./tests/e2e/*"],
+      "@/setup/*": ["./tests/setup/*"]
+    }
+  },
+
+  "include": [
+    "./**/*",
+    "../playwright.config.ts",
+    "../src/**/*"
+  ],
+
+  "exclude": [
+    "../node_modules",
+    "../dist",
+    "../coverage",
+    "./test-results"
+  ]
+}

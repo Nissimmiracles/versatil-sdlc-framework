@@ -3,8 +3,8 @@ import { jest } from '@jest/globals';
 // Global test setup
 beforeAll(() => {
   // Set test environment variables
-  process.env.NODE_ENV = 'test';
-  process.env.VERSATIL_ENV = 'testing';
+  process.env['NODE_ENV'] = 'test';
+  process.env['VERSATIL_ENV'] = 'testing';
 
   // Mock console methods for cleaner test output
   global.console = {

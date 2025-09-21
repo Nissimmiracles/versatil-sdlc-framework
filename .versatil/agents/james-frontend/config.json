@@ -1,0 +1,30 @@
+{
+  "id": "james-frontend",
+  "name": "James-Frontend",
+  "role": "Frontend Specialist",
+  "description": "React/Vue expert, UI/UX, performance optimization",
+  "enabled": true,
+  "auto_activate": true,
+  "patterns": [
+    "*.jsx",
+    "*.tsx",
+    "*.vue",
+    "components/**",
+    "*.css"
+  ],
+  "keywords": [
+    "react",
+    "vue",
+    "component",
+    "ui",
+    "frontend"
+  ],
+  "tools": [
+    "react",
+    "vue",
+    "eslint",
+    "prettier",
+    "webpack"
+  ],
+  "configured_at": "2025-09-21T10:03:37.209Z"
+}

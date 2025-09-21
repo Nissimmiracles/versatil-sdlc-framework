@@ -1,0 +1,95 @@
+{
+  "ai.model": "claude-3.5-sonnet",
+  "ai.temperature": 0.7,
+  "ai.enableCodeActions": true,
+  "ai.enableCodeGeneration": true,
+  "ai.enableCodeCompletion": true,
+
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/.versatil/cache": true,
+    "**/*.js.map": true,
+    "**/*.d.ts.map": true
+  },
+
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/.versatil/cache": true,
+    "**/package-lock.json": true
+  },
+
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.organizeImports": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "on"
+  },
+
+  "files.associations": {
+    "*.mcp.spec.ts": "typescript",
+    "*.bmad": "markdown",
+    "*.versatil": "json",
+    ".cursorrules": "yaml",
+    "CLAUDE.md": "markdown"
+  },
+
+  "testExplorer.useNativeTesting": true,
+  "jest.autoRun": "off",
+  "jest.showCoverageOnLoad": true,
+
+  "emmet.includeLanguages": {
+    "typescript": "typescriptreact",
+    "javascript": "javascriptreact"
+  },
+
+  "path-intellisense.mappings": {
+    "@": "${workspaceRoot}/src",
+    "@/*": "${workspaceRoot}/src/*",
+    "@/types/*": "${workspaceRoot}/src/types/*",
+    "@/agents/*": "${workspaceRoot}/src/agents/*",
+    "@/services/*": "${workspaceRoot}/src/services/*",
+    "@/utils/*": "${workspaceRoot}/src/utils/*",
+    "@/tests/*": "${workspaceRoot}/tests/*"
+  },
+
+  "bmad.agents.enableAutoActivation": true,
+  "bmad.quality.enableRealTimeValidation": true,
+  "bmad.context.preserveOnAgentSwitch": true,
+
+  "chrome-mcp.enabled": true,
+  "chrome-mcp.autoStart": false,
+  "chrome-mcp.debugMode": false,
+  "chrome-mcp.headless": true,
+  "chrome-mcp.viewport": {
+    "width": 1920,
+    "height": 1080
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "project": {},
+  "agents": {
+    "maria-qa": {
+      "enabled": true,
+      "auto_activate": true,
+      "configured_at": "2025-09-21T10:03:37.207Z"
+    },
+    "marcus-backend": {
+      "enabled": true,
+      "auto_activate": true,
+      "configured_at": "2025-09-21T10:03:37.208Z"
+    },
+    "james-frontend": {
+      "enabled": true,
+      "auto_activate": true,
+      "configured_at": "2025-09-21T10:03:37.209Z"
+    },
+    "sarah-pm": {
+      "enabled": false,
+      "auto_activate": false,
+      "configured_at": "2025-09-21T10:03:37.209Z"
+    },
+    "alex-ba": {
+      "enabled": false,
+      "auto_activate": false,
+      "configured_at": "2025-09-21T10:03:37.209Z"
+    },
+    "dr-ai-ml": {
+      "enabled": false,
+      "auto_activate": false,
+      "configured_at": "2025-09-21T10:03:37.210Z"
+    }
+  }
+}

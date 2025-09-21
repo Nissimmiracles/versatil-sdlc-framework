@@ -9,9 +9,14 @@ import { BaseAgent } from './base-agent';
 import { EnhancedMaria } from './enhanced-maria';
 import { EnhancedJames } from './enhanced-james';
 import { EnhancedMarcus } from './enhanced-marcus';
+import { SarahPM } from './sarah-pm';
+import { AlexBA } from './alex-ba';
+import { DrAIML } from './dr-ai-ml';
 import { DevOpsDan } from './devops-dan';
 import { SecuritySam } from './security-sam';
 import { IntrospectiveAgent } from './introspective-agent';
+import { ArchitectureDan } from './architecture-dan';
+import { DeploymentOrchestrator } from './deployment-orchestrator';
 import { log } from '../utils/logger';
 
 export interface AgentMetadata {
@@ -278,6 +283,86 @@ export class AgentRegistry {
       autoActivate: false, // Manual or scheduled activation
       collaborators: ['enhanced-maria', 'enhanced-james', 'enhanced-marcus', 'devops-dan', 'security-sam'],
       mcpTools: ['Read MCP', 'Grep MCP', 'Bash MCP', 'WebFetch MCP']
+    });
+
+    // Architecture-Dan - System Architecture & Design Patterns Specialist
+    this.registerAgent(new ArchitectureDan(log), {
+      id: 'architecture-dan',
+      name: 'Architecture Dan',
+      specialization: 'System Architecture & Design Patterns Specialist',
+      version: '1.0.0',
+      capabilities: [
+        'System architecture design and validation',
+        'Design pattern recognition and implementation',
+        'SOLID principles enforcement',
+        'Architectural decision records (ADRs)',
+        'Scalability assessment and optimization',
+        'Integration pattern validation',
+        'Technology stack consistency checking'
+      ],
+      triggers: {
+        filePatterns: [
+          '**/architecture/**', '**/design/**', '**/patterns/**',
+          '*.architecture.*', '*.design.*', '**/adr/**',
+          '**/config/**', '**/interfaces/**', '**/abstract/**'
+        ],
+        keywords: [
+          'architecture', 'design', 'pattern', 'interface', 'abstract',
+          'singleton', 'factory', 'observer', 'mvc', 'microservice',
+          'scalability', 'coupling', 'cohesion', 'solid'
+        ],
+        errorPatterns: [
+          'architecture.*violation', 'design.*pattern.*misuse',
+          'tight.*coupling', 'single.*responsibility.*violation'
+        ]
+      },
+      dependencies: [
+        'typescript', 'eslint', 'architectural-linting'
+      ],
+      priority: 2,
+      autoActivate: true,
+      collaborators: ['enhanced-james', 'enhanced-marcus', 'security-sam', 'enhanced-maria'],
+      mcpTools: ['Read MCP', 'Write MCP', 'Grep MCP']
+    });
+
+    // Deployment Orchestrator - Enhanced Deployment Pipeline Manager
+    this.registerAgent(new DeploymentOrchestrator(log), {
+      id: 'deployment-orchestrator',
+      name: 'Deployment Orchestrator',
+      specialization: 'Advanced Deployment Pipeline & Release Management',
+      version: '1.0.0',
+      capabilities: [
+        'Multi-environment deployment orchestration',
+        'Blue-green deployment strategy implementation',
+        'Deployment readiness validation',
+        'Environment configuration management',
+        'Health check automation and monitoring',
+        'Rollback strategy coordination',
+        'Docker and Kubernetes optimization'
+      ],
+      triggers: {
+        filePatterns: [
+          '**/deployment/**', '**/deploy/**', '**/k8s/**',
+          'Dockerfile', 'docker-compose.yml', '*.deployment.*',
+          '.github/workflows/**', '**/terraform/**', '**/helm/**'
+        ],
+        keywords: [
+          'deployment', 'deploy', 'docker', 'kubernetes', 'k8s',
+          'helm', 'terraform', 'blue-green', 'canary', 'rollback',
+          'environment', 'production', 'staging', 'pipeline'
+        ],
+        errorPatterns: [
+          'deployment.*failed', 'health.*check.*failed',
+          'rollback.*triggered', 'environment.*error'
+        ]
+      },
+      dependencies: [
+        'docker', 'kubernetes', 'helm', 'terraform'
+      ],
+      priority: 2,
+      autoActivate: true,
+      collaborators: ['devops-dan', 'security-sam', 'enhanced-maria', 'enhanced-marcus'],
+      mcpTools: ['Docker MCP', 'Kubernetes MCP', 'AWS MCP', 'GitHub MCP']
     });
 
     console.log(`✅ Registered ${this.agents.size} Enhanced BMAD Agents`);

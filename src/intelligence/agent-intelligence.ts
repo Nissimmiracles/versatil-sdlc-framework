@@ -78,13 +78,12 @@ export class AgentIntelligenceManager {
    * Create an intelligent proxy that intercepts agent calls
    */
   private createIntelligentProxy(agent: BaseAgent, wrapper: IntelligentAgentWrapper): BaseAgent {
-    const self = this;
     const agentId = agent['id'];
 
     return new Proxy(agent, {
       get(target, prop, receiver) {
         if (prop === 'activate') {
-          return async function(context: AgentActivationContext): Promise<AgentResponse> {
+          return async (context: AgentActivationContext): Promise<AgentResponse> => {
             // Track activation
             const activationId = usageAnalytics.trackAgentActivation(
               agentId,
@@ -96,7 +95,7 @@ export class AgentIntelligenceManager {
 
             try {
               // Apply any learned adaptations
-              const adaptedContext = self.applyAdaptations(agentId, context);
+              const adaptedContext = this.applyAdaptations(agentId, context);
 
               // Execute original agent
               const response = await target.activate.call(this, adaptedContext);
@@ -118,9 +117,9 @@ export class AgentIntelligenceManager {
                 (wrapper.performanceMetrics.avgExecutionTime + executionTime) / 2;
 
               // Enhanced response with learning context
-              const enhancedResponse = self.enhanceResponse(response, wrapper, activationId);
+              const enhancedResponse = this.enhanceResponse(response, wrapper, activationId);
 
-              self.logger.debug('Intelligent agent activation completed', {
+              this.logger.debug('Intelligent agent activation completed', {
                 agentId,
                 executionTime,
                 issuesDetected,
@@ -130,7 +129,7 @@ export class AgentIntelligenceManager {
               return enhancedResponse;
 
             } catch (error) {
-              self.logger.error('Intelligent agent activation failed', {
+              this.logger.error('Intelligent agent activation failed', {
                 agentId,
                 error: error.message,
                 activationId
