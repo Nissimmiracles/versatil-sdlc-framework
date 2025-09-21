@@ -1,4 +1,5 @@
-import { BaseAgent, AgentActivationContext, AgentResponse } from './base-agent';
+import { BaseAgent, AgentActivationContext, AgentResponse, ValidationResults, Issue, Recommendation } from './base-agent';
+import { agentIntelligence } from '../intelligence/agent-intelligence';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -13,12 +14,12 @@ import * as path from 'path';
  * - Real-time quality dashboard
  */
 export class EnhancedMaria extends BaseAgent {
-  private qualityMetrics: QualityMetrics;
+  private qualityMetrics: any;
   private configValidators: ConfigValidator[];
 
   constructor() {
     super('enhanced-maria', 'Advanced QA Lead & Configuration Validator');
-    this.qualityMetrics = new QualityMetrics();
+    this.qualityMetrics = {};
     this.configValidators = [
       new RouteConfigValidator(),
       new NavigationValidator(),
@@ -53,16 +54,15 @@ export class EnhancedMaria extends BaseAgent {
     };
   }
 
-  private async runComprehensiveValidation(context: AgentActivationContext): Promise<ValidationResults> {
-    const results: ValidationResults = {
-      configurationScore: 100,
-      issues: [],
-      warnings: [],
-      recommendations: [],
-      crossFileAnalysis: {},
-      performanceMetrics: {},
-      accessibilityIssues: [],
-      securityConcerns: []
+  protected async runAgentSpecificValidation(context: AgentActivationContext): Promise<Partial<ValidationResults>> {
+    return this.runComprehensiveValidation(context);
+  }
+
+  private async runComprehensiveValidation(context: AgentActivationContext): Promise<EnhancedValidationResults> {
+    const baseResults = await this.runStandardValidation(context);
+    const results: EnhancedValidationResults = {
+      ...baseResults,
+      configurationScore: 100
     };
 
     // Run each validator
@@ -83,7 +83,7 @@ export class EnhancedMaria extends BaseAgent {
     return results;
   }
 
-  private generateQualityDashboard(results: ValidationResults): QualityDashboard {
+  private generateQualityDashboard(results: EnhancedValidationResults): QualityDashboard {
     const criticalCount = results.issues.filter(i => i.severity === 'critical').length;
     const highCount = results.issues.filter(i => i.severity === 'high').length;
     const mediumCount = results.issues.filter(i => i.severity === 'medium').length;
@@ -108,7 +108,7 @@ export class EnhancedMaria extends BaseAgent {
     };
   }
 
-  private identifyCriticalIssues(results: ValidationResults): CriticalIssue[] {
+  private identifyCriticalIssues(results: EnhancedValidationResults): CriticalIssue[] {
     return results.issues
       .filter(issue => issue.severity === 'critical' || issue.severity === 'high')
       .map(issue => ({
@@ -120,7 +120,7 @@ export class EnhancedMaria extends BaseAgent {
   }
 
   private generateEnhancedReport(
-    results: ValidationResults,
+    results: EnhancedValidationResults,
     dashboard: QualityDashboard,
     criticalIssues: CriticalIssue[]
   ): string {
@@ -186,7 +186,7 @@ export class EnhancedMaria extends BaseAgent {
     return report;
   }
 
-  private generateActionableRecommendations(results: ValidationResults): any[] {
+  private generateActionableRecommendations(results: EnhancedValidationResults): Recommendation[] {
     const recommendations = [];
 
     // High-priority fixes
@@ -231,12 +231,6 @@ export class EnhancedMaria extends BaseAgent {
     return recommendations;
   }
 
-  private getScoreEmoji(score: number): string {
-    if (score >= 95) return '🟢';
-    if (score >= 85) return '🟡';
-    if (score >= 70) return '🟠';
-    return '🔴';
-  }
 
   private calculateTrend(currentScore: number): 'improving' | 'declining' | 'stable' {
     // This would typically compare with historical data
@@ -285,22 +279,8 @@ export class EnhancedMaria extends BaseAgent {
     return strategies[issue.type] || 'Implement monitoring for this issue type';
   }
 
-  private mergeResults(target: ValidationResults, source: Partial<ValidationResults>): void {
-    if (source.issues) target.issues.push(...source.issues);
-    if (source.warnings) target.warnings.push(...source.warnings);
-    if (source.recommendations) target.recommendations.push(...source.recommendations);
-    if (source.crossFileAnalysis) {
-      Object.assign(target.crossFileAnalysis, source.crossFileAnalysis);
-    }
-    if (source.performanceMetrics) {
-      Object.assign(target.performanceMetrics, source.performanceMetrics);
-    }
-    if (source.accessibilityIssues) {
-      target.accessibilityIssues.push(...source.accessibilityIssues);
-    }
-    if (source.securityConcerns) {
-      target.securityConcerns.push(...source.securityConcerns);
-    }
+  private mergeResults(target: EnhancedValidationResults, source: Partial<ValidationResults>): void {
+    this.mergeValidationResults(target, source);
   }
 
   private calculatePriority(criticalIssues: CriticalIssue[]): 'low' | 'medium' | 'high' | 'critical' {
@@ -316,7 +296,7 @@ export class EnhancedMaria extends BaseAgent {
     return 'low';
   }
 
-  private determineHandoffs(results: ValidationResults): string[] {
+  private determineHandoffs(results: EnhancedValidationResults): string[] {
     const handoffs = [];
 
     // Security issues -> Security-Sam
@@ -348,24 +328,9 @@ export class EnhancedMaria extends BaseAgent {
   }
 }
 
-// Supporting interfaces and classes
-interface ValidationResults {
+// Extended ValidationResults for Enhanced Maria
+interface EnhancedValidationResults extends ValidationResults {
   configurationScore: number;
-  issues: Issue[];
-  warnings: string[];
-  recommendations: string[];
-  crossFileAnalysis: Record<string, string>;
-  performanceMetrics: Record<string, any>;
-  accessibilityIssues: string[];
-  securityConcerns: string[];
-}
-
-interface Issue {
-  type: string;
-  severity: 'critical' | 'high' | 'medium' | 'low';
-  message: string;
-  file: string;
-  line?: number;
 }
 
 interface CriticalIssue extends Issue {
@@ -385,9 +350,8 @@ interface QualityDashboard {
   lastUpdated: string;
 }
 
-interface QualityMetrics {
-  // Quality metrics tracking would be implemented here
-}
+// Quality metrics interface (placeholder)
+type QualityMetrics = Record<string, any>;
 
 // Validator base class
 abstract class ConfigValidator {
@@ -520,4 +484,6 @@ class CrossFileValidator extends ConfigValidator {
   }
 }
 
-export default EnhancedMaria;
+// Export singleton instance with intelligence wrapper
+export const enhancedMaria = agentIntelligence.wrapAgent(new EnhancedMaria());
+export default enhancedMaria;

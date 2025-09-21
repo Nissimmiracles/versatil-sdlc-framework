@@ -1,4 +1,4 @@
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../agent-dispatcher';
+import { BaseAgent, AgentActivationContext, AgentResponse, ValidationResults } from './base-agent';
 
 /**
  * DevOps-Dan - Infrastructure & Deployment Specialist
@@ -9,6 +9,21 @@ export class DevOpsDan extends BaseAgent {
     super('devops-dan', 'Infrastructure & Deployment');
   }
 
+  protected async runAgentSpecificValidation(context: AgentActivationContext): Promise<Partial<ValidationResults>> {
+    const patterns = this.analyzeInfrastructurePatterns(context.content || '', context.filePath);
+    const recommendations = this.generateRecommendations(patterns, context.matchedKeywords || []);
+
+    return {
+      issues: [],
+      warnings: [],
+      recommendations: recommendations.map(r => ({
+        type: r.type,
+        priority: r.priority as any,
+        message: r.message
+      }))
+    };
+  }
+
   async activate(context: AgentActivationContext): Promise<AgentResponse> {
     const { trigger, filePath, content, matchedKeywords = [] } = context;
 
@@ -17,7 +32,7 @@ export class DevOpsDan extends BaseAgent {
     const recommendations = this.generateRecommendations(infrastructurePatterns, matchedKeywords);
 
     return {
-      agentId: this.id,
+      agentId: 'devops-dan',
       message: this.generateResponse(infrastructurePatterns, recommendations),
       suggestions: recommendations,
       priority: this.calculatePriority(infrastructurePatterns),

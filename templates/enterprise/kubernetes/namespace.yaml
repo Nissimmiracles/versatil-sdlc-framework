@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: versatil-sdlc
+  labels:
+    name: versatil-sdlc
+    app.kubernetes.io/name: versatil-sdlc
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: namespace
+    app.kubernetes.io/part-of: versatil-platform

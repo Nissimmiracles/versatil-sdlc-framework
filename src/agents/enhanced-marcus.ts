@@ -1,4 +1,5 @@
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../agent-dispatcher';
+import { BaseAgent, AgentActivationContext, AgentResponse, ValidationResults } from './base-agent';
+import { agentIntelligence } from '../intelligence/agent-intelligence';
 
 /**
  * Enhanced Marcus - Advanced Backend Specialist with API-Frontend Integration Validation
@@ -13,6 +14,10 @@ import { BaseAgent, AgentActivationContext, AgentResponse } from '../agent-dispa
 export class EnhancedMarcus extends BaseAgent {
   constructor() {
     super('enhanced-marcus', 'Advanced Backend Specialist & Integration Validator');
+  }
+
+  protected async runAgentSpecificValidation(context: AgentActivationContext): Promise<Partial<ValidationResults>> {
+    return this.runBackendValidation(context);
   }
 
   async activate(context: AgentActivationContext): Promise<AgentResponse> {
@@ -32,7 +37,7 @@ export class EnhancedMarcus extends BaseAgent {
     ];
 
     return {
-      agentId: this.id,
+      agentId: 'enhanced-marcus',
       message: this.generateEnhancedReport(issues, backendValidation),
       suggestions: this.generateActionableRecommendations(issues),
       priority: this.calculatePriority(issues),
@@ -463,12 +468,6 @@ export class EnhancedMarcus extends BaseAgent {
     return recommendations;
   }
 
-  private getScoreEmoji(score: number): string {
-    if (score >= 95) return '🟢';
-    if (score >= 85) return '🟡';
-    if (score >= 70) return '🟠';
-    return '🔴';
-  }
 
   private calculatePriority(issues: any[]): 'low' | 'medium' | 'high' | 'critical' {
     if (issues.some(i => i.severity === 'critical')) return 'critical';
@@ -497,4 +496,6 @@ export class EnhancedMarcus extends BaseAgent {
   }
 }
 
-export default EnhancedMarcus;
+// Export singleton instance with intelligence wrapper
+export const enhancedMarcus = agentIntelligence.wrapAgent(new EnhancedMarcus());
+export default enhancedMarcus;

@@ -1,4 +1,4 @@
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../agent-dispatcher';
+import { BaseAgent, AgentActivationContext, AgentResponse, ValidationResults } from './base-agent';
 
 /**
  * Security-Sam - Security & Compliance Specialist
@@ -7,6 +7,23 @@ import { BaseAgent, AgentActivationContext, AgentResponse } from '../agent-dispa
 export class SecuritySam extends BaseAgent {
   constructor() {
     super('security-sam', 'Security & Compliance');
+  }
+
+  protected async runAgentSpecificValidation(context: AgentActivationContext): Promise<Partial<ValidationResults>> {
+    const securityAnalysis = this.analyzeSecurityPatterns(context.content || '', context.filePath);
+    const vulnerabilities = this.detectVulnerabilities(context.content || '', context.filePath);
+
+    return {
+      issues: vulnerabilities.map(v => ({
+        type: 'security-vulnerability',
+        severity: v.severity as any,
+        message: v.description,
+        file: context.filePath || 'unknown',
+        fix: v.recommendation
+      })),
+      securityConcerns: vulnerabilities.map(v => v.description),
+      warnings: []
+    };
   }
 
   async activate(context: AgentActivationContext): Promise<AgentResponse> {
@@ -18,7 +35,7 @@ export class SecuritySam extends BaseAgent {
     const recommendations = this.generateSecurityRecommendations(securityAnalysis, vulnerabilities);
 
     return {
-      agentId: this.id,
+      agentId: 'security-sam',
       message: this.generateResponse(securityAnalysis, vulnerabilities, recommendations, emergency),
       suggestions: recommendations,
       priority: emergency ? 'critical' : this.calculatePriority(securityAnalysis, vulnerabilities),

@@ -47,7 +47,8 @@
     "**/*.spec.ts",
     "index.js",
     "jest.config.js",
-    "scripts/**/*.js"
+    "scripts/**/*.js",
+    "templates/**/*"
   ],
   "ts-node": {
     "esm": true,

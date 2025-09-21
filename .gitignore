@@ -105,11 +105,26 @@ pnpm-lock.yaml
 docs/_build/
 docs/site/
 
-# Security
+# 🚨 CRITICAL SECURITY FILES
 .secrets
+.credentials
+.tokens
 *.pem
 *.key
 *.crt
+*.p12
+*.pfx
+secrets/
+credentials/
+private/
+api-keys.json
+service-account.json
+firebase-adminsdk-*.json
+
+# 🔑 SMTP & EMAIL CREDENTIALS
+smtp-config.json
+mail-credentials.json
+email-secrets.env
 
 # Development
 .cache/

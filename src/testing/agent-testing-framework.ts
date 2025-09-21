@@ -288,7 +288,7 @@ const fetchUserProfile = async (id: string) => {
       severity: 'critical',
       mockContent: `
 // Hardcoded API key - security risk
-const API_KEY = 'sk-1234567890abcdef';
+const API_KEY = 'sk-test-fake-key-for-testing-only';
 
 // Insecure API configuration
 const apiConfig = {

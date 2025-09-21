@@ -1,8 +1,39 @@
-# Security Policy
+# SECURITY.md - VERSATIL SDLC Framework Security Policy
 
-## 🔒 VERSATIL SDLC Framework Security
+## 🛡️ Security Overview
 
-The security of the VERSATIL SDLC Framework and its users is our top priority. This document outlines our security policies, practices, and procedures for reporting vulnerabilities.
+The VERSATIL SDLC Framework takes security seriously and implements multiple layers of protection to ensure your development environment and deployed applications remain secure.
+
+## 🚨 Reporting Security Vulnerabilities
+
+### Immediate Response Protocol
+
+If you discover a security vulnerability, please follow these steps:
+
+1. **DO NOT** create a public GitHub issue
+2. **DO NOT** share the vulnerability publicly
+3. **DO** email us immediately at: `security@versatil-framework.com`
+4. **DO** include as much detail as possible
+
+### What to Include in Your Report
+
+```yaml
+Security Report Template:
+  - Vulnerability Type: [XSS, SQL Injection, CSRF, etc.]
+  - Affected Component: [Agent name, file path, service]
+  - Impact Level: [Critical, High, Medium, Low]
+  - Steps to Reproduce: [Detailed reproduction steps]
+  - Proof of Concept: [Code snippet or screenshot]
+  - Suggested Fix: [If you have recommendations]
+  - Your Contact: [Email for follow-up questions]
+```
+
+### Response Timeline
+
+- **Initial Response**: Within 24 hours
+- **Impact Assessment**: Within 48 hours
+- **Fix Development**: Within 1-7 days (depending on severity)
+- **Public Disclosure**: After fix is released and tested
 
 ## 🛡️ Security Standards
 

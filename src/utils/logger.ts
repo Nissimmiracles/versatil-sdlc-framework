@@ -28,7 +28,7 @@ export class VERSATILLogger {
   private logs: LogEntry[] = [];
   private enableConsole: boolean;
 
-  private constructor() {
+  constructor() {
     this.logLevel = this.getLogLevelFromEnv();
     this.enableConsole = process.env.NODE_ENV === 'development' || process.env.DEBUG_MODE === 'true';
   }
@@ -109,6 +109,10 @@ export class VERSATILLogger {
 
   public warn(message: string, context?: Record<string, unknown>, component?: string, agentId?: string): void {
     this.log(LogLevel.WARN, message, context, component, agentId);
+  }
+
+  public warning(message: string, context?: Record<string, unknown>, component?: string): void {
+    this.warn(message, context, component);
   }
 
   public info(message: string, context?: Record<string, unknown>, component?: string, agentId?: string): void {

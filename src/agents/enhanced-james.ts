@@ -1,4 +1,5 @@
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../agent-dispatcher';
+import { BaseAgent, AgentActivationContext, AgentResponse, ValidationResults } from './base-agent';
+import { agentIntelligence } from '../intelligence/agent-intelligence';
 
 /**
  * Enhanced James - Advanced Frontend Specialist with Route-Navigation Validation
@@ -13,6 +14,10 @@ import { BaseAgent, AgentActivationContext, AgentResponse } from '../agent-dispa
 export class EnhancedJames extends BaseAgent {
   constructor() {
     super('enhanced-james', 'Advanced Frontend Specialist & Navigation Validator');
+  }
+
+  protected async runAgentSpecificValidation(context: AgentActivationContext): Promise<Partial<ValidationResults>> {
+    return this.runFrontendValidation(context);
   }
 
   async activate(context: AgentActivationContext): Promise<AgentResponse> {
@@ -32,7 +37,7 @@ export class EnhancedJames extends BaseAgent {
     ];
 
     return {
-      agentId: this.id,
+      agentId: 'enhanced-james',
       message: this.generateEnhancedReport(issues, validationResults),
       suggestions: this.generateActionableRecommendations(issues),
       priority: this.calculatePriority(issues),
@@ -379,12 +384,6 @@ export class EnhancedJames extends BaseAgent {
     return recommendations;
   }
 
-  private getScoreEmoji(score: number): string {
-    if (score >= 95) return '🟢';
-    if (score >= 85) return '🟡';
-    if (score >= 70) return '🟠';
-    return '🔴';
-  }
 
   private calculatePriority(issues: any[]): 'low' | 'medium' | 'high' | 'critical' {
     if (issues.some(i => i.severity === 'critical')) return 'critical';
@@ -410,4 +409,6 @@ export class EnhancedJames extends BaseAgent {
   }
 }
 
-export default EnhancedJames;
+// Export singleton instance with intelligence wrapper
+export const enhancedJames = agentIntelligence.wrapAgent(new EnhancedJames());
+export default enhancedJames;

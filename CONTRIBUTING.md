@@ -1,6 +1,8 @@
-# 🤝 Contributing to VERSATIL SDLC Framework
+# Contributing to VERSATIL SDLC Framework
 
-Welcome to the VERSATIL SDLC Framework community! We're excited that you're interested in contributing to the future of AI-native development.
+🎉 **Thank you for your interest in contributing to VERSATIL SDLC Framework!**
+
+We're building the world's first AI-Native SDLC framework that achieves zero context loss through intelligent agent orchestration. Your contributions help make this revolutionary development tool even better.
 
 ## 🎯 Ways to Contribute
 

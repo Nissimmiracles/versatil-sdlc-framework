@@ -25,11 +25,15 @@ beforeEach(() => {
 // Global timeout for async operations
 jest.setTimeout(30000);
 
-// Mock MCP tools for testing
-jest.mock('@anthropic-ai/mcp-sdk', () => ({
-  createTool: jest.fn(),
-  invokeTool: jest.fn(),
-}));
+// Mock MCP tools for testing (optional dependency)
+try {
+  jest.mock('@anthropic-ai/mcp-sdk', () => ({
+    createTool: jest.fn(),
+    invokeTool: jest.fn(),
+  }));
+} catch (error) {
+  // MCP SDK not available in test environment
+}
 
 // Mock file system operations
 jest.mock('fs/promises', () => ({

@@ -11,6 +11,7 @@ import { EnhancedJames } from './enhanced-james';
 import { EnhancedMarcus } from './enhanced-marcus';
 import { DevOpsDan } from './devops-dan';
 import { SecuritySam } from './security-sam';
+import { IntrospectiveAgent } from './introspective-agent';
 import { log } from '../utils/logger';
 
 export interface AgentMetadata {
@@ -42,7 +43,7 @@ export class AgentRegistry {
   private registerAllAgents(): void {
     console.log('🤖 Registering Enhanced BMAD Agents...');
 
-    // Enhanced Maria - Advanced QA Lead with Configuration Validation
+    // Enhanced Maria - Advanced QA Lead with Configuration Validation (Intelligence-wrapped)
     this.registerAgent(new EnhancedMaria(), {
       id: 'enhanced-maria',
       name: 'Enhanced Maria',
@@ -84,7 +85,7 @@ export class AgentRegistry {
       mcpTools: ['Chrome MCP', 'Playwright MCP', 'Testing MCP']
     });
 
-    // Enhanced James - Advanced Frontend Specialist with Route-Navigation Validation
+    // Enhanced James - Advanced Frontend Specialist with Route-Navigation Validation (Intelligence-wrapped)
     this.registerAgent(new EnhancedJames(), {
       id: 'enhanced-james',
       name: 'Enhanced James',
@@ -124,7 +125,7 @@ export class AgentRegistry {
       mcpTools: ['Chrome MCP', 'Shadcn MCP', 'Storybook MCP']
     });
 
-    // Enhanced Marcus - Advanced Backend Specialist with API-Frontend Integration
+    // Enhanced Marcus - Advanced Backend Specialist with API-Frontend Integration (Intelligence-wrapped)
     this.registerAgent(new EnhancedMarcus(), {
       id: 'enhanced-marcus',
       name: 'Enhanced Marcus',
@@ -239,6 +240,44 @@ export class AgentRegistry {
       autoActivate: true,
       collaborators: ['enhanced-marcus', 'enhanced-james', 'devops-dan', 'enhanced-maria'],
       mcpTools: ['Security Scanner MCP', 'Vault MCP']
+    });
+
+    // IntrospectiveAgent - Self-Monitoring & Optimization Controller
+    this.registerAgent(new IntrospectiveAgent(), {
+      id: 'introspective-agent',
+      name: 'IntrospectiveAgent',
+      specialization: 'Self-Monitoring & Optimization Controller',
+      version: '1.0.0',
+      capabilities: [
+        'Framework health monitoring',
+        'Performance optimization engine',
+        'Pattern recognition and analysis',
+        'Meta-learning from usage patterns',
+        'Autonomous improvement suggestions',
+        'Tool-based controller system',
+        'Real-time framework introspection'
+      ],
+      triggers: {
+        filePatterns: [
+          'src/**/*', 'package.json', 'tsconfig.json', 'jest.config.*',
+          '*.ts', '*.js', 'tests/**/*', '.github/**/*'
+        ],
+        keywords: [
+          'introspection', 'optimization', 'performance', 'monitoring',
+          'self-improvement', 'analysis', 'framework', 'health'
+        ],
+        errorPatterns: [
+          'performance.*degradation', 'memory.*leak', 'build.*slow',
+          'test.*timeout', 'optimization.*needed'
+        ]
+      },
+      dependencies: [
+        'fs-extra', 'child_process', 'performance-hooks'
+      ],
+      priority: 4, // Lower priority, runs periodically
+      autoActivate: false, // Manual or scheduled activation
+      collaborators: ['enhanced-maria', 'enhanced-james', 'enhanced-marcus', 'devops-dan', 'security-sam'],
+      mcpTools: ['Read MCP', 'Grep MCP', 'Bash MCP', 'WebFetch MCP']
     });
 
     console.log(`✅ Registered ${this.agents.size} Enhanced BMAD Agents`);

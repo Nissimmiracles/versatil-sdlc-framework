@@ -623,6 +623,53 @@ export class PerformanceMonitor extends EventEmitter {
     const oneHourAgo = Date.now() - 3600000;
     return this.alerts.filter(alert => alert.timestamp > oneHourAgo);
   }
+
+  /**
+   * Start monitoring (for server integration)
+   */
+  public start(): void {
+    if (!this.isMonitoring) {
+      this.startMonitoring();
+    }
+  }
+
+  /**
+   * Get Prometheus-compatible metrics
+   */
+  public getPrometheusMetrics(): string {
+    const dashboard = this.getPerformanceDashboard();
+    let metrics = '';
+
+    // System metrics
+    metrics += `# HELP versatil_system_health Overall system health score\n`;
+    metrics += `# TYPE versatil_system_health gauge\n`;
+    metrics += `versatil_system_health ${dashboard.system.overallHealth}\n\n`;
+
+    metrics += `# HELP versatil_total_executions Total agent executions\n`;
+    metrics += `# TYPE versatil_total_executions counter\n`;
+    metrics += `versatil_total_executions ${dashboard.system.totalAgentExecutions}\n\n`;
+
+    metrics += `# HELP versatil_response_time_avg Average response time\n`;
+    metrics += `# TYPE versatil_response_time_avg gauge\n`;
+    metrics += `versatil_response_time_avg ${dashboard.system.averageResponseTime}\n\n`;
+
+    // Agent-specific metrics
+    dashboard.agents.forEach(agent => {
+      metrics += `# HELP versatil_agent_executions Agent execution count\n`;
+      metrics += `# TYPE versatil_agent_executions counter\n`;
+      metrics += `versatil_agent_executions{agent="${agent.agentId}"} ${agent.totalExecutions}\n\n`;
+
+      metrics += `# HELP versatil_agent_quality_score Agent quality score\n`;
+      metrics += `# TYPE versatil_agent_quality_score gauge\n`;
+      metrics += `versatil_agent_quality_score{agent="${agent.agentId}"} ${agent.averageQualityScore}\n\n`;
+
+      metrics += `# HELP versatil_agent_issues_detected Issues detected by agent\n`;
+      metrics += `# TYPE versatil_agent_issues_detected counter\n`;
+      metrics += `versatil_agent_issues_detected{agent="${agent.agentId}"} ${agent.issuesDetected}\n\n`;
+    });
+
+    return metrics;
+  }
 }
 
 // Export singleton instance

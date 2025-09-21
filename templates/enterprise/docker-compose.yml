@@ -1,0 +1,236 @@
+# VERSATIL SDLC Framework - Enterprise Docker Compose
+# Production-ready deployment with Enhanced BMAD agents, monitoring, and security
+
+version: '3.8'
+
+services:
+  # VERSATIL Core Application
+  versatil-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: versatil-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - ENHANCED_AGENTS_ENABLED=true
+      - PERFORMANCE_MONITORING=true
+      - QUALITY_THRESHOLD=85
+      - SECURITY_SCORE_MINIMUM=90
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
+      - versatil-data:/app/.versatil
+    depends_on:
+      - redis
+      - postgres
+      - monitoring
+    networks:
+      - versatil-network
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MCP Server for Claude Integration
+  versatil-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: versatil-mcp
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - MCP_SERVER_PORT=3001
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "3001:3001"
+    volumes:
+      - versatil-data:/app/.versatil
+    depends_on:
+      - redis
+    networks:
+      - versatil-network
+
+  # Redis for Caching and Session Management
+  redis:
+    image: redis:7-alpine
+    container_name: versatil-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-data:/data
+    networks:
+      - versatil-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL for Analytics and Metrics Storage
+  postgres:
+    image: postgres:15-alpine
+    container_name: versatil-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=versatil
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - versatil-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Prometheus for Metrics Collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: versatil-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - versatil-network
+
+  # Grafana for Monitoring Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: versatil-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - versatil-network
+
+  # Elasticsearch for Log Aggregation
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    container_name: versatil-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - versatil-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Kibana for Log Visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.9.0
+    container_name: versatil-kibana
+    restart: unless-stopped
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - versatil-network
+
+  # Nginx Reverse Proxy with SSL
+  nginx:
+    image: nginx:alpine
+    container_name: versatil-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - versatil-app
+      - grafana
+      - kibana
+    networks:
+      - versatil-network
+
+  # Security Scanner (Trivy)
+  security-scanner:
+    image: aquasec/trivy:latest
+    container_name: versatil-security
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - trivy-cache:/root/.cache
+    command: ["server", "--listen", "0.0.0.0:4954"]
+    ports:
+      - "4954:4954"
+    networks:
+      - versatil-network
+
+  # Backup Service
+  backup:
+    image: alpine:latest
+    container_name: versatil-backup
+    restart: unless-stopped
+    volumes:
+      - versatil-data:/data/versatil
+      - postgres-data:/data/postgres
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh
+    command: /bin/sh -c "chmod +x /backup.sh && crond -f"
+    environment:
+      - BACKUP_SCHEDULE=0 2 * * *  # Daily at 2 AM
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - versatil-network
+
+networks:
+  versatil-network:
+    driver: bridge
+
+volumes:
+  versatil-data:
+    driver: local
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  elasticsearch-data:
+    driver: local
+  trivy-cache:
+    driver: local
