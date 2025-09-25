@@ -1,6 +1,7 @@
 {
   "name": "versatil-sdlc-framework",
   "version": "1.0.0",
+  "type": "module",
   "description": "🚀 World's first AI-Native SDLC framework achieving ZERO CONTEXT LOSS through intelligent agent orchestration. Enhanced BMAD methodology with 6 specialized agents, 85%+ test coverage, enterprise security, and Chrome MCP integration.",
   "main": "versatil-mcp-server.js",
   "bin": {
@@ -28,6 +29,10 @@
     "test:accessibility": "playwright test --project=accessibility",
     "test:security": "playwright test --project=security",
     "test:bmad": "playwright test --project=bmad-integration",
+    "simulation:stress-test": "node dist/simulation/standalone-test.js",
+    "simulation:stress-test-full": "node dist/simulation/stress-test.js",
+    "simulation:capability-matrix": "node dist/simulation/capability-matrix.js",
+    "simulation:quick": "node dist/simulation/quick-stress-test.js",
     "test:full": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "test:maria-qa": "npm run test:coverage && npm run test:e2e:all",
     "playwright:install": "playwright install chromium",
@@ -37,6 +42,9 @@
     "cursor:update": "npm run test:full && npm run build && echo 'Framework ready for Cursor update'",
     "security:scan": "npm audit --audit-level=moderate",
     "validate": "npm run lint && npm run test:full && npm run build",
+    "test:stability": "node scripts/run-stability-tests.js",
+    "test:stability:ci": "node scripts/run-stability-tests.js --ci",
+    "healthcheck": "npm run test:stability && echo 'Framework health: GOOD'",
     "health-check": "node dist/index.js --health-check",
     "agents": "node scripts/show-agents-simple.js",
     "show-agents": "node scripts/show-agents-simple.js",
