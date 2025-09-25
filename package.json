@@ -1,6 +1,6 @@
 {
   "name": "versatil-sdlc-framework",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "🚀 World's first AI-Native SDLC framework achieving ZERO CONTEXT LOSS through intelligent agent orchestration. Enhanced BMAD methodology with 6 specialized agents, 85%+ test coverage, enterprise security, and Chrome MCP integration.",
   "main": "versatil-mcp-server.js",
