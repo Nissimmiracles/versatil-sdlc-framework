@@ -1,4 +1,4 @@
-import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent';
+import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent.js';
 
 export class IntrospectiveAgent extends BaseAgent {
   name = 'IntrospectiveAgent';

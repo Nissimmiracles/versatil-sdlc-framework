@@ -3,8 +3,8 @@
   "name": "Sarah-PM",
   "role": "Project Manager",
   "description": "Project coordination, documentation, planning",
-  "enabled": false,
-  "auto_activate": false,
+  "enabled": true,
+  "auto_activate": true,
   "patterns": [
     "README.md",
     "*.md",
@@ -23,5 +23,5 @@
     "github-actions",
     "project-management"
   ],
-  "configured_at": "2025-09-21T10:03:37.209Z"
+  "configured_at": "2025-09-28T21:25:52.939Z"
 }

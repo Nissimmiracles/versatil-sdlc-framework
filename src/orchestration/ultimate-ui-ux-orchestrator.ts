@@ -143,7 +143,7 @@ export class UltimateUIUXOrchestrator extends EventEmitter {
   private async initializeMCPTools(): Promise<void> {
     // Initialize Playwright MCP
     try {
-      const PlaywrightMCP = await import('@modelcontextprotocol/playwright-mcp');
+      const PlaywrightMCP = await import('@modelcontextprotocol/playwright-mcp' as any);
       this.uiTools.playwright = new PlaywrightMCP.Client({
         browsers: this.testConfig.browsers,
         headless: true,
@@ -156,7 +156,7 @@ export class UltimateUIUXOrchestrator extends EventEmitter {
     
     // Initialize Chrome DevTools MCP
     try {
-      const ChromeMCP = await import('@modelcontextprotocol/chrome-mcp');
+      const ChromeMCP = await import('@modelcontextprotocol/chrome-mcp' as any);
       this.uiTools.chrome = new ChromeMCP.Client({
         port: 9222,
         features: ['performance', 'accessibility', 'coverage', 'network']
@@ -168,7 +168,7 @@ export class UltimateUIUXOrchestrator extends EventEmitter {
     
     // Initialize shadcn MCP
     try {
-      const ShadcnMCP = await import('@modelcontextprotocol/shadcn-mcp');
+      const ShadcnMCP = await import('@modelcontextprotocol/shadcn-mcp' as any);
       this.uiTools.shadcn = new ShadcnMCP.Client({
         components: 'all',
         themes: this.testConfig.themes

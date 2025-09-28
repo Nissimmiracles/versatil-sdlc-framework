@@ -681,6 +681,22 @@ export class PerformanceMonitor extends EventEmitter {
 
     return metrics;
   }
+
+  getMetrics(): any {
+    return this.getPerformanceDashboard();
+  }
+
+  getAdaptiveInsights(): any {
+    return {
+      trends: this.calculateSystemTrends(),
+      health: this.getSystemHealthScore(),
+      recommendations: []
+    };
+  }
+
+  isHealthy(): boolean {
+    return this.getSystemHealthScore() >= 70;
+  }
 }
 
 // Export singleton instance

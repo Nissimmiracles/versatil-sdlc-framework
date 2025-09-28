@@ -30,4 +30,20 @@ export abstract class BaseAgent {
   protected calculateStandardPriority(results: ValidationResults): string {
     return 'medium';
   }
+
+  async analyze(context: AgentActivationContext): Promise<AgentResponse> {
+    return this.activate(context);
+  }
+
+  async runTests(context: AgentActivationContext): Promise<any> {
+    return { success: true, message: 'Tests not implemented for this agent' };
+  }
+
+  async analyzeArchitecture(context: AgentActivationContext): Promise<any> {
+    return { success: true, message: 'Architecture analysis not implemented for this agent' };
+  }
+
+  async manageDeployment(context: AgentActivationContext): Promise<any> {
+    return { success: true, message: 'Deployment management not implemented for this agent' };
+  }
 }

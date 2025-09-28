@@ -1,0 +1,85 @@
+{
+  "phases": [
+    {
+      "name": "Phase 1: Script Validation",
+      "description": "Dependencies and script execution",
+      "passed": 0,
+      "failed": 1,
+      "total": 1,
+      "duration": 31.6,
+      "status": "error",
+      "error": "Command failed: npm run validate:scripts"
+    },
+    {
+      "name": "Phase 2: Enhanced Maria",
+      "description": "Pattern detection and QA integration",
+      "passed": 4,
+      "failed": 0,
+      "total": 4,
+      "duration": 0.9,
+      "status": "passed"
+    },
+    {
+      "name": "Phase 3: E2E Integration",
+      "description": "Complete system workflow validation",
+      "passed": 1,
+      "failed": 0,
+      "total": 1,
+      "duration": 8.3,
+      "status": "passed"
+    },
+    {
+      "name": "Jest Unit Tests",
+      "description": "TypeScript unit tests with coverage",
+      "passed": 0,
+      "failed": 1,
+      "total": 1,
+      "duration": 0.8,
+      "status": "error",
+      "error": "Command failed: npm run test:unit\nError: Can't find a root directory while resolving a config file path.\nProvided path to resolve: ./jest-unit.config.js\ncwd: /Users/nissimmenashe/VERSATIL SDLC FW\n    at resolveConfigPath (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/resolveConfigPath.js:123:11)\n    at readInitialOptions (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/index.js:397:53)\n    at readConfig (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/index.js:147:54)\n    at /Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/index.js:463:18\n    at Array.map (<anonymous>)\n    at readConfigs (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/index.js:457:10)\n    at async runCLI (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/@jest/core/build/cli/index.js:151:59)\n    at async Object.run (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-cli/build/run.js:130:37)\n"
+    },
+    {
+      "name": "Jest Integration Tests",
+      "description": "Cross-component integration validation",
+      "passed": 0,
+      "failed": 1,
+      "total": 1,
+      "duration": 0.7,
+      "status": "error",
+      "error": "Command failed: npm run test:integration\nError: Can't find a root directory while resolving a config file path.\nProvided path to resolve: ./jest-unit.config.js\ncwd: /Users/nissimmenashe/VERSATIL SDLC FW\n    at resolveConfigPath (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/resolveConfigPath.js:123:11)\n    at readInitialOptions (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/index.js:397:53)\n    at readConfig (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/index.js:147:54)\n    at /Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/index.js:463:18\n    at Array.map (<anonymous>)\n    at readConfigs (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-config/build/index.js:457:10)\n    at async runCLI (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/@jest/core/build/cli/index.js:151:59)\n    at async Object.run (/Users/nissimmenashe/VERSATIL SDLC FW/node_modules/jest-cli/build/run.js:130:37)\n"
+    },
+    {
+      "name": "Demo Scenarios",
+      "description": "Real-world usage scenario validation",
+      "passed": 1,
+      "failed": 0,
+      "total": 1,
+      "duration": 0.2,
+      "status": "passed"
+    }
+  ],
+  "totalTests": 9,
+  "totalPassed": 6,
+  "totalFailed": 3,
+  "totalDuration": 42.5,
+  "startTime": 1759086973384,
+  "memoryUsage": {
+    "start": {
+      "rss": 50823168,
+      "heapTotal": 7438336,
+      "heapUsed": 4856904,
+      "external": 1916201,
+      "arrayBuffers": 10515
+    },
+    "peak": {
+      "rss": 50823168,
+      "heapTotal": 7438336,
+      "heapUsed": 4860264,
+      "external": 1910985,
+      "arrayBuffers": 10515
+    }
+  },
+  "timestamp": "2025-09-28T19:16:55.862Z",
+  "framework": "VERSATIL SDLC Framework",
+  "version": "1.2.1"
+}

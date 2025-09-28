@@ -24,7 +24,7 @@ export interface TestCase {
 export interface CapabilityMatrix { [key: string]: any; }
 export { SimulationQa as SimulationQA };
 
-import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent';
+import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent.js';
 
 export class SimulationQa extends BaseAgent {
   name = 'SimulationQa';

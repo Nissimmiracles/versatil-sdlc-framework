@@ -4,32 +4,32 @@
     "maria-qa": {
       "enabled": true,
       "auto_activate": true,
-      "configured_at": "2025-09-21T10:03:37.207Z"
+      "configured_at": "2025-09-28T21:25:52.935Z"
     },
     "marcus-backend": {
       "enabled": true,
       "auto_activate": true,
-      "configured_at": "2025-09-21T10:03:37.208Z"
+      "configured_at": "2025-09-28T21:25:52.938Z"
+    },
+    "sarah-pm": {
+      "enabled": true,
+      "auto_activate": true,
+      "configured_at": "2025-09-28T21:25:52.939Z"
     },
     "james-frontend": {
       "enabled": true,
       "auto_activate": true,
-      "configured_at": "2025-09-21T10:03:37.209Z"
-    },
-    "sarah-pm": {
-      "enabled": false,
-      "auto_activate": false,
-      "configured_at": "2025-09-21T10:03:37.209Z"
+      "configured_at": "2025-09-28T21:25:52.939Z"
     },
     "alex-ba": {
       "enabled": false,
       "auto_activate": false,
-      "configured_at": "2025-09-21T10:03:37.209Z"
+      "configured_at": "2025-09-28T21:25:52.939Z"
     },
     "dr-ai-ml": {
       "enabled": false,
       "auto_activate": false,
-      "configured_at": "2025-09-21T10:03:37.210Z"
+      "configured_at": "2025-09-28T21:25:52.939Z"
     }
   }
 }

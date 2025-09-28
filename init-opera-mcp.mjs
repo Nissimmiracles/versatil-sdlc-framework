@@ -389,7 +389,7 @@ class VERSATILMCPInitializer {
 export const versatilMCP = new VERSATILMCPInitializer();
 
 // Auto-initialize (run directly)
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   versatilMCP.initialize()
     .then(() => {
       console.log('🚀 VERSATIL v1.2.1 with MCP initialized successfully');

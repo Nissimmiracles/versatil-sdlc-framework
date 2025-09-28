@@ -232,7 +232,7 @@ export class StackAwareOrchestrator extends EventEmitter {
     // Claude Code MCP (steipete/claude-code-mcp)
     if (this.stackConfig.claude) {
       try {
-        const ClaudeCodeMCP = await import('claude-code-mcp');
+        const ClaudeCodeMCP = await import('claude-code-mcp' as any);
         this.mcpClients.claude = new ClaudeCodeMCP.Client({
           workspace: this.paths.project.root,
           contextProvider: async () => this.getFullContext()

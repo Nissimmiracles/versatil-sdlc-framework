@@ -67,6 +67,8 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
   private indexPath: string;
   private supabase: any;
   private isSupabaseEnabled: boolean = false;
+  private edgeFunctionsEnabled: boolean = false;
+  private supabaseUrl: string | null = null;
   
   // Enhanced configuration
   private config = {
@@ -118,13 +120,20 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     try {
       const supabaseUrl = process.env.SUPABASE_URL;
       const supabaseKey = process.env.SUPABASE_ANON_KEY;
-      
+
       if (supabaseUrl && supabaseKey) {
         this.supabase = createClient(supabaseUrl, supabaseKey);
         this.isSupabaseEnabled = true;
-        
+        this.supabaseUrl = supabaseUrl;
+        this.edgeFunctionsEnabled = true; // Enable edge functions integration
+
         // Ensure vector table exists
         await this.ensureVectorTable();
+
+        this.logger.info('Supabase + Edge Functions initialized', {
+          supabaseUrl: supabaseUrl.replace(/\/.*/, '//[HIDDEN]'),
+          edgeFunctions: this.edgeFunctionsEnabled
+        }, 'rag-memory');
       }
     } catch (error) {
       this.logger.warn('Supabase initialization failed, using local storage', { error }, 'rag-memory');
@@ -623,6 +632,390 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     return await this.queryMemoriesInternal(typeof query === 'string' ? { query } : query);
   }
   async close(): Promise<void> {}
+
+  // ============================================================================
+  // AGENT-SPECIFIC RAG METHODS WITH EDGE FUNCTION INTEGRATION
+  // ============================================================================
+
+  /**
+   * Enhanced Maria (QA) RAG query using edge functions
+   */
+  async mariaRAG(query: string, context: any, config?: any): Promise<any> {
+    if (!this.edgeFunctionsEnabled || !this.supabaseUrl) {
+      // Fallback to local processing
+      return this.localMariaRAG(query, context, config);
+    }
+
+    try {
+      const response = await fetch(`${this.supabaseUrl}/functions/v1/maria-rag`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ query, context, config }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Maria RAG edge function failed: ${response.statusText}`);
+      }
+
+      const result = await response.json() as any;
+
+      if (!result.success) {
+        throw new Error(result.error || 'Maria RAG processing failed');
+      }
+
+      this.logger.info('Maria RAG edge function completed', {
+        similarPatterns: result.data?.ragInsights?.similarPatterns || 0,
+        processingTime: result.metadata?.processingTime || 0
+      }, 'maria-rag');
+
+      return result;
+
+    } catch (error) {
+      this.logger.warn('Maria RAG edge function failed, using fallback', { error }, 'maria-rag');
+      return this.localMariaRAG(query, context, config);
+    }
+  }
+
+  /**
+   * Enhanced James (Frontend) RAG query using edge functions
+   */
+  async jamesRAG(query: string, context: any, config?: any): Promise<any> {
+    if (!this.edgeFunctionsEnabled || !this.supabaseUrl) {
+      // Fallback to local processing
+      return this.localJamesRAG(query, context, config);
+    }
+
+    try {
+      const response = await fetch(`${this.supabaseUrl}/functions/v1/james-rag`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ query, context, config }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`James RAG edge function failed: ${response.statusText}`);
+      }
+
+      const result = await response.json() as any;
+
+      if (!result.success) {
+        throw new Error(result.error || 'James RAG processing failed');
+      }
+
+      this.logger.info('James RAG edge function completed', {
+        componentPatterns: result.data?.ragInsights?.componentPatterns || 0,
+        processingTime: result.metadata?.processingTime || 0
+      }, 'james-rag');
+
+      return result;
+
+    } catch (error) {
+      this.logger.warn('James RAG edge function failed, using fallback', { error }, 'james-rag');
+      return this.localJamesRAG(query, context, config);
+    }
+  }
+
+  /**
+   * Enhanced Marcus (Backend) RAG query using edge functions
+   */
+  async marcusRAG(query: string, context: any, config?: any): Promise<any> {
+    if (!this.edgeFunctionsEnabled || !this.supabaseUrl) {
+      // Fallback to local processing
+      return this.localMarcusRAG(query, context, config);
+    }
+
+    try {
+      const response = await fetch(`${this.supabaseUrl}/functions/v1/marcus-rag`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ query, context, config }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Marcus RAG edge function failed: ${response.statusText}`);
+      }
+
+      const result = await response.json() as any;
+
+      if (!result.success) {
+        throw new Error(result.error || 'Marcus RAG processing failed');
+      }
+
+      this.logger.info('Marcus RAG edge function completed', {
+        apiPatterns: result.data?.ragInsights?.apiPatterns || 0,
+        securitySolutions: result.data?.ragInsights?.securitySolutions || 0,
+        processingTime: result.metadata?.processingTime || 0
+      }, 'marcus-rag');
+
+      return result;
+
+    } catch (error) {
+      this.logger.warn('Marcus RAG edge function failed, using fallback', { error }, 'marcus-rag');
+      return this.localMarcusRAG(query, context, config);
+    }
+  }
+
+  /**
+   * Fallback local Maria RAG processing
+   */
+  private async localMariaRAG(query: string, context: any, config?: any): Promise<any> {
+    const ragQuery: RAGQuery = {
+      query: `QA testing patterns ${query}`,
+      queryType: 'semantic',
+      agentId: 'enhanced-maria',
+      topK: config?.maxExamples || 3,
+      filters: {
+        tags: ['test', 'qa', 'testing'],
+        contentTypes: ['code', 'text']
+      }
+    };
+
+    const results = await this.queryMemoriesInternal(ragQuery);
+    return {
+      success: true,
+      data: {
+        testPatterns: results.documents,
+        qaBestPractices: [],
+        projectStandards: [],
+        ragInsights: {
+          similarPatterns: results.documents.length,
+          projectStandards: 0,
+          expertise: 0,
+          avgSimilarity: results.documents.reduce((sum, doc) => sum + (doc.metadata.relevanceScore || 0), 0) / results.documents.length
+        }
+      },
+      metadata: {
+        agentId: 'enhanced-maria',
+        processingTime: results.processingTime,
+        queryType: 'local-fallback'
+      }
+    };
+  }
+
+  /**
+   * Fallback local James RAG processing
+   */
+  private async localJamesRAG(query: string, context: any, config?: any): Promise<any> {
+    const ragQuery: RAGQuery = {
+      query: `Frontend component patterns ${query}`,
+      queryType: 'semantic',
+      agentId: 'enhanced-james',
+      topK: config?.maxExamples || 3,
+      filters: {
+        tags: ['frontend', 'component', 'ui'],
+        contentTypes: ['code']
+      }
+    };
+
+    const results = await this.queryMemoriesInternal(ragQuery);
+    return {
+      success: true,
+      data: {
+        componentPatterns: results.documents,
+        uiPatterns: [],
+        performancePatterns: [],
+        ragInsights: {
+          componentPatterns: results.documents.length,
+          uiPatterns: 0,
+          performanceOptimizations: 0,
+          avgSimilarity: results.documents.reduce((sum, doc) => sum + (doc.metadata.relevanceScore || 0), 0) / results.documents.length
+        }
+      },
+      metadata: {
+        agentId: 'enhanced-james',
+        processingTime: results.processingTime,
+        queryType: 'local-fallback'
+      }
+    };
+  }
+
+  /**
+   * Fallback local Marcus RAG processing
+   */
+  private async localMarcusRAG(query: string, context: any, config?: any): Promise<any> {
+    const ragQuery: RAGQuery = {
+      query: `Backend API patterns ${query}`,
+      queryType: 'semantic',
+      agentId: 'enhanced-marcus',
+      topK: config?.maxExamples || 3,
+      filters: {
+        tags: ['backend', 'api', 'security'],
+        contentTypes: ['code']
+      }
+    };
+
+    const results = await this.queryMemoriesInternal(ragQuery);
+    return {
+      success: true,
+      data: {
+        apiPatterns: results.documents,
+        securityPatterns: [],
+        performancePatterns: [],
+        databaseOptimizations: [],
+        ragInsights: {
+          apiPatterns: results.documents.length,
+          securitySolutions: 0,
+          performanceOptimizations: 0,
+          databaseOptimizations: 0,
+          avgSimilarity: results.documents.reduce((sum, doc) => sum + (doc.metadata.relevanceScore || 0), 0) / results.documents.length
+        }
+      },
+      metadata: {
+        agentId: 'enhanced-marcus',
+        processingTime: results.processingTime,
+        queryType: 'local-fallback'
+      }
+    };
+  }
+
+  /**
+   * Store agent-specific patterns in enhanced schema
+   */
+  async storeAgentPattern(agentName: string, pattern: any): Promise<string> {
+    if (!this.isSupabaseEnabled) {
+      // Fallback to local storage
+      return this.storeMemory({
+        content: pattern.code_content || pattern.content,
+        contentType: 'code',
+        metadata: {
+          agentId: agentName,
+          timestamp: Date.now(),
+          tags: pattern.tags || [],
+          ...pattern.metadata
+        }
+      });
+    }
+
+    try {
+      const { data, error } = await this.supabase
+        .from('agent_code_patterns')
+        .insert({
+          agent_name: agentName,
+          pattern_type: pattern.pattern_type || 'unknown',
+          code_content: pattern.code_content || pattern.content,
+          file_path: pattern.file_path,
+          language: pattern.language,
+          framework: pattern.framework,
+          quality_score: pattern.quality_score || 80,
+          metadata: pattern.metadata || {},
+          tags: pattern.tags || []
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      this.logger.info('Agent pattern stored in enhanced schema', {
+        agentName,
+        patternType: pattern.pattern_type,
+        id: data.id
+      }, 'rag-memory');
+
+      return data.id;
+
+    } catch (error) {
+      this.logger.error('Failed to store agent pattern', { error, agentName }, 'rag-memory');
+      // Fallback to local storage
+      return this.storeMemory({
+        content: pattern.code_content || pattern.content,
+        contentType: 'code',
+        metadata: {
+          agentId: agentName,
+          timestamp: Date.now(),
+          tags: pattern.tags || [],
+          ...pattern.metadata
+        }
+      });
+    }
+  }
+
+  /**
+   * Store agent solutions in enhanced schema
+   */
+  async storeAgentSolution(agentName: string, solution: any): Promise<string> {
+    if (!this.isSupabaseEnabled) {
+      return this.storeMemory({
+        content: solution.solution_code || solution.content,
+        contentType: 'code',
+        metadata: {
+          agentId: agentName,
+          timestamp: Date.now(),
+          problemType: solution.problem_type,
+          ...solution.metadata
+        }
+      });
+    }
+
+    try {
+      const { data, error } = await this.supabase
+        .from('agent_solutions')
+        .insert({
+          agent_name: agentName,
+          problem_type: solution.problem_type,
+          problem_description: solution.problem_description,
+          solution_code: solution.solution_code,
+          solution_explanation: solution.solution_explanation,
+          effectiveness_score: solution.effectiveness_score || 0.8,
+          dependencies: solution.dependencies || [],
+          compatibility: solution.compatibility || {}
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      this.logger.info('Agent solution stored in enhanced schema', {
+        agentName,
+        problemType: solution.problem_type,
+        id: data.id
+      }, 'rag-memory');
+
+      return data.id;
+
+    } catch (error) {
+      this.logger.error('Failed to store agent solution', { error, agentName }, 'rag-memory');
+      return this.storeMemory({
+        content: solution.solution_code || solution.content,
+        contentType: 'code',
+        metadata: {
+          agentId: agentName,
+          timestamp: Date.now(),
+          problemType: solution.problem_type,
+          ...solution.metadata
+        }
+      });
+    }
+  }
+
+  /**
+   * Get production deployment status
+   */
+  getProductionStatus(): {
+    supabaseEnabled: boolean;
+    edgeFunctionsEnabled: boolean;
+    agentRAGAvailable: boolean;
+    enhancedSchemaReady: boolean;
+  } {
+    return {
+      supabaseEnabled: this.isSupabaseEnabled,
+      edgeFunctionsEnabled: this.edgeFunctionsEnabled,
+      agentRAGAvailable: this.edgeFunctionsEnabled && this.supabaseUrl !== null,
+      enhancedSchemaReady: this.isSupabaseEnabled
+    };
+  }
 }
 
 // Export enhanced singleton instance

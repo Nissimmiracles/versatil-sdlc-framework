@@ -1,18 +1,56 @@
-// Quick test runner for VERSATIL v1.2.0
-const { helloAutonomousWorld, autonomousBugFixJourney, beforeAfterComparison } = require('./tests/enhanced-demo-suite.js');
+#!/usr/bin/env node
 
-console.log('🚀 VERSATIL v1.2.0 Demo Runner\n');
-console.log('Select a demo:');
-console.log('1. Hello Autonomous World (Learning Demo)');
-console.log('2. Autonomous Bug Fix Journey');
-console.log('3. Before vs After Comparison\n');
+/**
+ * VERSATIL v1.2.0 Demo Runner
+ * ES Module wrapper for the demos
+ */
 
-// Run the first demo by default
-console.log('Running: Hello Autonomous World...\n');
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-helloAutonomousWorld()
-  .then(() => {
-    console.log('\n✨ Demo complete! The AI has learned and will apply this knowledge to future tasks!');
-    console.log('\nTo run other demos, edit run-demo.cjs and change the function call.');
-  })
-  .catch(console.error);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const demos = {
+  '1': { file: 'working-demo.cjs', name: 'Working Demo' },
+  '2': { file: 'introspective-test.cjs', name: 'Introspective Test' },
+  '3': { file: 'test-enhanced-bmad.js', name: 'Enhanced BMAD Test' }
+};
+
+console.log(`
+╔═══════════════════════════════════════════════════════════════╗
+║              VERSATIL v1.2.0 - Demo Runner                     ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Select a demo to run:
+
+1. Working Demo - See learning, bug fixes, transformations
+2. Introspective Test - Framework self-testing
+3. Enhanced BMAD Test - Original enhanced test
+
+Enter your choice (1-3): `);
+
+process.stdin.once('data', (data) => {
+  const choice = data.toString().trim();
+  const demo = demos[choice];
+  
+  if (demo) {
+    console.clear();
+    console.log(`\nRunning ${demo.name}...\n`);
+    
+    const child = spawn('node', [join(__dirname, demo.file)], {
+      stdio: 'inherit',
+      cwd: __dirname
+    });
+    
+    child.on('exit', (code) => {
+      if (code !== 0) {
+        console.error(`\nDemo exited with code ${code}`);
+      }
+    });
+  } else {
+    console.log('\nInvalid choice. Please run again and select 1-3.');
+    process.exit(0);
+  }
+});

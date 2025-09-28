@@ -1,0 +1,54 @@
+{
+  "timestamp": "2025-09-28T19:12:36.708Z",
+  "framework": "VERSATIL SDLC Framework",
+  "version": "1.2.1",
+  "runner": "Enhanced Test Runner",
+  "systemInfo": {
+    "nodeVersion": "v24.7.0",
+    "platform": "darwin",
+    "architecture": "arm64",
+    "memoryTotal": "16384MB",
+    "cpuCount": 8
+  },
+  "summary": {
+    "totalPhases": 4,
+    "successfulPhases": 3,
+    "totalDuration": 46960,
+    "successRate": 75
+  },
+  "phases": {
+    "Script Validation (Phase 1)": {
+      "command": "npm run validate:scripts",
+      "duration": 32232,
+      "success": false,
+      "error": "Command failed: npm run validate:scripts",
+      "output": ",\n> versatil-sdlc-framework@1.2.1 validate:scripts\n> node test/validate-scripts.cjs\n\n\n╔══════════════════════════════════════════════════════════════╗\n║            VERSATIL Script Validation Suite                 ║\n║                  Phase 1 → Phase 2 Readiness                ║\n╚══════════════════════════════════════════════════════════════╝\n\n📁 Phase 1: File Existence Validation\n\n   ✅ Agent Display                  scripts/show-agents.cjs\n   ✅ Agent Display (Simple)         scripts/show-agents-simple.cjs\n   ✅ File Analyzer                  scripts/analyze-file.cjs\n   ✅ Multi-Agent Simulator          scripts/simulate-multi-agent.cjs\n   ✅ Script Test Runner             scripts/test-all-scripts.cjs\n   ✅ Sample Test File               test/sample.js\n\n🔗 Phase 2: Package.json Script Mapping\n\n   ✅ show-agents          → scripts/show-agents.cjs\n   ✅ analyze              → scripts/analyze-file.cjs\n   ✅ simulate             → scripts/simulate-multi-agent.cjs\n   ✅ test-all-scripts     → scripts/test-all-scripts.cjs\n\n🚀 Phase 3: Script Execution Testing\n\n   Testing show-agents          ... ✅ PASS\n   Testing analyze              ... ✅ PASS\n   Testing simulate             ... ✅ PASS\n   Testing test-all-scripts     ... ❌ FAIL\n\n📦 Phase 4: Dependency Validation\n\n   ✅ chalk                               (installed)\n   ✅ @modelcontextprotocol/sdk           (installed)\n   ✅ zod                                 (installed)\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📊 VALIDATION SUMMARY\n\n   Total Tests:     17\n   ✅ Passed:       16\n   ❌ Failed:       1\n   Success Rate:    94.1%\n\n⚠️  ISSUES DETECTED:\n\n🚨 CRITICAL ISSUES:\n\n   1. Execution Failure: npm run test-all-scripts failed to execute\n      → Check script implementation for errors\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n❌ 1 CRITICAL ISSUE(S) DETECTED\n\n⚠️  Fix critical issues before proceeding to Phase 2\n\n,",
+      "startTime": 1759086709751,
+      "endTime": 1759086741983
+    },
+    "Enhanced Maria Integration (Phase 2)": {
+      "command": "npm run test:phase2",
+      "duration": 932,
+      "success": true,
+      "output": "\n> versatil-sdlc-framework@1.2.1 test:phase2\n> node test/run-phase2-tests.cjs\n\n\n╔══════════════════════════════════════════════════════════════╗\n║            VERSATIL Phase 2 - Test Runner                   ║\n║               Enhanced Maria Test Suite                     ║\n╚══════════════════════════════════════════════════════════════╝\n\nRunning 4 test suites...\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📋 Enhanced Maria Unit Tests\n✅ PASSED\n\n📋 Pattern Analyzer Tests\n✅ PASSED\n\n📋 Integration Tests\n✅ PASSED\n\n📋 IDE Integration Tests\n✅ PASSED\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nPhase 2 Test Summary:\n\n  Test Suites:  4/4 passed\n  ✅ Passed:    4\n  ❌ Failed:    0\n  ⏱️  Duration:   0.50s\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n✅ ALL PHASE 2 TESTS PASSED!\n\n🎉 Enhanced Maria fully validated - Ready for Phase 3\n\n",
+      "startTime": 1759086742085,
+      "endTime": 1759086743017
+    },
+    "End-to-End Integration (Phase 3)": {
+      "command": "npm run test:phase3",
+      "duration": 7323,
+      "success": true,
+      "output": "\n> versatil-sdlc-framework@1.2.1 test:phase3\n> node test/run-phase3-tests.cjs\n\n\n╔══════════════════════════════════════════════════════════════╗\n║            VERSATIL Phase 3 - Test Runner                   ║\n║           Full System Integration Testing                   ║\n╚══════════════════════════════════════════════════════════════╝\n\nRunning 1 test suite...\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n📋 End-to-End System Tests\n✅ PASSED\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\nPhase 3 Test Summary:\n\n  Test Suites:  1/1 passed\n  ✅ Passed:    1\n  ❌ Failed:    0\n  ⏱️  Duration:   6.93s\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n✅ ALL PHASE 3 TESTS PASSED!\n\n🎉 Full system integration validated - Production ready\n\n",
+      "startTime": 1759086743117,
+      "endTime": 1759086750440
+    },
+    "TypeScript Build": {
+      "command": "npm run build",
+      "duration": 6063,
+      "success": true,
+      "output": "\n> versatil-sdlc-framework@1.2.1 build\n> tsc\n\n",
+      "startTime": 1759086750542,
+      "endTime": 1759086756605
+    }
+  }
+}

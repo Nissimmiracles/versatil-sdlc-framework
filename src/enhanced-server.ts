@@ -5,12 +5,12 @@
 
 import express from 'express';
 import { createServer } from 'http';
-import { Server as SocketServer } from 'socket.io';
+// import { Server as SocketServer } from 'socket.io';
 import { SDLCOrchestrator } from './flywheel/sdlc-orchestrator';
 import { AgentRegistry } from './agents/agent-registry';
 import { VERSATILLogger } from './utils/logger';
 import { PerformanceMonitor } from './analytics/performance-monitor';
-import { VERSATILMCPServer } from './mcp/versatil-mcp-server';
+// import { VERSATILMCPServer } from './mcp/versatil-mcp-server';
 import { enhancedBMAD } from './bmad/enhanced-bmad-coordinator';
 import { vectorMemoryStore } from './rag/vector-memory-store';
 import { OperaOrchestrator } from './opera/opera-orchestrator';
@@ -19,7 +19,7 @@ import * as path from 'path';
 export async function startEnhancedServer() {
   const app = express();
   const httpServer = createServer(app);
-  const io = new SocketServer(httpServer);
+  // const io = new SocketServer(httpServer);
   
   // Initialize components
   const logger = new VERSATILLogger();
@@ -32,7 +32,7 @@ export async function startEnhancedServer() {
   const opera = OperaOrchestrator.getInstance();
   
   // Initialize MCP server
-  const mcpServer = new VERSATILMCPServer({} as any);
+  // const mcpServer = new VERSATILMCPServer({} as any);
   
   // Setup routes
   app.use(express.json());
@@ -103,30 +103,30 @@ export async function startEnhancedServer() {
   });
   
   // WebSocket for real-time updates
-  io.on('connection', (socket) => {
-    console.log('Client connected:', socket.id);
-    
-    // Subscribe to Opera events
-    opera.on('goal_completed', (data) => {
-      socket.emit('opera:goal_completed', data);
-    });
-    
-    opera.on('decision_made', (data) => {
-      socket.emit('opera:decision', data);
-    });
-    
-    // Subscribe to learning events
-    enhancedBMAD.on('learning_milestone', (data) => {
-      socket.emit('learning:milestone', data);
-    });
-    
-    socket.on('disconnect', () => {
-      console.log('Client disconnected:', socket.id);
-    });
-  });
+  // io.on('connection', (socket) => {
+  //   console.log('Client connected:', socket.id);
+  //
+  //   // Subscribe to Opera events
+  //   opera.on('goal_completed', (data) => {
+  //     socket.emit('opera:goal_completed', data);
+  //   });
+  //
+  //   opera.on('decision_made', (data) => {
+  //     socket.emit('opera:decision', data);
+  //   });
+  //
+  //   // Subscribe to learning events
+  //   enhancedBMAD.on('learning_milestone', (data) => {
+  //     socket.emit('learning:milestone', data);
+  //   });
+  //
+  //   socket.on('disconnect', () => {
+  //     console.log('Client disconnected:', socket.id);
+  //   });
+  // });
   
   // Start services
-  await mcpServer.start();
+  // await mcpServer.start();
   
   const PORT = process.env.PORT || 3788;
   httpServer.listen(PORT, () => {

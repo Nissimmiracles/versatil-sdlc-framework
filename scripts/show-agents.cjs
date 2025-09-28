@@ -7,8 +7,18 @@
 
 const fs = require('fs');
 const path = require('path');
+const chalkModule = require('chalk');
+const chalk = chalkModule.default || chalkModule;
 
 const AGENTS_DIR = path.join(__dirname, '..', '.versatil', 'agents');
+
+const colors = {
+  magenta: (text) => chalk.magenta(text),
+  green: (text) => chalk.green(text),
+  cyan: (text) => chalk.cyan(text),
+  yellow: (text) => chalk.yellow(text),
+  red: (text) => chalk.red(text)
+};
 
 function displayAgents() {
   console.log('\n╔══════════════════════════════════════════════════════════════╗');
