@@ -3,10 +3,10 @@
  * Enhanced Maria-QA Unit Testing Cleanup
  */
 
-module.exports = async function jestGlobalTeardown() {
+export default async function jestGlobalTeardown() {
   console.log('🧹 VERSATIL SDLC Framework - Starting Jest Global Teardown');
 
-  const bmadConfig = global.bmadJestConfig;
+  const bmadConfig = (global as any).bmadJestConfig;
 
   if (bmadConfig) {
     const duration = Date.now() - bmadConfig.startTime;
@@ -17,8 +17,8 @@ module.exports = async function jestGlobalTeardown() {
     console.log(`   📋 Test Type: ${bmadConfig.testType}`);
 
     // Cleanup global configuration
-    delete global.bmadJestConfig;
+    delete (global as any).bmadJestConfig;
   }
 
   console.log('✅ Jest Global Teardown Complete');
-};
+}

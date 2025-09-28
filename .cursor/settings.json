@@ -80,16 +80,4 @@
     "@/tests/*": "${workspaceRoot}/tests/*"
   },
 
-  "bmad.agents.enableAutoActivation": true,
-  "bmad.quality.enableRealTimeValidation": true,
-  "bmad.context.preserveOnAgentSwitch": true,
-
-  "chrome-mcp.enabled": true,
-  "chrome-mcp.autoStart": false,
-  "chrome-mcp.debugMode": false,
-  "chrome-mcp.headless": true,
-  "chrome-mcp.viewport": {
-    "width": 1920,
-    "height": 1080
-  }
 }

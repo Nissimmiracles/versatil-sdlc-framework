@@ -19,6 +19,9 @@ import { AgentRegistry } from '../agents/agent-registry';
 import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator';
 import { VERSATILLogger } from '../utils/logger';
 import { PerformanceMonitor } from '../analytics/performance-monitor';
+import { enhancedBMAD } from '../bmad/enhanced-bmad-coordinator';
+import { vectorMemoryStore } from '../rag/vector-memory-store';
+import { registerEnhancedMCPTools } from './enhanced-mcp-tools';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

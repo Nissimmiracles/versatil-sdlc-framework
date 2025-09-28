@@ -11,6 +11,13 @@ async function globalTeardown(config: FullConfig) {
   console.log('🧹 VERSATIL SDLC Framework - Starting Enhanced Maria-QA Test Cleanup');
 
   try {
+    // Stop VERSATIL test server
+    console.log('🛑 Stopping VERSATIL Test Server...');
+    const testServer = (global as any).testServer;
+    if (testServer && testServer.stop) {
+      await testServer.stop();
+      delete (global as any).testServer;
+    }
     // Generate comprehensive test report
     console.log('📊 Generating Enhanced Maria-QA Test Report...');
 

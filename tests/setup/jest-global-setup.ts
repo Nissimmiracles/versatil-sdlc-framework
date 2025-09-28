@@ -3,7 +3,11 @@
  * Enhanced Maria-QA Unit Testing Initialization
  */
 
-module.exports = async function jestGlobalSetup() {
+declare global {
+  var bmadJestConfig: any;
+}
+
+export default async function jestGlobalSetup() {
   console.log('🧪 VERSATIL SDLC Framework - Starting Jest Global Setup');
   console.log('👩‍🔬 Enhanced Maria-QA Unit Testing Initialization');
 
@@ -36,4 +40,4 @@ module.exports = async function jestGlobalSetup() {
   console.log('   🔧 Hybrid Jest + Playwright Integration');
 
   console.log('✅ Jest Global Setup Complete');
-};
+}

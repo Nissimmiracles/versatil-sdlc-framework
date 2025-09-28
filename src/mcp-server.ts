@@ -20,13 +20,19 @@ import { versatilDispatcher } from './agent-dispatcher.js';
 import { versionManager } from './version-manager.js';
 import { changelogGenerator } from './changelog-generator.js';
 import { gitBackupManager } from './git-backup-manager.js';
+import { FeedbackMCPHandler } from './mcp/feedback-mcp-tools.js';
+import { BMADMCPIntegration } from './dashboard/bmad-mcp-integration.js';
 
 export class VERSATILMCPServer {
   private server: Server;
   private projectRoot: string;
+  private feedbackHandler: FeedbackMCPHandler;
+  private bmadIntegration: BMADMCPIntegration;
 
   constructor(projectRoot: string = process.cwd()) {
     this.projectRoot = projectRoot;
+    this.feedbackHandler = new FeedbackMCPHandler(projectRoot);
+    this.bmadIntegration = new BMADMCPIntegration();
     this.server = new Server(
       {
         name: 'versatil-framework',
@@ -187,6 +193,121 @@ export class VERSATILMCPServer {
               properties: {},
             },
           },
+          // Feedback System Tools
+          {
+            name: 'versatil_submit_feedback',
+            description: 'Submit user feedback about VERSATIL framework experience',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                rating: {
+                  type: 'number',
+                  minimum: 1,
+                  maximum: 5,
+                  description: 'Rating from 1 (very poor) to 5 (excellent)',
+                },
+                message: {
+                  type: 'string',
+                  description: 'Detailed feedback message',
+                },
+                category: {
+                  type: 'string',
+                  enum: [
+                    'agent_performance',
+                    'user_experience',
+                    'feature_request',
+                    'bug_report',
+                    'documentation',
+                    'integration',
+                    'performance',
+                    'security'
+                  ],
+                  description: 'Feedback category (optional)',
+                },
+                agentId: {
+                  type: 'string',
+                  description: 'Specific agent the feedback relates to (optional)',
+                },
+                urgent: {
+                  type: 'boolean',
+                  description: 'Mark as urgent if requiring immediate attention',
+                },
+              },
+              required: ['rating', 'message'],
+            },
+          },
+          {
+            name: 'versatil_quick_feedback',
+            description: 'Submit quick feedback with minimal information',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                rating: {
+                  type: 'number',
+                  minimum: 1,
+                  maximum: 5,
+                  description: 'Quick rating from 1-5',
+                },
+                message: {
+                  type: 'string',
+                  description: 'Brief feedback message',
+                },
+              },
+              required: ['rating', 'message'],
+            },
+          },
+          {
+            name: 'versatil_feedback_analytics',
+            description: 'Get comprehensive feedback analytics and insights',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                timeframe: {
+                  type: 'string',
+                  enum: ['week', 'month', 'quarter', 'all'],
+                  description: 'Analytics timeframe (optional)',
+                },
+                category: {
+                  type: 'string',
+                  enum: [
+                    'agent_performance',
+                    'user_experience',
+                    'feature_request',
+                    'bug_report',
+                    'documentation',
+                    'integration',
+                    'performance',
+                    'security'
+                  ],
+                  description: 'Filter by specific category (optional)',
+                },
+              },
+            },
+          },
+          {
+            name: 'versatil_improvement_roadmap',
+            description: 'Generate improvement roadmap based on user feedback',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                priority: {
+                  type: 'string',
+                  enum: ['critical', 'high', 'medium', 'low', 'all'],
+                  description: 'Priority level filter (optional)',
+                },
+                includeTimeline: {
+                  type: 'boolean',
+                  description: 'Include estimated timeline for improvements',
+                },
+              },
+            },
+          },
+          // BMAD Quality Dashboard Tools
+          ...this.bmadIntegration.getAvailableTools().map(tool => ({
+            name: tool.name,
+            description: tool.description,
+            inputSchema: tool.parameters
+          }))
         ],
       };
     });
@@ -220,6 +341,27 @@ export class VERSATILMCPServer {
 
         case 'versatil_framework_status':
           return await this.handleFrameworkStatus(request.params.arguments);
+
+        // Feedback System Tools
+        case 'versatil_submit_feedback':
+          return await this.handleSubmitFeedback(request.params.arguments);
+
+        case 'versatil_quick_feedback':
+          return await this.handleQuickFeedback(request.params.arguments);
+
+        case 'versatil_feedback_analytics':
+          return await this.handleFeedbackAnalytics(request.params.arguments);
+
+        case 'versatil_improvement_roadmap':
+          return await this.handleImprovementRoadmap(request.params.arguments);
+
+        // BMAD Quality Dashboard Tools
+        case 'bmad_trigger_ui_test':
+        case 'bmad_get_quality_metrics':
+        case 'bmad_get_agent_status':
+        case 'bmad_generate_quality_report':
+        case 'bmad_execute_quality_check':
+          return await this.handleBMADTool(request.params.name, request.params.arguments);
 
         default:
           throw new Error(`Unknown tool: ${request.params.name}`);
@@ -749,13 +891,222 @@ Please provide more specific details before proceeding.`
     return mimeTypes[ext] || 'text/plain';
   }
 
+  // Feedback System Handlers
+  private async handleSubmitFeedback(args: any) {
+    try {
+      const result = await this.feedbackHandler.handleSubmitFeedback(args);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `📝 **Feedback Submitted Successfully**
+
+${result.message}
+
+**Feedback ID:** ${result.feedbackId}
+**Rating:** ${args.rating}/5
+**Category:** ${args.category || 'User Experience'}
+
+${result.nextSteps ?
+  `**Next Steps:**\n${result.nextSteps.map(step => `• ${step}`).join('\n')}` :
+  ''
+}
+
+Thank you for helping improve VERSATIL! Your feedback drives our development priorities.`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `❌ **Feedback Submission Failed**
+
+Error: ${error instanceof Error ? error.message : 'Unknown error'}
+
+Please try again or contact support if the issue persists.`,
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleQuickFeedback(args: any) {
+    try {
+      const result = await this.feedbackHandler.handleQuickFeedback(args);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `⚡ **Quick Feedback Received**
+
+${result.message}
+
+**Feedback ID:** ${result.feedbackId}
+
+Your quick feedback helps us understand user satisfaction and identify areas for improvement!`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `❌ Quick feedback failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleFeedbackAnalytics(args: any) {
+    try {
+      const result = await this.feedbackHandler.handleFeedbackAnalytics(args);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `📊 **VERSATIL Feedback Analytics**
+
+**Overall Statistics:**
+• Total Feedback: ${result.analytics.totalFeedback}
+• Average Rating: ${result.analytics.averageRating.toFixed(1)}/5.0
+• Urgent Issues: ${result.analytics.urgentIssues}
+
+**Category Breakdown:**
+${Object.entries(result.analytics.categoryBreakdown)
+  .map(([category, count]) => `• ${category}: ${count}`)
+  .join('\n')}
+
+**Key Insights:**
+${result.insights.map(insight => `• ${insight}`).join('\n')}
+
+**Recommendations:**
+${result.recommendations.map(rec => `• ${rec}`).join('\n')}
+
+${result.analytics.topIssues && result.analytics.topIssues.length > 0 ?
+  `\n**Top Issues:**\n${result.analytics.topIssues
+    .slice(0, 5)
+    .map((issue: any) => `• ${issue.issue} (${issue.count} reports, ${issue.severity} severity)`)
+    .join('\n')}` :
+  ''
+}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `❌ Analytics generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  private async handleImprovementRoadmap(args: any) {
+    try {
+      const result = await this.feedbackHandler.handleImprovementRoadmap(args);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `🗺️ **VERSATIL Improvement Roadmap**
+
+Based on user feedback analysis, here's our improvement roadmap:
+
+**Priority Overview:**
+${result.priorities.map(priority => `• ${priority}`).join('\n')}
+
+**Critical Issues (Immediate):**
+${result.roadmap.criticalIssues && result.roadmap.criticalIssues.length > 0 ?
+  result.roadmap.criticalIssues.slice(0, 3).map((issue: any) => `• ${issue}`).join('\n') :
+  '• No critical issues identified'
+}
+
+**Top Feature Requests:**
+${result.roadmap.featureRequests && result.roadmap.featureRequests.length > 0 ?
+  result.roadmap.featureRequests.slice(0, 5).map((req: any) => `• ${req.feature} (${req.votes} votes)`).join('\n') :
+  '• No feature requests pending'
+}
+
+**User Experience Improvements:**
+${result.roadmap.userExperienceImprovements && result.roadmap.userExperienceImprovements.length > 0 ?
+  result.roadmap.userExperienceImprovements.slice(0, 3).map((improvement: any) => `• ${improvement}`).join('\n') :
+  '• User experience is performing well'
+}
+
+**Performance Optimizations:**
+${result.roadmap.performanceOptimizations && result.roadmap.performanceOptimizations.length > 0 ?
+  result.roadmap.performanceOptimizations.slice(0, 3).map((opt: any) => `• ${opt}`).join('\n') :
+  '• No performance issues identified'
+}
+
+${result.estimatedTimeline ?
+  `\n**Estimated Timeline:**\n${Object.entries(result.estimatedTimeline)
+    .map(([item, timeline]) => `• ${item}: ${timeline}`)
+    .join('\n')}` :
+  ''
+}
+
+This roadmap is continuously updated based on your feedback. Keep the feedback coming!`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `❌ Roadmap generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
+        ],
+      };
+    }
+  }
+
+  /**
+   * Handle BMAD Quality Dashboard tool calls
+   */
+  private async handleBMADTool(toolName: string, args: any): Promise<any> {
+    try {
+      const result = await this.bmadIntegration.handleToolCall(toolName, args);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            message: `Failed to execute BMAD tool: ${toolName}`
+          }, null, 2)
+        }]
+      };
+    }
+  }
+
   /**
    * Start the MCP server
    */
   async start(): Promise<void> {
+    // Start BMAD integration
+    await this.bmadIntegration.start();
+
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     console.error('🔗 VERSATIL MCP Server started and ready for connections');
+    console.error('🎯 BMAD Quality Dashboard integrated and active');
   }
 }
 

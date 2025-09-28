@@ -3,7 +3,7 @@
 > **V**ersioned **E**xpert **R**eliable **S**martly **T**riggered **A**I **I**ntelligent **L**earning
 > **S**oftware **D**evelopment **L**ife **C**ycle Framework
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0+-blue.svg)
@@ -12,7 +12,13 @@
 ![Security](https://img.shields.io/badge/security-enterprise%20grade-red.svg)
 ![Test Coverage](https://img.shields.io/badge/coverage-85%25+-brightgreen.svg)
 
-**🌟 The world's first AI-Native SDLC framework that achieves ZERO CONTEXT LOSS through intelligent agent orchestration and real MCP tool integration.**
+**🌟 The world's first autonomous AI-Native SDLC framework with RAG memory, Archon orchestration, and self-learning agents achieving ZERO CONTEXT LOSS.**
+
+### 🆕 Version 1.2.0 Features:
+- **🧠 RAG Memory System** - Agents learn from every interaction
+- **🤖 Archon Orchestrator** - Fully autonomous goal execution
+- **🚀 Self-Healing** - Automatic recovery and adaptation
+- **📈 Pattern Recognition** - Proactive issue prevention
 
 ---
 
@@ -49,13 +55,19 @@ We proactively addressed GitGuardian alerts and implemented comprehensive securi
 ### Option 1: NPM Installation (Recommended)
 ```bash
 # Install globally
-npm install -g versatil-sdlc-framework
+npm install -g versatil-sdlc-framework@latest
 
 # Initialize in your project
 npx versatil-sdlc init
 
 # Start development with agents
 npx versatil-sdlc start
+
+# 🆕 Start with enhanced features (v1.2.0)
+npx versatil-sdlc enhanced
+
+# 🆕 Start in autonomous mode (v1.2.0)
+npx versatil-sdlc autonomous
 ```
 
 ### Option 2: Clone & Setup
@@ -90,7 +102,9 @@ A **production-ready AI-Native Software Development Lifecycle framework** that t
 
 ### 🤖 Core Features
 
-- **🧠 6 Specialized AI Agents** working in perfect harmony
+- **🧠 6 Specialized AI Agents** with memory and learning capabilities
+- **🧠 RAG Memory System** for persistent agent knowledge (v1.2.0)
+- **🤖 Archon Autonomous Orchestrator** for goal-based execution (v1.2.0)
 - **🔍 Enhanced Configuration Validation** preventing production bugs
 - **🌐 Chrome MCP Primary Testing** framework integration
 - **🔄 Zero Context Loss** preservation system
@@ -99,7 +113,9 @@ A **production-ready AI-Native Software Development Lifecycle framework** that t
 - **📈 Real-time Performance Monitoring** and analytics
 - **🧪 85%+ Test Coverage** with comprehensive validation
 - **🔒 Enterprise Security** with automated vulnerability detection
-- **🤝 Adaptive Learning** from user interactions and feedback
+- **🤝 Adaptive Learning** with vector memory and pattern recognition
+- **🔄 Self-Healing Execution** with automatic failure recovery (v1.2.0)
+- **🎯 Goal-Based Development** - describe what you want, not how (v1.2.0)
 
 ### 🎪 The Enhanced BMAD Agent Team
 
@@ -699,6 +715,38 @@ We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md
 - **Onboarding Time**: 75% reduction for new team members
 - **Code Review Efficiency**: 60% faster review cycles
 - **Knowledge Sharing**: 100% project knowledge retention
+
+---
+
+## 🎆 What's New in v1.2.0
+
+### Revolutionary Autonomous Development
+
+- **🧠 RAG Memory System**: Agents remember and learn from every interaction
+- **🤖 Archon Orchestrator**: Fully autonomous goal planning and execution
+- **🔄 Self-Healing**: Automatic recovery from failures with alternative strategies
+- **📈 Pattern Recognition**: Detect and proactively fix recurring issues
+- **🎯 Goal-Based Development**: Just describe what you want to build
+- **📁 Persistent Knowledge**: All learnings preserved across sessions
+
+### Quick Example
+
+```javascript
+// Old way: Manual agent coordination
+const maria = getAgent('maria');
+const marcus = getAgent('marcus');
+await maria.activate(context);
+await marcus.activate(context);
+
+// New way: Autonomous execution
+await enhancedBMAD.executeBMADWorkflow(
+  'my-project',
+  'Build a secure user authentication system with JWT'
+);
+// AI handles everything: planning, coding, testing, deployment!
+```
+
+[Read the Complete Enhanced Features Guide →](./ENHANCED_FEATURES_GUIDE.md)
 
 ---
 

@@ -17,6 +17,7 @@ import { SecuritySam } from './security-sam';
 import { IntrospectiveAgent } from './introspective-agent';
 import { ArchitectureDan } from './architecture-dan';
 import { DeploymentOrchestrator } from './deployment-orchestrator';
+import { SimulationQA } from './simulation-qa';
 import { log } from '../utils/logger';
 
 export interface AgentMetadata {
@@ -365,7 +366,46 @@ export class AgentRegistry {
       mcpTools: ['Docker MCP', 'Kubernetes MCP', 'AWS MCP', 'GitHub MCP']
     });
 
-    console.log(`✅ Registered ${this.agents.size} Enhanced BMAD Agents`);
+    // SimulationQA - Pre-Development Reality Validator & Stress Tester
+    this.registerAgent(new SimulationQA(), {
+      id: 'simulation-qa',
+      name: 'SimulationQA',
+      specialization: 'Pre-Development Reality Validator & Stress Tester',
+      version: '1.0.0',
+      capabilities: [
+        'Framework promise mapping and validation',
+        'Autonomous test case generation',
+        'Reality vs architecture validation',
+        'Vapor-ware detection and elimination',
+        'GitHub readiness assessment',
+        'Capability matrix generation',
+        'Brutal honesty reporting',
+        'Live framework stress testing'
+      ],
+      triggers: {
+        filePatterns: [
+          'CLAUDE.md', 'README.md', 'package.json', 'src/**/*',
+          '*.test.*', 'docs/**/*', '.github/**/*'
+        ],
+        keywords: [
+          'simulation', 'validation', 'test', 'reality', 'stress',
+          'capability', 'github', 'release', 'promise', 'claim'
+        ],
+        errorPatterns: [
+          'promise.*not.*implemented', 'capability.*missing',
+          'vapor.*detected', 'functionality.*broken'
+        ]
+      },
+      dependencies: [
+        'fs-extra', 'child_process', 'events'
+      ],
+      priority: 0, // Highest priority - validates everything else
+      autoActivate: false, // Manual activation for stress testing
+      collaborators: ['enhanced-maria', 'enhanced-james', 'enhanced-marcus', 'sarah-pm', 'alex-ba', 'introspective-agent'],
+      mcpTools: ['Read MCP', 'Grep MCP', 'Bash MCP', 'Write MCP', 'Edit MCP']
+    });
+
+    console.log(`✅ Registered ${this.agents.size} Enhanced BMAD Agents (including SimulationQA)`);
     this.printAgentSummary();
   }
 

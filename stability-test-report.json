@@ -1,0 +1,174 @@
+{
+  "timestamp": "2025-09-24T20:31:46.974Z",
+  "totalTests": 12,
+  "passedTests": 9,
+  "failedTests": 3,
+  "testSuites": {
+    "Build System Stability": {
+      "name": "Build System Stability",
+      "startTime": 1758745906976,
+      "tests": [
+        {
+          "name": "Clean Build",
+          "status": "PASSED",
+          "duration": 1299,
+          "result": "Build completed successfully"
+        },
+        {
+          "name": "Incremental Build",
+          "status": "PASSED",
+          "duration": 921,
+          "result": "Incremental build completed"
+        },
+        {
+          "name": "Build Artifacts Validation",
+          "status": "PASSED",
+          "duration": 0,
+          "result": "All 6 build artifacts present"
+        }
+      ],
+      "passed": 3,
+      "failed": 0,
+      "errors": [],
+      "warnings": [],
+      "duration": 2220
+    },
+    "MCP Server Stability": {
+      "name": "MCP Server Stability",
+      "startTime": 1758745909196,
+      "tests": [
+        {
+          "name": "MCP Server Startup",
+          "status": "FAILED",
+          "duration": 30002,
+          "error": "Server startup timeout (30s)"
+        },
+        {
+          "name": "MCP Tools Availability",
+          "status": "FAILED",
+          "duration": 15003,
+          "error": "MCP tools test timeout"
+        }
+      ],
+      "passed": 0,
+      "failed": 2,
+      "errors": [],
+      "warnings": [],
+      "duration": 45006
+    },
+    "Agent System Stability": {
+      "name": "Agent System Stability",
+      "startTime": 1758745954203,
+      "tests": [
+        {
+          "name": "Agent Registry Loading",
+          "status": "PASSED",
+          "duration": 0,
+          "result": "All 6 agents available"
+        },
+        {
+          "name": "Agent Dispatcher",
+          "status": "PASSED",
+          "duration": 1,
+          "result": "Agent dispatcher available"
+        }
+      ],
+      "passed": 2,
+      "failed": 0,
+      "errors": [],
+      "warnings": [],
+      "duration": 1
+    },
+    "ES Module Stability": {
+      "name": "ES Module Stability",
+      "startTime": 1758745954204,
+      "tests": [
+        {
+          "name": "Import Resolution",
+          "status": "FAILED",
+          "duration": 8,
+          "error": "ES module import issues found: dist/adaptive-agent-creator.js: import { VERSATILAgentDispatcher } from './agent-dispatcher', dist/agents/agent-registry.js: import { EnhancedMaria } from './enhanced-maria', dist/agents/agent-registry.js: import { EnhancedJames } from './enhanced-james', dist/agents/agent-registry.js: import { EnhancedMarcus } from './enhanced-marcus', dist/agents/agent-registry.js: import { DevOpsDan } from './devops-dan' (and 25 more)"
+        }
+      ],
+      "passed": 0,
+      "failed": 1,
+      "errors": [],
+      "warnings": [],
+      "duration": 8
+    },
+    "TypeScript Compilation": {
+      "name": "TypeScript Compilation",
+      "startTime": 1758745954212,
+      "tests": [
+        {
+          "name": "TypeScript Type Check",
+          "status": "PASSED",
+          "duration": 640,
+          "result": "TypeScript compilation clean"
+        }
+      ],
+      "passed": 1,
+      "failed": 0,
+      "errors": [],
+      "warnings": [],
+      "duration": 640
+    },
+    "File System Operations": {
+      "name": "File System Operations",
+      "startTime": 1758745954852,
+      "tests": [
+        {
+          "name": "Directory Operations",
+          "status": "PASSED",
+          "duration": 1,
+          "result": "File system operations working"
+        }
+      ],
+      "passed": 1,
+      "failed": 0,
+      "errors": [],
+      "warnings": [],
+      "duration": 1
+    },
+    "Performance Benchmarks": {
+      "name": "Performance Benchmarks",
+      "startTime": 1758745954853,
+      "tests": [
+        {
+          "name": "Build Performance",
+          "status": "PASSED",
+          "duration": 585,
+          "result": "Build completed in 585ms",
+          "performance": {
+            "buildTime": 585
+          }
+        }
+      ],
+      "passed": 1,
+      "failed": 0,
+      "errors": [],
+      "warnings": [],
+      "duration": 585
+    },
+    "Integration Tests": {
+      "name": "Integration Tests",
+      "startTime": 1758745955438,
+      "tests": [
+        {
+          "name": "E2E Framework Integration",
+          "status": "PASSED",
+          "duration": 0,
+          "result": "Basic integration check passed"
+        }
+      ],
+      "passed": 1,
+      "failed": 0,
+      "errors": [],
+      "warnings": [],
+      "duration": 0
+    }
+  },
+  "errors": [],
+  "warnings": [],
+  "performance": {}
+}

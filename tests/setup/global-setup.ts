@@ -1,12 +1,23 @@
 import { chromium, FullConfig } from '@playwright/test';
+import VERSATILTestServer from '../fixtures/test-server.js';
 
 /**
  * VERSATIL SDLC Framework - Global Test Setup
  * Enhanced Maria-QA Configuration with Chrome MCP Integration
  */
 
+let testServer: VERSATILTestServer;
+
 async function globalSetup(config: FullConfig) {
   console.log('🚀 VERSATIL SDLC Framework - Starting Enhanced Maria-QA Test Setup');
+
+  // Start VERSATIL test server
+  console.log('🧪 Starting VERSATIL Test Server...');
+  testServer = new VERSATILTestServer(3000);
+  await testServer.start();
+
+  // Store server instance globally for teardown
+  (global as any).testServer = testServer;
 
   // Chrome MCP Server Initialization
   console.log('🔧 Initializing Chrome MCP Server...');
@@ -52,9 +63,8 @@ async function globalSetup(config: FullConfig) {
 
     // Security headers validation setup
     console.log('🔒 Setting up security validation...');
-    await page.goto(config.projects[0].use?.baseURL || 'http://localhost:3000');
-    const response = await page.waitForResponse(() => true);
-    const securityHeaders = response.headers();
+    const response = await page.goto(config.projects[0].use?.baseURL || 'http://localhost:3000');
+    const securityHeaders = response?.headers() || {};
 
     // Store security baseline
     (global as any).securityBaseline = {

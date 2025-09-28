@@ -1,23 +1,21 @@
 # VERSATIL MCP Setup for Cursor
 
 ## Current Status
-- ✅ MCP Server created: `versatil-mcp-server.js`
-- ✅ Claude Desktop configured
-- ⚠️ Cursor MCP integration needs verification
+- ✅ MCP Server: Production binary `bin/versatil-mcp.js`
+- ✅ VS Code configuration: `.vscode/settings.json`
+- ✅ Cursor configuration: `.cursor/settings.json` (cleaned)
+- ✅ Framework integration: Complete BMAD agent system
 
-## Cursor MCP Integration Options
+## Recommended MCP Configuration
 
-### Option 1: VS Code Extension Approach
-Cursor might use VS Code extensions for MCP integration. Check if there's an MCP extension.
-
-### Option 2: Settings Configuration
-Added MCP server config to Cursor settings.json:
+### Primary: VS Code Settings
+The framework uses `.vscode/settings.json` for MCP server configuration:
 ```json
 "mcp.servers": {
     "versatil-sdlc-framework": {
         "command": "node",
-        "args": ["/Users/nissimmenashe/VERSATIL SDLC FW/versatil-mcp-server.js"],
-        "cwd": "/Users/nissimmenashe/VERSATIL SDLC FW",
+        "args": ["./bin/versatil-mcp.js", "${workspaceFolder}"],
+        "cwd": "${workspaceFolder}",
         "env": {
             "NODE_ENV": "production",
             "VERSATIL_MCP_MODE": "true"
@@ -26,11 +24,19 @@ Added MCP server config to Cursor settings.json:
 }
 ```
 
-### Option 3: Workspace Configuration
-Create workspace-specific MCP configuration in `.vscode/settings.json`
-
-### Option 4: Continue Extension Integration
-Since you have Continue extension, check if it supports MCP integration.
+### Alternative: Claude Desktop Configuration
+For use with Claude Desktop:
+```json
+{
+    "mcpServers": {
+        "versatil-sdlc-framework": {
+            "command": "node",
+            "args": ["./bin/versatil-mcp.js", "."],
+            "cwd": "/Users/nissimmenashe/VERSATIL SDLC FW"
+        }
+    }
+}
+```
 
 ## Available MCP Tools
 
@@ -41,24 +47,41 @@ Since you have Continue extension, check if it supports MCP integration.
 
 ## Testing MCP Server
 
-You can test the MCP server directly:
+Test the production MCP server:
 ```bash
 cd "/Users/nissimmenashe/VERSATIL SDLC FW"
-echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}' | node versatil-mcp-server.js
+echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}' | node bin/versatil-mcp.js .
 ```
 
-## Next Steps
+## Available BMAD Agents via MCP
 
-1. **Restart Cursor** - Essential for settings to take effect
-2. **Check Command Palette** - Look for MCP or VERSATIL commands
-3. **Verify in Chat** - Try asking about VERSATIL tools
-4. **Alternative**: Use Claude Desktop which is already configured
+The production server provides access to all BMAD agents:
+- **enhanced-maria**: Quality assurance and testing
+- **enhanced-james**: Frontend development and UI
+- **enhanced-marcus**: Backend architecture and APIs
+- **devops-dan**: Deployment and infrastructure
+- **security-sam**: Security analysis and compliance
+- **architecture-dan**: System design and patterns
 
-## Manual Activation (Alternative)
+## Usage Instructions
 
-If MCP doesn't work in Cursor yet, you can manually activate agents by asking:
-- "Activate Enhanced Maria for code review"
-- "Run VERSATIL quality gates"
-- "Get framework status"
+1. **Restart IDE** - Essential for MCP settings to take effect
+2. **Verify Connection** - Check MCP server status in IDE
+3. **Activate Agents** - Use MCP tools to activate specific agents
+4. **Test Tools** - Try `versatil_activate_agent` with different agents
 
-The agents will respond with contextual analysis based on your project type.
+## MCP Tool Examples
+
+```json
+// Activate Enhanced Maria for testing
+{
+    "tool": "versatil_activate_agent",
+    "agentId": "enhanced-maria",
+    "context": "Review test coverage for authentication module"
+}
+
+// Get framework status
+{
+    "tool": "versatil_framework_status"
+}
+```

@@ -1,13 +1,13 @@
 {
   "name": "versatil-sdlc-framework",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
-  "description": "🚀 World's first AI-Native SDLC framework achieving ZERO CONTEXT LOSS through intelligent agent orchestration. Enhanced BMAD methodology with 6 specialized agents, 85%+ test coverage, enterprise security, and Chrome MCP integration.",
+  "description": "🚀 AI-Native SDLC framework with RAG memory, Archon autonomous orchestration, and Enhanced BMAD agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
   "main": "versatil-mcp-server.js",
   "bin": {
     "versatil": "./bin/versatil.js",
     "versatil-mcp": "./bin/versatil-mcp.js",
-    "versatil-sdlc": "./index.js"
+    "versatil-sdlc": "./dist/index-enhanced.js"
   },
   "scripts": {
     "build": "tsc",
@@ -48,6 +48,16 @@
     "health-check": "node dist/index.js --health-check",
     "agents": "node scripts/show-agents-simple.js",
     "show-agents": "node scripts/show-agents-simple.js",
+    "test:enhanced": "node test-enhanced-bmad.js",
+    "test:demo": "node tests/run-all-tests.js",
+    "test:interactive": "node tests/run-all-tests.js",
+    "test:scenarios": "node tests/real-world-scenarios.js",
+    "test:edge-cases": "node tests/edge-case-tests.js",
+    "test:learning": "node tests/learning-demos.js",
+    "test:quick": "node tests/enhanced-demo-suite.js",
+    "migrate": "node scripts/migrate-to-1.2.0.js",
+    "start:enhanced": "node dist/index.js enhanced",
+    "start:autonomous": "node dist/index.js autonomous",
     "init": "node scripts/setup-agents.js",
     "version:check": "node scripts/version-check.js",
     "version:fix": "node scripts/version-check.js --fix",

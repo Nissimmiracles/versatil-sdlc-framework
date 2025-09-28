@@ -17,10 +17,7 @@ export default defineConfig({
   // Test configuration
   testDir: './tests',
   testMatch: [
-    '**/*.e2e.{ts,js}',
-    '**/*.playwright.{ts,js}',
-    '**/*.mcp.{ts,js}',
-    '**/e2e/**/*.{test,spec}.{ts,js}'
+    '**/tests/e2e/**/*.{ts,js}'
   ],
 
   // Global test settings
@@ -39,8 +36,8 @@ export default defineConfig({
   ],
 
   // Global test setup and teardown
-  globalSetup: require.resolve('./tests/setup/global-setup.ts'),
-  globalTeardown: require.resolve('./tests/setup/global-teardown.ts'),
+  globalSetup: './tests/setup/global-setup.ts',
+  globalTeardown: './tests/setup/global-teardown.ts',
 
   // Use options
   use: {
@@ -94,9 +91,7 @@ export default defineConfig({
         viewport: { width: 1920, height: 1080 }
       },
       testMatch: [
-        '**/*.test.{ts,js}',
-        '**/*.spec.{ts,js}',
-        '**/*.e2e.{ts,js}'
+        '**/tests/e2e/**/*.{ts,js}'
       ]
     },
 
@@ -190,13 +185,13 @@ export default defineConfig({
     }
   ],
 
-  // Web server configuration for local development
-  webServer: process.env.CI ? undefined : {
-    command: 'npm run dev',
-    port: 3000,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000
-  },
+  // Web server configuration - disabled since we use global setup
+  // webServer: process.env.CI ? undefined : {
+  //   command: 'npm run dev',
+  //   port: 3000,
+  //   reuseExistingServer: !process.env.CI,
+  //   timeout: 120 * 1000
+  // },
 
   // Output directory
   outputDir: 'test-results/',

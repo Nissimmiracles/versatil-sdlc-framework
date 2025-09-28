@@ -3,7 +3,7 @@
  * Enhanced Maria-QA Unit Testing Setup
  */
 
-module.exports = {
+export default {
   displayName: 'unit',
   preset: 'ts-jest',
   testEnvironment: 'node',
