@@ -1,5 +1,9 @@
 -- VERSATIL SDLC Framework - Initial Vector Database Migration
 -- This migration sets up the vector database for Agentic RAG
+--
+-- ISOLATION NOTE: This database is stored in ~/.versatil/supabase/
+-- It is NEVER stored in the user's project directory
+-- This ensures complete separation between framework and project
 
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS vector;

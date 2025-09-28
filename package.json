@@ -9,7 +9,8 @@
     "versatil-sdlc": "./dist/index-enhanced.js"
   },
   "scripts": {
-    "postinstall": "node scripts/setup-supabase-auto.js || true",
+    "postinstall": "node scripts/validate-isolation.js && node scripts/setup-supabase-auto.js || true",
+    "validate:isolation": "node scripts/validate-isolation.js",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "build:release": "npm run lint && npm run build && npm run test:full",

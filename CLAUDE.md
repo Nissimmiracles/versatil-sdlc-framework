@@ -6,16 +6,68 @@ This document defines the **BMAD (Business-Managed Agile Development)** methodol
 
 ---
 
+## 🔒 CRITICAL: ISOLATION ENFORCEMENT
+
+### **Framework-Project Separation (MANDATORY)**
+
+The VERSATIL framework is **COMPLETELY ISOLATED** from user projects. This is **NON-NEGOTIABLE** and MUST be enforced at all times.
+
+#### Isolation Architecture:
+```yaml
+Framework_Home: "~/.versatil/"           # All framework data here
+User_Project: "$(pwd)"                   # User's project (current directory)
+Framework_Install: "/usr/local/lib/node_modules/versatil-sdlc-framework/"
+
+Forbidden_In_Project:
+  - ".versatil/"          # ❌ OLD method - NEVER use
+  - "versatil/"           # ❌ Framework directory
+  - "supabase/"           # ❌ Must be in ~/.versatil/supabase/
+  - ".versatil-memory/"   # ❌ Must be in ~/.versatil/rag-memory/
+  - ".versatil-logs/"     # ❌ Must be in ~/.versatil/logs/
+
+Allowed_In_Project:
+  - ".versatil-project.json"  # ✅ ONLY this file (project config)
+  - ".gitignore"              # ✅ Should ignore .versatil-project.json
+```
+
+#### Why Isolation?
+1. **Clean Projects**: No framework pollution in user's codebase
+2. **Git Safety**: No accidental commits of framework data
+3. **Multi-Project**: Same framework installation works with ALL projects
+4. **Updates**: Framework updates don't touch user code
+5. **Security**: Framework credentials stay in ~/.versatil/.env
+
+#### Validation:
+```bash
+# Run this to verify isolation:
+npm run validate:isolation
+
+# Auto-runs on:
+- npm install (postinstall hook)
+- npm start
+- Framework initialization
+```
+
+#### ⚠️ AGENTS: You MUST:
+1. **NEVER** create framework files in user's project
+2. **ALWAYS** use `~/.versatil/` for framework data
+3. **CHECK** isolation before any file operation
+4. **VALIDATE** paths don't cross boundaries
+5. **WARN** user if isolation is violated
+
+---
+
 ## 🎯 BMAD Methodology Overview
 
 **BMAD** represents a revolutionary approach to AI-native software development, where specialized agents work in harmony to deliver exceptional software products. Each agent brings unique expertise while maintaining seamless collaboration through intelligent handoffs and context preservation.
 
 ### Core Principles:
-1. **Specialization over Generalization** - Each agent masters specific domains
-2. **Context Preservation** - Zero information loss during agent switches
-3. **Quality-First Approach** - Maria-QA reviews all deliverables
-4. **Business Alignment** - Alex-BA ensures requirements traceability
-5. **Continuous Integration** - Real-time collaboration and feedback
+1. **Isolation First** - Framework and project completely separated
+2. **Specialization over Generalization** - Each agent masters specific domains
+3. **Context Preservation** - Zero information loss during agent switches
+4. **Quality-First Approach** - Maria-QA reviews all deliverables
+5. **Business Alignment** - Alex-BA ensures requirements traceability
+6. **Continuous Integration** - Real-time collaboration and feedback
 
 ---
 

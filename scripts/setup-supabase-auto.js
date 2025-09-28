@@ -27,14 +27,63 @@ const log = {
 
 class SupabaseAutoSetup {
   constructor() {
+    // ISOLATION: Framework files go to user's home directory, NOT project directory
+    const os = require('os');
+    this.versatilHome = path.join(os.homedir(), '.versatil');
+    this.frameworkRoot = path.dirname(path.dirname(__filename)); // VERSATIL framework installation
+
+    // Supabase setup in isolated framework directory
+    this.supabaseDir = path.join(this.versatilHome, 'supabase');
+    this.envFile = path.join(this.versatilHome, '.env');
+
+    // Project context (read-only, never write here)
     this.projectRoot = process.cwd();
-    this.supabaseDir = path.join(this.projectRoot, 'supabase');
-    this.envFile = path.join(this.projectRoot, '.env');
-    this.envExampleFile = path.join(this.projectRoot, '.env.example');
+    this.projectVersatilConfig = path.join(this.projectRoot, '.versatil-project.json');
+
+    this.ensureIsolation();
+  }
+
+  ensureIsolation() {
+    // Ensure .versatil home directory exists
+    const fs = require('fs');
+    if (!fs.existsSync(this.versatilHome)) {
+      fs.mkdirSync(this.versatilHome, { recursive: true });
+    }
+
+    // Create isolation marker
+    const isolationMarker = path.join(this.versatilHome, 'ISOLATION_NOTICE.md');
+    const isolationContent = `# VERSATIL Framework - Isolated Installation
+
+⚠️ **IMPORTANT**: This directory contains VERSATIL framework data and should NEVER be committed to your project.
+
+## Isolation Architecture:
+- Framework Home: ${this.versatilHome}
+- Your Project: ${this.projectRoot}
+- Supabase Config: ${this.supabaseDir}
+
+## Why Isolation?
+1. Prevents framework files from polluting your project
+2. Keeps your git repository clean
+3. Allows framework updates without touching your code
+4. Enables working on multiple projects with same framework installation
+
+## What's Stored Here:
+- Supabase vector database configuration
+- RAG memory indices
+- Agent execution history
+- Framework logs and metrics
+
+DO NOT commit this directory to version control!
+`;
+
+    fs.writeFileSync(isolationMarker, isolationContent);
   }
 
   async run() {
     console.log('\n🚀 VERSATIL SDLC Framework - Automatic Supabase Setup\n');
+    console.log('📁 Isolated Installation:');
+    console.log(`   Framework Home: ${this.versatilHome}`);
+    console.log(`   Your Project: ${this.projectRoot}\n`);
     console.log('This will configure vector database for Agentic RAG...\n');
 
     try {

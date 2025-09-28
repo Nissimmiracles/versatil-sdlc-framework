@@ -4,6 +4,39 @@
 # ⚡ ENHANCED VERSION 2.0 - Based on Enhanced Maria Analysis
 # Includes comprehensive configuration validation, cross-file consistency checking,
 # and enhanced detection capabilities to prevent issues like the VERSSAI Brain Route bug
+#
+# 🔒 ISOLATION ENFORCEMENT
+# The framework is COMPLETELY ISOLATED from user projects:
+# - Framework Home: ~/.versatil/
+# - User Project: Current working directory
+# - NO framework files should EVER be in user's project
+# - NO user project files should EVER be in framework directory
+
+# =====================================
+# 🔒 ISOLATION RULES - CRITICAL
+# =====================================
+
+# RULE 1: Framework files MUST be in ~/.versatil/ or framework installation directory
+# NEVER create these in user's project:
+FORBIDDEN_IN_PROJECT:
+  - ".versatil/"           # OLD installation method - DEPRECATED
+  - "versatil/"            # Framework directory - MUST NOT be in project
+  - ".versatil-framework/" # Framework data - MUST be in ~/.versatil/
+  - "supabase/"            # Supabase config - MUST be in ~/.versatil/supabase/
+
+# RULE 2: Only this file is allowed in user's project:
+ALLOWED_IN_PROJECT:
+  - ".versatil-project.json"  # Project configuration ONLY
+
+# RULE 3: All framework data goes to isolated home directory:
+FRAMEWORK_HOME: "~/.versatil/"
+FRAMEWORK_STORAGE:
+  - "~/.versatil/supabase/"       # Vector database
+  - "~/.versatil/rag-memory/"     # RAG indices
+  - "~/.versatil/agents/"         # Agent state
+  - "~/.versatil/logs/"           # Framework logs
+  - "~/.versatil/config/"         # Framework config
+  - "~/.versatil/.env"            # Framework environment
 
 # =====================================
 # ENHANCED BMAD METHODOLOGY - AGENT ACTIVATION
