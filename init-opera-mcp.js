@@ -12,6 +12,7 @@ import { environmentScanner } from './dist/environment/environment-scanner.js';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs/promises';
 import * as path from 'path';
+import * as os from 'os';
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,10 @@ dotenv.config();
 class VERSATILMCPInitializer {
   constructor(config) {
     this.logger = new VERSATILLogger('VERSATILMCPInit');
+
+    // ISOLATION: Framework home in user's home directory
+    this.versatilHome = path.join(os.homedir(), '.versatil');
+
     this.config = {
       opera: {
         enabled: true,
@@ -89,20 +94,26 @@ class VERSATILMCPInitializer {
 
   /**
    * Ensure required directories exist
+   * ISOLATION: All directories in ~/.versatil/ (user home), not project directory
    */
   async ensureDirectories() {
     const dirs = [
-      '.versatil',
-      '.versatil/backups',
-      '.versatil/backups/opera-mcp',
-      '.versatil/logs',
-      '.versatil/rag',
-      '.versatil/mcp'
+      this.versatilHome,
+      path.join(this.versatilHome, 'backups'),
+      path.join(this.versatilHome, 'backups', 'opera-mcp'),
+      path.join(this.versatilHome, 'logs'),
+      path.join(this.versatilHome, 'rag'),
+      path.join(this.versatilHome, 'mcp'),
+      path.join(this.versatilHome, 'supabase')
     ];
 
     for (const dir of dirs) {
-      await fs.mkdir(path.join(process.cwd(), dir), { recursive: true });
+      await fs.mkdir(dir, { recursive: true });
     }
+
+    this.logger.info('Framework directories created in ~/.versatil/', {
+      home: this.versatilHome
+    }, 'Init');
   }
 
   /**

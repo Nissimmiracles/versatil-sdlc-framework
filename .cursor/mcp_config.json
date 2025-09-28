@@ -2,11 +2,12 @@
   "mcpServers": {
     "versatil-sdlc": {
       "command": "node",
-      "args": ["versatil-mcp-server.js"],
+      "args": ["dist/mcp-server.js"],
       "cwd": "/Users/nissimmenashe/VERSATIL SDLC FW",
       "env": {
         "NODE_ENV": "production",
-        "VERSATIL_MCP_MODE": "true"
+        "VERSATIL_MCP_MODE": "true",
+        "VERSATIL_HOME": "~/.versatil"
       }
     },
     "claude-code-mcp": {

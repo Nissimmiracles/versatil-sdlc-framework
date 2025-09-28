@@ -17,6 +17,7 @@
     "**/dist": true,
     "**/coverage": true,
     "**/.versatil/cache": true,
+    "**/.rebranding-backup*": true,
     "**/*.js.map": true,
     "**/*.d.ts.map": true
   },
@@ -26,7 +27,24 @@
     "**/dist": true,
     "**/coverage": true,
     "**/.versatil/cache": true,
+    "**/.rebranding-backup*": true,
     "**/package-lock.json": true
+  },
+
+  "versatil.isolation": {
+    "frameworkHome": "~/.versatil/",
+    "forbiddenInProject": [
+      ".versatil/",
+      "versatil/",
+      "supabase/",
+      ".versatil-memory/",
+      ".versatil-logs/"
+    ],
+    "allowedInProject": [
+      ".versatil-project.json"
+    ],
+    "validateOnSave": true,
+    "validateOnStart": true
   },
 
   "editor.formatOnSave": true,
