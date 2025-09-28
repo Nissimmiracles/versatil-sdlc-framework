@@ -1,7 +1,7 @@
 export interface MCPDefinition { name: string; version: string; [key: string]: any; }
 
-import { BaseAgent, AgentResponse, AgentActivationContext } from '../base-agent';
-import { VERSATILLogger } from '../../utils/logger';
+import { BaseAgent, AgentResponse, AgentActivationContext } from '../base-agent.js';
+import { VERSATILLogger } from '../../utils/logger.js';
 
 export class MCPAutoDiscoveryAgent extends BaseAgent {
   systemPrompt = 'MCP Auto Discovery Agent';
