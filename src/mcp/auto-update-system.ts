@@ -470,6 +470,8 @@ export class MCPAutoUpdateSystem extends EventEmitter {
       results.push({
         id: 'react-performance-mcp',
         name: 'React Performance MCP',
+        command: 'npx',
+        args: ['@community/react-performance-mcp'],
         description: 'Performance monitoring and optimization for React apps',
         category: 'monitoring',
         capabilities: ['performance-profiling', 'bundle-analysis', 'render-optimization'],

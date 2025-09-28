@@ -389,14 +389,17 @@ class VERSATILMCPInitializer {
 export const versatilMCP = new VERSATILMCPInitializer();
 
 // Auto-initialize (run directly)
-versatilMCP.initialize()
-  .then(() => {
-    console.log('🚀 VERSATIL v1.2.0 with MCP initialized successfully');
-    console.log('📡 Opera MCP server running');
-    console.log('🔄 Auto-update enabled');
-    console.log('🔍 MCP auto-discovery active');
-  })
-  .catch((error) => {
-    console.error('❌ Failed to initialize VERSATIL:', error);
-    process.exit(1);
-  });
+if (require.main === module) {
+  versatilMCP.initialize()
+    .then(() => {
+      console.log('🚀 VERSATIL v1.2.1 with MCP initialized successfully');
+      console.log('📡 Opera MCP server running');
+      console.log('🔄 Auto-update enabled');
+      console.log('🔍 MCP auto-discovery active');
+      console.log('\n✅ Press Ctrl+C to stop');
+    })
+    .catch((error) => {
+      console.error('❌ Failed to initialize VERSATIL:', error);
+      process.exit(1);
+    });
+}
