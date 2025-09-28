@@ -43,7 +43,7 @@ class VersatilMigration {
 
 This tool will help you migrate to VERSATIL v1.2.0 with:
 - 🧠 RAG Memory System
-- 🤖 Archon Autonomous Orchestration
+- 🤖 Opera Autonomous Orchestration
 - 🚀 Enhanced BMAD Agents
 
 `);
@@ -66,8 +66,8 @@ This tool will help you migrate to VERSATIL v1.2.0 with:
       // Step 6: Initialize RAG memory
       await this.initializeRAGMemory();
 
-      // Step 7: Set up Archon
-      await this.setupArchon();
+      // Step 7: Set up Opera
+      await this.setupOpera();
 
       // Step 8: Update agent configurations
       await this.updateAgentConfigurations();
@@ -192,9 +192,9 @@ This tool will help you migrate to VERSATIL v1.2.0 with:
     const newDirs = [
       '.versatil/rag',
       '.versatil/rag/vector-index',
-      '.versatil/archon',
-      '.versatil/archon/goals',
-      '.versatil/archon/decisions',
+      '.versatil/opera',
+      '.versatil/opera/goals',
+      '.versatil/opera/decisions',
       '.versatil/learning',
       '.versatil/metrics'
     ];
@@ -231,7 +231,7 @@ This tool will help you migrate to VERSATIL v1.2.0 with:
           memoryDepth: 10,
           embeddingDimension: 384
         },
-        archon: {
+        opera: {
           enabled: true,
           autonomousMode: false,
           maxConcurrentExecutions: 3,
@@ -308,10 +308,10 @@ This tool will help you migrate to VERSATIL v1.2.0 with:
     console.log(`   ✅ Initialized RAG with ${initialMemories.length} seed memories`);
   }
 
-  async setupArchon() {
-    console.log('\n📌 Step 7: Setting up Archon orchestrator...');
+  async setupOpera() {
+    console.log('\n📌 Step 7: Setting up Opera orchestrator...');
     
-    const archonConfig = {
+    const operaConfig = {
       version: '1.2.0',
       autonomousMode: false,
       maxConcurrentExecutions: 3,
@@ -321,10 +321,10 @@ This tool will help you migrate to VERSATIL v1.2.0 with:
       memoryQueryDepth: 10
     };
     
-    const archonConfigPath = path.join(process.cwd(), '.versatil', 'archon', 'config.json');
-    await fs.writeFile(archonConfigPath, JSON.stringify(archonConfig, null, 2));
+    const operaConfigPath = path.join(process.cwd(), '.versatil', 'opera', 'config.json');
+    await fs.writeFile(operaConfigPath, JSON.stringify(operaConfig, null, 2));
     
-    console.log('   ✅ Archon orchestrator configured');
+    console.log('   ✅ Opera orchestrator configured');
   }
 
   async updateAgentConfigurations() {
@@ -351,7 +351,7 @@ This tool will help you migrate to VERSATIL v1.2.0 with:
     
     const checks = [
       { name: 'RAG directories', path: '.versatil/rag/vector-index' },
-      { name: 'Archon configuration', path: '.versatil/archon/config.json' },
+      { name: 'Opera configuration', path: '.versatil/opera/config.json' },
       { name: 'Enhanced configuration', path: '.versatil/config.json' },
       { name: 'Agent configurations', path: '.versatil/agent-config.json' }
     ];
@@ -385,7 +385,7 @@ This tool will help you migrate to VERSATIL v1.2.0 with:
 
 New Features Available:
 - 🧠 RAG Memory System - Agents now learn from experience
-- 🤖 Archon Orchestrator - Autonomous goal execution
+- 🤖 Opera Orchestrator - Autonomous goal execution
 - 🚀 Enhanced Agents - With memory and learning capabilities
 
 Next Steps:

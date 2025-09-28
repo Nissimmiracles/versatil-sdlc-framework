@@ -12,15 +12,15 @@
 ![Security](https://img.shields.io/badge/security-enterprise%20grade-red.svg)
 ![Test Coverage](https://img.shields.io/badge/coverage-85%25+-brightgreen.svg)
 
-**🌟 The world's first autonomous AI-Native SDLC framework with RAG memory, Archon orchestration, and self-learning agents achieving ZERO CONTEXT LOSS.**
+**🌟 The world's first autonomous AI-Native SDLC framework with RAG memory, Opera orchestration, and self-learning agents achieving ZERO CONTEXT LOSS.**
 
 ### 🆕 Version 1.2.1 Features:
 - **🧠 RAG Memory System** - Agents learn from every interaction
-- **🤖 Archon Orchestrator** - Fully autonomous goal execution
+- **🤖 Opera Orchestrator** - Fully autonomous goal execution
 - **🚀 Self-Healing** - Automatic recovery and adaptation
 - **📈 Pattern Recognition** - Proactive issue prevention
 - **⚡ Real-time Progress Tracking** - WebSocket-based live SDLC visibility
-- **🔄 Archon MCP Server** - Model Context Protocol interface with auto-updates
+- **🔄 Opera MCP Server** - Model Context Protocol interface with auto-updates
 - **🎯 MCP Auto-Discovery** - Automatic tool discovery and integration
 - **📊 Complete SDLC Context** - Task-level progress for all agents
 - **🔧 Automatic Updates** - Self-updating framework with rollback capability
@@ -74,7 +74,7 @@ npx versatil-sdlc enhanced
 # 🆕 Start in autonomous mode (v1.2.0)
 npx versatil-sdlc autonomous
 
-# 🆕 Start Archon MCP server (v1.2.1)
+# 🆕 Start Opera MCP server (v1.2.1)
 npx versatil-sdlc archon:start
 ```
 
@@ -112,7 +112,7 @@ A **production-ready AI-Native Software Development Lifecycle framework** that t
 
 - **🧠 6 Specialized AI Agents** with memory and learning capabilities
 - **🧠 RAG Memory System** for persistent agent knowledge (v1.2.0)
-- **🤖 Archon Autonomous Orchestrator** for goal-based execution (v1.2.0)
+- **🤖 Opera Autonomous Orchestrator** for goal-based execution (v1.2.0)
 - **🔍 Enhanced Configuration Validation** preventing production bugs
 - **🌐 Chrome MCP Primary Testing** framework integration
 - **🔄 Zero Context Loss** preservation system
@@ -728,9 +728,9 @@ We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md
 
 ## 🎆 What's New in v1.2.1
 
-### Archon MCP Integration & Auto-Updates
+### Opera MCP Integration & Auto-Updates
 
-- **📡 Archon MCP Server**: Full Model Context Protocol server for external orchestration
+- **📡 Opera MCP Server**: Full Model Context Protocol server for external orchestration
 - **🔄 Automatic Updates**: Self-updating framework with version management
 - **🔧 MCP Tool Discovery**: Automatically finds and suggests relevant MCPs
 - **💾 Backup & Rollback**: Safe updates with automatic backups
@@ -740,7 +740,7 @@ We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md
 ### Revolutionary Autonomous Development (v1.2.0)
 
 - **🧠 RAG Memory System**: Agents remember and learn from every interaction
-- **🤖 Archon Orchestrator**: Fully autonomous goal planning and execution
+- **🤖 Opera Orchestrator**: Fully autonomous goal planning and execution
 - **🔄 Self-Healing**: Automatic recovery from failures with alternative strategies
 - **📈 Pattern Recognition**: Detect and proactively fix recurring issues
 - **🎯 Goal-Based Development**: Just describe what you want to build
@@ -764,7 +764,7 @@ await enhancedBMAD.executeBMADWorkflow(
 ```
 
 [Read the Complete Enhanced Features Guide →](./ENHANCED_FEATURES_GUIDE.md)
-[Read the Archon MCP Documentation →](./ARCHON_MCP_DOCUMENTATION.md)
+[Read the Opera MCP Documentation →](./OPERA_MCP_DOCUMENTATION.md)
 
 ---
 

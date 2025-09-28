@@ -8,7 +8,7 @@
 import { 
   enhancedBMAD, 
   vectorMemoryStore,
-  ArchonOrchestrator 
+  OperaOrchestrator 
 } from 'versatil-sdlc-framework';
 
 /**
@@ -38,7 +38,7 @@ Build a data processing system with these requirements:
 
   console.log('📋 Conflicting Requirements:', conflictingReqs);
   
-  console.log('\n🤖 Archon Conflict Resolution:\n');
+  console.log('\n🤖 Opera Conflict Resolution:\n');
   
   console.log('🚨 Conflicts Detected:');
   console.log('   1. Real-time vs 100% accuracy (trade-off required)');
@@ -153,7 +153,7 @@ export async function cascadingFailureTest() {
     console.log(`   ${f.time} - ${f.component}: ${f.error}`);
   });
   
-  console.log('\n🚑 Archon Emergency Protocol Activated:\n');
+  console.log('\n🚑 Opera Emergency Protocol Activated:\n');
   
   console.log('📊 Failure Analysis:');
   console.log('   Root cause detected: Database connection pool exhausted');
@@ -337,7 +337,7 @@ export async function resourceCompetitionTest() {
     console.log(`   ${p.id}: ${p.description} (${p.priority})`);
   });
   
-  console.log('\n🧠 Archon Resource Optimization:\n');
+  console.log('\n🧠 Opera Resource Optimization:\n');
   
   console.log('📊 Priority Matrix:');
   console.log('   1. Data corruption (critical + data loss risk)');

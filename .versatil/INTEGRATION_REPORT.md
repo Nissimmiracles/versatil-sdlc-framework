@@ -17,7 +17,7 @@ Generated: 2025-09-28T02:37:10.166Z
    - Query with @memory <topic>
    
 
-2. **Archon Orchestrator**
+2. **Opera Orchestrator**
    - Set goals with @archon <goal>
    - Autonomous execution
    - Self-healing capabilities

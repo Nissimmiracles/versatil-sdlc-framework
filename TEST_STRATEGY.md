@@ -181,7 +181,7 @@ Not passive watching:
 - **Action Taken**: How many start VERSATIL after tests
 
 ### Understanding
-- **Concept Clarity**: Do users understand RAG/Archon?
+- **Concept Clarity**: Do users understand RAG/Opera?
 - **Value Recognition**: Can they articulate benefits?
 - **Confidence Level**: Ready to use in production?
 

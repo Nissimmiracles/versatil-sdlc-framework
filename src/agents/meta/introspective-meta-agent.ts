@@ -8,7 +8,7 @@ import { AgentResponse, AgentActivationContext } from '../agent-types';
 import { VERSATILLogger } from '../../utils/logger';
 import { IsolatedVERSATILOrchestrator } from '../../orchestration/isolated-versatil-orchestrator';
 import { AgenticRAGOrchestrator, AgentMemory } from '../../orchestration/agentic-rag-orchestrator';
-import { PlanFirstArchon, MultiAgentPlan } from '../../orchestration/plan-first-archon';
+import { PlanFirstOpera, MultiAgentPlan } from '../../orchestration/plan-first-opera';
 import { StackAwareOrchestrator } from '../../orchestration/stack-aware-orchestrator';
 
 export interface SystemInsight {
@@ -84,7 +84,7 @@ You are the guardian and optimizer of the entire VERSATIL ecosystem.`;
   private logger: VERSATILLogger;
   private orchestrator?: IsolatedVERSATILOrchestrator;
   private ragOrchestrator?: AgenticRAGOrchestrator;
-  private planOrchestrator?: PlanFirstArchon;
+  private planOrchestrator?: PlanFirstOpera;
   private stackOrchestrator?: StackAwareOrchestrator;
   
   // System monitoring
@@ -127,7 +127,7 @@ You are the guardian and optimizer of the entire VERSATIL ecosystem.`;
   public async initialize(orchestrators: {
     main: IsolatedVERSATILOrchestrator;
     rag: AgenticRAGOrchestrator;
-    plan: PlanFirstArchon;
+    plan: PlanFirstOpera;
     stack: StackAwareOrchestrator;
   }): Promise<void> {
     this.orchestrator = orchestrators.main;

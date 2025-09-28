@@ -107,7 +107,7 @@ my-project/
 
 **What VERSATIL adds:**
 - RAG memory to existing Supabase
-- Archon orchestration to agents
+- Opera orchestration to agents
 - Enhanced agent commands
 - Introspective testing
 
@@ -142,7 +142,7 @@ agents/
 **What VERSATIL adds:**
 - Memory system to each agent
 - Cross-agent learning
-- Archon coordination
+- Opera coordination
 - Pattern recognition
 
 ---

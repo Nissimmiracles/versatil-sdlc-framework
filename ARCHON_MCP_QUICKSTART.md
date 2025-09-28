@@ -1,6 +1,6 @@
-# 🚀 VERSATIL Archon MCP Quick Start Guide
+# 🚀 VERSATIL Opera MCP Quick Start Guide
 
-Get up and running with VERSATIL's Archon MCP in 5 minutes!
+Get up and running with VERSATIL's Opera MCP in 5 minutes!
 
 ## Prerequisites
 
@@ -21,7 +21,7 @@ npm install
 # Copy configuration
 cp .env.example .env
 
-# Start Archon MCP
+# Start Opera MCP
 npm run archon:start
 ```
 
@@ -79,9 +79,9 @@ Edit `.env` file with your settings:
 
 ```env
 # Essential settings
-ARCHON_MCP_PORT=3000
-ARCHON_AUTO_UPDATE=true
-ARCHON_UPDATE_CHANNEL=stable
+OPERA_MCP_PORT=3000
+OPERA_AUTO_UPDATE=true
+OPERA_UPDATE_CHANNEL=stable
 
 # Optional: Enable MCP discovery
 MCP_AUTO_DISCOVERY=true
@@ -101,7 +101,7 @@ MCP_AUTO_DISCOVERY=true
        "servers": {
          "archon": {
            "command": "node",
-           "args": ["init-archon-mcp.js"],
+           "args": ["init-opera-mcp.js"],
            "env": {}
          }
        }
@@ -111,20 +111,20 @@ MCP_AUTO_DISCOVERY=true
 
 3. **Use in your IDE:**
    - Type: `@archon create a new feature`
-   - The AI will use Archon MCP tools automatically
+   - The AI will use Opera MCP tools automatically
 
 ## 🎮 Interactive Demo
 
 Try the interactive demo to see all features:
 
 ```bash
-npm run demo:archon-mcp
+npm run demo:opera-mcp
 ```
 
 ## 🛠️ Common Commands
 
 ```bash
-# Start Archon MCP
+# Start Opera MCP
 npm run archon:start
 
 # Check health status
@@ -142,7 +142,7 @@ npm run mcp:status
 
 ## 📊 Monitoring
 
-Access Archon resources:
+Access Opera resources:
 
 ```javascript
 // View active goals
@@ -163,13 +163,13 @@ const context = await readMCPResource('archon://context');
 lsof -i :3000
 
 # Use different port
-ARCHON_MCP_PORT=3001 npm run archon:start
+OPERA_MCP_PORT=3001 npm run archon:start
 ```
 
 ### Updates failing
 ```bash
 # Disable auto-update temporarily
-ARCHON_AUTO_UPDATE=false npm run archon:start
+OPERA_AUTO_UPDATE=false npm run archon:start
 
 # Manual rollback
 npm run archon:rollback -- --version=1.2.0
@@ -186,17 +186,17 @@ tail -f .versatil/logs/mcp-discovery.log
 
 ## 🚀 Next Steps
 
-1. **Explore Documentation**: Read [ARCHON_MCP_DOCUMENTATION.md](./ARCHON_MCP_DOCUMENTATION.md)
+1. **Explore Documentation**: Read [OPERA_MCP_DOCUMENTATION.md](./OPERA_MCP_DOCUMENTATION.md)
 2. **Join Community**: [Discord Server](https://discord.gg/versatil)
-3. **Watch Tutorial**: [YouTube - Archon MCP Setup](https://youtube.com/@versatil)
+3. **Watch Tutorial**: [YouTube - Opera MCP Setup](https://youtube.com/@versatil)
 4. **Enterprise Support**: [enterprise@versatil.com](mailto:enterprise@versatil.com)
 
 ## 💡 Pro Tips
 
-1. **Enable Learning Mode**: Set `ARCHON_LEARNING_MODE=adaptive` for smarter orchestration
+1. **Enable Learning Mode**: Set `OPERA_LEARNING_MODE=adaptive` for smarter orchestration
 2. **Use Update Channels**: Stay on `stable` for production, try `beta` for new features
 3. **Monitor Performance**: Check `archon://metrics` regularly
-4. **Backup Strategy**: Keep `ARCHON_MAX_BACKUPS=5` for safe rollbacks
+4. **Backup Strategy**: Keep `OPERA_MAX_BACKUPS=5` for safe rollbacks
 5. **Integrate MCPs**: Let auto-discovery find tools for your stack
 
 ---

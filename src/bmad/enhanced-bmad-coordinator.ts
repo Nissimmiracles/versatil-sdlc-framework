@@ -1,6 +1,6 @@
 /**
  * VERSATIL SDLC Framework - Enhanced BMAD Integration
- * Integrates RAG memory and Archon orchestration with existing BMAD agents
+ * Integrates RAG memory and Opera orchestration with existing BMAD agents
  */
 
 import { EventEmitter } from 'events';
@@ -8,13 +8,13 @@ import { BaseAgent, AgentActivationContext, AgentResponse } from '../agents/base
 import { AgentRegistry } from '../agents/agent-registry';
 import { VERSATILLogger } from '../utils/logger';
 import { vectorMemoryStore, RAGQuery } from '../rag/vector-memory-store';
-import { ArchonOrchestrator, ArchonGoal } from '../archon/archon-orchestrator';
+import { OperaOrchestrator, OperaGoal } from '../opera/opera-orchestrator';
 import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator';
 import { AgentIntelligenceManager } from '../intelligence/agent-intelligence';
 
 export interface EnhancedBMADConfig {
   ragEnabled: boolean;
-  archonEnabled: boolean;
+  operaEnabled: boolean;
   autonomousMode: boolean;
   memoryDepth: number;
   contextWindowSize: number;
@@ -26,7 +26,7 @@ export interface BMADContext {
   phase: string;
   activeAgents: string[];
   memory: any[];
-  goals: ArchonGoal[];
+  goals: OperaGoal[];
   decisions: any[];
 }
 
@@ -42,7 +42,7 @@ export interface EnhancedAgentResponse extends AgentResponse {
 export class EnhancedBMADCoordinator extends EventEmitter {
   private logger: VERSATILLogger;
   private agentRegistry: AgentRegistry;
-  private archonOrchestrator: ArchonOrchestrator;
+  private operaOrchestrator: OperaOrchestrator;
   private sdlcOrchestrator: SDLCOrchestrator;
   private intelligenceManager: AgentIntelligenceManager;
   private config: EnhancedBMADConfig;
@@ -54,7 +54,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
     this.logger = new VERSATILLogger();
     this.config = {
       ragEnabled: true,
-      archonEnabled: true,
+      operaEnabled: true,
       autonomousMode: true,
       memoryDepth: 10,
       contextWindowSize: 5,
@@ -71,9 +71,9 @@ export class EnhancedBMADCoordinator extends EventEmitter {
     this.intelligenceManager = new AgentIntelligenceManager();
     this.sdlcOrchestrator = new SDLCOrchestrator();
     
-    if (this.config.archonEnabled) {
-      this.archonOrchestrator = new ArchonOrchestrator(this.agentRegistry);
-      this.setupArchonIntegration();
+    if (this.config.operaEnabled) {
+      this.operaOrchestrator = new OperaOrchestrator(this.agentRegistry);
+      this.setupOperaIntegration();
     }
     
     // Enhance all agents with RAG and autonomous capabilities
@@ -160,7 +160,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
     }
     
     // 5. Check for autonomous actions
-    if (this.config.autonomousMode && this.config.archonEnabled) {
+    if (this.config.autonomousMode && this.config.operaEnabled) {
       const autonomousActions = await this.checkAutonomousActions(
         agentId, 
         context, 
@@ -357,12 +357,12 @@ export class EnhancedBMADCoordinator extends EventEmitter {
   }
 
   /**
-   * Queue autonomous goal for Archon execution
+   * Queue autonomous goal for Opera execution
    */
   private async queueAutonomousGoal(action: any, agentId: string): Promise<void> {
-    if (!this.archonOrchestrator) return;
+    if (!this.operaOrchestrator) return;
     
-    const goal: ArchonGoal = {
+    const goal: OperaGoal = {
       id: this.generateId('goal'),
       type: this.mapActionToGoalType(action.type),
       description: `${action.reason}: ${action.suggestedAction}`,
@@ -372,7 +372,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
       successCriteria: [`${action.type} completed successfully`]
     };
     
-    await this.archonOrchestrator.addGoal(goal);
+    await this.operaOrchestrator.addGoal(goal);
     
     this.logger.info('Autonomous goal queued', { goal, action, agentId }, 'bmad-enhanced');
   }
@@ -503,21 +503,21 @@ export class EnhancedBMADCoordinator extends EventEmitter {
   }
 
   /**
-   * Setup Archon integration
+   * Setup Opera integration
    */
-  private setupArchonIntegration(): void {
-    // Listen to Archon events
-    this.archonOrchestrator.on('goal_completed', ({ goal, decision }) => {
-      this.logger.info('Archon goal completed', { goal, decision }, 'bmad-enhanced');
+  private setupOperaIntegration(): void {
+    // Listen to Opera events
+    this.operaOrchestrator.on('goal_completed', ({ goal, decision }) => {
+      this.logger.info('Opera goal completed', { goal, decision }, 'bmad-enhanced');
       this.emit('autonomous_goal_completed', { goal, decision });
     });
     
-    this.archonOrchestrator.on('goal_failed', ({ goal, decision }) => {
-      this.logger.warn('Archon goal failed', { goal, decision }, 'bmad-enhanced');
+    this.operaOrchestrator.on('goal_failed', ({ goal, decision }) => {
+      this.logger.warn('Opera goal failed', { goal, decision }, 'bmad-enhanced');
       this.emit('autonomous_goal_failed', { goal, decision });
     });
     
-    this.archonOrchestrator.on('human_intervention_required', ({ step, error }) => {
+    this.operaOrchestrator.on('human_intervention_required', ({ step, error }) => {
       this.logger.warn('Human intervention required', { step, error }, 'bmad-enhanced');
       this.emit('human_intervention_required', { step, error });
     });
@@ -598,7 +598,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
     const context = await this.getContext(projectId);
     
     // Create initial goal
-    const goal: ArchonGoal = {
+    const goal: OperaGoal = {
       id: this.generateId('workflow'),
       type: 'feature',
       description: requirements,
@@ -617,8 +617,8 @@ export class EnhancedBMADCoordinator extends EventEmitter {
     context.goals.push(goal);
     
     // Queue for autonomous execution
-    if (this.archonOrchestrator) {
-      await this.archonOrchestrator.addGoal(goal);
+    if (this.operaOrchestrator) {
+      await this.operaOrchestrator.addGoal(goal);
     }
     
     this.emit('workflow_started', { projectId, goal });
@@ -658,7 +658,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
       .trim();
   }
   
-  private mapActionToGoalType(actionType: string): ArchonGoal['type'] {
+  private mapActionToGoalType(actionType: string): OperaGoal['type'] {
     const mapping = {
       'emergency_response': 'bug_fix',
       'agent_coordination': 'feature',
@@ -668,7 +668,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
     return mapping[actionType] || 'feature';
   }
   
-  private determinePriority(action: any): ArchonGoal['priority'] {
+  private determinePriority(action: any): OperaGoal['priority'] {
     if (action.type === 'emergency_response') return 'critical';
     if (action.confidence && action.confidence > 0.8) return 'high';
     return 'medium';
@@ -703,11 +703,11 @@ export class EnhancedBMADCoordinator extends EventEmitter {
   setAutonomousMode(enabled: boolean): void {
     this.config.autonomousMode = enabled;
     
-    if (this.archonOrchestrator) {
+    if (this.operaOrchestrator) {
       if (enabled) {
-        this.archonOrchestrator.resumeAutonomous();
+        this.operaOrchestrator.resumeAutonomous();
       } else {
-        this.archonOrchestrator.pauseAutonomous();
+        this.operaOrchestrator.pauseAutonomous();
       }
     }
     
@@ -722,17 +722,17 @@ export class EnhancedBMADCoordinator extends EventEmitter {
       contexts: this.contexts.size,
       enhancedAgents: this.enhancedAgents.size,
       ragEnabled: this.config.ragEnabled,
-      archonEnabled: this.config.archonEnabled,
+      operaEnabled: this.config.operaEnabled,
       autonomousMode: this.config.autonomousMode
     };
     
-    if (this.archonOrchestrator) {
-      const archonState = await this.archonOrchestrator.getState();
-      metrics['archonMetrics'] = {
-        activeGoals: archonState.currentGoals.length,
-        activeDecisions: archonState.activeDecisions.length,
-        queuedSteps: archonState.executionQueue.length,
-        performance: archonState.performance
+    if (this.operaOrchestrator) {
+      const operaState = await this.operaOrchestrator.getState();
+      metrics['operaMetrics'] = {
+        activeGoals: operaState.currentGoals.length,
+        activeDecisions: operaState.activeDecisions.length,
+        queuedSteps: operaState.executionQueue.length,
+        performance: operaState.performance
       };
     }
     

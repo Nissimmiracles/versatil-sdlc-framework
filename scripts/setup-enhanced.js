@@ -2,7 +2,7 @@
 
 /**
  * VERSATIL SDLC Framework - Enhanced Features Setup
- * Quick setup script for RAG and Archon features
+ * Quick setup script for RAG and Opera features
  */
 
 const fs = require('fs');
@@ -15,7 +15,7 @@ console.log(`
 
 This script will help you set up the new enhanced features:
 - 🧠 RAG Memory System
-- 🤖 Archon Autonomous Orchestrator
+- 🤖 Opera Autonomous Orchestrator
 - 🚀 Enhanced BMAD Integration
 
 `);
@@ -63,8 +63,8 @@ async function setup() {
       '.versatil',
       '.versatil/rag',
       '.versatil/rag/vector-index',
-      '.versatil/archon',
-      '.versatil/archon/goals',
+      '.versatil/opera',
+      '.versatil/opera/goals',
       '.versatil/learning'
     ];
     
@@ -86,7 +86,7 @@ async function setup() {
           memoryDepth: 10,
           embeddingDimension: 384
         },
-        archon: {
+        opera: {
           enabled: true,
           autonomousMode: false,
           maxConcurrentExecutions: 3,
@@ -112,7 +112,7 @@ async function setup() {
     // Step 4: Ask about autonomous mode
     const enableAuto = await prompt('🤖 Enable autonomous mode? (y/n): ');
     if (enableAuto === 'y' || enableAuto === 'yes') {
-      config.features.archon.autonomousMode = true;
+      config.features.opera.autonomousMode = true;
       fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
       console.log('✅ Autonomous mode enabled\n');
     } else {
@@ -123,7 +123,7 @@ async function setup() {
     console.log('📝 Creating example script...');
     const exampleScript = `/**
  * VERSATIL Enhanced Features Example
- * Demonstrates RAG memory and Archon orchestration
+ * Demonstrates RAG memory and Opera orchestration
  */
 
 import { 
@@ -249,7 +249,7 @@ main().catch(console.error);
 
 Your project is now configured with:
 - 🧠 RAG Memory System
-- 🤖 Archon Orchestrator${config.features.archon.autonomousMode ? ' (Autonomous Mode)' : ''}
+- 🤖 Opera Orchestrator${config.features.opera.autonomousMode ? ' (Autonomous Mode)' : ''}
 - 🚀 Enhanced BMAD Agents
 
 Quick Start Commands:

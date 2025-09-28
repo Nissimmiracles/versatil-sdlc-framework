@@ -14,7 +14,7 @@ src/rag/
 └── embeddings/                # Cached embeddings
 ```
 
-### 🤖 Archon Orchestrator
+### 🤖 Opera Orchestrator
 ```
 src/archon/
 ├── archon-orchestrator.ts     # Autonomous orchestration
@@ -25,7 +25,7 @@ src/archon/
 .versatil/archon/
 ├── goals/                    # Active goals
 ├── decisions/                # Decision history
-└── config.json              # Archon configuration
+└── config.json              # Opera configuration
 ```
 
 ### 🚀 Enhanced Components
@@ -101,7 +101,7 @@ package.json                   # New scripts & version
 
 1. **Enhanced Agents** inherit from base agents
 2. **RAG Memory** integrates with all agent decisions
-3. **Archon** orchestrates enhanced BMAD workflow
+3. **Opera** orchestrates enhanced BMAD workflow
 4. **MCP Tools** expose all v1.2.0 features
 5. **Test Suite** demonstrates real value
 

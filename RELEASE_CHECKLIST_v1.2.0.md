@@ -4,7 +4,7 @@
 - **Version**: 1.2.0  
 - **Release Name**: "Autonomous Intelligence"
 - **Release Date**: Ready for release
-- **Major Features**: RAG Memory, Archon Orchestrator, Enhanced Agents
+- **Major Features**: RAG Memory, Opera Orchestrator, Enhanced Agents
 
 ---
 
@@ -17,7 +17,7 @@
 - [x] Relevance feedback loop
 - [x] Integration with all agents
 
-### 2. **Archon Orchestrator** ✅
+### 2. **Opera Orchestrator** ✅
 - [x] Goal-based planning
 - [x] Autonomous execution
 - [x] Multi-agent coordination
@@ -102,7 +102,7 @@ This will:
 1. Backup existing configuration
 2. Update to v1.2.0
 3. Initialize RAG memory
-4. Configure Archon
+4. Configure Opera
 5. Update agent settings
 
 ---
@@ -166,7 +166,7 @@ This will:
 We're excited to announce the biggest update yet:
 
 🧠 RAG Memory System - Your AI agents now learn and remember
-🤖 Archon Orchestrator - Autonomous goal-based development
+🤖 Opera Orchestrator - Autonomous goal-based development
 🚀 85% faster development with 95% bug prevention
 
 Quick start:

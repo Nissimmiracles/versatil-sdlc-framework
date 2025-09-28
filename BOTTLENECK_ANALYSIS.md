@@ -98,7 +98,7 @@ class OptimizedEnvironmentScanner {
 }
 ```
 
-### 4. **Archon Decision Making**
+### 4. **Opera Decision Making**
 
 #### Issue: Excessive Memory Queries
 ```typescript
@@ -224,7 +224,7 @@ Operation               Current     Target      Improvement
 RAG Query              500ms       50ms        10x
 Agent Activation       200ms       50ms        4x
 Environment Scan       10s         1s          10x
-Archon Decision        2s          200ms       10x
+Opera Decision        2s          200ms       10x
 File Operations        100ms       20ms        5x
 MCP Call              200ms       50ms        4x
 ```
@@ -236,7 +236,7 @@ Component              Current     Target      Reduction
 Agent Registry         Unbounded   100MB       -
 RAG Memory Store       Unbounded   500MB       -
 Environment Cache      Unbounded   200MB       -
-Archon History        Unbounded   100MB       -
+Opera History        Unbounded   100MB       -
 ```
 
 ---

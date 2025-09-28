@@ -1,6 +1,6 @@
 # 🚀 VERSATIL SDLC Framework v1.2.0 Release Notes
 
-## Major Release: RAG Memory & Archon Autonomous Orchestration
+## Major Release: RAG Memory & Opera Autonomous Orchestration
 
 ### Release Date: December 2024
 
@@ -15,7 +15,7 @@
 - **Feedback Learning**: Improve memory quality based on user feedback
 - **Persistent Knowledge**: All agent learnings are preserved across sessions
 
-### 🤖 **Archon Autonomous Orchestrator**
+### 🤖 **Opera Autonomous Orchestrator**
 - **Hierarchical Goal Planning**: Break complex requirements into executable steps
 - **Multi-Agent Coordination**: Orchestrate multiple agents in parallel or sequence
 - **Autonomous Decision Making**: AI-driven strategy selection and execution
@@ -48,7 +48,7 @@
 
 ### Enhanced Mode
 ```bash
-# Start with RAG + Archon (manual trigger)
+# Start with RAG + Opera (manual trigger)
 npx versatil-sdlc enhanced
 ```
 
@@ -85,7 +85,7 @@ const results = await vectorMemoryStore.queryMemories({
 });
 ```
 
-### Archon Goals
+### Opera Goals
 ```typescript
 import { enhancedBMAD } from 'versatil-sdlc-framework';
 
@@ -216,7 +216,7 @@ const goal = {
 
 Special thanks to our community for feature requests and testing:
 - RAG implementation inspired by community feedback
-- Archon design based on user workflow analysis
+- Opera design based on user workflow analysis
 - Pattern detection from real-world usage data
 
 ---

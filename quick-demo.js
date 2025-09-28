@@ -142,7 +142,7 @@ async function emergencyProductionFix() {
   console.log('   Error: "Connection pool exhausted"');
   console.log('   Revenue Loss: $10,000/minute\n');
   
-  console.log('🚑 ARCHON EMERGENCY MODE ACTIVATED\n');
+  console.log('🚑 OPERA EMERGENCY MODE ACTIVATED\n');
   
   // Simulate rapid diagnosis and fix
   const timeline = [
@@ -180,7 +180,7 @@ async function emergencyProductionFix() {
   await vectorMemoryStore.storeMemory({
     content: 'Connection pool exhaustion: Always close connections in finally block',
     metadata: {
-      agentId: 'archon',
+      agentId: 'opera',
       timestamp: Date.now(),
       tags: ['incident', 'production', 'connection-leak']
     }
@@ -242,7 +242,7 @@ async function beforeAfterComparison() {
   console.log('🤖 VERSATIL: "Understood. Executing autonomous workflow..."\n');
   
   console.log('🧠 Memory Search: Found 12 relevant auth patterns');
-  console.log('📋 Archon Plan: 7 parallel steps identified\n');
+  console.log('📋 Opera Plan: 7 parallel steps identified\n');
   
   const afterSteps = [
     '⚡ Parallel Execution:',

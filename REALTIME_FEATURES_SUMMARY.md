@@ -2,8 +2,8 @@
 
 ## ✅ Features Implemented
 
-### 1. **Archon MCP** (`/src/mcp/archon-mcp.ts`)
-- ✅ Full MCP interface for Archon orchestration
+### 1. **Opera MCP** (`/src/mcp/opera-mcp.ts`)
+- ✅ Full MCP interface for Opera orchestration
 - ✅ 7 MCP tools exposed:
   - `archon_create_goal` - Create and queue goals
   - `archon_goal_status` - Monitor goal progress
@@ -135,7 +135,7 @@ ws.on('message', (data) => {
 });
 ```
 
-### 3. Create Archon Goal via MCP
+### 3. Create Opera Goal via MCP
 ```bash
 # Using MCP client
 mcp call archon_create_goal '{

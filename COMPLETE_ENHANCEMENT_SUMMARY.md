@@ -62,7 +62,7 @@ node mcp-auto-discovery-demo.cjs
 ├─────────────────────────┤
 │   Integration Layer     │ ← MCP adapters
 ├─────────────────────────┤
-│  Orchestration Layer    │ ← Archon & Agents
+│  Orchestration Layer    │ ← Opera & Agents
 ├─────────────────────────┤
 │  Intelligence Layer     │ ← RAG & Learning
 ├─────────────────────────┤
@@ -144,7 +144,7 @@ Operation          Target    Achieved
 RAG Query          50ms      ✅
 Agent Activation   50ms      ✅
 Environment Scan   1s        ✅
-Archon Decision    200ms     ✅
+Opera Decision    200ms     ✅
 MCP Call          50ms      ✅
 ```
 

@@ -56,7 +56,7 @@
           "message": "Argument of type 'Timer' is not assignable to parameter of type 'string | number | Timeout'."
         },
         {
-          "file": "\nsrc/mcp/archon-mcp.ts",
+          "file": "\nsrc/mcp/opera-mcp.ts",
           "line": 542,
           "message": "Argument of type 'Timer' is not assignable to parameter of type 'string | number | Timeout'."
         },
@@ -114,22 +114,22 @@
     {
       "code": "TS2353",
       "count": 6,
-      "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'.",
+      "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'OperaGoal'.",
       "examples": [
         {
           "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
           "line": 558,
-          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'."
+          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'OperaGoal'."
         },
         {
           "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
           "line": 585,
-          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'."
+          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'OperaGoal'."
         },
         {
           "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
           "line": 715,
-          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'."
+          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'OperaGoal'."
         }
       ]
     },
@@ -308,48 +308,48 @@
       ]
     },
     {
-      "file": "\nmcp/archon-mcp.ts",
+      "file": "\nmcp/opera-mcp.ts",
       "count": 16,
       "errors": [
         {
-          "file": "\nsrc/mcp/archon-mcp.ts",
+          "file": "\nsrc/mcp/opera-mcp.ts",
           "line": 6,
           "column": 36,
           "code": "TS2307",
           "message": "Cannot find module '@modelcontextprotocol/sdk' or its corresponding type declarations.",
-          "fullMatch": "\nsrc/mcp/archon-mcp.ts(6,36): error TS2307: Cannot find module '@modelcontextprotocol/sdk' or its corresponding type declarations."
+          "fullMatch": "\nsrc/mcp/opera-mcp.ts(6,36): error TS2307: Cannot find module '@modelcontextprotocol/sdk' or its corresponding type declarations."
         },
         {
-          "file": "\nsrc/mcp/archon-mcp.ts",
+          "file": "\nsrc/mcp/opera-mcp.ts",
           "line": 106,
           "column": 40,
           "code": "TS2339",
-          "message": "Property 'getGoalStatus' does not exist on type 'EnhancedArchonOrchestrator'.",
-          "fullMatch": "\nsrc/mcp/archon-mcp.ts(106,40): error TS2339: Property 'getGoalStatus' does not exist on type 'EnhancedArchonOrchestrator'."
+          "message": "Property 'getGoalStatus' does not exist on type 'EnhancedOperaOrchestrator'.",
+          "fullMatch": "\nsrc/mcp/opera-mcp.ts(106,40): error TS2339: Property 'getGoalStatus' does not exist on type 'EnhancedOperaOrchestrator'."
         },
         {
-          "file": "\nsrc/mcp/archon-mcp.ts",
+          "file": "\nsrc/mcp/opera-mcp.ts",
           "line": 110,
           "column": 32,
           "code": "TS2339",
-          "message": "Property 'getAllGoalsStatus' does not exist on type 'EnhancedArchonOrchestrator'.",
-          "fullMatch": "\nsrc/mcp/archon-mcp.ts(110,32): error TS2339: Property 'getAllGoalsStatus' does not exist on type 'EnhancedArchonOrchestrator'."
+          "message": "Property 'getAllGoalsStatus' does not exist on type 'EnhancedOperaOrchestrator'.",
+          "fullMatch": "\nsrc/mcp/opera-mcp.ts(110,32): error TS2339: Property 'getAllGoalsStatus' does not exist on type 'EnhancedOperaOrchestrator'."
         },
         {
-          "file": "\nsrc/mcp/archon-mcp.ts",
+          "file": "\nsrc/mcp/opera-mcp.ts",
           "line": 125,
           "column": 32,
           "code": "TS2339",
-          "message": "Property 'getDecisionHistory' does not exist on type 'EnhancedArchonOrchestrator'.",
-          "fullMatch": "\nsrc/mcp/archon-mcp.ts(125,32): error TS2339: Property 'getDecisionHistory' does not exist on type 'EnhancedArchonOrchestrator'."
+          "message": "Property 'getDecisionHistory' does not exist on type 'EnhancedOperaOrchestrator'.",
+          "fullMatch": "\nsrc/mcp/opera-mcp.ts(125,32): error TS2339: Property 'getDecisionHistory' does not exist on type 'EnhancedOperaOrchestrator'."
         },
         {
-          "file": "\nsrc/mcp/archon-mcp.ts",
+          "file": "\nsrc/mcp/opera-mcp.ts",
           "line": 145,
           "column": 32,
           "code": "TS2339",
-          "message": "Property 'getLearningInsights' does not exist on type 'EnhancedArchonOrchestrator'.",
-          "fullMatch": "\nsrc/mcp/archon-mcp.ts(145,32): error TS2339: Property 'getLearningInsights' does not exist on type 'EnhancedArchonOrchestrator'."
+          "message": "Property 'getLearningInsights' does not exist on type 'EnhancedOperaOrchestrator'.",
+          "fullMatch": "\nsrc/mcp/opera-mcp.ts(145,32): error TS2339: Property 'getLearningInsights' does not exist on type 'EnhancedOperaOrchestrator'."
         }
       ]
     },
@@ -394,8 +394,8 @@
           "line": 369,
           "column": 7,
           "code": "TS2353",
-          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'.",
-          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(369,7): error TS2353: Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'."
+          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'OperaGoal'.",
+          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(369,7): error TS2353: Object literal may only specify known properties, and 'constraints' does not exist in type 'OperaGoal'."
         }
       ]
     },
@@ -700,8 +700,8 @@
           "line": 37,
           "column": 37,
           "code": "TS2339",
-          "message": "Property 'getInstance' does not exist on type 'typeof ArchonOrchestrator'.",
-          "fullMatch": "\nsrc/enhanced-server.ts(37,37): error TS2339: Property 'getInstance' does not exist on type 'typeof ArchonOrchestrator'."
+          "message": "Property 'getInstance' does not exist on type 'typeof OperaOrchestrator'.",
+          "fullMatch": "\nsrc/enhanced-server.ts(37,37): error TS2339: Property 'getInstance' does not exist on type 'typeof OperaOrchestrator'."
         },
         {
           "file": "\nsrc/enhanced-server.ts",
@@ -716,8 +716,8 @@
           "line": 165,
           "column": 37,
           "code": "TS2339",
-          "message": "Property 'getInstance' does not exist on type 'typeof ArchonOrchestrator'.",
-          "fullMatch": "\nsrc/enhanced-server.ts(165,37): error TS2339: Property 'getInstance' does not exist on type 'typeof ArchonOrchestrator'."
+          "message": "Property 'getInstance' does not exist on type 'typeof OperaOrchestrator'.",
+          "fullMatch": "\nsrc/enhanced-server.ts(165,37): error TS2339: Property 'getInstance' does not exist on type 'typeof OperaOrchestrator'."
         }
       ]
     }

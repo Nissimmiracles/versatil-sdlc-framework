@@ -18,7 +18,7 @@
 
 3. **Core Concepts** (as demonstrations)
    - RAG memory patterns (mock implementation)
-   - Archon orchestration flow (conceptual)
+   - Opera orchestration flow (conceptual)
    - Enhanced agent behaviors (simulated)
    - Learning improvements (demonstrated)
 
@@ -29,7 +29,7 @@
    - **Needed**: Supabase + OpenAI embeddings
    - **Effort**: 2-3 days to implement
 
-2. **Archon Orchestrator**
+2. **Opera Orchestrator**
    - **Current**: Conceptual design + mock
    - **Needed**: Full autonomous execution engine
    - **Effort**: 1 week to implement
@@ -54,7 +54,7 @@
 
 #### Phase 2: Core Implementation (Next steps)
 1. **Week 1**: Implement real RAG with Supabase
-2. **Week 2**: Build Archon orchestrator
+2. **Week 2**: Build Opera orchestrator
 3. **Week 3**: Enhance all agents with memory
 4. **Week 4**: Integration testing
 
@@ -78,7 +78,7 @@
    - Set up OpenAI embeddings
    - Deploy edge functions
 
-3. **Build Archon Engine**
+3. **Build Opera Engine**
    - Use the architecture in archon-orchestrator.ts
    - Implement goal planning
    - Add execution monitoring
@@ -106,7 +106,7 @@ What you need for production:
 
 1. **Start with local mocks** (you're here)
 2. **Add Supabase for RAG** (1 week)
-3. **Implement core Archon** (1 week)
+3. **Implement core Opera** (1 week)
 4. **Enhance 2-3 key agents** (1 week)
 5. **MVP ready** (3 weeks total)
 

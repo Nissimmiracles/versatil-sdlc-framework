@@ -27,7 +27,7 @@
       "contextPrefix": "SELF_DEV:",
       "isolatedMemory": true
     },
-    "archon": {
+    "opera": {
       "enabled": true,
       "autonomousMode": true,
       "selfReferentialMode": true,

@@ -8,7 +8,7 @@
 import { 
   enhancedBMAD, 
   vectorMemoryStore,
-  ArchonOrchestrator 
+  OperaOrchestrator 
 } from 'versatil-sdlc-framework';
 
 /**

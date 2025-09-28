@@ -22,7 +22,7 @@ To maintain a robust and scalable framework, VERSATIL v1.2.0 enforces strict sep
 │              (MCP Connectors)                    │
 ├─────────────────────────────────────────────────┤
 │           Orchestration Layer                    │
-│         (Archon & Agent Registry)                │
+│         (Opera & Agent Registry)                │
 ├─────────────────────────────────────────────────┤
 │            Intelligence Layer                    │
 │          (RAG Memory & Learning)                 │
@@ -100,10 +100,10 @@ class DeveloperAgent {
 }
 ```
 
-### Rule 4: Archon Orchestration Neutrality
+### Rule 4: Opera Orchestration Neutrality
 ```typescript
-// ❌ WRONG: Archon knows specific implementations
-class ArchonOrchestrator {
+// ❌ WRONG: Opera knows specific implementations
+class OperaOrchestrator {
   planGoal(goal: Goal) {
     if (project.usesReact) {
       return new ReactPlan(); // Coupled to React
@@ -111,8 +111,8 @@ class ArchonOrchestrator {
   }
 }
 
-// ✅ CORRECT: Archon uses strategies
-class ArchonOrchestrator {
+// ✅ CORRECT: Opera uses strategies
+class OperaOrchestrator {
   planGoal(goal: Goal, context: Context) {
     const strategy = this.strategySelector.select(context);
     return strategy.createPlan(goal);
@@ -230,7 +230,7 @@ User Request
     ↓
 Application Layer (parses request)
     ↓
-Orchestration (Archon plans)
+Orchestration (Opera plans)
     ↓
 Context Request → Environment Scanner
     ↓              ↓
@@ -333,7 +333,7 @@ module.exports = {
 ### 3. **Dependency Injection**
 ```typescript
 // All cross-layer dependencies injected
-class ArchonOrchestrator {
+class OperaOrchestrator {
   constructor(
     private contextProvider: IContextProvider,
     private toolRegistry: IToolRegistry,

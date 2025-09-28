@@ -8,7 +8,7 @@ import { EventEmitter } from 'events';
 import * as path from 'path';
 import * as os from 'os';
 import { VERSATILLogger } from '../utils/logger';
-import { EnhancedArchonOrchestrator } from '../archon/enhanced-archon-orchestrator';
+import { EnhancedOperaOrchestrator } from '../opera/enhanced-opera-orchestrator';
 import { AgentRegistry } from '../agents/agent-registry';
 import { vectorMemoryStore } from '../rag/vector-memory-store';
 

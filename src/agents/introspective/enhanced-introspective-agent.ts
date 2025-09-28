@@ -2,7 +2,7 @@
  * VERSATIL SDLC Framework - Enhanced Introspective Agent
  * 
  * This agent has FULL access to:
- * - Archon Orchestrator (for autonomous fixes)
+ * - Opera Orchestrator (for autonomous fixes)
  * - RAG Memory Store (for learning and pattern recognition)
  * - Environment Scanner (for context awareness)
  * - All other agents and components
@@ -12,7 +12,7 @@ import { BaseAgent } from '../base-agent';
 import { AgentResponse, AgentActivationContext } from '../agent-types';
 import { VERSATILLogger } from '../../utils/logger';
 import { vectorMemoryStore, RAGQuery } from '../../rag/vector-memory-store';
-import { ArchonOrchestrator, ArchonGoal } from '../../archon/archon-orchestrator';
+import { OperaOrchestrator, OperaGoal } from '../../opera/opera-orchestrator';
 import { environmentScanner, ProjectContext } from '../../environment/environment-scanner';
 import { AgentRegistry } from '../agent-registry';
 import * as fs from 'fs/promises';
@@ -26,7 +26,7 @@ export class EnhancedIntrospectiveAgent extends BaseAgent {
   public systemPrompt = `You are the Enhanced Introspective Agent for VERSATIL SDLC Framework v1.2.0.
 
 You have FULL ACCESS to:
-1. Archon Orchestrator - Can create goals for autonomous fixes
+1. Opera Orchestrator - Can create goals for autonomous fixes
 2. RAG Memory Store - Can query and store patterns
 3. Environment Scanner - Full project context awareness
 4. All framework components and agents
@@ -34,7 +34,7 @@ You have FULL ACCESS to:
 Your enhanced responsibilities:
 1. Continuously monitor framework AND project health
 2. Learn from all errors and successes
-3. Autonomously fix issues via Archon
+3. Autonomously fix issues via Opera
 4. Maintain complete context awareness
 5. Predict and prevent problems
 6. Optimize framework performance
@@ -43,7 +43,7 @@ Your enhanced responsibilities:
 You are the guardian of both the framework and the project.`;
 
   private logger: VERSATILLogger;
-  private archon: ArchonOrchestrator;
+  private opera: OperaOrchestrator;
   private agentRegistry: AgentRegistry;
   private projectContext: ProjectContext | null = null;
   
@@ -54,7 +54,7 @@ You are the guardian of both the framework and the project.`;
     projectHealth: 100,
     agentPerformance: new Map<string, number>(),
     memoryEfficiency: 100,
-    archonEffectiveness: 100,
+    operaEffectiveness: 100,
     predictedIssues: [],
     autonomousFixCount: 0,
     learnedPatterns: 0
@@ -65,10 +65,10 @@ You are the guardian of both the framework and the project.`;
   private successPatterns: Map<string, any> = new Map();
   private performanceInsights: Map<string, any> = new Map();
 
-  constructor(logger: VERSATILLogger, archon: ArchonOrchestrator, agentRegistry: AgentRegistry) {
+  constructor(logger: VERSATILLogger, opera: OperaOrchestrator, agentRegistry: AgentRegistry) {
     super();
     this.logger = logger;
-    this.archon = archon;
+    this.opera = opera;
     this.agentRegistry = agentRegistry;
     this.initializeEnhancedMonitoring();
   }
@@ -85,16 +85,16 @@ You are the guardian of both the framework and the project.`;
       await this.handleFileChanges(changes);
     });
     
-    // Subscribe to Archon events
-    this.archon.on('goal_completed', async (data) => {
+    // Subscribe to Opera events
+    this.opera.on('goal_completed', async (data) => {
       await this.learnFromGoalCompletion(data);
     });
     
-    this.archon.on('goal_failed', async (data) => {
+    this.opera.on('goal_failed', async (data) => {
       await this.analyzeGoalFailure(data);
     });
     
-    this.archon.on('step_failed', async (data) => {
+    this.opera.on('step_failed', async (data) => {
       await this.handleStepFailure(data);
     });
   }
@@ -176,8 +176,8 @@ You are the guardian of both the framework and the project.`;
     // 4. Memory efficiency
     const memoryEfficiency = await this.checkMemoryEfficiency();
     
-    // 5. Archon effectiveness
-    const archonEffectiveness = await this.checkArchonEffectiveness();
+    // 5. Opera effectiveness
+    const operaEffectiveness = await this.checkOperaEffectiveness();
     
     // Compile results
     const overallHealth = (
@@ -185,14 +185,14 @@ You are the guardian of both the framework and the project.`;
       projectHealth * 0.2 +
       agentPerformance * 0.2 +
       memoryEfficiency * 0.15 +
-      archonEffectiveness * 0.15
+      operaEffectiveness * 0.15
     );
     
     // Update metrics
     this.enhancedMetrics.frameworkHealth = frameworkHealth;
     this.enhancedMetrics.projectHealth = projectHealth;
     this.enhancedMetrics.memoryEfficiency = memoryEfficiency;
-    this.enhancedMetrics.archonEffectiveness = archonEffectiveness;
+    this.enhancedMetrics.operaEffectiveness = operaEffectiveness;
     
     // Identify issues
     const issues: any[] = [];
@@ -234,7 +234,7 @@ You are the guardian of both the framework and the project.`;
       projectHealth,
       agentPerformance,
       memoryEfficiency,
-      archonEffectiveness,
+      operaEffectiveness,
       issues
     });
     
@@ -254,7 +254,7 @@ You are the guardian of both the framework and the project.`;
         message: i.message,
         actions: ['Investigate', 'Fix autonomously']
       })),
-      handoffTo: criticalIssues.length > 0 ? ['archon'] : [],
+      handoffTo: criticalIssues.length > 0 ? ['opera'] : [],
       context: {
         healthMetrics: this.enhancedMetrics,
         issues,
@@ -273,14 +273,14 @@ You are the guardian of both the framework and the project.`;
       imports: 0,
       agents: 0,
       memory: 0,
-      archon: 0
+      opera: 0
     };
     
     // Check critical files
     const criticalFiles = [
       'package.json',
       'src/agents/agent-registry.ts',
-      'src/archon/archon-orchestrator.ts',
+      'src/opera/opera-orchestrator.ts',
       'src/rag/vector-memory-store.ts',
       'src/environment/environment-scanner.ts'
     ];
@@ -317,12 +317,12 @@ You are the guardian of both the framework and the project.`;
       checks.memory = 50;
     }
     
-    // Check Archon
+    // Check Opera
     try {
-      const archonState = await this.archon.getState();
-      checks.archon = archonState ? 100 : 0;
+      const operaState = await this.opera.getState();
+      checks.opera = operaState ? 100 : 0;
     } catch {
-      checks.archon = 0;
+      checks.opera = 0;
     }
     
     // Calculate weighted health
@@ -330,7 +330,7 @@ You are the guardian of both the framework and the project.`;
       checks.files * 0.3 +
       checks.agents * 0.2 +
       checks.memory * 0.2 +
-      checks.archon * 0.3
+      checks.opera * 0.3
     );
     
     return health;
@@ -456,11 +456,11 @@ You are the guardian of both the framework and the project.`;
   }
 
   /**
-   * Check Archon effectiveness
+   * Check Opera effectiveness
    */
-  private async checkArchonEffectiveness(): Promise<number> {
+  private async checkOperaEffectiveness(): Promise<number> {
     try {
-      const state = await this.archon.getState();
+      const state = await this.opera.getState();
       
       // Calculate based on success rate
       const successRate = state.performance.successRate * 100;
@@ -530,7 +530,7 @@ You are the guardian of both the framework and the project.`;
           actions: [o.action]
         }))
       ],
-      handoffTo: predictions.some(p => p.severity === 'high') ? ['archon'] : [],
+      handoffTo: predictions.some(p => p.severity === 'high') ? ['opera'] : [],
       context: {
         analysis: {
           errorPatterns: errorAnalysis.patterns.length,
@@ -554,7 +554,7 @@ You are the guardian of both the framework and the project.`;
       
       if (impact.severity === 'high') {
         // Create goal for verification
-        const goal: ArchonGoal = {
+        const goal: OperaGoal = {
           id: `verify-change-${Date.now()}`,
           type: 'optimization',
           description: `Verify and test changes to ${change.path}`,
@@ -564,7 +564,7 @@ You are the guardian of both the framework and the project.`;
           successCriteria: ['All tests pass', 'No new issues detected']
         };
         
-        await this.archon.addGoal(goal);
+        await this.opera.addGoal(goal);
       }
       
       // Learn from the change pattern
@@ -573,7 +573,7 @@ You are the guardian of both the framework and the project.`;
   }
 
   /**
-   * Initiate autonomous fix via Archon
+   * Initiate autonomous fix via Opera
    */
   private async initiateAutonomousFix(issue: string): Promise<AgentResponse> {
     this.logger.info('Initiating autonomous fix', { issue }, 'introspective');
@@ -582,7 +582,7 @@ You are the guardian of both the framework and the project.`;
     const similarFixes = await this.querySimilarFixes(issue);
     
     // Create fix goal
-    const goal: ArchonGoal = {
+    const goal: OperaGoal = {
       id: `auto-fix-${Date.now()}`,
       type: 'bug_fix',
       description: `Autonomous fix for: ${issue}`,
@@ -605,7 +605,7 @@ You are the guardian of both the framework and the project.`;
       goal.constraints.push(`Apply learnings from ${similarFixes.length} similar fixes`);
     }
     
-    await this.archon.addGoal(goal);
+    await this.opera.addGoal(goal);
     
     // Track autonomous fix
     this.enhancedMetrics.autonomousFixCount++;
@@ -617,10 +617,10 @@ You are the guardian of both the framework and the project.`;
       suggestions: [{
         type: 'autonomous-fix',
         priority: 'high',
-        message: 'Archon is working on the fix',
+        message: 'Opera is working on the fix',
         actions: ['Monitor progress', 'Verify results']
       }],
-      handoffTo: ['archon'],
+      handoffTo: ['opera'],
       context: {
         goal,
         similarFixes: similarFixes.length,
@@ -713,7 +713,7 @@ You are the guardian of both the framework and the project.`;
     
     // Create improvement goal
     if (rootCause.preventable) {
-      const improvementGoal: ArchonGoal = {
+      const improvementGoal: OperaGoal = {
         id: `improve-${goal.type}-${Date.now()}`,
         type: 'optimization',
         description: `Improve ${goal.type} handling based on failure analysis`,
@@ -723,7 +723,7 @@ You are the guardian of both the framework and the project.`;
         successCriteria: ['Pattern documented', 'Prevention measures in place']
       };
       
-      await this.archon.addGoal(improvementGoal);
+      await this.opera.addGoal(improvementGoal);
     }
   }
 

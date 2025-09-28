@@ -79,7 +79,7 @@ OPENAI_API_KEY=your_key  # For real embeddings
 ## 3. ❌→✅ Multimodal/Multimodel Capabilities
 
 ### Found Issues:
-- **Text-only** support in both RAG and Archon
+- **Text-only** support in both RAG and Opera
 - **Single model** approach
 - **No image/diagram handling**
 
@@ -91,7 +91,7 @@ OPENAI_API_KEY=your_key  # For real embeddings
 - **Diagram storage** with annotations
 - **Cross-modal search** capabilities
 
-#### Archon Multimodel (`multimodal-archon-orchestrator.ts`):
+#### Opera Multimodel (`multimodal-archon-orchestrator.ts`):
 - **4 AI models** configured:
   - Claude 3 Opus (reasoning + vision)
   - GPT-4 Vision (UI analysis)
@@ -113,7 +113,7 @@ const goal = {
   }]
 };
 
-// Archon will:
+// Opera will:
 // 1. Select GPT-4 Vision for UI analysis
 // 2. Use Claude 3 for reasoning
 // 3. Synthesize insights from both
@@ -190,7 +190,7 @@ node test-self-referential.cjs
 | **Vector DB** | ❌ File-based | ✅ Supabase pgvector ready |
 | **Embeddings** | ❌ Random | ✅ OpenAI/CLIP support |
 | **Multimodal RAG** | ❌ Text only | ✅ Text/Code/Image/Diagram |
-| **Multimodel Archon** | ❌ Single model | ✅ 4 models with selection |
+| **Multimodel Opera** | ❌ Single model | ✅ 4 models with selection |
 | **Onboarding** | ⚠️ Basic | ✅ 6 scenarios + auto-detect |
 | **Self-Development** | ❌ Not possible | ✅ Safe self-improvement |
 
@@ -211,11 +211,11 @@ const results = await vectorMemoryStore.queryMemories({
 });
 ```
 
-### 2. **Multimodal Archon**
+### 2. **Multimodal Opera**
 ```javascript
-import { multimodalArchon } from './src/archon/multimodal-archon-orchestrator';
+import { multimodalOpera } from './src/archon/multimodal-archon-orchestrator';
 
-await multimodalArchon.analyzeScreenshotForBug(
+await multimodalOpera.analyzeScreenshotForBug(
   screenshotBase64,
   "Button not aligned on mobile view"
 );

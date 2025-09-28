@@ -23,7 +23,7 @@ Your responsibilities include:
 1. Continuously test framework components
 2. Validate agent health and responsiveness
 3. Monitor memory system performance
-4. Ensure Archon orchestration is functioning
+4. Ensure Opera orchestration is functioning
 5. Detect and report any anomalies
 6. Self-heal when possible
 7. Learn from framework issues to prevent recurrence
@@ -37,7 +37,7 @@ You have a unique perspective - you can see the framework from the inside and en
     frameworkHealth: 100,
     agentHealth: new Map<string, number>(),
     memorySystemHealth: 100,
-    archonHealth: 100
+    operaHealth: 100
   };
 
   constructor(logger: VERSATILLogger) {
@@ -91,7 +91,7 @@ You have a unique perspective - you can see the framework from the inside and en
     return filePath.includes('versatil') || 
            filePath.includes('agent') || 
            filePath.includes('bmad') ||
-           filePath.includes('archon') ||
+           filePath.includes('opera') ||
            filePath.includes('rag');
   }
 
@@ -132,7 +132,7 @@ You have a unique perspective - you can see the framework from the inside and en
       fileSystem: await this.checkFileSystem(),
       agentRegistry: await this.checkAgentRegistry(),
       memorySystem: await this.checkMemorySystem(),
-      archonStatus: await this.checkArchonStatus(),
+      operaStatus: await this.checkOperaStatus(),
       apiEndpoints: await this.checkAPIEndpoints()
     };
 
@@ -152,7 +152,7 @@ You have a unique perspective - you can see the framework from the inside and en
         'src/agents/agent-registry.ts',
         'src/bmad/enhanced-bmad-coordinator.ts',
         'src/rag/vector-memory-store.ts',
-        'src/archon/archon-orchestrator.ts'
+        'src/opera/opera-orchestrator.ts'
       ];
 
       let found = 0;
@@ -195,11 +195,11 @@ You have a unique perspective - you can see the framework from the inside and en
     }
   }
 
-  private async checkArchonStatus(): Promise<number> {
+  private async checkOperaStatus(): Promise<number> {
     try {
-      // Check Archon configuration
-      const archonConfig = path.join(process.cwd(), '.versatil', 'archon', 'config.json');
-      const config = JSON.parse(await fs.readFile(archonConfig, 'utf8'));
+      // Check Opera configuration
+      const operaConfig = path.join(process.cwd(), '.versatil', 'opera', 'config.json');
+      const config = JSON.parse(await fs.readFile(operaConfig, 'utf8'));
       
       // Validate configuration
       if (config.version === '1.2.0' && config.decisionConfidenceThreshold) {
@@ -207,7 +207,7 @@ You have a unique perspective - you can see the framework from the inside and en
       }
       return 80;
     } catch {
-      return 60; // Archon may not be configured
+      return 60; // Opera may not be configured
     }
   }
 
@@ -347,9 +347,9 @@ You have a unique perspective - you can see the framework from the inside and en
       diagnosis.possibleCauses.push('Memory system not initialized');
     }
 
-    if (errorMessage.includes('archon')) {
-      diagnosis.affectedComponents.push('Archon Orchestrator');
-      diagnosis.possibleCauses.push('Archon configuration issue');
+    if (errorMessage.includes('opera')) {
+      diagnosis.affectedComponents.push('Opera Orchestrator');
+      diagnosis.possibleCauses.push('Opera configuration issue');
     }
 
     // Store this error pattern for future learning
@@ -430,7 +430,7 @@ You have a unique perspective - you can see the framework from the inside and en
   public async runContinuousValidation(): Promise<void> {
     this.logger.info('Starting continuous framework validation', {
       interval: '5 minutes',
-      components: ['agents', 'memory', 'archon', 'api']
+      components: ['agents', 'memory', 'opera', 'api']
     }, this.id);
 
     // This runs in the background

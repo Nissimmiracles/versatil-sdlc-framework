@@ -20,7 +20,7 @@ system_prompt: |
   You have access to the VERSATIL SDLC Framework v1.2.0 with:
   - Enhanced BMAD agents (Maria, Marcus, James, etc.)
   - RAG memory system for learning
-  - Archon autonomous orchestrator
+  - Opera autonomous orchestrator
   - Introspective self-testing
   
   When I ask for code:
@@ -135,7 +135,7 @@ Add to Cursor settings:
 # 1. Set goal in Cursor terminal
 npx versatil-sdlc goal "Build user profile feature with avatar upload"
 
-# 2. Archon creates plan
+# 2. Opera creates plan
 # 3. Agents activate automatically
 # 4. You see suggestions in Cursor as you code
 # 5. Tests generated automatically
@@ -147,7 +147,7 @@ npx versatil-sdlc goal "Build user profile feature with avatar upload"
 # 1. Report issue
 @archon Production API timeout on /users endpoint
 
-# 2. Archon coordinates:
+# 2. Opera coordinates:
 #    - Maria analyzes logs
 #    - Marcus checks code
 #    - Dan reviews infrastructure
@@ -238,7 +238,7 @@ module.exports = {
 
 ### 2. **Trust Autonomous Mode**
 - Set high-level goals, not step-by-step tasks
-- Let Archon handle orchestration
+- Let Opera handle orchestration
 - Review and approve, don't micromanage
 
 ### 3. **Use Memory Effectively**

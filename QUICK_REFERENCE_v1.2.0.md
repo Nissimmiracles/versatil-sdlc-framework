@@ -23,7 +23,7 @@ const memories = await vectorMemoryStore.queryMemories({
 });
 ```
 
-## 🤖 Archon Goals
+## 🤖 Opera Goals
 ```javascript
 // Set autonomous goal
 await archon.addGoal({
@@ -119,7 +119,7 @@ npm run test:edge-cases
 ## 💡 Pro Tips
 1. **Let agents learn**: Every interaction improves future performance
 2. **Set clear goals**: Better constraints = better results
-3. **Trust autonomy**: Let Archon handle the complexity
+3. **Trust autonomy**: Let Opera handle the complexity
 4. **Review memories**: See what your agents have learned
 5. **Start enhanced**: Get benefits immediately
 

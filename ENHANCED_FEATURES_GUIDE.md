@@ -1,11 +1,11 @@
 # 🚀 VERSATIL Enhanced Features Guide
 
-## RAG Memory System & Archon Autonomous Orchestration
+## RAG Memory System & Opera Autonomous Orchestration
 
 ### Table of Contents
 1. [Overview](#overview)
 2. [RAG Memory System](#rag-memory-system)
-3. [Archon Autonomous Orchestrator](#archon-autonomous-orchestrator)
+3. [Opera Autonomous Orchestrator](#archon-autonomous-orchestrator)
 4. [Enhanced BMAD Integration](#enhanced-bmad-integration)
 5. [Getting Started](#getting-started)
 6. [API Reference](#api-reference)
@@ -19,13 +19,13 @@
 The enhanced VERSATIL SDLC Framework introduces three revolutionary features:
 
 - **🧠 RAG Memory System**: Vector-based memory storage for agents to learn from past interactions
-- **🤖 Archon Orchestrator**: Autonomous goal planning and execution with hierarchical agent coordination
-- **🚀 Enhanced BMAD**: Integration of RAG and Archon with existing BMAD agents for zero context loss
+- **🤖 Opera Orchestrator**: Autonomous goal planning and execution with hierarchical agent coordination
+- **🚀 Enhanced BMAD**: Integration of RAG and Opera with existing BMAD agents for zero context loss
 
 ### Key Benefits
 
 1. **Persistent Learning**: Agents remember and learn from every interaction
-2. **Autonomous Execution**: Set goals and let Archon orchestrate the entire workflow
+2. **Autonomous Execution**: Set goals and let Opera orchestrate the entire workflow
 3. **Pattern Recognition**: Automatically detect and respond to recurring issues
 4. **Self-Healing**: Autonomous recovery from failures with alternative strategies
 
@@ -102,11 +102,11 @@ await vectorMemoryStore.updateMemoryRelevance(
 
 ---
 
-## Archon Autonomous Orchestrator
+## Opera Autonomous Orchestrator
 
-### What is Archon?
+### What is Opera?
 
-Archon is a hierarchical orchestration system that autonomously plans and executes complex development workflows. It breaks down high-level goals into executable steps and coordinates multiple agents.
+Opera is a hierarchical orchestration system that autonomously plans and executes complex development workflows. It breaks down high-level goals into executable steps and coordinates multiple agents.
 
 ### Core Capabilities
 
@@ -123,14 +123,14 @@ Archon is a hierarchical orchestration system that autonomously plans and execut
 - **refactor**: Code restructuring
 - **security**: Security enhancements
 
-### Using Archon
+### Using Opera
 
 #### Create a Goal
 
 ```typescript
-import { ArchonOrchestrator, ArchonGoal } from 'versatil-sdlc-framework';
+import { OperaOrchestrator, OperaGoal } from 'versatil-sdlc-framework';
 
-const goal: ArchonGoal = {
+const goal: OperaGoal = {
   id: 'goal-123',
   type: 'feature',
   description: 'Implement user authentication with JWT',
@@ -156,7 +156,7 @@ await archonOrchestrator.addGoal(goal);
 #### Monitor Execution
 
 ```typescript
-// Listen to Archon events
+// Listen to Opera events
 archonOrchestrator.on('decision_made', (decision) => {
   console.log(`Decision: ${decision.decision}`);
   console.log(`Confidence: ${decision.confidence}`);
@@ -177,7 +177,7 @@ archonOrchestrator.on('human_intervention_required', ({ step, error }) => {
 });
 ```
 
-#### Get Archon State
+#### Get Opera State
 
 ```typescript
 const state = archonOrchestrator.getState();
@@ -269,7 +269,7 @@ npm install -g versatil-sdlc-framework@latest
 
 #### Option 1: Enhanced Mode
 ```bash
-# Start with enhanced features (RAG + Archon, manual mode)
+# Start with enhanced features (RAG + Opera, manual mode)
 npx versatil-sdlc enhanced
 ```
 
@@ -296,7 +296,7 @@ await startAutonomousMode();
 import { 
   enhancedBMAD, 
   vectorMemoryStore, 
-  ArchonGoal 
+  OperaGoal 
 } from 'versatil-sdlc-framework';
 
 async function buildFeature() {
@@ -317,7 +317,7 @@ async function buildFeature() {
     }
   });
   
-  // 3. Execute workflow - Archon will handle the rest
+  // 3. Execute workflow - Opera will handle the rest
   await enhancedBMAD.executeBMADWorkflow(
     projectId,
     'Implement secure user registration with email verification'
@@ -356,15 +356,15 @@ class VectorMemoryStore {
 }
 ```
 
-### ArchonOrchestrator
+### OperaOrchestrator
 
 ```typescript
-class ArchonOrchestrator {
+class OperaOrchestrator {
   // Add goal for execution
-  async addGoal(goal: ArchonGoal): Promise<void>
+  async addGoal(goal: OperaGoal): Promise<void>
   
   // Get current state
-  getState(): ArchonState
+  getState(): OperaState
   
   // Control autonomous mode
   pauseAutonomous(): void
@@ -413,7 +413,7 @@ class EnhancedBMADCoordinator {
 
 ```typescript
 // Autonomous bug fix
-const bugGoal: ArchonGoal = {
+const bugGoal: OperaGoal = {
   id: 'bug-001',
   type: 'bug_fix',
   description: 'Fix memory leak in user service causing server crashes',
@@ -464,7 +464,7 @@ await enhancedBMAD.executeBMADWorkflow(
    - Email notifications`
 );
 
-// Archon will coordinate all necessary agents automatically
+// Opera will coordinate all necessary agents automatically
 ```
 
 ---
@@ -549,7 +549,7 @@ enhancedBMAD.on('enhanced_activation', (data) => {
 });
 
 archonOrchestrator.on('decision_made', (decision) => {
-  console.log('Archon decision:', decision);
+  console.log('Opera decision:', decision);
 });
 ```
 

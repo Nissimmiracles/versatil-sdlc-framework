@@ -2,7 +2,7 @@
 
 ## Overview
 
-VERSATIL v1.2.0 now features **complete environmental context awareness**, addressing your concerns about Archon and the Introspective Agent having full visibility.
+VERSATIL v1.2.0 now features **complete environmental context awareness**, addressing your concerns about Opera and the Introspective Agent having full visibility.
 
 ---
 
@@ -21,7 +21,7 @@ Provides comprehensive project analysis:
 - **Pattern Detection**: Architecture, design patterns, anti-patterns
 - **Real-time Monitoring**: Watches for file changes
 
-### 2. **Enhanced Archon Orchestrator**
+### 2. **Enhanced Opera Orchestrator**
 ```typescript
 // src/archon/enhanced-archon-orchestrator.ts
 ```
@@ -39,7 +39,7 @@ Now includes:
 ```
 
 Now has access to:
-- **Archon Orchestrator**: Can create goals for autonomous fixes
+- **Opera Orchestrator**: Can create goals for autonomous fixes
 - **RAG Memory Store**: Full query and storage capabilities
 - **Environment Scanner**: Complete project visibility
 - **All Framework Components**: Can monitor and control everything
@@ -69,7 +69,7 @@ Now has access to:
    └── Pattern Learning
 ```
 
-### Archon Decision Making
+### Opera Decision Making
 ```
 Goal Received → Scan Environment → Query RAG with Context
      ↓                                        ↓
@@ -82,7 +82,7 @@ Execute with Environment Awareness → Learn & Store
 ```
 Monitor → Detect Issue → Query RAG → Analyze Context
    ↓                                      ↓
-Create Fix Goal → Send to Archon → Monitor Execution
+Create Fix Goal → Send to Opera → Monitor Execution
    ↓
 Learn from Result → Update Patterns → Continuous Improvement
 ```
@@ -141,9 +141,9 @@ Learn from Result → Update Patterns → Continuous Improvement
 
 ## 🚀 Usage Examples
 
-### 1. **Archon with Full Context**
+### 1. **Opera with Full Context**
 ```javascript
-// When Archon receives a goal
+// When Opera receives a goal
 const goal = {
   type: 'feature',
   description: 'Add user authentication'
@@ -175,7 +175,7 @@ const fixGoal = {
   ]
 };
 
-// Sends to Archon for execution
+// Sends to Opera for execution
 ```
 
 ### 3. **File Change Impact Analysis**
@@ -240,7 +240,7 @@ This shows:
 ## 📈 Benefits
 
 ### 1. **Smarter Decisions**
-- Archon adapts plans to your specific tech stack
+- Opera adapts plans to your specific tech stack
 - Agents selected based on actual project needs
 - Risk assessment based on real metrics
 
@@ -271,9 +271,9 @@ const context = await environmentScanner.scanEnvironment();
 console.log(context); // Full project details
 ```
 
-### 2. **Verify Archon Context**
+### 2. **Verify Opera Context**
 ```javascript
-// In any Archon decision
+// In any Opera decision
 decision.environmentContext // Contains project specifics
 ```
 
@@ -291,7 +291,7 @@ await environmentScanner.scan(); // ✅ Scan environment
 
 With full context awareness:
 
-1. **TypeScript Project**: Archon ensures type safety in all generated code
+1. **TypeScript Project**: Opera ensures type safety in all generated code
 2. **Low Test Coverage**: Automatically prioritizes test creation
 3. **Large Files**: Proactively suggests and executes refactoring
 4. **Missing Dependencies**: Detects and suggests required packages
@@ -302,7 +302,7 @@ With full context awareness:
 ## 📚 Summary
 
 Your requirements are now fully met:
-- ✅ **Archon** has complete environment awareness
+- ✅ **Opera** has complete environment awareness
 - ✅ **RAG** stores and queries with full context
 - ✅ **Introspective Agent** can access everything
 - ✅ **Continuous monitoring** of the entire environment

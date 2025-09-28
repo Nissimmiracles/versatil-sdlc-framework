@@ -25,7 +25,7 @@ const vectorMemoryStore = {
   }
 };
 
-const ArchonOrchestrator = {
+const OperaOrchestrator = {
   getInstance: () => ({
     getEstimatedCompletion: () => '2 hours'
   })
@@ -171,7 +171,7 @@ export async function autonomousBugFixJourney() {
   console.log('   • No obvious error messages');
   console.log('   • Happens only in production\n');
   
-  console.log('🤖 Archon creates autonomous investigation plan...\n');
+  console.log('🤖 Opera creates autonomous investigation plan...\n');
   
   // Create bug fix goal
   const bugGoal = {
@@ -193,8 +193,8 @@ export async function autonomousBugFixJourney() {
     ]
   };
   
-  // Simulate Archon's execution plan
-  console.log('🎯 Archon Execution Plan:');
+  // Simulate Opera's execution plan
+  console.log('🎯 Opera Execution Plan:');
   console.log('   Step 1: Memory profiling (Maria + Marcus)');
   console.log('   Step 2: Code analysis for common leak patterns');
   console.log('   Step 3: Identify problematic code sections');
@@ -251,7 +251,7 @@ export async function autonomousBugFixJourney() {
       testingApproach: 'Stress test with memory profiling'
     }),
     metadata: {
-      agentId: 'archon',
+      agentId: 'opera',
       timestamp: Date.now(),
       tags: ['bug-fix', 'memory-leak', 'self-healing', 'solution-pattern']
     }
@@ -291,8 +291,8 @@ export async function fullProjectSimulation() {
   const projectId = 'notification-system-' + Date.now();
   await enhancedBMAD.createContext(projectId);
   
-  // Show Archon's planning
-  console.log('🧠 Archon Analyzing Requirements...\n');
+  // Show Opera's planning
+  console.log('🧠 Opera Analyzing Requirements...\n');
   await new Promise(r => setTimeout(r, 1000));
   
   console.log('📐 Generated Architecture:');
@@ -552,7 +552,7 @@ export async function beforeAfterComparison() {
   console.log('🤖 VERSATIL: "Understood. Executing autonomous workflow..."\n');
   
   console.log('🧠 Memory Search: Found 12 relevant auth patterns');
-  console.log('📋 Archon Plan: 7 parallel steps identified\n');
+  console.log('📋 Opera Plan: 7 parallel steps identified\n');
   
   console.log('⚡ Parallel Execution:');
   await new Promise(r => setTimeout(r, 800));
@@ -610,7 +610,7 @@ Welcome to the VERSATIL Enhanced Features Interactive Demo!
 
 This test suite demonstrates:
 - 🧠 RAG Memory System in action
-- 🤖 Archon Autonomous Orchestration  
+- 🤖 Opera Autonomous Orchestration  
 - 🚀 Self-healing and pattern recognition
 - 📈 Learning and improvement over time
 - 🎯 Goal-based development

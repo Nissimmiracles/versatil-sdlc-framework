@@ -8,7 +8,7 @@
 import { 
   enhancedBMAD, 
   vectorMemoryStore,
-  ArchonOrchestrator 
+  OperaOrchestrator 
 } from 'versatil-sdlc-framework';
 
 /**
@@ -49,7 +49,7 @@ Requirements:
   // Execute autonomous workflow
   await enhancedBMAD.executeBMADWorkflow(projectId, requirements);
   
-  console.log('\n🤖 Archon is orchestrating the entire microservices architecture...\n');
+  console.log('\n🤖 Opera is orchestrating the entire microservices architecture...\n');
   
   // Simulate the complex orchestration
   const services = [
@@ -137,8 +137,8 @@ export async function legacyRefactoringScenario() {
   
   console.log('🎯 Refactoring Goal: Modernize without breaking production\n');
   
-  // Archon's strategic approach
-  console.log('🧠 Archon\'s Refactoring Strategy:\n');
+  // Opera's strategic approach
+  console.log('🧠 Opera\'s Refactoring Strategy:\n');
   
   const phases = [
     {
@@ -233,7 +233,7 @@ export async function emergencyProductionFix() {
     successCriteria: ['Service restored', 'Root cause identified', 'Prevention added']
   };
   
-  console.log('⚡ Archon Emergency Response Protocol:\n');
+  console.log('⚡ Opera Emergency Response Protocol:\n');
   
   // Simulate rapid diagnosis and fix
   const timeline = [
@@ -277,7 +277,7 @@ export async function emergencyProductionFix() {
       timeToResolve: '8 minutes'
     }),
     metadata: {
-      agentId: 'archon',
+      agentId: 'opera',
       timestamp: Date.now(),
       tags: ['incident', 'production', 'critical', 'resolved']
     }
@@ -403,7 +403,7 @@ Build a fitness tracking app with:
   
   console.log('📋 Requirements:', requirements);
   
-  console.log('\n🏗️ Archon\'s Multi-Platform Strategy:\n');
+  console.log('\n🏗️ Opera\'s Multi-Platform Strategy:\n');
   
   console.log('🎨 Technology Stack Decision:');
   console.log('   • Framework: React Native + Expo');

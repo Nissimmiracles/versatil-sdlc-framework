@@ -42,7 +42,7 @@ async function showBanner(mode: string) {
     console.log(`
 🚀 Enhanced Mode Features:
 - 🧠 RAG Memory System - Agents learn from experience
-- 🤖 Archon Orchestrator - Goal-based development
+- 🤖 Opera Orchestrator - Goal-based development
 - 📈 Continuous Learning - Improves with every interaction
 - ⚡ 85% faster development
 
@@ -112,7 +112,7 @@ VERSATIL SDLC Framework v1.2.0
 Usage: versatil-sdlc [command] [options]
 
 Commands:
-  enhanced     Start in enhanced mode with RAG & Archon
+  enhanced     Start in enhanced mode with RAG & Opera
   autonomous   Start in fully autonomous mode
   migrate      Migrate from v1.1.x to v1.2.0
   test         Run interactive test suite

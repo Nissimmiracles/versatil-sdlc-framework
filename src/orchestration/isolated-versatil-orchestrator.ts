@@ -8,7 +8,7 @@ import * as os from 'os';
 import { EventEmitter } from 'events';
 import { VERSATILLogger } from '../utils/logger';
 import { StackAwareOrchestrator } from './stack-aware-orchestrator';
-import { PlanFirstArchon } from './plan-first-archon';
+import { PlanFirstOpera } from './plan-first-opera';
 import { GitHubSyncOrchestrator } from './github-sync-orchestrator';
 
 export interface IsolatedPaths {
@@ -46,7 +46,7 @@ export class IsolatedVERSATILOrchestrator extends EventEmitter {
 
   // Sub-orchestrators for specific responsibilities
   private stackOrchestrator: StackAwareOrchestrator;
-  private planOrchestrator: PlanFirstArchon;
+  private planOrchestrator: PlanFirstOpera;
   private githubSync: GitHubSyncOrchestrator;
 
   constructor(projectRoot?: string) {
@@ -65,7 +65,7 @@ export class IsolatedVERSATILOrchestrator extends EventEmitter {
     
     // Initialize sub-orchestrators
     this.stackOrchestrator = new StackAwareOrchestrator(this.paths);
-    this.planOrchestrator = new PlanFirstArchon(this.paths);
+    this.planOrchestrator = new PlanFirstOpera(this.paths);
     this.githubSync = new GitHubSyncOrchestrator(this.paths);
     
     this.logger.info('Isolated VERSATIL Orchestrator initialized', {

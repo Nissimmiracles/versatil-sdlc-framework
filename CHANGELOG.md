@@ -27,14 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Persistent knowledge base for each agent
   - Memory tagging and filtering capabilities
   
-- 🤖 **Archon Autonomous Orchestrator**: Hierarchical agent orchestration system
+- 🤖 **Opera Autonomous Orchestrator**: Hierarchical agent orchestration system
   - Goal-based planning and execution
   - Multi-agent coordination (parallel and sequential)
   - Autonomous decision making with confidence scoring
   - Self-healing with automatic failure recovery
   - Alternative plan generation and execution
   
-- 🚀 **Enhanced BMAD Integration**: Unified system combining RAG and Archon with existing agents
+- 🚀 **Enhanced BMAD Integration**: Unified system combining RAG and Opera with existing agents
   - Context-aware agent responses using past experiences
   - Pattern detection for recurring issues
   - Autonomous action triggering
@@ -44,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 📝 **New MCP Tools**:
   - `versatil_memory_store`: Store information in RAG memory
   - `versatil_memory_query`: Query memories with semantic search
-  - `versatil_create_goal`: Create autonomous goals for Archon
+  - `versatil_create_goal`: Create autonomous goals for Opera
   - `versatil_enhanced_agent`: Activate agents with enhanced features
   - `versatil_autonomous_mode`: Control autonomous settings
   - `versatil_performance_metrics`: Get comprehensive metrics

@@ -360,11 +360,11 @@ export class VERSATILEnvironmentDetector {
       });
     }
     
-    // 3. Integrate Archon with existing SDLC
+    // 3. Integrate Opera with existing SDLC
     if (this.detectedEnvironment.existingSDLC) {
       plan.enhancements.push({
-        type: 'integrate-archon',
-        action: 'Add Archon orchestration to existing SDLC phases',
+        type: 'integrate-opera',
+        action: 'Add Opera orchestration to existing SDLC phases',
         phases: Object.keys(this.detectedEnvironment.existingSDLC)
           .filter(k => this.detectedEnvironment.existingSDLC[k])
       });
@@ -411,7 +411,7 @@ export class VERSATILEnvironmentDetector {
           useExistingSupabase: true,
           vectorStoreStatus: this.detectedEnvironment.rag.hasVectorStore ? 'existing' : 'to-be-added'
         },
-        archon: {
+        opera: {
           enabled: true,
           integrateWithExisting: true,
           sdlcPhases: this.detectedEnvironment.existingSDLC
@@ -465,8 +465,8 @@ export class VERSATILEnvironmentDetector {
 - Query memories with: @memory <query>
 - Patterns are learned and applied automatically
 
-## Archon Orchestrator
-- Set high-level goals: @archon <goal>
+## Opera Orchestrator
+- Set high-level goals: @opera <goal>
 - Autonomous execution of complex tasks
 - Self-healing and error recovery
 
@@ -484,7 +484,7 @@ When you save a file:
 
 ## Goal-Based Development
 Instead of step-by-step instructions, try:
-"@archon Build user authentication with JWT and 2FA"
+"@opera Build user authentication with JWT and 2FA"
 
 The system will autonomously:
 - Plan the implementation
@@ -744,14 +744,14 @@ ${plan.migrations.map(m => `- ${m}`).join('\n')}
 4. **Test Integration**:
    \`\`\`bash
    # In Cursor, try:
-   @archon Build a simple REST endpoint
+   @opera Build a simple REST endpoint
    @memory Show patterns for API development
    \`\`\`
 
 ## 📊 Feature Activation Status:
 
 - **RAG Memory System**: ${this.detectedEnvironment.rag.hasVectorStore ? 'Ready' : 'Needs setup'}
-- **Archon Orchestrator**: Ready to integrate
+- **Opera Orchestrator**: Ready to integrate
 - **Enhanced Agents**: Ready to enhance
 - **Introspective Testing**: Ready to add
 

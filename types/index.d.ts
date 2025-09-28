@@ -42,8 +42,8 @@ declare module 'versatil-sdlc-framework' {
     updateMemoryRelevance(memoryId: string, feedback: 'helpful' | 'not_helpful'): Promise<void>;
   }
 
-  // Archon Types
-  export interface ArchonGoal {
+  // Opera Types
+  export interface OperaGoal {
     id: string;
     type: 'feature' | 'bug_fix' | 'optimization' | 'refactor' | 'security';
     description: string;
@@ -53,7 +53,7 @@ declare module 'versatil-sdlc-framework' {
     deadline?: Date;
   }
 
-  export interface ArchonDecision {
+  export interface OperaDecision {
     id: string;
     timestamp: number;
     goalId: string;
@@ -83,9 +83,9 @@ declare module 'versatil-sdlc-framework' {
     confidence: number;
   }
 
-  export interface ArchonState {
-    currentGoals: ArchonGoal[];
-    activeDecisions: ArchonDecision[];
+  export interface OperaState {
+    currentGoals: OperaGoal[];
+    activeDecisions: OperaDecision[];
     executionQueue: ExecutionStep[];
     completedSteps: string[];
     performance: {
@@ -95,9 +95,9 @@ declare module 'versatil-sdlc-framework' {
     };
   }
 
-  export class ArchonOrchestrator {
-    addGoal(goal: ArchonGoal): Promise<void>;
-    getState(): ArchonState;
+  export class OperaOrchestrator {
+    addGoal(goal: OperaGoal): Promise<void>;
+    getState(): OperaState;
     pauseAutonomous(): void;
     resumeAutonomous(): void;
     on(event: 'goal_completed' | 'goal_failed' | 'decision_made' | 'step_completed' | 'human_intervention_required', callback: Function): void;
@@ -106,7 +106,7 @@ declare module 'versatil-sdlc-framework' {
   // Enhanced BMAD Types
   export interface EnhancedBMADConfig {
     ragEnabled: boolean;
-    archonEnabled: boolean;
+    operaEnabled: boolean;
     autonomousMode: boolean;
     memoryDepth: number;
     contextWindowSize: number;
@@ -118,7 +118,7 @@ declare module 'versatil-sdlc-framework' {
     phase: string;
     activeAgents: string[];
     memory: any[];
-    goals: ArchonGoal[];
+    goals: OperaGoal[];
     decisions: any[];
   }
 

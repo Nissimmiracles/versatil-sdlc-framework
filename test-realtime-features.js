@@ -1,13 +1,13 @@
 /**
  * Test script for VERSATIL Real-time SDLC Tracking & Auto-Update
- * Demonstrates Archon MCP, automatic MCP discovery, and real-time progress tracking
+ * Demonstrates Opera MCP, automatic MCP discovery, and real-time progress tracking
  */
 
 const { VERSATILLogger } = require('./dist/utils/logger');
 const { MCPAutoDiscoveryAgent } = require('./dist/agents/mcp/mcp-auto-discovery-agent');
 const { MCPAutoUpdateSystem } = require('./dist/mcp/auto-update-system');
-const { EnhancedArchonOrchestrator } = require('./dist/archon/enhanced-archon-orchestrator');
-const { createArchonMCP } = require('./dist/mcp/archon-mcp');
+const { EnhancedOperaOrchestrator } = require('./dist/opera/enhanced-opera-orchestrator');
+const { createOperaMCP } = require('./dist/mcp/opera-mcp');
 const { AgentRegistry } = require('./dist/agents/agent-registry');
 const { SDLCOrchestrator } = require('./dist/flywheel/sdlc-orchestrator');
 const { EnhancedBMADCoordinator } = require('./dist/bmad/enhanced-bmad-coordinator');
@@ -29,7 +29,7 @@ async function testRealTimeFeatures() {
     // Initialize Enhanced BMAD Coordinator
     const bmadCoordinator = new EnhancedBMADCoordinator({
       ragEnabled: true,
-      archonEnabled: true,
+      operaEnabled: true,
       autonomousMode: true
     });
     
@@ -57,17 +57,17 @@ async function testRealTimeFeatures() {
     
     console.log('✅ MCP Auto-Update system active\n');
     
-    // Step 3: Initialize Archon MCP
-    console.log('3️⃣ Starting Archon MCP with Auto-Updates...');
+    // Step 3: Initialize Opera MCP
+    console.log('3️⃣ Starting Opera MCP with Auto-Updates...');
     
-    const archon = new EnhancedArchonOrchestrator(agentRegistry);
-    const archonMCP = createArchonMCP(archon, {
+    const opera = new EnhancedOperaOrchestrator(agentRegistry);
+    const operaMCP = createOperaMCP(opera, {
       autoUpdate: true,
       updateInterval: 10000 // 10 seconds for demo
     });
     
-    await archonMCP.start();
-    console.log('✅ Archon MCP operational\n');
+    await operaMCP.start();
+    console.log('✅ Opera MCP operational\n');
     
     // Step 4: Initialize Real-time SDLC Tracker
     console.log('4️⃣ Starting Real-time SDLC Progress Tracker...');
@@ -105,9 +105,9 @@ async function testRealTimeFeatures() {
     // Step 5: Simulate SDLC Activity
     console.log('5️⃣ Simulating SDLC Activity...\n');
     
-    // Create a test goal via Archon
-    console.log('   Creating test goal via Archon MCP...');
-    const goalResponse = await simulateArchonGoal(archon);
+    // Create a test goal via Opera
+    console.log('   Creating test goal via Opera MCP...');
+    const goalResponse = await simulateOperaGoal(opera);
     console.log(`   ✅ Goal Created: ${goalResponse.goalId}\n`);
     
     // Trigger MCP discovery based on project needs
@@ -168,7 +168,7 @@ async function testRealTimeFeatures() {
     console.log('\n🧹 Cleaning up...');
     realtimeTracker.stop();
     autoUpdateSystem.stop();
-    await archonMCP.stop();
+    await operaMCP.stop();
     
     console.log('\n✨ Real-time Features Test Complete!');
     console.log('\n💡 To view real-time updates, connect to WebSocket at ws://localhost:8080');
@@ -179,10 +179,10 @@ async function testRealTimeFeatures() {
   }
 }
 
-// Helper function to simulate Archon goal creation
-async function simulateArchonGoal(archon) {
+// Helper function to simulate Opera goal creation
+async function simulateOperaGoal(opera) {
   // In a real implementation, this would use the MCP interface
-  const goal = await archon.createGoal({
+  const goal = await opera.createGoal({
     type: 'feature',
     description: 'Implement real-time progress tracking dashboard',
     priority: 'high',

@@ -11,7 +11,7 @@ import {
 } from '@modelcontextprotocol/sdk';
 import { enhancedBMAD } from '../bmad/enhanced-bmad-coordinator';
 import { vectorMemoryStore } from '../rag/vector-memory-store';
-import { ArchonOrchestrator } from '../archon/archon-orchestrator';
+import { OperaOrchestrator } from '../opera/opera-orchestrator';
 
 export function registerEnhancedMCPTools(server: any, config: any) {
   
@@ -65,10 +65,10 @@ export function registerEnhancedMCPTools(server: any, config: any) {
       }
     },
 
-    // Archon Orchestration Tools
+    // Opera Orchestration Tools
     {
-      name: 'versatil_archon_goal',
-      description: 'Set a development goal for Archon to achieve autonomously',
+      name: 'versatil_opera_goal',
+      description: 'Set a development goal for Opera to achieve autonomously',
       inputSchema: {
         type: 'object',
         properties: {
@@ -101,8 +101,8 @@ export function registerEnhancedMCPTools(server: any, config: any) {
     },
     
     {
-      name: 'versatil_archon_status',
-      description: 'Get Archon orchestrator status and active goals',
+      name: 'versatil_opera_status',
+      description: 'Get Opera orchestrator status and active goals',
       inputSchema: {
         type: 'object',
         properties: {
@@ -181,12 +181,12 @@ export function registerEnhancedMCPTools(server: any, config: any) {
       case 'versatil_memory_query':
         return await handleMemoryQuery(args);
       
-      // Archon Operations
-      case 'versatil_archon_goal':
-        return await handleArchonGoal(args);
+      // Opera Operations
+      case 'versatil_opera_goal':
+        return await handleOperaGoal(args);
       
-      case 'versatil_archon_status':
-        return await handleArchonStatus(args);
+      case 'versatil_opera_status':
+        return await handleOperaStatus(args);
       
       // Enhanced BMAD
       case 'versatil_bmad_autonomous':
@@ -253,15 +253,15 @@ async function handleMemoryQuery(args: any) {
   };
 }
 
-async function handleArchonGoal(args: any) {
+async function handleOperaGoal(args: any) {
   const goal = {
     id: `goal-${Date.now()}`,
     ...args,
     deadline: args.deadline ? new Date(args.deadline) : undefined
   };
   
-  const archon = ArchonOrchestrator.getInstance();
-  await archon.addGoal(goal);
+  const opera = OperaOrchestrator.getInstance();
+  await opera.addGoal(goal);
   
   return {
     content: [{
@@ -269,18 +269,18 @@ async function handleArchonGoal(args: any) {
       text: JSON.stringify({
         success: true,
         goalId: goal.id,
-        status: 'Goal added to Archon queue',
+        status: 'Goal added to Opera queue',
         estimatedCompletion: Date.now() + 300000
       }, null, 2)
     }]
   };
 }
 
-async function handleArchonStatus(args: any) {
+async function handleOperaStatus(args: any) {
   const { includeHistory = false } = args;
   
-  const archon = ArchonOrchestrator.getInstance();
-  const state = await archon.getState();
+  const opera = OperaOrchestrator.getInstance();
+  const state = await opera.getState();
   
   const status = {
     activeGoals: state.currentGoals,
@@ -365,8 +365,8 @@ export const enhancedMCPTools = {
   registerEnhancedMCPTools,
   handleMemoryStore,
   handleMemoryQuery,
-  handleArchonGoal,
-  handleArchonStatus,
+  handleOperaGoal,
+  handleOperaStatus,
   handleBMADAutonomous,
   handleLearningInsights
 };

@@ -1,13 +1,13 @@
-# 🎯 Archon & SDLC Flywheel Integration Guide
+# 🎯 Opera & SDLC Flywheel Integration Guide
 
 ## Overview
 
-Archon is the **autonomous orchestrator** that sits at the center of the VERSATIL SDLC flywheel, coordinating all phases and agents.
+Opera is the **autonomous orchestrator** that sits at the center of the VERSATIL SDLC flywheel, coordinating all phases and agents.
 
-## The Complete SDLC Flywheel with Archon
+## The Complete SDLC Flywheel with Opera
 
 ```
-                    🎯 ARCHON ORCHESTRATOR
+                    🎯 OPERA ORCHESTRATOR
                            ↓ Goals
     Requirements ←────────────────────────→ Monitoring
          ↓                                      ↑
@@ -20,7 +20,7 @@ Archon is the **autonomous orchestrator** that sits at the center of the VERSATI
                     Continuous Learning
 ```
 
-## How Archon Works in Each Phase
+## How Opera Works in Each Phase
 
 ### 1. **Requirements Phase**
 ```javascript
@@ -34,54 +34,54 @@ archon.addGoal({
 });
 ```
 
-**Archon Actions**:
+**Opera Actions**:
 - Decomposes goal into tasks
 - Assigns to appropriate agents
 - Creates execution plan
 
 ### 2. **Analysis Phase**
 - **Alex-BA** analyzes requirements
-- Archon queries RAG memory for similar past projects
+- Opera queries RAG memory for similar past projects
 - Identifies patterns and best practices
 - Makes autonomous decisions on approach
 
 ### 3. **Design Phase**
 - **Dan-Architect** creates technical design
-- Archon validates against constraints
+- Opera validates against constraints
 - Checks memory for architectural patterns
 - Autonomously adjusts design based on learnings
 
 ### 4. **Development Phase**
 - **Marcus/James** implement features
-- Archon monitors progress
+- Opera monitors progress
 - Detects blockers and reassigns tasks
 - Applies learned code patterns from RAG
 
 ### 5. **Testing Phase**
 - **Maria** runs comprehensive tests
-- Archon analyzes results
+- Opera analyzes results
 - Decides if quality gates are met
 - Triggers fixes autonomously if needed
 
 ### 6. **Deployment Phase**
 - **DevOps-Dan** handles deployment
-- Archon monitors metrics
+- Opera monitors metrics
 - Ready to rollback if issues detected
 - Learns from deployment patterns
 
 ### 7. **Monitoring Phase**
 - Continuous health checks
-- Archon detects anomalies
+- Opera detects anomalies
 - Triggers autonomous fixes
 - Stores patterns in RAG
 
 ### 8. **Feedback Phase**
 - Collects user feedback
-- Archon prioritizes improvements
+- Opera prioritizes improvements
 - Creates new goals autonomously
 - Feeds learning back to RAG
 
-## Archon Decision Flow
+## Opera Decision Flow
 
 ```javascript
 // Example: Autonomous bug fix
@@ -111,20 +111,20 @@ if (monitoring.detectsIssue('high CPU usage')) {
 
 ## Key Integration Points
 
-### RAG + Archon
+### RAG + Opera
 - Every decision queries past experiences
 - Successful outcomes stored as patterns
 - Failed attempts stored as anti-patterns
 - Continuous improvement loop
 
-### Agents + Archon
-- Archon coordinates agent activities
+### Agents + Opera
+- Opera coordinates agent activities
 - Manages handoffs between agents
 - Resolves conflicts in recommendations
 - Optimizes agent utilization
 
-### Flywheel + Archon
-- Archon ensures smooth phase transitions
+### Flywheel + Opera
+- Opera ensures smooth phase transitions
 - Quality gates enforced automatically
 - Parallel execution where possible
 - Zero context loss between phases
@@ -163,7 +163,7 @@ await archon.addGoal({
   priority: 'high'
 });
 
-// Archon handles everything:
+// Opera handles everything:
 // - Requirements gathering
 // - Technical design
 // - Implementation
@@ -174,7 +174,7 @@ await archon.addGoal({
 
 ### Self-Healing Production Issue
 ```javascript
-// Archon detects issue
+// Opera detects issue
 monitoring.on('alert', async (issue) => {
   if (issue.severity === 'critical') {
     await archon.addGoal({
@@ -197,4 +197,4 @@ monitoring.on('alert', async (issue) => {
 
 ---
 
-The SDLC flywheel with Archon transforms development from a linear process to an intelligent, self-improving cycle. Each rotation makes the system smarter and faster.
+The SDLC flywheel with Opera transforms development from a linear process to an intelligent, self-improving cycle. Each rotation makes the system smarter and faster.

@@ -13,7 +13,7 @@ import { PerformanceMonitor } from './analytics/performance-monitor';
 import { VERSATILMCPServer } from './mcp/versatil-mcp-server';
 import { enhancedBMAD } from './bmad/enhanced-bmad-coordinator';
 import { vectorMemoryStore } from './rag/vector-memory-store';
-import { ArchonOrchestrator } from './archon/archon-orchestrator';
+import { OperaOrchestrator } from './opera/opera-orchestrator';
 import * as path from 'path';
 
 export async function startEnhancedServer() {
@@ -29,7 +29,7 @@ export async function startEnhancedServer() {
   
   // Initialize enhanced features
   await vectorMemoryStore.initialize();
-  const archon = ArchonOrchestrator.getInstance();
+  const opera = OperaOrchestrator.getInstance();
   
   // Initialize MCP server
   const mcpServer = new VERSATILMCPServer({} as any);
@@ -46,7 +46,7 @@ export async function startEnhancedServer() {
       mode: 'enhanced',
       features: {
         rag: true,
-        archon: true,
+        opera: true,
         enhancedAgents: true
       }
     });
@@ -76,18 +76,18 @@ export async function startEnhancedServer() {
     }
   });
   
-  // Archon endpoints
-  app.post('/api/archon/goal', async (req, res) => {
+  // Opera endpoints
+  app.post('/api/opera/goal', async (req, res) => {
     try {
-      await archon.addGoal(req.body);
-      res.json({ success: true, status: archon.getState() });
+      await opera.addGoal(req.body);
+      res.json({ success: true, status: opera.getState() });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   });
   
-  app.get('/api/archon/status', (req, res) => {
-    res.json(archon.getState());
+  app.get('/api/opera/status', (req, res) => {
+    res.json(opera.getState());
   });
   
   // BMAD endpoints
@@ -106,13 +106,13 @@ export async function startEnhancedServer() {
   io.on('connection', (socket) => {
     console.log('Client connected:', socket.id);
     
-    // Subscribe to Archon events
-    archon.on('goal_completed', (data) => {
-      socket.emit('archon:goal_completed', data);
+    // Subscribe to Opera events
+    opera.on('goal_completed', (data) => {
+      socket.emit('opera:goal_completed', data);
     });
     
-    archon.on('decision_made', (data) => {
-      socket.emit('archon:decision', data);
+    opera.on('decision_made', (data) => {
+      socket.emit('opera:decision', data);
     });
     
     // Subscribe to learning events
@@ -132,7 +132,7 @@ export async function startEnhancedServer() {
   httpServer.listen(PORT, () => {
     logger.info(`VERSATIL Enhanced Server running on port ${PORT}`, {
       mode: 'enhanced',
-      features: ['rag', 'archon', 'enhanced-agents']
+      features: ['rag', 'opera', 'enhanced-agents']
     });
     
     console.log(`
@@ -150,8 +150,8 @@ Ready for autonomous development with learning!
 export async function startAutonomousMode() {
   // Enable full autonomous mode
   enhancedBMAD.setAutonomousMode(true);
-  const archon = ArchonOrchestrator.getInstance();
-  archon.startAutonomous();
+  const opera = OperaOrchestrator.getInstance();
+  opera.startAutonomous();
   
   await startEnhancedServer();
   
@@ -171,7 +171,7 @@ No manual intervention required!
   // Example autonomous goal
   setTimeout(() => {
     console.log('\n📋 Example: Setting autonomous goal...\n');
-    archon.addGoal({
+    opera.addGoal({
       id: 'auto-goal-1',
       type: 'feature',
       description: 'Add user authentication with JWT',

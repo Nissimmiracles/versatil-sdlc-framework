@@ -51,7 +51,7 @@ async function test() {
   console.log('\n✅ VERSATIL integration working!');
   console.log('\nNext steps:');
   console.log('1. Run Supabase migration (if using Supabase)');
-  console.log('2. Try @archon commands in Cursor');
+  console.log('2. Try @opera commands in Cursor');
   console.log('3. Watch agents learn and improve!\n');
 }
 

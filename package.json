@@ -1,7 +1,7 @@
 {
   "name": "versatil-sdlc-framework",
   "version": "1.2.1",
-  "description": "🚀 AI-Native SDLC framework with RAG memory, Archon autonomous orchestration, and Enhanced BMAD agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
+  "description": "🚀 AI-Native SDLC framework with RAG memory, Opera autonomous orchestration, and Enhanced BMAD agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
   "main": "dist/index.js",
   "bin": {
     "versatil": "./bin/versatil.js",
@@ -28,7 +28,7 @@
     "test:accessibility": "playwright test --project=accessibility",
     "test:security": "playwright test --project=security",
     "test:bmad": "playwright test --project=bmad-integration",
-    "test:archon-mcp": "node test-archon-mcp.cjs",
+    "test:opera-mcp": "node test-opera-mcp.cjs",
     "test:self-referential": "node test-self-referential.cjs",
     "simulation:stress-test": "node dist/simulation/standalone-test.js",
     "simulation:stress-test-full": "node dist/simulation/stress-test.js",
@@ -64,12 +64,12 @@
     "verify:context": "node verify-context-awareness.cjs",
     "start:enhanced": "node dist/index.js enhanced",
     "start:autonomous": "node dist/index.js autonomous",
-    "start:archon-mcp": "node init-archon-mcp.js",
-    "archon:start": "node init-archon-mcp.js",
-    "archon:update": "node init-archon-mcp.js --check-updates",
-    "archon:health": "node init-archon-mcp.js --health",
-    "mcp:discover": "node init-archon-mcp.js --discover-mcps",
-    "mcp:status": "node init-archon-mcp.js --mcp-status",
+    "start:opera-mcp": "node init-opera-mcp.js",
+    "opera:start": "node init-opera-mcp.js",
+    "opera:update": "node init-opera-mcp.js --check-updates",
+    "opera:health": "node init-opera-mcp.js --health",
+    "mcp:discover": "node init-opera-mcp.js --discover-mcps",
+    "mcp:status": "node init-opera-mcp.js --mcp-status",
     "init": "node scripts/setup-agents.js",
     "version:check": "node scripts/version-check.js",
     "version:fix": "node scripts/version-check.js --fix",
@@ -133,6 +133,7 @@
   },
   "homepage": "https://github.com/MiraclesGIT/versatil-sdlc-framework#readme",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.1",
     "@supabase/supabase-js": "^2.39.0",
     "@types/express": "^4.17.23",
     "axios": "^1.6.0",
@@ -194,8 +195,8 @@
     "LICENSE",
     "tsconfig.json",
     "jest.config.js",
-    "init-archon-mcp.js",
-    "test-archon-mcp.js",
+    "init-opera-mcp.js",
+    "test-opera-mcp.js",
     "ARCHON_MCP_DOCUMENTATION.md"
   ]
 }

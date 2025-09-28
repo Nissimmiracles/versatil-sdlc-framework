@@ -56,7 +56,7 @@ The new `IntrospectiveAgent` class provides:
 - Runs health checks every 5 minutes
 - Monitors agent responsiveness
 - Tracks memory system performance
-- Validates Archon orchestration
+- Validates Opera orchestration
 
 ### Self-Testing Capabilities
 ```javascript
@@ -96,7 +96,7 @@ agent.activate({
 ### 2. **Component Health**
 - Agent registry status
 - Memory system operations
-- Archon configuration
+- Opera configuration
 - API endpoints
 
 ### 3. **Functionality**

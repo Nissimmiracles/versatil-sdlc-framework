@@ -1,16 +1,16 @@
-# VERSATIL v1.2.0 - Archon MCP and Auto-Update
+# VERSATIL v1.2.0 - Opera MCP and Auto-Update
 
 ## Overview
 
-The Archon Model Context Protocol (MCP) integration provides a standardized interface for interacting with the VERSATIL Archon orchestrator, enabling seamless integration with AI assistants, IDEs, and other MCP-compatible tools. The system includes automatic update capabilities to ensure you're always running the latest version.
+The Opera Model Context Protocol (MCP) integration provides a standardized interface for interacting with the VERSATIL Opera orchestrator, enabling seamless integration with AI assistants, IDEs, and other MCP-compatible tools. The system includes automatic update capabilities to ensure you're always running the latest version.
 
 ## Key Features
 
-### 1. Archon MCP Server
+### 1. Opera MCP Server
 
-- **Standardized Interface**: Full MCP-compliant server exposing Archon functionality
+- **Standardized Interface**: Full MCP-compliant server exposing Opera functionality
 - **Tool Suite**: Comprehensive tools for goal management, planning, and execution
-- **Resource Access**: Direct access to Archon state, metrics, and context
+- **Resource Access**: Direct access to Opera state, metrics, and context
 - **Real-time Updates**: Live access to orchestration status and results
 
 ### 2. Automatic Updates
@@ -33,8 +33,8 @@ The Archon Model Context Protocol (MCP) integration provides a standardized inte
 # Install VERSATIL with MCP support
 npm install versatil-sdlc-fw@1.2.0
 
-# Initialize with Archon MCP
-node init-archon-mcp.js
+# Initialize with Opera MCP
+node init-opera-mcp.js
 ```
 
 ## Configuration
@@ -42,30 +42,30 @@ node init-archon-mcp.js
 Create a `.env` file with:
 
 ```bash
-# Archon MCP Configuration
-ARCHON_MCP_PORT=3000
-ARCHON_UPDATE_CHANNEL=stable  # stable, beta, or dev
-ARCHON_AUTO_UPDATE=true
-ARCHON_UPDATE_INTERVAL=86400000  # 24 hours in milliseconds
+# Opera MCP Configuration
+OPERA_MCP_PORT=3000
+OPERA_UPDATE_CHANNEL=stable  # stable, beta, or dev
+OPERA_AUTO_UPDATE=true
+OPERA_UPDATE_INTERVAL=86400000  # 24 hours in milliseconds
 
 # Optional: Custom update registry
-ARCHON_UPDATE_REGISTRY=https://registry.versatil.dev/mcp
+OPERA_UPDATE_REGISTRY=https://registry.versatil.dev/mcp
 ```
 
 ## Usage
 
-### Starting the Archon MCP Server
+### Starting the Opera MCP Server
 
 ```javascript
-const { versatilMCP } = require('./init-archon-mcp');
+const { versatilMCP } = require('./init-opera-mcp');
 
-// Initialize VERSATIL with Archon MCP
+// Initialize VERSATIL with Opera MCP
 await versatilMCP.initialize();
 
 // The server is now running and ready for connections
 ```
 
-### Using Archon MCP Tools
+### Using Opera MCP Tools
 
 The following tools are available via MCP:
 
@@ -114,7 +114,7 @@ await mcp.call('archon_rollback', {
 });
 ```
 
-### Accessing Archon Resources
+### Accessing Opera Resources
 
 ```javascript
 // Get active goals
@@ -155,13 +155,13 @@ const updates = await mcp.read('archon://updates');
 
 ```bash
 # Check for updates manually
-node test-archon-mcp.js --check-updates
+node test-opera-mcp.js --check-updates
 
 # Apply specific version
-node test-archon-mcp.js --apply-update 1.2.1
+node test-opera-mcp.js --apply-update 1.2.1
 
 # Rollback to previous version
-node test-archon-mcp.js --rollback 1.2.0
+node test-opera-mcp.js --rollback 1.2.0
 ```
 
 ## MCP Auto-Discovery
@@ -234,10 +234,10 @@ await mcp.call('mcp_install_recommended', {
 1. **Update Failures**
    ```bash
    # Check update logs
-   cat .versatil/logs/archon-mcp-updates.log
+   cat .versatil/logs/opera-mcp-updates.log
    
    # Rollback to previous version
-   node init-archon-mcp.js --rollback
+   node init-opera-mcp.js --rollback
    ```
 
 2. **MCP Connection Issues**
@@ -246,7 +246,7 @@ await mcp.call('mcp_install_recommended', {
    curl http://localhost:3000/mcp/status
    
    # Restart MCP server
-   node init-archon-mcp.js --restart
+   node init-opera-mcp.js --restart
    ```
 
 3. **Discovery Problems**
@@ -255,12 +255,12 @@ await mcp.call('mcp_install_recommended', {
    rm -rf .versatil/mcp/cache
    
    # Re-run discovery
-   node test-archon-mcp.js --rediscover
+   node test-opera-mcp.js --rediscover
    ```
 
 ## API Reference
 
-### Archon MCP Tools
+### Opera MCP Tools
 
 | Tool | Description | Parameters |
 |------|-------------|------------|
@@ -273,7 +273,7 @@ await mcp.call('mcp_install_recommended', {
 | `archon_apply_update` | Apply update | version, backup |
 | `archon_rollback` | Rollback version | version |
 
-### Archon MCP Resources
+### Opera MCP Resources
 
 | URI | Description | Format |
 |-----|-------------|--------|
@@ -295,9 +295,9 @@ await mcp.call('mcp_install_recommended', {
 ### Upcoming Features
 
 - **v1.2.1**: Enhanced MCP discovery algorithms
-- **v1.2.2**: Multi-tenant support for Archon MCP
+- **v1.2.2**: Multi-tenant support for Opera MCP
 - **v1.3.0**: AI-powered update recommendations
-- **v1.4.0**: Distributed Archon orchestration
+- **v1.4.0**: Distributed Opera orchestration
 
 ## Support
 
