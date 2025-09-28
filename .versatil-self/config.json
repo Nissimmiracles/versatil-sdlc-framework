@@ -1,0 +1,97 @@
+{
+  "version": "1.2.0",
+  "mode": "self-referential",
+  "timestamp": "2025-09-28T13:51:49.427Z",
+  "boundaries": {
+    "contextRoot": "/Users/nissimmenashe/VERSATIL SDLC FW",
+    "allowedPaths": [
+      "src",
+      "tests",
+      "docs",
+      "scripts"
+    ],
+    "excludedPaths": [
+      "node_modules",
+      "dist",
+      ".git",
+      ".versatil-self"
+    ],
+    "recursionPrevention": true,
+    "maxDepth": 3
+  },
+  "features": {
+    "rag": {
+      "enabled": true,
+      "reranking": true,
+      "multimodal": true,
+      "contextPrefix": "SELF_DEV:",
+      "isolatedMemory": true
+    },
+    "archon": {
+      "enabled": true,
+      "autonomousMode": true,
+      "selfReferentialMode": true,
+      "carefulMode": true,
+      "riskTolerance": 0.2,
+      "requireConfirmation": [
+        "delete",
+        "major-refactor"
+      ],
+      "modelPreference": [
+        "claude-3-opus"
+      ]
+    },
+    "agents": {
+      "priorityOrder": [
+        "introspective-agent",
+        "architecture-dan",
+        "enhanced-marcus",
+        "enhanced-maria",
+        "security-sam"
+      ],
+      "specialRules": {
+        "introspective-agent": {
+          "checkInterval": 60000,
+          "autoFix": true,
+          "monitorSelf": true
+        }
+      }
+    },
+    "introspection": {
+      "enabled": true,
+      "continuous": true,
+      "selfMonitoring": true,
+      "recursionDetection": true,
+      "performanceTracking": true
+    }
+  },
+  "goals": {
+    "continuous": [
+      {
+        "id": "improve-test-coverage",
+        "description": "Maintain and improve test coverage above 85%",
+        "agent": "enhanced-maria",
+        "trigger": "coverage-drop"
+      },
+      {
+        "id": "optimize-performance",
+        "description": "Identify and fix performance bottlenecks",
+        "agent": "enhanced-marcus",
+        "trigger": "performance-issue"
+      },
+      {
+        "id": "enhance-documentation",
+        "description": "Keep documentation synchronized with code",
+        "agent": "alex-ba",
+        "trigger": "code-change"
+      }
+    ],
+    "immediate": [
+      {
+        "id": "analyze-self",
+        "description": "Analyze VERSATIL codebase and identify improvements",
+        "priority": "high"
+      }
+    ]
+  }
+}

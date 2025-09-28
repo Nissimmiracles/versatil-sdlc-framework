@@ -6,7 +6,7 @@
  * showing framework promises vs reality with brutal honesty.
  */
 
-import { SimulationQA } from '../agents/simulation-qa.js';
+import { SimulationQA } from '../agents/simulation-qa';
 
 async function showCapabilityMatrix() {
   console.log('📊 VERSATIL Framework Capability Matrix\n');
@@ -29,18 +29,18 @@ async function showCapabilityMatrix() {
     console.log('📋 Category Analysis:');
     console.log('========================');
 
-    Object.entries(matrix.categories).forEach(([category, score]) => {
+    Object.entries(matrix.categories).forEach(([category, score]: [string, any]) => {
       const statusEmoji = {
         working: '✅',
         partial: '⚡',
         broken: '⚠️',
         vapor: '🌫️'
-      }[score.status];
+      }[score.status as string];
 
       console.log(`${statusEmoji} ${category}:`);
       console.log(`   Success Rate: ${score.percentage}% (${score.actual}/${score.promised})`);
       console.log(`   Status: ${score.status.toUpperCase()}`);
-      if (score.evidence.length > 0) {
+      if (score.evidence && score.evidence.length > 0) {
         console.log(`   Evidence: ${score.evidence.slice(0, 2).join(', ')}`);
       }
       console.log();

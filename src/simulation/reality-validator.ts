@@ -197,7 +197,7 @@ export class RealityValidator extends EventEmitter {
       const startTime = Date.now();
 
       try {
-        testCase.timestamp = new Date();
+        testCase.timestamp = Date.now();
 
         // Execute the specific test case
         const result = await this.executeSpecificTest(testCase);
@@ -442,7 +442,7 @@ export class RealityValidator extends EventEmitter {
       logs.forEach(log => {
         evidence.push({
           type: 'log_entry',
-          timestamp: new Date(),
+          timestamp: new Date(Date.now()),
           source: 'framework-logs',
           data: log,
           relevant: this.isLogRelevant(log, scenario),
@@ -459,7 +459,7 @@ export class RealityValidator extends EventEmitter {
     } catch (error) {
       evidence.push({
         type: 'error_message',
-        timestamp: new Date(),
+        timestamp: new Date(Date.now()),
         source: 'evidence-collection',
         data: { error: error instanceof Error ? error.message : String(error) },
         relevant: true,
@@ -680,7 +680,7 @@ export class RealityValidator extends EventEmitter {
     const exportPath = filePath || path.join(this.projectRoot, '.versatil', 'validation-results.json');
 
     const exportData = {
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(Date.now()).toISOString(),
       validator: 'VERSATIL Reality Validator',
       projectRoot: this.projectRoot,
       results: this.validationResults,

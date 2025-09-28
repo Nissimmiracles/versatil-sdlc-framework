@@ -7,7 +7,7 @@
  */
 
 import { BaseAgent, AgentActivationContext, ValidationResults } from '../agents/base-agent';
-import { agentRegistry } from '../agents/agent-registry';
+import { AgentRegistry } from '../agents/agent-registry';
 
 export interface TestScenario {
   id: string;
@@ -36,8 +36,10 @@ export interface TestResult {
 export class AgentTestingFramework {
   private testScenarios: TestScenario[] = [];
   private testResults: TestResult[] = [];
+  private agentRegistry: AgentRegistry;
 
-  constructor() {
+  constructor(agentRegistry: AgentRegistry) {
+    this.agentRegistry = agentRegistry;
     this.initializeTestScenarios();
   }
 
@@ -355,7 +357,7 @@ const processUserInput = (input) => {
     const startTime = Date.now();
 
     try {
-      const agent = agentRegistry.getAgent(agentId);
+      const agent = this.agentRegistry.getAgent(agentId);
       if (!agent) {
         return {
           scenario: scenario.id,
@@ -612,6 +614,11 @@ const processUserInput = (input) => {
   }
 }
 
-// Export singleton instance
-export const agentTestingFramework = new AgentTestingFramework();
-export default agentTestingFramework;
+// Export singleton instance - lazy initialization
+let _instance: AgentTestingFramework | null = null;
+export function getAgentTestingFramework(agentRegistry: AgentRegistry): AgentTestingFramework {
+  if (!_instance) {
+    _instance = new AgentTestingFramework(agentRegistry);
+  }
+  return _instance;
+}

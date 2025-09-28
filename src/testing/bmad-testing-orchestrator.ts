@@ -5,10 +5,10 @@
  * UI/UX testing with real-time quality feedback and agent handoffs.
  */
 
-import { EnhancedMaria } from '../agents/enhanced-maria.js';
-import { EnhancedJames } from '../agents/enhanced-james.js';
-import { AgentActivationContext, AgentResponse } from '../agents/base-agent.js';
-import { VERSATILLogger } from '../utils/logger.js';
+import { EnhancedMaria } from '../agents/enhanced-maria';
+import { EnhancedJames } from '../agents/enhanced-james';
+import { AgentActivationContext, AgentResponse } from '../agents/base-agent';
+import { VERSATILLogger } from '../utils/logger';
 
 export interface UITestingContext {
   filePath?: string;

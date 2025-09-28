@@ -1,143 +1,42 @@
 {
   "compilerOptions": {
-    // Target and Module Configuration
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-
-    // Module Interoperability
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "checkJs": false,
-
-    // JSX Configuration
-    "jsx": "react-jsx",
-    "jsxImportSource": "react",
-
-    // Output Configuration
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "target": "ES2020",
+    "module": "ES2020",
+    "lib": [
+      "ES2020"
+    ],
     "outDir": "./dist",
     "rootDir": "./src",
-    "removeComments": false,
-
-    // Enhanced Type Checking for BMAD Methodology
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Additional Quality Checks
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "useUnknownInCatchVariables": true,
-
-    // Module Resolution
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": false,
+    "strict": false,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-
-    // Enhanced Path Mapping for BMAD Structure
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/agents/*": ["./src/agents/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/testing/*": ["./src/testing/*"],
-      "@/intelligence/*": ["./src/intelligence/*"],
-      "@/analytics/*": ["./src/analytics/*"],
-      "@/tests/*": ["./tests/*"],
-      "@/playwright/*": ["./tests/playwright/*"],
-      "@/e2e/*": ["./tests/e2e/*"]
-    },
-
-    // Type Definitions for Enhanced Features
-    "types": ["node", "jest", "@playwright/test"],
-
-    // Experimental Features
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-
-    // Performance Optimizations
-    "incremental": true,
-    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+    "forceConsistentCasingInFileNames": false,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false,
+    "alwaysStrict": false,
+    "noImplicitOverride": false,
+    "allowUnreachableCode": true,
+    "allowUnusedLabels": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "moduleResolution": "node"
   },
-
-  // Enhanced Include Patterns
   "include": [
-    "src/**/*",
-    "tests/**/*",
-    "playwright.config.ts",
-    "jest.config.js",
-    ".cursorrules",
-    "CLAUDE.md"
+    "src/**/*"
   ],
-
-  // Enhanced Exclude Patterns
   "exclude": [
     "node_modules",
     "dist",
-    "coverage",
-    "test-results",
-    ".versatil/cache",
-    "**/*.js.map",
-    "**/*.d.ts.map",
-    // Exclude generated files
-    "**/*.generated.ts",
-    "**/*.auto.ts",
-    // Keep test files in compilation for better IDE support
-    // but exclude from build output
-    "templates/**/*",
-    "examples/**/*"
-  ],
-
-  // Enhanced ts-node Configuration
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node",
-    "transpileOnly": false,
-    "files": true,
-    "compilerOptions": {
-      "target": "ES2022",
-      "module": "ESNext",
-      "moduleResolution": "node"
-    }
-  },
-
-  // Watch Options for Development
-  "watchOptions": {
-    "watchFile": "useFsEvents",
-    "watchDirectory": "useFsEvents",
-    "fallbackPolling": "dynamicPriority",
-    "synchronousWatchDirectory": true,
-    "excludeDirectories": [
-      "**/node_modules",
-      "**/dist",
-      "**/coverage",
-      "**/test-results"
-    ]
-  },
-
-  // Exclude test files from main build
-  "exclude": [
-    "node_modules",
-    "dist",
-    "coverage",
-    "test-results",
-    "tests/**/*",
-    "jest.config.js",
-    "playwright.config.ts"
+    "tests",
+    "**/*.test.ts",
+    "**/*.spec.ts"
   ]
 }

@@ -1,0 +1,38 @@
+{
+  "version": "1.2.0",
+  "detected": {
+    "cursor": true,
+    "supabase": false,
+    "claude": false,
+    "agents": {
+      "format": "bmad",
+      "location": null,
+      "existing": []
+    },
+    "sdlc": {
+      "src": true,
+      "tests": true
+    },
+    "rag": {
+      "hasVectorStore": false
+    },
+    "cursorRulesPath": ".cursorrules"
+  },
+  "timestamp": "2025-09-28T02:37:10.164Z",
+  "features": {
+    "rag": {
+      "enabled": false,
+      "useExisting": false,
+      "needsVectorSetup": false
+    },
+    "archon": {
+      "enabled": true,
+      "integrateWithExisting": true
+    },
+    "enhancedAgents": {
+      "enabled": true,
+      "existingAgents": [],
+      "format": "bmad"
+    }
+  }
+}

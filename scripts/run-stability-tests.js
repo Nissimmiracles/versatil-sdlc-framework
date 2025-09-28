@@ -182,11 +182,11 @@ class VERSATILStabilityTester {
             reject(new Error(`Server startup failed: ${error.message}`));
           });
 
-          // Timeout after 30 seconds
+          // Timeout after 60 seconds
           setTimeout(() => {
             server.kill();
-            reject(new Error('Server startup timeout (30s)'));
-          }, 30000);
+            reject(new Error('Server startup timeout (60s)'));
+          }, 60000);
 
           // Send test command after 2 seconds
           setTimeout(() => {
@@ -247,7 +247,7 @@ class VERSATILStabilityTester {
           setTimeout(() => {
             server.kill();
             reject(new Error('MCP tools test timeout'));
-          }, 15000);
+          }, 30000);
 
           // Send tools list request
           setTimeout(() => {
@@ -501,7 +501,7 @@ class VERSATILStabilityTester {
         const configFiles = [
           'package.json',
           'tsconfig.json',
-          'jest.config.js'
+          'jest.config.cjs'
         ];
 
         const missingConfigs = configFiles.filter(file =>

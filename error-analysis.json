@@ -1,0 +1,725 @@
+{
+  "totalErrors": 175,
+  "errorsByCode": [
+    {
+      "code": "TS2339",
+      "count": 112,
+      "message": "Property 'handleStepFailure' does not exist on type 'EnhancedIntrospectiveAgent'.",
+      "examples": [
+        {
+          "file": "\n> versatil-sdlc-framework@1.2.1 build\n> tsc\n\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 98,
+          "message": "Property 'handleStepFailure' does not exist on type 'EnhancedIntrospectiveAgent'."
+        },
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 126,
+          "message": "Property 'predictPotentialIssues' does not exist on type 'EnhancedIntrospectiveAgent'."
+        },
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 129,
+          "message": "Property 'optimizeFrameworkPerformance' does not exist on type 'EnhancedIntrospectiveAgent'."
+        }
+      ]
+    },
+    {
+      "code": "TS2307",
+      "count": 18,
+      "message": "Cannot find module '../agents/base-agent' or its corresponding type declarations.",
+      "examples": [
+        {
+          "file": "\nsrc/agents/introspective/full-context-introspective-agent.ts",
+          "line": 7,
+          "message": "Cannot find module '../agents/base-agent' or its corresponding type declarations."
+        },
+        {
+          "file": "\nsrc/agents/introspective/full-context-introspective-agent.ts",
+          "line": 8,
+          "message": "Cannot find module '../utils/logger' or its corresponding type declarations."
+        },
+        {
+          "file": "\nsrc/agents/introspective/full-context-introspective-agent.ts",
+          "line": 9,
+          "message": "Cannot find module '../rag/vector-memory-store' or its corresponding type declarations."
+        }
+      ]
+    },
+    {
+      "code": "TS2345",
+      "count": 10,
+      "message": "Argument of type 'Timer' is not assignable to parameter of type 'string | number | Timeout'.",
+      "examples": [
+        {
+          "file": "\nsrc/agents/meta/introspective-meta-agent.ts",
+          "line": 998,
+          "message": "Argument of type 'Timer' is not assignable to parameter of type 'string | number | Timeout'."
+        },
+        {
+          "file": "\nsrc/mcp/archon-mcp.ts",
+          "line": 542,
+          "message": "Argument of type 'Timer' is not assignable to parameter of type 'string | number | Timeout'."
+        },
+        {
+          "file": "\nsrc/mcp/auto-update-system.ts",
+          "line": 91,
+          "message": "Argument of type 'Timer' is not assignable to parameter of type 'string | number | Timeout'."
+        }
+      ]
+    },
+    {
+      "code": "TS2554",
+      "count": 7,
+      "message": "Expected 2 arguments, but got 1.",
+      "examples": [
+        {
+          "file": "\nsrc/enhanced-server.ts",
+          "line": 33,
+          "message": "Expected 2 arguments, but got 1."
+        },
+        {
+          "file": "\nsrc/orchestration/agentic-rag-orchestrator.ts",
+          "line": 107,
+          "message": "Expected 0 arguments, but got 1."
+        },
+        {
+          "file": "\nsrc/orchestration/agentic-rag-orchestrator.ts",
+          "line": 108,
+          "message": "Expected 0 arguments, but got 1."
+        }
+      ]
+    },
+    {
+      "code": "TS2305",
+      "count": 7,
+      "message": "Module '\"../agents/mcp/mcp-auto-discovery-agent\"' has no exported member 'MCPDefinition'.",
+      "examples": [
+        {
+          "file": " close, _onTimeout, [Symbol.dispose]\nsrc/mcp/auto-update-system.ts",
+          "line": 9,
+          "message": "Module '\"../agents/mcp/mcp-auto-discovery-agent\"' has no exported member 'MCPDefinition'."
+        },
+        {
+          "file": "\nsrc/simulation/quick-stress-test.ts",
+          "line": 9,
+          "message": "Module '\"../agents/simulation-qa\"' has no exported member 'SimulationScenario'."
+        },
+        {
+          "file": "\nsrc/simulation/quick-stress-test.ts",
+          "line": 9,
+          "message": "Module '\"../agents/simulation-qa\"' has no exported member 'CapabilityMatrix'."
+        }
+      ]
+    },
+    {
+      "code": "TS2353",
+      "count": 6,
+      "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'.",
+      "examples": [
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 558,
+          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'."
+        },
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 585,
+          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'."
+        },
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 715,
+          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'."
+        }
+      ]
+    },
+    {
+      "code": "TS1343",
+      "count": 4,
+      "message": "The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'.",
+      "examples": [
+        {
+          "file": "\nsrc/simulation/capability-matrix.ts",
+          "line": 68,
+          "message": "The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'."
+        },
+        {
+          "file": "\nsrc/simulation/quick-stress-test.ts",
+          "line": 172,
+          "message": "The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'."
+        },
+        {
+          "file": "\nsrc/simulation/standalone-test.ts",
+          "line": 179,
+          "message": "The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', 'node18', 'node20', or 'nodenext'."
+        }
+      ]
+    },
+    {
+      "code": "TS2724",
+      "count": 3,
+      "message": "'\"../agents/simulation-qa\"' has no exported member named 'SimulationQA'. Did you mean 'SimulationQa'?",
+      "examples": [
+        {
+          "file": "\nsrc/simulation/capability-matrix.ts",
+          "line": 9,
+          "message": "'\"../agents/simulation-qa\"' has no exported member named 'SimulationQA'. Did you mean 'SimulationQa'?"
+        },
+        {
+          "file": "\nsrc/simulation/stress-test.ts",
+          "line": 9,
+          "message": "'\"../agents/simulation-qa\"' has no exported member named 'SimulationQA'. Did you mean 'SimulationQa'?"
+        },
+        {
+          "file": "\nsrc/testing/agent-testing-framework.ts",
+          "line": 10,
+          "message": "'\"../agents/agent-registry\"' has no exported member named 'agentRegistry'. Did you mean 'AgentRegistry'?"
+        }
+      ]
+    },
+    {
+      "code": "TS2551",
+      "count": 2,
+      "message": "Property 'analyzeProjectContext' does not exist on type 'EnhancedIntrospectiveAgent'. Did you mean 'projectContext'?",
+      "examples": [
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 138,
+          "message": "Property 'analyzeProjectContext' does not exist on type 'EnhancedIntrospectiveAgent'. Did you mean 'projectContext'?"
+        },
+        {
+          "file": "\nsrc/agents/introspective/full-context-introspective-agent.ts",
+          "line": 339,
+          "message": "Property 'analyzePatterns' does not exist on type 'FullContextIntrospectiveAgent'. Did you mean 'analyzePlans'?"
+        }
+      ]
+    },
+    {
+      "code": "TS2367",
+      "count": 2,
+      "message": "This comparison appears to be unintentional because the types 'boolean' and 'string' have no overlap.",
+      "examples": [
+        {
+          "file": " close, _onTimeout, [Symbol.dispose]\nsrc/mcp/auto-update-system.ts",
+          "line": 351,
+          "message": "This comparison appears to be unintentional because the types 'boolean' and 'string' have no overlap."
+        },
+        {
+          "file": "\nsrc/tracking/realtime-sdlc-tracker.ts",
+          "line": 352,
+          "message": "This comparison appears to be unintentional because the types 'string' and 'number' have no overlap."
+        }
+      ]
+    },
+    {
+      "code": "TS2559",
+      "count": 1,
+      "message": "Type 'AgentRegistry' has no properties in common with type 'EventEmitterOptions'.",
+      "examples": [
+        {
+          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "line": 75,
+          "message": "Type 'AgentRegistry' has no properties in common with type 'EventEmitterOptions'."
+        }
+      ]
+    },
+    {
+      "code": "TS2488",
+      "count": 1,
+      "message": "Type 'BaseAgent' must have a '[Symbol.iterator]()' method that returns an iterator.",
+      "examples": [
+        {
+          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "line": 91,
+          "message": "Type 'BaseAgent' must have a '[Symbol.iterator]()' method that returns an iterator."
+        }
+      ]
+    },
+    {
+      "code": "TS2341",
+      "count": 1,
+      "message": "Property 'initialize' is private and only accessible within class 'EnhancedVectorMemoryStore'.",
+      "examples": [
+        {
+          "file": "\nsrc/orchestration/agentic-rag-orchestrator.ts",
+          "line": 134,
+          "message": "Property 'initialize' is private and only accessible within class 'EnhancedVectorMemoryStore'."
+        }
+      ]
+    },
+    {
+      "code": "TS2322",
+      "count": 1,
+      "message": "Type 'number' is not assignable to type 'string'.",
+      "examples": [
+        {
+          "file": "\nsrc/tracking/realtime-sdlc-tracker.ts",
+          "line": 170,
+          "message": "Type 'number' is not assignable to type 'string'."
+        }
+      ]
+    }
+  ],
+  "filesWithMostErrors": [
+    {
+      "file": "\nagents/introspective/enhanced-introspective-agent.ts",
+      "count": 36,
+      "errors": [
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 126,
+          "column": 21,
+          "code": "TS2339",
+          "message": "Property 'predictPotentialIssues' does not exist on type 'EnhancedIntrospectiveAgent'.",
+          "fullMatch": "\nsrc/agents/introspective/enhanced-introspective-agent.ts(126,21): error TS2339: Property 'predictPotentialIssues' does not exist on type 'EnhancedIntrospectiveAgent'."
+        },
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 129,
+          "column": 21,
+          "code": "TS2339",
+          "message": "Property 'optimizeFrameworkPerformance' does not exist on type 'EnhancedIntrospectiveAgent'.",
+          "fullMatch": "\nsrc/agents/introspective/enhanced-introspective-agent.ts(129,21): error TS2339: Property 'optimizeFrameworkPerformance' does not exist on type 'EnhancedIntrospectiveAgent'."
+        },
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 132,
+          "column": 21,
+          "code": "TS2339",
+          "message": "Property 'learnFromPattern' does not exist on type 'EnhancedIntrospectiveAgent'.",
+          "fullMatch": "\nsrc/agents/introspective/enhanced-introspective-agent.ts(132,21): error TS2339: Property 'learnFromPattern' does not exist on type 'EnhancedIntrospectiveAgent'."
+        },
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 138,
+          "column": 21,
+          "code": "TS2551",
+          "message": "Property 'analyzeProjectContext' does not exist on type 'EnhancedIntrospectiveAgent'. Did you mean 'projectContext'?",
+          "fullMatch": "\nsrc/agents/introspective/enhanced-introspective-agent.ts(138,21): error TS2551: Property 'analyzeProjectContext' does not exist on type 'EnhancedIntrospectiveAgent'. Did you mean 'projectContext'?"
+        },
+        {
+          "file": "\nsrc/agents/introspective/enhanced-introspective-agent.ts",
+          "line": 141,
+          "column": 21,
+          "code": "TS2339",
+          "message": "Property 'handleFrameworkError' does not exist on type 'EnhancedIntrospectiveAgent'.",
+          "fullMatch": "\nsrc/agents/introspective/enhanced-introspective-agent.ts(141,21): error TS2339: Property 'handleFrameworkError' does not exist on type 'EnhancedIntrospectiveAgent'."
+        }
+      ]
+    },
+    {
+      "file": "\nmcp/archon-mcp.ts",
+      "count": 16,
+      "errors": [
+        {
+          "file": "\nsrc/mcp/archon-mcp.ts",
+          "line": 6,
+          "column": 36,
+          "code": "TS2307",
+          "message": "Cannot find module '@modelcontextprotocol/sdk' or its corresponding type declarations.",
+          "fullMatch": "\nsrc/mcp/archon-mcp.ts(6,36): error TS2307: Cannot find module '@modelcontextprotocol/sdk' or its corresponding type declarations."
+        },
+        {
+          "file": "\nsrc/mcp/archon-mcp.ts",
+          "line": 106,
+          "column": 40,
+          "code": "TS2339",
+          "message": "Property 'getGoalStatus' does not exist on type 'EnhancedArchonOrchestrator'.",
+          "fullMatch": "\nsrc/mcp/archon-mcp.ts(106,40): error TS2339: Property 'getGoalStatus' does not exist on type 'EnhancedArchonOrchestrator'."
+        },
+        {
+          "file": "\nsrc/mcp/archon-mcp.ts",
+          "line": 110,
+          "column": 32,
+          "code": "TS2339",
+          "message": "Property 'getAllGoalsStatus' does not exist on type 'EnhancedArchonOrchestrator'.",
+          "fullMatch": "\nsrc/mcp/archon-mcp.ts(110,32): error TS2339: Property 'getAllGoalsStatus' does not exist on type 'EnhancedArchonOrchestrator'."
+        },
+        {
+          "file": "\nsrc/mcp/archon-mcp.ts",
+          "line": 125,
+          "column": 32,
+          "code": "TS2339",
+          "message": "Property 'getDecisionHistory' does not exist on type 'EnhancedArchonOrchestrator'.",
+          "fullMatch": "\nsrc/mcp/archon-mcp.ts(125,32): error TS2339: Property 'getDecisionHistory' does not exist on type 'EnhancedArchonOrchestrator'."
+        },
+        {
+          "file": "\nsrc/mcp/archon-mcp.ts",
+          "line": 145,
+          "column": 32,
+          "code": "TS2339",
+          "message": "Property 'getLearningInsights' does not exist on type 'EnhancedArchonOrchestrator'.",
+          "fullMatch": "\nsrc/mcp/archon-mcp.ts(145,32): error TS2339: Property 'getLearningInsights' does not exist on type 'EnhancedArchonOrchestrator'."
+        }
+      ]
+    },
+    {
+      "file": "\nbmad/enhanced-bmad-coordinator.ts",
+      "count": 13,
+      "errors": [
+        {
+          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "line": 75,
+          "column": 56,
+          "code": "TS2559",
+          "message": "Type 'AgentRegistry' has no properties in common with type 'EventEmitterOptions'.",
+          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(75,56): error TS2559: Type 'AgentRegistry' has no properties in common with type 'EventEmitterOptions'."
+        },
+        {
+          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "line": 91,
+          "column": 16,
+          "code": "TS2488",
+          "message": "Type 'BaseAgent' must have a '[Symbol.iterator]()' method that returns an iterator.",
+          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(91,16): error TS2488: Type 'BaseAgent' must have a '[Symbol.iterator]()' method that returns an iterator."
+        },
+        {
+          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "line": 96,
+          "column": 26,
+          "code": "TS2339",
+          "message": "Property 'registerAgent' does not exist on type 'AgentRegistry'.",
+          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(96,26): error TS2339: Property 'registerAgent' does not exist on type 'AgentRegistry'."
+        },
+        {
+          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "line": 240,
+          "column": 45,
+          "code": "TS2339",
+          "message": "Property 'queryMemories' does not exist on type '{ initialize(): Promise<void>; storeMemory(memory: any): Promise<void>; searchMemories(query: string): Promise<any[]>; }'.",
+          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(240,45): error TS2339: Property 'queryMemories' does not exist on type '{ initialize(): Promise<void>; storeMemory(memory: any): Promise<void>; searchMemories(query: string): Promise<any[]>; }'."
+        },
+        {
+          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "line": 369,
+          "column": 7,
+          "code": "TS2353",
+          "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'.",
+          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(369,7): error TS2353: Object literal may only specify known properties, and 'constraints' does not exist in type 'ArchonGoal'."
+        }
+      ]
+    },
+    {
+      "file": "\norchestration/agentic-rag-orchestrator.ts",
+      "count": 12,
+      "errors": [
+        {
+          "file": "\nsrc/orchestration/agentic-rag-orchestrator.ts",
+          "line": 107,
+          "column": 41,
+          "code": "TS2554",
+          "message": "Expected 0 arguments, but got 1.",
+          "fullMatch": "\nsrc/orchestration/agentic-rag-orchestrator.ts(107,41): error TS2554: Expected 0 arguments, but got 1."
+        },
+        {
+          "file": "\nsrc/orchestration/agentic-rag-orchestrator.ts",
+          "line": 108,
+          "column": 46,
+          "code": "TS2554",
+          "message": "Expected 0 arguments, but got 1.",
+          "fullMatch": "\nsrc/orchestration/agentic-rag-orchestrator.ts(108,46): error TS2554: Expected 0 arguments, but got 1."
+        },
+        {
+          "file": "\nsrc/orchestration/agentic-rag-orchestrator.ts",
+          "line": 109,
+          "column": 45,
+          "code": "TS2554",
+          "message": "Expected 0 arguments, but got 1.",
+          "fullMatch": "\nsrc/orchestration/agentic-rag-orchestrator.ts(109,45): error TS2554: Expected 0 arguments, but got 1."
+        },
+        {
+          "file": "\nsrc/orchestration/agentic-rag-orchestrator.ts",
+          "line": 110,
+          "column": 39,
+          "code": "TS2554",
+          "message": "Expected 0 arguments, but got 1.",
+          "fullMatch": "\nsrc/orchestration/agentic-rag-orchestrator.ts(110,39): error TS2554: Expected 0 arguments, but got 1."
+        },
+        {
+          "file": "\nsrc/orchestration/agentic-rag-orchestrator.ts",
+          "line": 111,
+          "column": 43,
+          "code": "TS2554",
+          "message": "Expected 0 arguments, but got 1.",
+          "fullMatch": "\nsrc/orchestration/agentic-rag-orchestrator.ts(111,43): error TS2554: Expected 0 arguments, but got 1."
+        }
+      ]
+    },
+    {
+      "file": "\ntracking/realtime-sdlc-tracker.ts",
+      "count": 11,
+      "errors": [
+        {
+          "file": "\nsrc/tracking/realtime-sdlc-tracker.ts",
+          "line": 150,
+          "column": 49,
+          "code": "TS2339",
+          "message": "Property 'size' does not exist on type 'BaseAgent[]'.",
+          "fullMatch": "\nsrc/tracking/realtime-sdlc-tracker.ts(150,49): error TS2339: Property 'size' does not exist on type 'BaseAgent[]'."
+        },
+        {
+          "file": "\nsrc/tracking/realtime-sdlc-tracker.ts",
+          "line": 170,
+          "column": 11,
+          "code": "TS2322",
+          "message": "Type 'number' is not assignable to type 'string'.",
+          "fullMatch": "\nsrc/tracking/realtime-sdlc-tracker.ts(170,11): error TS2322: Type 'number' is not assignable to type 'string'."
+        },
+        {
+          "file": "\nsrc/tracking/realtime-sdlc-tracker.ts",
+          "line": 197,
+          "column": 39,
+          "code": "TS2345",
+          "message": "Argument of type 'number' is not assignable to parameter of type 'string'.",
+          "fullMatch": "\nsrc/tracking/realtime-sdlc-tracker.ts(197,39): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'."
+        },
+        {
+          "file": "\nsrc/tracking/realtime-sdlc-tracker.ts",
+          "line": 212,
+          "column": 39,
+          "code": "TS2345",
+          "message": "Argument of type 'number' is not assignable to parameter of type 'string'.",
+          "fullMatch": "\nsrc/tracking/realtime-sdlc-tracker.ts(212,39): error TS2345: Argument of type 'number' is not assignable to parameter of type 'string'."
+        },
+        {
+          "file": "\nsrc/tracking/realtime-sdlc-tracker.ts",
+          "line": 229,
+          "column": 27,
+          "code": "TS2339",
+          "message": "Property 'on' does not exist on type 'SDLCOrchestrator'.",
+          "fullMatch": "\nsrc/tracking/realtime-sdlc-tracker.ts(229,27): error TS2339: Property 'on' does not exist on type 'SDLCOrchestrator'."
+        }
+      ]
+    },
+    {
+      "file": "\nsimulation/capability-matrix.ts",
+      "count": 9,
+      "errors": [
+        {
+          "file": "\nsrc/simulation/capability-matrix.ts",
+          "line": 9,
+          "column": 10,
+          "code": "TS2724",
+          "message": "'\"../agents/simulation-qa\"' has no exported member named 'SimulationQA'. Did you mean 'SimulationQa'?",
+          "fullMatch": "\nsrc/simulation/capability-matrix.ts(9,10): error TS2724: '\"../agents/simulation-qa\"' has no exported member named 'SimulationQA'. Did you mean 'SimulationQa'?"
+        },
+        {
+          "file": "\nsrc/simulation/capability-matrix.ts",
+          "line": 38,
+          "column": 15,
+          "code": "TS2339",
+          "message": "Property 'status' does not exist on type 'unknown'.",
+          "fullMatch": "\nsrc/simulation/capability-matrix.ts(38,15): error TS2339: Property 'status' does not exist on type 'unknown'."
+        },
+        {
+          "file": "\nsrc/simulation/capability-matrix.ts",
+          "line": 41,
+          "column": 45,
+          "code": "TS2339",
+          "message": "Property 'percentage' does not exist on type 'unknown'.",
+          "fullMatch": "\nsrc/simulation/capability-matrix.ts(41,45): error TS2339: Property 'percentage' does not exist on type 'unknown'."
+        },
+        {
+          "file": "\nsrc/simulation/capability-matrix.ts",
+          "line": 41,
+          "column": 67,
+          "code": "TS2339",
+          "message": "Property 'actual' does not exist on type 'unknown'.",
+          "fullMatch": "\nsrc/simulation/capability-matrix.ts(41,67): error TS2339: Property 'actual' does not exist on type 'unknown'."
+        },
+        {
+          "file": "\nsrc/simulation/capability-matrix.ts",
+          "line": 41,
+          "column": 83,
+          "code": "TS2339",
+          "message": "Property 'promised' does not exist on type 'unknown'.",
+          "fullMatch": "\nsrc/simulation/capability-matrix.ts(41,83): error TS2339: Property 'promised' does not exist on type 'unknown'."
+        }
+      ]
+    },
+    {
+      "file": "\nsimulation/quick-stress-test.ts",
+      "count": 7,
+      "errors": [
+        {
+          "file": "\nsrc/simulation/quick-stress-test.ts",
+          "line": 9,
+          "column": 10,
+          "code": "TS2305",
+          "message": "Module '\"../agents/simulation-qa\"' has no exported member 'SimulationScenario'.",
+          "fullMatch": "\nsrc/simulation/quick-stress-test.ts(9,10): error TS2305: Module '\"../agents/simulation-qa\"' has no exported member 'SimulationScenario'."
+        },
+        {
+          "file": "\nsrc/simulation/quick-stress-test.ts",
+          "line": 9,
+          "column": 30,
+          "code": "TS2305",
+          "message": "Module '\"../agents/simulation-qa\"' has no exported member 'CapabilityMatrix'.",
+          "fullMatch": "\nsrc/simulation/quick-stress-test.ts(9,30): error TS2305: Module '\"../agents/simulation-qa\"' has no exported member 'CapabilityMatrix'."
+        },
+        {
+          "file": "\nsrc/simulation/quick-stress-test.ts",
+          "line": 32,
+          "column": 27,
+          "code": "TS2339",
+          "message": "Property 'status' does not exist on type 'unknown'.",
+          "fullMatch": "\nsrc/simulation/quick-stress-test.ts(32,27): error TS2339: Property 'status' does not exist on type 'unknown'."
+        },
+        {
+          "file": "\nsrc/simulation/quick-stress-test.ts",
+          "line": 32,
+          "column": 62,
+          "code": "TS2339",
+          "message": "Property 'status' does not exist on type 'unknown'.",
+          "fullMatch": "\nsrc/simulation/quick-stress-test.ts(32,62): error TS2339: Property 'status' does not exist on type 'unknown'."
+        },
+        {
+          "file": "\nsrc/simulation/quick-stress-test.ts",
+          "line": 33,
+          "column": 50,
+          "code": "TS2339",
+          "message": "Property 'percentage' does not exist on type 'unknown'.",
+          "fullMatch": "\nsrc/simulation/quick-stress-test.ts(33,50): error TS2339: Property 'percentage' does not exist on type 'unknown'."
+        }
+      ]
+    },
+    {
+      "file": "\nagents/introspective/full-context-introspective-agent.ts",
+      "count": 6,
+      "errors": [
+        {
+          "file": "\nsrc/agents/introspective/full-context-introspective-agent.ts",
+          "line": 7,
+          "column": 66,
+          "code": "TS2307",
+          "message": "Cannot find module '../agents/base-agent' or its corresponding type declarations.",
+          "fullMatch": "\nsrc/agents/introspective/full-context-introspective-agent.ts(7,66): error TS2307: Cannot find module '../agents/base-agent' or its corresponding type declarations."
+        },
+        {
+          "file": "\nsrc/agents/introspective/full-context-introspective-agent.ts",
+          "line": 8,
+          "column": 32,
+          "code": "TS2307",
+          "message": "Cannot find module '../utils/logger' or its corresponding type declarations.",
+          "fullMatch": "\nsrc/agents/introspective/full-context-introspective-agent.ts(8,32): error TS2307: Cannot find module '../utils/logger' or its corresponding type declarations."
+        },
+        {
+          "file": "\nsrc/agents/introspective/full-context-introspective-agent.ts",
+          "line": 9,
+          "column": 35,
+          "code": "TS2307",
+          "message": "Cannot find module '../rag/vector-memory-store' or its corresponding type declarations.",
+          "fullMatch": "\nsrc/agents/introspective/full-context-introspective-agent.ts(9,35): error TS2307: Cannot find module '../rag/vector-memory-store' or its corresponding type declarations."
+        },
+        {
+          "file": "\nsrc/agents/introspective/full-context-introspective-agent.ts",
+          "line": 10,
+          "column": 31,
+          "code": "TS2307",
+          "message": "Cannot find module '../agents/agent-registry' or its corresponding type declarations.",
+          "fullMatch": "\nsrc/agents/introspective/full-context-introspective-agent.ts(10,31): error TS2307: Cannot find module '../agents/agent-registry' or its corresponding type declarations."
+        },
+        {
+          "file": "\nsrc/agents/introspective/full-context-introspective-agent.ts",
+          "line": 137,
+          "column": 10,
+          "code": "TS2339",
+          "message": "Property 'systemPrompt' does not exist on type 'FullContextIntrospectiveAgent'.",
+          "fullMatch": "\nsrc/agents/introspective/full-context-introspective-agent.ts(137,10): error TS2339: Property 'systemPrompt' does not exist on type 'FullContextIntrospectiveAgent'."
+        }
+      ]
+    },
+    {
+      "file": "\nrag/enhanced-vector-memory-store.ts",
+      "count": 6,
+      "errors": [
+        {
+          "file": "\nsrc/rag/enhanced-vector-memory-store.ts",
+          "line": 101,
+          "column": 16,
+          "code": "TS2339",
+          "message": "Property 'loadExistingMemories' does not exist on type 'EnhancedVectorMemoryStore'.",
+          "fullMatch": "\nsrc/rag/enhanced-vector-memory-store.ts(101,16): error TS2339: Property 'loadExistingMemories' does not exist on type 'EnhancedVectorMemoryStore'."
+        },
+        {
+          "file": "\nsrc/rag/enhanced-vector-memory-store.ts",
+          "line": 138,
+          "column": 21,
+          "code": "TS2339",
+          "message": "Property 'generateMemoryId' does not exist on type 'EnhancedVectorMemoryStore'.",
+          "fullMatch": "\nsrc/rag/enhanced-vector-memory-store.ts(138,21): error TS2339: Property 'generateMemoryId' does not exist on type 'EnhancedVectorMemoryStore'."
+        },
+        {
+          "file": "\nsrc/rag/enhanced-vector-memory-store.ts",
+          "line": 156,
+          "column": 16,
+          "code": "TS2339",
+          "message": "Property 'persistMemory' does not exist on type 'EnhancedVectorMemoryStore'.",
+          "fullMatch": "\nsrc/rag/enhanced-vector-memory-store.ts(156,16): error TS2339: Property 'persistMemory' does not exist on type 'EnhancedVectorMemoryStore'."
+        },
+        {
+          "file": "\nsrc/rag/enhanced-vector-memory-store.ts",
+          "line": 255,
+          "column": 23,
+          "code": "TS2339",
+          "message": "Property 'applyFilters' does not exist on type 'EnhancedVectorMemoryStore'.",
+          "fullMatch": "\nsrc/rag/enhanced-vector-memory-store.ts(255,23): error TS2339: Property 'applyFilters' does not exist on type 'EnhancedVectorMemoryStore'."
+        },
+        {
+          "file": "\nsrc/rag/enhanced-vector-memory-store.ts",
+          "line": 469,
+          "column": 31,
+          "code": "TS2339",
+          "message": "Property 'applyFilters' does not exist on type 'EnhancedVectorMemoryStore'.",
+          "fullMatch": "\nsrc/rag/enhanced-vector-memory-store.ts(469,31): error TS2339: Property 'applyFilters' does not exist on type 'EnhancedVectorMemoryStore'."
+        }
+      ]
+    },
+    {
+      "file": "\nenhanced-server.ts",
+      "count": 5,
+      "errors": [
+        {
+          "file": "\nsrc/enhanced-server.ts",
+          "line": 8,
+          "column": 40,
+          "code": "TS2307",
+          "message": "Cannot find module 'socket.io' or its corresponding type declarations.",
+          "fullMatch": "\nsrc/enhanced-server.ts(8,40): error TS2307: Cannot find module 'socket.io' or its corresponding type declarations."
+        },
+        {
+          "file": "\nsrc/enhanced-server.ts",
+          "line": 33,
+          "column": 24,
+          "code": "TS2554",
+          "message": "Expected 2 arguments, but got 1.",
+          "fullMatch": "\nsrc/enhanced-server.ts(33,24): error TS2554: Expected 2 arguments, but got 1."
+        },
+        {
+          "file": "\nsrc/enhanced-server.ts",
+          "line": 37,
+          "column": 37,
+          "code": "TS2339",
+          "message": "Property 'getInstance' does not exist on type 'typeof ArchonOrchestrator'.",
+          "fullMatch": "\nsrc/enhanced-server.ts(37,37): error TS2339: Property 'getInstance' does not exist on type 'typeof ArchonOrchestrator'."
+        },
+        {
+          "file": "\nsrc/enhanced-server.ts",
+          "line": 84,
+          "column": 47,
+          "code": "TS2339",
+          "message": "Property 'queryMemories' does not exist on type '{ initialize(): Promise<void>; storeMemory(memory: any): Promise<void>; searchMemories(query: string): Promise<any[]>; }'.",
+          "fullMatch": "\nsrc/enhanced-server.ts(84,47): error TS2339: Property 'queryMemories' does not exist on type '{ initialize(): Promise<void>; storeMemory(memory: any): Promise<void>; searchMemories(query: string): Promise<any[]>; }'."
+        },
+        {
+          "file": "\nsrc/enhanced-server.ts",
+          "line": 165,
+          "column": 37,
+          "code": "TS2339",
+          "message": "Property 'getInstance' does not exist on type 'typeof ArchonOrchestrator'.",
+          "fullMatch": "\nsrc/enhanced-server.ts(165,37): error TS2339: Property 'getInstance' does not exist on type 'typeof ArchonOrchestrator'."
+        }
+      ]
+    }
+  ]
+}

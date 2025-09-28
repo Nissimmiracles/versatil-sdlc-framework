@@ -6,22 +6,22 @@
  * like Claude Desktop, providing complete repository context and agent access
  */
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Server } from '@modelcontextprotocol/sdk/server/index';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio';
 import {
   CallToolRequestSchema,
   ListResourcesRequestSchema,
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+} from '@modelcontextprotocol/sdk';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { versatilDispatcher } from './agent-dispatcher.js';
-import { versionManager } from './version-manager.js';
-import { changelogGenerator } from './changelog-generator.js';
-import { gitBackupManager } from './git-backup-manager.js';
-import { FeedbackMCPHandler } from './mcp/feedback-mcp-tools.js';
-import { BMADMCPIntegration } from './dashboard/bmad-mcp-integration.js';
+import { versatilDispatcher } from './agent-dispatcher';
+import { versionManager } from './version-manager';
+import { changelogGenerator } from './changelog-generator';
+import { gitBackupManager } from './git-backup-manager';
+import { FeedbackMCPHandler } from './mcp/feedback-mcp-tools';
+import { BMADMCPIntegration } from './dashboard/bmad-mcp-integration';
 
 export class VERSATILMCPServer {
   private server: Server;
@@ -33,18 +33,7 @@ export class VERSATILMCPServer {
     this.projectRoot = projectRoot;
     this.feedbackHandler = new FeedbackMCPHandler(projectRoot);
     this.bmadIntegration = new BMADMCPIntegration();
-    this.server = new Server(
-      {
-        name: 'versatil-framework',
-        version: '1.0.0',
-      },
-      {
-        capabilities: {
-          resources: {},
-          tools: {},
-        },
-      }
-    );
+    this.server = new Server({ name: "versatil-framework", version: "1.0.0" }, {});
 
     this.setupToolHandlers();
     this.setupResourceHandlers();

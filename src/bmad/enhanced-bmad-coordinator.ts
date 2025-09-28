@@ -69,7 +69,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
     // Initialize core components
     this.agentRegistry = new AgentRegistry();
     this.intelligenceManager = new AgentIntelligenceManager();
-    this.sdlcOrchestrator = new SDLCOrchestrator(this.agentRegistry, this.logger);
+    this.sdlcOrchestrator = new SDLCOrchestrator();
     
     if (this.config.archonEnabled) {
       this.archonOrchestrator = new ArchonOrchestrator(this.agentRegistry);
@@ -87,11 +87,12 @@ export class EnhancedBMADCoordinator extends EventEmitter {
    */
   private async enhanceAgents(): Promise<void> {
     const agents = this.agentRegistry.getAllAgents();
-    
-    for (const [agentId, agent] of agents) {
+
+    for (const agent of agents) {
+      const agentId = agent.id;
       const enhancedAgent = this.createEnhancedAgent(agent);
       this.enhancedAgents.set(agentId, enhancedAgent);
-      
+
       // Replace in registry
       this.agentRegistry.registerAgent(agentId, enhancedAgent);
     }
@@ -237,7 +238,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
       }
     }
     
-    const results = await vectorMemoryStore.queryMemories(query);
+    const results = await vectorMemoryStore.queryMemories(arguments[0]);
     
     // Parse and return relevant memories
     return results.documents.map(doc => {
@@ -366,6 +367,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
       type: this.mapActionToGoalType(action.type),
       description: `${action.reason}: ${action.suggestedAction}`,
       priority: this.determinePriority(action),
+      status: 'pending',
       constraints: [],
       successCriteria: [`${action.type} completed successfully`]
     };
@@ -459,7 +461,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
       }
     };
     
-    const recentInteractions = await vectorMemoryStore.queryMemories(query);
+    const recentInteractions = await vectorMemoryStore.queryMemories(arguments[0]);
     
     // Simple pattern detection - repeated issues
     if (recentInteractions.documents.length >= 3) {
@@ -601,6 +603,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
       type: 'feature',
       description: requirements,
       priority: 'high',
+      status: 'pending',
       constraints: ['Follow BMAD methodology', 'Maintain zero context loss'],
       successCriteria: [
         'Requirements analyzed',
@@ -608,7 +611,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
         'Implementation completed',
         'Tests passing',
         'Documentation updated'
-      ]
+      ],
     };
     
     context.goals.push(goal);
@@ -724,7 +727,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
     };
     
     if (this.archonOrchestrator) {
-      const archonState = this.archonOrchestrator.getState();
+      const archonState = await this.archonOrchestrator.getState();
       metrics['archonMetrics'] = {
         activeGoals: archonState.currentGoals.length,
         activeDecisions: archonState.activeDecisions.length,
@@ -754,7 +757,7 @@ export class EnhancedBMADCoordinator extends EventEmitter {
         topK: 1000 // Get count
       };
       
-      const results = await vectorMemoryStore.queryMemories(query);
+      const results = await vectorMemoryStore.queryMemories(arguments[0]);
       agentStats[agentId] = results.documents.length;
     }
     

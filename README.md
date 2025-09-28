@@ -3,7 +3,7 @@
 > **V**ersioned **E**xpert **R**eliable **S**martly **T**riggered **A**I **I**ntelligent **L**earning
 > **S**oftware **D**evelopment **L**ife **C**ycle Framework
 
-![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.1-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0+-blue.svg)
@@ -14,11 +14,16 @@
 
 **🌟 The world's first autonomous AI-Native SDLC framework with RAG memory, Archon orchestration, and self-learning agents achieving ZERO CONTEXT LOSS.**
 
-### 🆕 Version 1.2.0 Features:
+### 🆕 Version 1.2.1 Features:
 - **🧠 RAG Memory System** - Agents learn from every interaction
 - **🤖 Archon Orchestrator** - Fully autonomous goal execution
 - **🚀 Self-Healing** - Automatic recovery and adaptation
 - **📈 Pattern Recognition** - Proactive issue prevention
+- **⚡ Real-time Progress Tracking** - WebSocket-based live SDLC visibility
+- **🔄 Archon MCP Server** - Model Context Protocol interface with auto-updates
+- **🎯 MCP Auto-Discovery** - Automatic tool discovery and integration
+- **📊 Complete SDLC Context** - Task-level progress for all agents
+- **🔧 Automatic Updates** - Self-updating framework with rollback capability
 
 ---
 
@@ -68,6 +73,9 @@ npx versatil-sdlc enhanced
 
 # 🆕 Start in autonomous mode (v1.2.0)
 npx versatil-sdlc autonomous
+
+# 🆕 Start Archon MCP server (v1.2.1)
+npx versatil-sdlc archon:start
 ```
 
 ### Option 2: Clone & Setup
@@ -718,9 +726,18 @@ We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md
 
 ---
 
-## 🎆 What's New in v1.2.0
+## 🎆 What's New in v1.2.1
 
-### Revolutionary Autonomous Development
+### Archon MCP Integration & Auto-Updates
+
+- **📡 Archon MCP Server**: Full Model Context Protocol server for external orchestration
+- **🔄 Automatic Updates**: Self-updating framework with version management
+- **🔧 MCP Tool Discovery**: Automatically finds and suggests relevant MCPs
+- **💾 Backup & Rollback**: Safe updates with automatic backups
+- **📊 Update Channels**: Stable, beta, and dev update tracks
+- **🔒 Secure Updates**: Checksum verification for all updates
+
+### Revolutionary Autonomous Development (v1.2.0)
 
 - **🧠 RAG Memory System**: Agents remember and learn from every interaction
 - **🤖 Archon Orchestrator**: Fully autonomous goal planning and execution
@@ -747,6 +764,7 @@ await enhancedBMAD.executeBMADWorkflow(
 ```
 
 [Read the Complete Enhanced Features Guide →](./ENHANCED_FEATURES_GUIDE.md)
+[Read the Archon MCP Documentation →](./ARCHON_MCP_DOCUMENTATION.md)
 
 ---
 

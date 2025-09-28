@@ -6,14 +6,14 @@
  * and execute framework operations through standardized MCP tools
  */
 
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Server } from '@modelcontextprotocol/sdk/server/index';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
   ErrorCode,
   McpError,
-} from '@modelcontextprotocol/sdk/types.js';
+} from '@modelcontextprotocol/sdk';
 
 import { AgentRegistry } from '../agents/agent-registry';
 import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator';
@@ -40,18 +40,7 @@ export class VERSATILMCPServer {
 
   constructor(config: VERSATILMCPConfig) {
     this.config = config;
-    this.server = new Server(
-      {
-        name: config.name,
-        version: config.version,
-      },
-      {
-        capabilities: {
-          tools: {},
-          logging: {},
-        },
-      }
-    );
+    this.server = new Server({ name: config.name, version: config.version }, {});
 
     this.setupToolHandlers();
     this.setupErrorHandling();
@@ -705,7 +694,9 @@ export class VERSATILMCPServer {
       // Get appropriate agents for file
       const agents = this.config.agents.getAgentsForFilePattern(filePath);
       if (agents.length > 0 && agents[0]) {
-        const [agentId, agent] = agents[0]; // Use the first (highest priority) agent
+        const firstAgent = agents[0];
+        const agentId = (firstAgent as any).id || (firstAgent as any)[0];
+        const agent = (firstAgent as any).agent || (firstAgent as any)[1];
         const activationContext = {
           filePath,
           trigger: 'file-analysis',

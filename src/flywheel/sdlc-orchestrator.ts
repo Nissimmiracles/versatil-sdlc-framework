@@ -56,16 +56,18 @@ export interface FlywheelState {
   nextActions: string[];
 }
 
-export class SDLCOrchestrator {
+import { EventEmitter } from 'events';
+export class SDLCOrchestrator extends EventEmitter {
   private phases: Map<string, SDLCPhase> = new Map();
   private currentState: FlywheelState;
   private agentRegistry: AgentRegistry;
   private logger: VERSATILLogger;
   private feedbackHistory: Map<string, any[]> = new Map();
 
-  constructor(agentRegistry: AgentRegistry, logger: VERSATILLogger) {
+  constructor() { super(); }
+  initialize(agentRegistry: AgentRegistry, logger: VERSATILLogger) {
     this.agentRegistry = agentRegistry;
-    this.logger = logger;
+    this.logger = logger || VERSATILLogger.getInstance();
     this.initializeSDLCPhases();
     this.currentState = this.initializeState();
   }

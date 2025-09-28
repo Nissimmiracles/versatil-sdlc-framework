@@ -6,7 +6,7 @@
  * without hanging on complex filesystem operations.
  */
 
-import { SimulationScenario, CapabilityMatrix } from '../agents/simulation-qa.js';
+import { SimulationScenario, CapabilityMatrix } from '../agents/simulation-qa';
 
 async function runQuickStressTest() {
   console.log('⚡ Quick SimulationQA Stress Test...\n');
@@ -28,7 +28,7 @@ async function runQuickStressTest() {
     console.log(`Execution Time: ${executionTime}ms\n`);
 
     console.log('📈 Capability Matrix Summary:');
-    Object.entries(capabilityMatrix.categories).forEach(([category, score]) => {
+    Object.entries(capabilityMatrix.categories).forEach(([category, score]: [string, any]) => {
       const emoji = score.status === 'working' ? '✅' : score.status === 'vapor' ? '🌫️' : '⚠️';
       console.log(`${emoji} ${category}: ${score.percentage}% (${score.status})`);
     });

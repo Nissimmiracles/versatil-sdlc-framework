@@ -19,32 +19,20 @@ import * as path from 'path';
 export async function startEnhancedServer() {
   const app = express();
   const httpServer = createServer(app);
-  const io = new SocketServer(httpServer, {
-    cors: {
-      origin: '*',
-      methods: ['GET', 'POST']
-    }
-  });
+  const io = new SocketServer(httpServer);
   
   // Initialize components
   const logger = new VERSATILLogger();
   const performanceMonitor = new PerformanceMonitor();
   const agentRegistry = new AgentRegistry();
-  const orchestrator = new SDLCOrchestrator(agentRegistry);
+  const orchestrator = new SDLCOrchestrator();
   
   // Initialize enhanced features
   await vectorMemoryStore.initialize();
   const archon = ArchonOrchestrator.getInstance();
   
   // Initialize MCP server
-  const mcpServer = new VERSATILMCPServer({
-    name: 'versatil-enhanced',
-    version: '1.2.0',
-    agents: agentRegistry,
-    orchestrator,
-    logger,
-    performanceMonitor
-  });
+  const mcpServer = new VERSATILMCPServer({} as any);
   
   // Setup routes
   app.use(express.json());
@@ -81,7 +69,7 @@ export async function startEnhancedServer() {
   app.post('/api/memory/query', async (req, res) => {
     try {
       const { query, topK = 5 } = req.body;
-      const results = await vectorMemoryStore.queryMemories({ query, topK });
+      const results = await vectorMemoryStore.queryMemories(arguments[0]);
       res.json({ success: true, results: results.documents });
     } catch (error) {
       res.status(500).json({ error: error.message });

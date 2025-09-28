@@ -64,7 +64,7 @@ export class VERSATILMCPClient {
 
     this.logger = new VERSATILLogger();
     this.agentRegistry = new AgentRegistry();
-    this.sdlcOrchestrator = new SDLCOrchestrator(this.agentRegistry, this.logger);
+    this.sdlcOrchestrator = new SDLCOrchestrator();
   }
 
   /**

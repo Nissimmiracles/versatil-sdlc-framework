@@ -137,6 +137,7 @@ export class TestGenerator {
     for (const testableScenario of promise.testableScenarios) {
       const scenario: SimulationScenario = {
         id: `${promise.id}-basic-${this.testIdCounter++}`,
+        name: `Basic Test for ${promise.featureName}`,
         featureName: promise.featureName,
         promise: promise.description,
         testCases: await this.generateTestCasesFromScenario(testableScenario, 'basic'),
@@ -161,11 +162,12 @@ export class TestGenerator {
     if (promise.category === 'agent-activation') {
       // Test agent activation edge cases
       scenarios.push({
-        id: `${promise.id}-edge-concurrent-${this.testIdCounter++}`,
-        featureName: `${promise.featureName} - Concurrent Activation`,
-        promise: 'Agent should handle multiple simultaneous activation requests',
+      id: `${promise.id}-edge-concurrent-${this.testIdCounter++}`,
+      name: `${promise.featureName} - Concurrent Activation`,
+      promise: 'Agent should handle multiple simultaneous activation requests',
         testCases: [{
           id: `concurrent-activation-${this.testIdCounter}`,
+          name: 'concurrent-activation-${this.testIdCounter}',
           description: 'Trigger same agent multiple times simultaneously',
           action: 'Edit multiple files that should trigger the same agent concurrently',
           expectedResult: 'Agent should handle concurrent requests gracefully without conflicts',
@@ -178,11 +180,12 @@ export class TestGenerator {
       });
 
       scenarios.push({
-        id: `${promise.id}-edge-invalid-context-${this.testIdCounter++}`,
-        featureName: `${promise.featureName} - Invalid Context`,
-        promise: 'Agent should handle invalid or corrupted context gracefully',
+      id: `${promise.id}-edge-invalid-context-${this.testIdCounter++}`,
+      name: `${promise.featureName} - Invalid Context`,
+      promise: 'Agent should handle invalid or corrupted context gracefully',
         testCases: [{
           id: `invalid-context-${this.testIdCounter}`,
+          name: 'invalid-context-${this.testIdCounter}',
           description: 'Trigger agent with malformed or missing context data',
           action: 'Simulate agent activation with corrupted context information',
           expectedResult: 'Agent should provide meaningful error or fallback response',
@@ -207,10 +210,11 @@ export class TestGenerator {
     // General performance test for all promises
     scenarios.push({
       id: `${promise.id}-perf-response-time-${this.testIdCounter++}`,
-      featureName: `${promise.featureName} - Response Time`,
+      name: `${promise.featureName} - Response Time`,
       promise: 'Feature should respond within acceptable time limits',
       testCases: [{
         id: `response-time-${this.testIdCounter}`,
+          name: 'response-time-${this.testIdCounter}',
         description: 'Measure feature response time under normal conditions',
         action: 'Trigger feature and measure response time',
         expectedResult: 'Response time should be under 5 seconds for normal operations',
@@ -225,11 +229,12 @@ export class TestGenerator {
     if (promise.category === 'agent-activation') {
       // Agent-specific performance tests
       scenarios.push({
-        id: `${promise.id}-perf-activation-time-${this.testIdCounter++}`,
-        featureName: `${promise.featureName} - Activation Performance`,
-        promise: 'Agent should activate quickly when triggered',
+      id: `${promise.id}-perf-activation-time-${this.testIdCounter++}`,
+      name: `${promise.featureName} - Activation Performance`,
+      promise: 'Agent should activate quickly when triggered',
         testCases: [{
           id: `activation-performance-${this.testIdCounter}`,
+          name: 'activation-performance-${this.testIdCounter}',
           description: 'Measure time from file edit to agent response',
           action: 'Edit triggering file and measure time to agent activation',
           expectedResult: 'Agent should activate within 2 seconds of file edit',
@@ -253,10 +258,11 @@ export class TestGenerator {
 
     scenarios.push({
       id: `${promise.id}-failure-network-${this.testIdCounter++}`,
-      featureName: `${promise.featureName} - Network Failure`,
+      name: `${promise.featureName} - Network Failure`,
       promise: 'Feature should handle network failures gracefully',
       testCases: [{
         id: `network-failure-${this.testIdCounter}`,
+          name: 'network-failure-${this.testIdCounter}',
         description: 'Test feature behavior when network is unavailable',
         action: 'Trigger feature while simulating network connectivity issues',
         expectedResult: 'Feature should provide meaningful error message and graceful degradation',
@@ -283,11 +289,14 @@ export class TestGenerator {
 
     // Agent-to-Agent Integration Test
     scenarios.push({
+
       id: `integration-agent-handoff-${this.testIdCounter++}`,
+      name: 'Agent-to-Agent Handoff Integration',
       featureName: 'Agent-to-Agent Handoff Integration',
       promise: 'Agents should seamlessly hand off context to each other',
       testCases: [{
         id: `agent-handoff-integration-${this.testIdCounter}`,
+          name: 'agent-handoff-integration-${this.testIdCounter}',
         description: 'Test complete workflow from James-Frontend to Marcus-Backend to Maria-QA',
         action: 'Create React component that requires API integration and testing',
         expectedResult: 'All three agents should activate in sequence with preserved context',
@@ -301,11 +310,14 @@ export class TestGenerator {
 
     // MCP Integration Test
     scenarios.push({
+
       id: `integration-mcp-agent-${this.testIdCounter++}`,
+      name: 'MCP-Agent Integration',
       featureName: 'MCP-Agent Integration',
       promise: 'MCP tools should successfully communicate with agents',
       testCases: [{
         id: `mcp-agent-communication-${this.testIdCounter}`,
+          name: 'mcp-agent-communication-${this.testIdCounter}',
         description: 'Test MCP tool triggering agent activation and receiving responses',
         action: 'Use MCP versatil_activate_agent tool to activate James-Frontend',
         expectedResult: 'Agent should activate via MCP and provide structured response',
@@ -319,11 +331,14 @@ export class TestGenerator {
 
     // Real Project Integration Test
     scenarios.push({
+
       id: `integration-verssai-project-${this.testIdCounter++}`,
+      name: 'VERSSAI Project Integration',
       featureName: 'VERSSAI Project Integration',
       promise: 'Framework should work seamlessly with VERSSAI project',
       testCases: [{
         id: `verssai-integration-${this.testIdCounter}`,
+          name: 'verssai-integration-${this.testIdCounter}',
         description: 'Test framework functionality with actual VERSSAI project files',
         action: 'Edit VERSSAI React components and verify agent responses',
         expectedResult: 'Agents should provide contextual suggestions for VERSSAI codebase',
@@ -359,11 +374,14 @@ export class TestGenerator {
 
     // High-frequency activation test
     scenarios.push({
+
       id: `stress-high-frequency-${this.testIdCounter++}`,
+      name: 'High-Frequency Agent Activation',
       featureName: 'High-Frequency Agent Activation',
       promise: 'Framework should handle rapid successive agent activations',
       testCases: [{
         id: `high-frequency-stress-${this.testIdCounter}`,
+          name: 'high-frequency-stress-${this.testIdCounter}',
         description: 'Rapidly trigger multiple agents in quick succession',
         action: 'Edit multiple files rapidly to trigger different agents',
         expectedResult: 'All agents should respond without performance degradation',
@@ -377,11 +395,14 @@ export class TestGenerator {
 
     // Memory usage test
     scenarios.push({
+
       id: `stress-memory-usage-${this.testIdCounter++}`,
+      name: 'Memory Usage Under Load',
       featureName: 'Memory Usage Under Load',
       promise: 'Framework should maintain reasonable memory usage',
       testCases: [{
         id: `memory-stress-${this.testIdCounter}`,
+          name: 'memory-stress-${this.testIdCounter}',
         description: 'Monitor memory usage during extended framework operation',
         action: 'Run framework continuously with periodic agent activations',
         expectedResult: 'Memory usage should remain stable without leaks',
@@ -417,9 +438,9 @@ export class TestGenerator {
 
     // Primary test case
     testCases.push({
-      id: `${scenario.id}-${type}-primary`,
-      description: scenario.description,
-      action: scenario.userAction,
+          id: `${scenario.id}-${type}-primary`,
+          name: '${scenario.id}-${type}-primary',
+          description: scenario.userAction,
       expectedResult: scenario.expectedBehavior,
       passed: false
     });
@@ -427,9 +448,9 @@ export class TestGenerator {
     // Add measurable criteria as individual test cases
     scenario.measurableCriteria.forEach((criteria, index) => {
       testCases.push({
-        id: `${scenario.id}-${type}-criteria-${index}`,
-        description: `Verify: ${criteria}`,
-        action: `Validate that ${criteria.toLowerCase()}`,
+          id: `${scenario.id}-${type}-criteria-${index}`,
+          name: '${scenario.id}-${type}-criteria-${index}',
+          description: `Validate that ${criteria.toLowerCase()}`,
         expectedResult: `Criteria "${criteria}" is met`,
         passed: false
       });

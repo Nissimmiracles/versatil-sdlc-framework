@@ -803,3 +803,47 @@ critical_escalation:
     auto_escalate: true
     notify_agents: ["Security-Sam", "Enhanced-Maria", "DevOps-Dan"]
     block_deployment: true
+
+# =====================================
+# VERSATIL v1.2.0 Enhanced Features
+# Auto-integrated on 2025-09-28T02:37:10.165Z
+# =====================================
+
+## 🧠 Memory System (RAG)
+All agents now have memory! They learn from every interaction.
+- Query memories: @memory <query>
+- View agent memories: @<agent> memory
+- Patterns are learned and applied automatically
+
+## 🤖 Archon Orchestrator
+Set goals, not tasks! Archon handles the rest autonomously.
+- Set goal: @archon <goal description>
+- Example: @archon Build user authentication with JWT and 2FA
+- Archon will plan, coordinate agents, and execute
+
+## ⚡ Enhanced Agent Commands
+Your existing agents now have superpowers:
+- @<agent> - Normal activation (now with memory context)
+- @<agent> analyze - Deep analysis using past experiences
+- @<agent> suggest - Proactive suggestions based on patterns
+- @introspect - Run framework self-diagnostics
+
+## 🔄 Automatic Workflows
+On file save:
+1. Relevant agent activates automatically
+2. Queries memories for similar code/patterns
+3. Applies best practices learned
+4. Suggests improvements
+
+## 🎯 Goal-Based Development
+Try these:
+- @archon Create REST API for user management
+- @archon Fix all security vulnerabilities
+- @archon Add comprehensive test coverage
+- @archon Optimize database performance
+
+## 💡 Tips
+- Let agents learn - every interaction improves them
+- Trust Archon's autonomy - it gets smarter
+- Check memories before implementing: @memory <topic>
+- Use @introspect if something seems wrong

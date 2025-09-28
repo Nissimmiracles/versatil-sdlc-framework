@@ -6,8 +6,8 @@
  * against the VERSATIL SDLC Framework and expose architectural theater.
  */
 
-import { SimulationQA } from '../agents/simulation-qa.js';
-import { AgentActivationContext } from '../agents/base-agent.js';
+import { SimulationQA } from '../agents/simulation-qa';
+import { AgentActivationContext } from '../agents/base-agent';
 
 async function runStressTest() {
   console.log('🔥 Starting SimulationQA Stress Test...\n');
