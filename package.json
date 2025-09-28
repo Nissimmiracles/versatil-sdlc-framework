@@ -9,6 +9,7 @@
     "versatil-sdlc": "./dist/index-enhanced.js"
   },
   "scripts": {
+    "postinstall": "node scripts/setup-supabase-auto.js || true",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "build:release": "npm run lint && npm run build && npm run test:full",

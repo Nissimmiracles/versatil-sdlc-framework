@@ -1,5 +1,5 @@
-import { OperaOrchestrator } from './opera-orchestrator';
-import { VERSATILLogger } from '../utils/logger';
+import { OperaOrchestrator } from './opera-orchestrator.js';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export class EnhancedOperaOrchestrator extends OperaOrchestrator {
   private logger: VERSATILLogger;
