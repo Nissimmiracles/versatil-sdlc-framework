@@ -1,0 +1,27 @@
+apiVersion: v2
+name: versatil-framework
+description: VERSATIL SDLC Framework v3.0.0 - Universal Multi-Language AI-Native Development Platform
+type: application
+version: 3.0.0
+appVersion: "3.0.0"
+keywords:
+  - sdlc
+  - ai-native
+  - multi-language
+  - bmad
+  - development-framework
+maintainers:
+  - name: VERSATIL Core Team
+    email: info@versatil-framework.com
+home: https://github.com/MiraclesGIT/versatil-sdlc-framework
+sources:
+  - https://github.com/MiraclesGIT/versatil-sdlc-framework
+dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: redis
+    version: "17.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled

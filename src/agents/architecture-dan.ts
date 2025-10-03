@@ -1,4 +1,4 @@
-import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent.js';
+import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent';
 
 export class ArchitectureDan extends BaseAgent {
   name = 'ArchitectureDan';

@@ -1,0 +1,105 @@
+name: 🆘 Support Request
+description: Get help with using the VERSATIL SDLC Framework
+title: "[Support]: "
+labels: ["support", "question"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Need Help?
+
+        We're here to help you get VERSATIL working!
+
+        **Quick troubleshooting:**
+        1. Check [QUICKSTART.md](../../QUICKSTART.md#troubleshooting)
+        2. Run `/framework:debug` for diagnostics
+        3. Try `npm run recover` for auto-fix
+
+  - type: dropdown
+    id: support-type
+    attributes:
+      label: Support Type
+      description: What kind of help do you need?
+      options:
+        - Installation/Setup
+        - Agent Configuration
+        - Slash Commands
+        - Proactive Mode
+        - Test Suite Issues
+        - Integration Help
+        - Performance Issues
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: Describe what you're trying to do or what problem you're facing
+      placeholder: I'm trying to activate Maria-QA but...
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What Have You Tried?
+      description: List what you've already attempted
+      placeholder: |
+        - Ran npm install
+        - Checked documentation
+        - Tried /framework:doctor
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: |
+        Run these commands and paste output:
+        ```bash
+        node --version
+        npm --version
+        cat package.json | grep version
+        ```
+      placeholder: |
+        node: v20.x.x
+        npm: 10.x.x
+        versatil: 2.0.0
+      render: shell
+
+  - type: textarea
+    id: debug-report
+    attributes:
+      label: Debug Report (Optional)
+      description: |
+        Run `/framework:debug` and paste the output or attach the JSON file
+      placeholder: Paste debug output here...
+      render: json
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Screenshots, error messages, or other helpful info
+      placeholder: Add any other context...
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+        ### 🙏 Thank You!
+
+        **Response Time:**
+        - Initial response: Within 48 hours
+        - Resolution: Depends on complexity
+
+        **While you wait:**
+        - Browse [documentation](../../CLAUDE.md)
+        - Check [existing issues](../issues?q=label%3Asupport)
+        - Try [troubleshooting guide](../../QUICKSTART.md#troubleshooting)

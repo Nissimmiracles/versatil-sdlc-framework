@@ -9,6 +9,11 @@ body:
         Thanks for taking the time to report a bug in the VERSATIL SDLC Framework!
         Please fill out this form to help us understand and fix the issue.
 
+        **Before submitting:**
+        1. Run `/framework:debug` to generate a debug report
+        2. Try `npm run recover` to see if auto-fix resolves it
+        3. Search existing issues to avoid duplicates
+
   - type: checkboxes
     id: framework-components
     attributes:

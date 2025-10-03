@@ -27,7 +27,19 @@ module.exports = {
   ],
 
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest'
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: 'tsconfig.test.json',
+      isolatedModules: true,
+      useESM: false,
+      babelConfig: false,
+      diagnostics: false
+    }],
+    '^.+\\.(js|jsx)$': ['ts-jest', {
+      tsconfig: 'tsconfig.test.json',
+      isolatedModules: true,
+      useESM: false,
+      babelConfig: false
+    }]
   },
 
   // TypeScript configuration for Jest
@@ -97,9 +109,20 @@ module.exports = {
 
   // Jest projects for different test types
   projects: [
-    './jest-unit.config.js',
+    './jest-unit.config.cjs',
     {
       displayName: 'integration',
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      transform: {
+        '^.+\\.(ts|tsx)$': ['ts-jest', {
+          tsconfig: 'tsconfig.test.json',
+          isolatedModules: true,
+          useESM: false,
+          babelConfig: false,
+          diagnostics: false
+        }]
+      },
       testMatch: [
         '<rootDir>/tests/integration/**/*.{ts,tsx}',
         '<rootDir>/tests/agents/**/*.{ts,tsx}',
@@ -114,7 +137,7 @@ module.exports = {
   errorOnDeprecated: true,
 
   // Global setup for BMAD integration
-  globalSetup: '<rootDir>/tests/setup/jest-global-setup.ts',
+  globalSetup: '<rootDir>/tests/setup/jest-global-setup.js',
   globalTeardown: '<rootDir>/tests/setup/jest-global-teardown.ts',
 
   // Enhanced reporting for Maria-QA

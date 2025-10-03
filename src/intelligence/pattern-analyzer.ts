@@ -26,6 +26,7 @@ export interface PatternMatch {
   suggestion: string;
   code: string;
   category: 'bug' | 'security' | 'performance' | 'style' | 'best-practice';
+  description?: string;
 }
 
 export interface AnalysisResult {
@@ -33,6 +34,11 @@ export interface AnalysisResult {
   score: number;
   summary: string;
   recommendations: string[];
+  coverage?: number;
+  quality?: number;
+  security?: number;
+  performance?: number;
+  issues?: any[];
 }
 
 export class PatternAnalyzer {
@@ -41,7 +47,7 @@ export class PatternAnalyzer {
    */
   static analyzeQA(content: string, filePath: string, ragContext?: RAGContext): AnalysisResult {
     const patterns: PatternMatch[] = [];
-    const lines = content.split('\n');
+    const lines = (content || '').split('\n');
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;
@@ -157,10 +163,37 @@ export class PatternAnalyzer {
    */
   static analyzeFrontend(content: string, filePath: string, ragContext?: RAGContext): AnalysisResult {
     const patterns: PatternMatch[] = [];
-    const lines = content.split('\n');
+    const lines = (content || '').split('\n');
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;
+
+      // Detect debugging code
+      if (line.includes('console.log') || line.includes('console.warn')) {
+        patterns.push({
+          type: 'debugging-code',
+          severity: 'critical',
+          line: lineNum,
+          column: 0,
+          message: 'Console.log detected - remove before production',
+          suggestion: 'Remove debug logging or use proper logger',
+          code: line.trim(),
+          category: 'bug'
+        });
+      }
+
+      if (line.includes('debugger')) {
+        patterns.push({
+          type: 'debugging-code',
+          severity: 'critical',
+          line: lineNum,
+          column: 0,
+          message: 'Debugger statement detected - remove before production',
+          suggestion: 'Remove debugger statement',
+          code: line.trim(),
+          category: 'bug'
+        });
+      }
 
       // Detect inline styles
       if (line.includes('style={{') || line.includes('style="')) {
@@ -258,7 +291,7 @@ export class PatternAnalyzer {
    */
   static analyzeBackend(content: string, filePath: string, ragContext?: RAGContext): AnalysisResult {
     const patterns: PatternMatch[] = [];
-    const lines = content.split('\n');
+    const lines = (content || '').split('\n');
 
     lines.forEach((line, index) => {
       const lineNum = index + 1;

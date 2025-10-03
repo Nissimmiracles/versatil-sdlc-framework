@@ -17,14 +17,19 @@ This guide provides comprehensive context for Cursor AI when performing framewor
 - **MCP Integration**: Model Context Protocol SDK 0.5.0
 
 ### Agent Configuration
-- **Enhanced Maria-QA**: Quality assurance lead with Chrome MCP integration
-- **Enhanced James-Frontend**: Frontend specialist with navigation validation
-- **Enhanced Marcus-Backend**: Backend specialist with API integration validation
+- **Enhanced Maria-QA**: Quality assurance lead with Chrome MCP integration and rule orchestration
+- **Enhanced James-Frontend**: Frontend specialist with navigation validation and parallel execution
+- **Enhanced Marcus-Backend**: Backend specialist with API integration validation and stress testing
+- **Enhanced Sarah-PM**: Project manager and coordinator with audit reporting
 - **Security-Sam**: Security and compliance specialist
 - **DevOps-Dan**: Infrastructure and deployment specialist
-- **Sarah-PM**: Project manager and coordinator
 - **Alex-BA**: Business analyst and requirements expert
 - **Dr.AI-ML**: Machine learning and AI specialist
+
+### Three Rules Integration (v2.0)
+- **Rule 1**: Parallel Task Execution with Collision Detection
+- **Rule 2**: Automated Stress Test Generation
+- **Rule 3**: Daily Audit and Health Check System
 
 ---
 
@@ -139,6 +144,149 @@ critical_detection_patterns:
 - Test coverage: 80%+ (85%+ for agents, 90%+ for testing)
 - Zero debugging code in production
 - WCAG 2.1 AA accessibility compliance
+
+---
+
+## 🔄 **THREE RULES INTEGRATION CONTEXT**
+
+### Rule 1: Parallel Task Execution with Collision Detection
+
+#### Cursor AI Integration Features
+```yaml
+Rule_1_Cursor_Features:
+  ai_assistance:
+    - Suggest parallelization opportunities in code
+    - Detect potential resource conflicts during development
+    - Recommend task splitting for large operations
+    - Balance agent workload automatically
+    - Optimize concurrent execution patterns
+
+  monitoring_integration:
+    - Real-time task execution tracking
+    - Resource utilization visualization
+    - Collision detection alerts
+    - Performance optimization suggestions
+    - Agent coordination status
+
+  development_workflow:
+    - Auto-suggest parallel patterns for loops and operations
+    - Detect blocking operations that can be parallelized
+    - Recommend async/await patterns
+    - Identify dependency cycles in code
+    - Suggest resource allocation strategies
+```
+
+#### Configuration Files Affected
+- `.cursor/settings.json` - Rule 1 AI assistance settings
+- `src/orchestration/parallel-task-manager.ts` - Core implementation
+- `src/agents/enhanced-bmad-config.ts` - Agent rule configurations
+- `src/core/versatil-orchestrator.ts` - Central coordination
+
+### Rule 2: Automated Stress Test Generation
+
+#### Cursor AI Integration Features
+```yaml
+Rule_2_Cursor_Features:
+  ai_assistance:
+    - Identify performance bottlenecks in code
+    - Suggest stress test scenarios for new features
+    - Recommend load testing patterns
+    - Generate chaos engineering tests
+    - Predict scaling issues
+
+  development_integration:
+    - Auto-generate tests for API endpoints
+    - Suggest UI component stress tests
+    - Identify integration testing opportunities
+    - Recommend performance baselines
+    - Alert for regression potential
+
+  maria_qa_coordination:
+    - Seamless test orchestration
+    - Real-time test result feedback
+    - Automated baseline tracking
+    - Quality gate integration
+    - Performance trend analysis
+```
+
+#### Configuration Files Affected
+- `src/testing/automated-stress-test-generator.ts` - Core implementation
+- `src/agents/enhanced-bmad-config.ts` - Maria-QA rule configuration
+- `test/integration/three-rules-integration.test.ts` - Test validation
+
+### Rule 3: Daily Audit and Health Check System
+
+#### Cursor AI Integration Features
+```yaml
+Rule_3_Cursor_Features:
+  ai_assistance:
+    - Health score analysis and interpretation
+    - Predictive issue detection
+    - Auto-remediation suggestions
+    - Compliance monitoring alerts
+    - Performance trend analysis
+
+  real_time_monitoring:
+    - System health dashboard integration
+    - Resource utilization alerts
+    - Quality score tracking
+    - Security compliance status
+    - Infrastructure health monitoring
+
+  notification_integration:
+    - Cursor-native alerts for critical issues
+    - Threshold warning notifications
+    - Trend analysis summaries
+    - Remediation action suggestions
+    - Executive summary generation
+```
+
+#### Configuration Files Affected
+- `src/audit/daily-audit-system.ts` - Core implementation
+- `.cursor/settings.json` - Notification and monitoring settings
+- `src/core/versatil-orchestrator.ts` - Health monitoring integration
+
+### Cross-Rule Integration Patterns
+
+#### Rule Coordination
+```yaml
+Rule_1_to_Rule_2: # Parallel → Stress Testing
+  trigger: "Task completion in development phase"
+  action: "Auto-generate stress tests for new components/APIs"
+  cursor_ai_role: "Suggest stress test scenarios based on parallel execution patterns"
+
+Rule_2_to_Rule_3: # Stress Testing → Health Audit
+  trigger: "Stress test results indicate performance issues"
+  action: "Trigger immediate health audit and optimization"
+  cursor_ai_role: "Analyze test results and suggest audit focus areas"
+
+Rule_3_to_Rule_1: # Health Audit → Parallel Tasks
+  trigger: "Audit identifies optimization opportunities"
+  action: "Create parallel remediation tasks across agents"
+  cursor_ai_role: "Recommend parallel execution strategies for fixes"
+```
+
+#### Cursor AI Enhancement Strategies
+```yaml
+AI_Enhancement_Strategies:
+  rule_aware_suggestions:
+    - Code suggestions consider all three rules
+    - Parallel execution opportunities highlighted
+    - Performance implications analyzed
+    - Quality gates integrated into suggestions
+
+  cross_rule_optimization:
+    - Suggestions optimize for multiple rules simultaneously
+    - Performance and quality balanced in recommendations
+    - Resource utilization considered in all suggestions
+    - Agent collaboration patterns recommended
+
+  predictive_assistance:
+    - Anticipate rule conflicts and suggest resolutions
+    - Predict performance issues before they occur
+    - Recommend proactive optimizations
+    - Suggest preventive measures
+```
 
 ---
 

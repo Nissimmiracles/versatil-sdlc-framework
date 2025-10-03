@@ -12,12 +12,14 @@ import * as path from 'path';
 export interface AgentMemory {
   id: string;
   agentId: string;
-  type: 'code' | 'decision' | 'pattern' | 'error' | 'success' | 'learning';
+  type: 'code' | 'decision' | 'pattern' | 'error' | 'success' | 'learning' | 'rule_execution' | 'cross_rule_optimization';
   content: any;
   context: any;
   timestamp: number;
   relevance?: number;
   tags: string[];
+  ruleId?: string;
+  ruleType?: 'parallel_execution' | 'stress_testing' | 'daily_audit';
 }
 
 export interface FullAgentContext {
@@ -109,7 +111,9 @@ export class AgenticRAGOrchestrator extends EventEmitter {
     patterns: new EnhancedVectorMemoryStore(),
     ui: new EnhancedVectorMemoryStore(),
     errors: new EnhancedVectorMemoryStore(),
-    learnings: new EnhancedVectorMemoryStore()
+    learnings: new EnhancedVectorMemoryStore(),
+    rule_execution: new EnhancedVectorMemoryStore(),
+    cross_rule_optimization: new EnhancedVectorMemoryStore()
   };
   
   // Agent-specific memory indexes
@@ -119,7 +123,23 @@ export class AgenticRAGOrchestrator extends EventEmitter {
   private patternDetector = {
     codePatterns: new Map<string, Pattern>(),
     errorPatterns: new Map<string, Pattern>(),
-    successPatterns: new Map<string, Pattern>()
+    successPatterns: new Map<string, Pattern>(),
+    rulePatterns: new Map<string, Pattern>(),
+    crossRulePatterns: new Map<string, Pattern>()
+  };
+
+  // Rule execution tracking
+  private ruleExecutionMetrics = {
+    parallel_execution: { successes: 0, failures: 0, avgTime: 0, collisions: 0 },
+    stress_testing: { testsGenerated: 0, testsRun: 0, failuresDetected: 0, avgDuration: 0 },
+    daily_audit: { auditsRun: 0, issuesFound: 0, avgScore: 0, trends: [] as any[] }
+  };
+
+  // Cross-rule optimization knowledge
+  private crossRuleKnowledge = {
+    synergies: new Map<string, any>(), // Rule combinations that work well together
+    conflicts: new Map<string, any>(), // Rule combinations that interfere
+    optimizations: new Map<string, any>() // Learned optimization patterns
   };
 
   constructor(paths: IsolatedPaths) {
@@ -720,4 +740,395 @@ export class AgenticRAGOrchestrator extends EventEmitter {
 
   async searchAllStores(query: any): Promise<any[]> { return []; }
   async getMemoryStatistics(): Promise<any> { return {}; }
+
+  /**
+   * Store rule execution result for learning
+   */
+  public async storeRuleExecution(
+    ruleType: 'parallel_execution' | 'stress_testing' | 'daily_audit',
+    ruleId: string,
+    executionData: any
+  ): Promise<void> {
+    const memory: AgentMemory = {
+      id: this.generateMemoryId(),
+      agentId: 'versatil-orchestrator',
+      type: 'rule_execution',
+      ruleId,
+      ruleType,
+      content: {
+        ruleType,
+        ruleId,
+        ...executionData,
+        timestamp: Date.now()
+      },
+      context: {
+        systemLoad: await this.getSystemLoad(),
+        activeAgents: await this.getActiveAgents(),
+        projectPhase: await this.getCurrentProjectPhase()
+      },
+      timestamp: Date.now(),
+      tags: ['rule_execution', ruleType, executionData.success ? 'success' : 'failure']
+    };
+
+    // Store in rule execution memory store
+    await this.memoryStores.rule_execution.storeMemory({
+      content: JSON.stringify(memory.content),
+      metadata: {
+        agentId: memory.agentId,
+        timestamp: memory.timestamp,
+        tags: memory.tags,
+        context: memory.context,
+        ruleType,
+        ruleId
+      }
+    });
+
+    // Update metrics
+    this.updateRuleMetrics(ruleType, executionData);
+
+    // Detect rule patterns
+    await this.detectRulePatterns(memory);
+
+    this.logger.debug('Stored rule execution memory', { ruleType, ruleId, success: executionData.success });
+  }
+
+  /**
+   * Store cross-rule optimization insights
+   */
+  public async storeCrossRuleOptimization(
+    ruleTypes: string[],
+    optimizationData: any
+  ): Promise<void> {
+    const memory: AgentMemory = {
+      id: this.generateMemoryId(),
+      agentId: 'versatil-orchestrator',
+      type: 'cross_rule_optimization',
+      content: {
+        ruleTypes,
+        optimization: optimizationData,
+        impact: optimizationData.impact,
+        confidence: optimizationData.confidence
+      },
+      context: {
+        combinationKey: ruleTypes.sort().join('_'),
+        timestamp: Date.now()
+      },
+      timestamp: Date.now(),
+      tags: ['cross_rule', 'optimization', ...ruleTypes]
+    };
+
+    // Store in cross-rule memory store
+    await this.memoryStores.cross_rule_optimization.storeMemory({
+      content: JSON.stringify(memory.content),
+      metadata: {
+        agentId: memory.agentId,
+        timestamp: memory.timestamp,
+        tags: memory.tags,
+        context: memory.context,
+        ruleTypes: ruleTypes.join(',')
+      }
+    });
+
+    // Update cross-rule knowledge
+    await this.updateCrossRuleKnowledge(ruleTypes, optimizationData);
+
+    this.logger.info('Stored cross-rule optimization', { ruleTypes, impact: optimizationData.impact });
+  }
+
+  /**
+   * Get rule execution insights for optimization
+   */
+  public async getRuleExecutionInsights(ruleType?: string): Promise<any> {
+    const insights = {
+      metrics: ruleType ? this.ruleExecutionMetrics[ruleType as keyof typeof this.ruleExecutionMetrics] : this.ruleExecutionMetrics,
+      patterns: await this.getRulePatterns(ruleType),
+      crossRuleOptimizations: await this.getCrossRuleOptimizations(ruleType),
+      recommendations: await this.generateRuleRecommendations(ruleType)
+    };
+
+    return insights;
+  }
+
+  /**
+   * Get context enhanced with rule execution memory
+   */
+  public async getContextWithRuleMemory(agentId: string, task: any): Promise<FullAgentContext> {
+    const baseContext = await this.getContextForAgent(agentId, task);
+
+    // Add rule execution memories
+    const ruleMemories = await this.getRuleExecutionMemories(task);
+    baseContext.memories.push(...ruleMemories);
+
+    // Add cross-rule optimizations
+    const crossRuleInsights = await this.getCrossRuleInsights(task);
+    (baseContext as any).ruleInsights = crossRuleInsights;
+
+    return baseContext;
+  }
+
+  /**
+   * Detect patterns in rule executions
+   */
+  private async detectRulePatterns(memory: AgentMemory): Promise<void> {
+    const similarExecutions = await this.findSimilarRuleExecutions(memory);
+
+    if (similarExecutions.length >= 3) {
+      const pattern: Pattern = {
+        id: this.generatePatternId(),
+        type: `rule_${memory.ruleType}`,
+        description: this.describeRulePattern(similarExecutions),
+        examples: similarExecutions.map(m => m.id)
+      };
+
+      this.patternDetector.rulePatterns.set(pattern.id, pattern);
+
+      // Store pattern in RAG
+      await this.memoryStores.patterns.storeMemory({
+        content: JSON.stringify(pattern),
+        contentType: 'code' as const,
+        metadata: {
+          agentId: memory.agentId,
+          timestamp: Date.now(),
+          tags: ['pattern', 'rule', memory.ruleType!],
+          ruleType: memory.ruleType
+        }
+      });
+
+      this.emit('rule_pattern:detected', pattern);
+    }
+  }
+
+  /**
+   * Update rule execution metrics
+   */
+  private updateRuleMetrics(ruleType: string, executionData: any): void {
+    const metrics = this.ruleExecutionMetrics[ruleType as keyof typeof this.ruleExecutionMetrics];
+    if (!metrics) return;
+
+    if (executionData.success) {
+      metrics.successes++;
+    } else {
+      metrics.failures++;
+    }
+
+    // Update specific metrics based on rule type
+    if (ruleType === 'parallel_execution') {
+      if (executionData.avgTime) {
+        metrics.avgTime = (metrics.avgTime + executionData.avgTime) / 2;
+      }
+      if (executionData.collisions) {
+        (metrics as any).collisions += executionData.collisions;
+      }
+    } else if (ruleType === 'stress_testing') {
+      if (executionData.testsGenerated) {
+        (metrics as any).testsGenerated += executionData.testsGenerated;
+      }
+      if (executionData.testsRun) {
+        (metrics as any).testsRun += executionData.testsRun;
+      }
+    } else if (ruleType === 'daily_audit') {
+      if (executionData.score) {
+        (metrics as any).avgScore = ((metrics as any).avgScore + executionData.score) / 2;
+      }
+    }
+  }
+
+  /**
+   * Update cross-rule knowledge base
+   */
+  private async updateCrossRuleKnowledge(ruleTypes: string[], optimizationData: any): Promise<void> {
+    const combinationKey = ruleTypes.sort().join('_');
+
+    if (optimizationData.impact > 0.1) {
+      // Positive synergy
+      this.crossRuleKnowledge.synergies.set(combinationKey, {
+        ruleTypes,
+        impact: optimizationData.impact,
+        confidence: optimizationData.confidence,
+        description: optimizationData.description,
+        lastUpdated: Date.now()
+      });
+    } else if (optimizationData.impact < -0.1) {
+      // Negative interaction (conflict)
+      this.crossRuleKnowledge.conflicts.set(combinationKey, {
+        ruleTypes,
+        impact: optimizationData.impact,
+        confidence: optimizationData.confidence,
+        description: optimizationData.description,
+        lastUpdated: Date.now()
+      });
+    }
+
+    // Store optimization pattern
+    if (optimizationData.optimization) {
+      this.crossRuleKnowledge.optimizations.set(combinationKey, {
+        ruleTypes,
+        optimization: optimizationData.optimization,
+        effectiveness: optimizationData.effectiveness,
+        lastUpdated: Date.now()
+      });
+    }
+  }
+
+  /**
+   * Get rule execution memories relevant to current task
+   */
+  private async getRuleExecutionMemories(task: any): Promise<AgentMemory[]> {
+    const ruleMemories = await this.memoryStores.rule_execution.searchMemories(
+      task.description || 'rule execution',
+      { limit: 10, rerank: true }
+    );
+
+    return ruleMemories.map(r => ({
+      id: r.id,
+      agentId: r.metadata.agentId,
+      type: 'rule_execution' as const,
+      content: JSON.parse(r.content),
+      context: r.metadata.context,
+      timestamp: r.metadata.timestamp,
+      relevance: r.similarity,
+      tags: r.metadata.tags || [],
+      ruleType: r.metadata.ruleType
+    }));
+  }
+
+  /**
+   * Get cross-rule insights for current task
+   */
+  private async getCrossRuleInsights(task: any): Promise<any> {
+    const crossRuleMemories = await this.memoryStores.cross_rule_optimization.searchMemories(
+      task.description || 'cross rule',
+      { limit: 5 }
+    );
+
+    return {
+      optimizations: crossRuleMemories.map(r => JSON.parse(r.content)),
+      synergies: Array.from(this.crossRuleKnowledge.synergies.values()),
+      conflicts: Array.from(this.crossRuleKnowledge.conflicts.values()),
+      recommendations: await this.generateCrossRuleRecommendations(task)
+    };
+  }
+
+  /**
+   * Generate rule-specific recommendations
+   */
+  private async generateRuleRecommendations(ruleType?: string): Promise<string[]> {
+    const recommendations: string[] = [];
+
+    if (!ruleType || ruleType === 'parallel_execution') {
+      const parallelMetrics = this.ruleExecutionMetrics.parallel_execution;
+      if (parallelMetrics.collisions > parallelMetrics.successes * 0.1) {
+        recommendations.push('Consider reducing parallel task concurrency to minimize collisions');
+      }
+      if (parallelMetrics.avgTime > 5000) {
+        recommendations.push('Optimize parallel task execution times through better resource allocation');
+      }
+    }
+
+    if (!ruleType || ruleType === 'stress_testing') {
+      const stressMetrics = this.ruleExecutionMetrics.stress_testing;
+      if (stressMetrics.failuresDetected > stressMetrics.testsRun * 0.3) {
+        recommendations.push('High failure rate detected - consider improving test coverage or implementation quality');
+      }
+    }
+
+    if (!ruleType || ruleType === 'daily_audit') {
+      const auditMetrics = this.ruleExecutionMetrics.daily_audit;
+      if (auditMetrics.avgScore < 0.8) {
+        recommendations.push('Average audit score below threshold - implement targeted improvements');
+      }
+    }
+
+    return recommendations;
+  }
+
+  /**
+   * Generate cross-rule recommendations
+   */
+  private async generateCrossRuleRecommendations(task: any): Promise<string[]> {
+    const recommendations: string[] = [];
+
+    // Check for beneficial synergies
+    for (const synergy of this.crossRuleKnowledge.synergies.values()) {
+      if (synergy.impact > 0.2 && synergy.confidence > 0.8) {
+        recommendations.push(`Consider combining ${synergy.ruleTypes.join(' + ')} for enhanced performance`);
+      }
+    }
+
+    // Warn about conflicts
+    for (const conflict of this.crossRuleKnowledge.conflicts.values()) {
+      if (Math.abs(conflict.impact) > 0.2 && conflict.confidence > 0.8) {
+        recommendations.push(`Avoid running ${conflict.ruleTypes.join(' + ')} simultaneously to prevent conflicts`);
+      }
+    }
+
+    return recommendations;
+  }
+
+  // Helper methods for new functionality
+  private async getSystemLoad(): Promise<number> {
+    // Get current system load metrics
+    return 0.5; // Placeholder
+  }
+
+  private async getActiveAgents(): Promise<string[]> {
+    // Get list of currently active agents
+    return Array.from(this.agentMemories.keys());
+  }
+
+  private async getCurrentProjectPhase(): Promise<string> {
+    // Determine current project phase
+    return 'development'; // Placeholder
+  }
+
+  private async getRulePatterns(ruleType?: string): Promise<Pattern[]> {
+    const patterns: Pattern[] = [];
+
+    for (const pattern of this.patternDetector.rulePatterns.values()) {
+      if (!ruleType || pattern.type.includes(ruleType)) {
+        patterns.push(pattern);
+      }
+    }
+
+    return patterns;
+  }
+
+  private async getCrossRuleOptimizations(ruleType?: string): Promise<any[]> {
+    const optimizations: any[] = [];
+
+    for (const optimization of this.crossRuleKnowledge.optimizations.values()) {
+      if (!ruleType || optimization.ruleTypes.includes(ruleType)) {
+        optimizations.push(optimization);
+      }
+    }
+
+    return optimizations;
+  }
+
+  private async findSimilarRuleExecutions(memory: AgentMemory): Promise<AgentMemory[]> {
+    const similar: AgentMemory[] = [];
+
+    // Search in rule execution store
+    const results = await this.memoryStores.rule_execution.searchMemories(
+      JSON.stringify(memory.content).substring(0, 100),
+      { limit: 10 }
+    );
+
+    return results.map(r => ({
+      id: r.id,
+      agentId: r.metadata.agentId,
+      type: 'rule_execution' as const,
+      content: JSON.parse(r.content),
+      context: r.metadata.context,
+      timestamp: r.metadata.timestamp,
+      tags: r.metadata.tags || [],
+      ruleType: r.metadata.ruleType
+    })).filter(m => m.id !== memory.id && m.ruleType === memory.ruleType);
+  }
+
+  private describeRulePattern(executions: AgentMemory[]): string {
+    const ruleType = executions[0]?.ruleType;
+    const successRate = executions.filter(e => e.content.success).length / executions.length;
+    return `Rule ${ruleType} pattern: ${executions.length} executions with ${(successRate * 100).toFixed(1)}% success rate`;
+  }
 }

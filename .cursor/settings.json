@@ -95,7 +95,218 @@
     "@/agents/*": "${workspaceRoot}/src/agents/*",
     "@/services/*": "${workspaceRoot}/src/services/*",
     "@/utils/*": "${workspaceRoot}/src/utils/*",
-    "@/tests/*": "${workspaceRoot}/tests/*"
+    "@/tests/*": "${workspaceRoot}/tests/*",
+    "@/orchestration/*": "${workspaceRoot}/src/orchestration/*",
+    "@/testing/*": "${workspaceRoot}/src/testing/*",
+    "@/audit/*": "${workspaceRoot}/src/audit/*",
+    "@/core/*": "${workspaceRoot}/src/core/*"
   },
+
+  "versatil.rules": {
+    "rule1_parallel_execution": {
+      "enabled": true,
+      "monitoring": true,
+      "max_concurrent_suggestions": 5,
+      "collision_detection": true,
+      "auto_optimization": true,
+      "ai_assistance": {
+        "suggest_parallelization": true,
+        "detect_resource_conflicts": true,
+        "recommend_task_splitting": true,
+        "agent_workload_balancing": true
+      }
+    },
+    "rule2_stress_testing": {
+      "enabled": true,
+      "auto_generation": true,
+      "ai_assistance": {
+        "suggest_test_scenarios": true,
+        "identify_performance_bottlenecks": true,
+        "recommend_load_patterns": true,
+        "generate_chaos_scenarios": true
+      },
+      "integration": {
+        "maria_qa_coordination": true,
+        "real_time_feedback": true,
+        "baseline_tracking": true,
+        "regression_alerts": true
+      }
+    },
+    "rule3_daily_audit": {
+      "enabled": true,
+      "frequency": "daily",
+      "real_time_monitoring": true,
+      "ai_assistance": {
+        "health_score_analysis": true,
+        "predictive_issue_detection": true,
+        "auto_remediation_suggestions": true,
+        "compliance_monitoring": true
+      },
+      "notifications": {
+        "cursor_alerts": true,
+        "threshold_warnings": true,
+        "trend_analysis": true,
+        "executive_summaries": false
+      }
+    }
+  },
+
+  "versatil.ai_enhancements": {
+    "rule_aware_suggestions": true,
+    "cross_rule_optimization": true,
+    "performance_insights": true,
+    "quality_gate_integration": true,
+    "agent_collaboration_hints": true,
+    "bmad_methodology_enforcement": true
+  },
+
+  "versatil.monitoring": {
+    "real_time_metrics": true,
+    "rule_execution_tracking": true,
+    "agent_performance_monitoring": true,
+    "resource_utilization_alerts": true,
+    "quality_score_tracking": true,
+    "trend_analysis_enabled": true
+  },
+
+  "claude.statusline": {
+    "enabled": true,
+    "script": ".claude/hooks/statusline/sync-status.sh",
+    "refresh_interval": 5000
+  },
+
+  "versatil.proactive_agents": {
+    "enabled": true,
+    "auto_activation": true,
+    "background_monitoring": true,
+    "inline_suggestions": true,
+    "statusline_updates": true,
+    "slash_commands_fallback": true,
+
+    "activation_triggers": {
+      "maria-qa": {
+        "file_patterns": ["*.test.*", "**/__tests__/**", "**/test/**", "*.spec.*"],
+        "code_patterns": ["describe(", "it(", "test(", "expect(", "jest.", "vitest."],
+        "keywords": ["test", "spec", "coverage", "quality"],
+        "auto_run_on_save": true,
+        "background_analysis": true,
+        "proactive_actions": [
+          "test_coverage_analysis",
+          "missing_test_detection",
+          "assertion_validation",
+          "quality_gate_enforcement"
+        ]
+      },
+      "james-frontend": {
+        "file_patterns": ["*.tsx", "*.jsx", "*.vue", "*.svelte", "*.css", "*.scss", "*.sass"],
+        "code_patterns": ["useState", "useEffect", "component", "props", "className"],
+        "keywords": ["component", "react", "vue", "ui", "frontend", "responsive"],
+        "auto_run_on_save": true,
+        "background_analysis": true,
+        "proactive_actions": [
+          "accessibility_check_wcag",
+          "component_structure_validation",
+          "responsive_design_verification",
+          "performance_optimization_suggestions"
+        ]
+      },
+      "marcus-backend": {
+        "file_patterns": ["*.api.*", "**/routes/**", "**/controllers/**", "**/server/**", "**/backend/**"],
+        "code_patterns": ["router.", "app.", "express.", "fastify.", "async function"],
+        "keywords": ["api", "server", "database", "auth", "security"],
+        "auto_run_on_save": true,
+        "background_analysis": true,
+        "proactive_actions": [
+          "security_pattern_validation_owasp",
+          "response_time_check_200ms",
+          "stress_test_generation",
+          "database_query_optimization"
+        ]
+      },
+      "sarah-pm": {
+        "file_patterns": ["*.md", "**/docs/**", "README.*", "CHANGELOG.*", "*.config.*"],
+        "code_patterns": ["# ", "## ", "- [ ]", "TODO", "FIXME"],
+        "keywords": ["project", "plan", "milestone", "documentation"],
+        "auto_run_on_milestone": true,
+        "background_analysis": false,
+        "proactive_actions": [
+          "sprint_report_generation",
+          "milestone_tracking",
+          "documentation_consistency_check"
+        ]
+      },
+      "alex-ba": {
+        "file_patterns": ["**/requirements/**", "*.feature", "*.story", "**/specs/**"],
+        "code_patterns": ["As a", "Given", "When", "Then"],
+        "keywords": ["requirement", "user story", "feature", "business logic"],
+        "auto_run_on_issue": true,
+        "background_analysis": false,
+        "proactive_actions": [
+          "requirement_extraction",
+          "user_story_generation",
+          "acceptance_criteria_validation"
+        ]
+      },
+      "dr-ai-ml": {
+        "file_patterns": ["*.py", "*.ipynb", "**/models/**", "**/ml/**", "**/ai/**"],
+        "code_patterns": ["import tensorflow", "import torch", "model.", "train("],
+        "keywords": ["machine learning", "model", "dataset", "training"],
+        "auto_run_on_save": true,
+        "background_analysis": true,
+        "proactive_actions": [
+          "model_performance_validation",
+          "data_quality_check",
+          "training_optimization_suggestions"
+        ]
+      }
+    },
+
+    "collaboration_patterns": {
+      "auto_handoff": true,
+      "parallel_agents": {
+        "enabled": true,
+        "max_concurrent": 3,
+        "coordination_via": "sarah-pm"
+      },
+      "context_preservation": {
+        "enabled": true,
+        "use_rag": true,
+        "use_claude_memory": true
+      }
+    },
+
+    "real_time_feedback": {
+      "statusline": {
+        "enabled": true,
+        "show_progress": true,
+        "show_active_agents": true,
+        "show_quality_score": true
+      },
+      "inline_annotations": {
+        "enabled": true,
+        "severity_colors": {
+          "error": "red",
+          "warning": "yellow",
+          "info": "blue",
+          "hint": "gray"
+        }
+      },
+      "notifications": {
+        "enabled": true,
+        "quality_gate_failures": true,
+        "test_failures": true,
+        "security_alerts": true
+      }
+    },
+
+    "quality_gates": {
+      "enforce_on_save": false,
+      "enforce_on_commit": true,
+      "enforce_on_push": true,
+      "block_on_failure": true,
+      "minimum_coverage": 80,
+      "maximum_response_time_ms": 200
+    }
+  }
 
 }

@@ -1,67 +1,59 @@
 /**
- * VERSATIL SDLC Framework - Jest Unit Testing Configuration
+ * VERSATIL SDLC Framework - Jest Unit Test Configuration
  * Enhanced Maria-QA Unit Testing Setup
+ *
+ * This configuration is specifically for unit tests only.
+ * Integration tests are handled separately in jest.config.cjs
  */
 
-export default {
-  displayName: 'unit',
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['<rootDir>/tests/unit'],
+module.exports = {
+  displayName: {
+    name: 'UNIT',
+    color: 'cyan'
+  },
 
-  // Unit test matching
+  // Unit test matching patterns
   testMatch: [
-    '<rootDir>/tests/unit/**/*.test.ts',
-    '<rootDir>/tests/unit/**/*.spec.ts'
+    '<rootDir>/src/**/__tests__/**/*.{ts,tsx,js}',
+    '<rootDir>/src/**/*.test.{ts,tsx,js}',
+    '<rootDir>/src/**/*.spec.{ts,tsx,js}',
+    // Explicitly exclude e2e and integration tests
+    '!**/*.e2e.{ts,tsx,js}',
+    '!**/*.playwright.{ts,tsx,js}',
+    '!**/*.integration.{ts,tsx,js}',
+    '!**/e2e/**',
+    '!**/integration/**'
   ],
 
-  // TypeScript transformation
-  transform: {
-    '^.+\\.ts$': 'ts-jest'
-  },
+  // Coverage collection for unit tests only
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/**/*.test.{ts,tsx}',
+    '!src/**/*.spec.{ts,tsx}',
+    '!src/**/*.e2e.{ts,tsx}',
+    '!src/**/*.playwright.{ts,tsx}',
+    '!src/**/*.integration.{ts,tsx}',
+    // Exclude test utilities and mocks
+    '!src/**/mocks/**',
+    '!src/**/stubs/**',
+    '!src/**/__tests__/**'
+  ],
 
-  // Module resolution
-  moduleFileExtensions: ['ts', 'js', 'json'],
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-    '^@/types/(.*)$': '<rootDir>/src/types/$1',
-    '^@/agents/(.*)$': '<rootDir>/src/agents/$1',
-    '^@/utils/(.*)$': '<rootDir>/src/utils/$1'
-  },
-
-  // TypeScript Jest configuration
-  globals: {
-    'ts-jest': {
-      tsconfig: {
-        target: 'ES2020',
-        module: 'commonjs',
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
-        strict: true
-      }
+  // Unit test specific coverage thresholds
+  coverageThreshold: {
+    global: {
+      branches: 75,
+      functions: 75,
+      lines: 75,
+      statements: 75
     }
   },
 
-  // Coverage configuration
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts'
-  ],
+  // Unit tests should be fast - run in parallel
+  maxWorkers: '50%',
 
-  coverageDirectory: 'coverage/unit',
-  coverageReporters: ['text', 'lcov', 'html'],
-
-  // Test timeout
-  testTimeout: 10000,
-
-  // Setup
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-
-  // Enhanced Maria-QA settings
-  verbose: true,
-  bail: false,
-  clearMocks: true,
-  restoreMocks: true
+  // Cache for faster reruns
+  cache: true,
+  cacheDirectory: '<rootDir>/.jest-cache/unit'
 };

@@ -1,5 +1,5 @@
-import { BaseAgent, AgentResponse, AgentActivationContext } from '../base-agent.js';
-import { VERSATILLogger } from '../../utils/logger.js';
+import { BaseAgent, AgentResponse, AgentActivationContext } from '../base-agent';
+import { VERSATILLogger } from '../../utils/logger';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';

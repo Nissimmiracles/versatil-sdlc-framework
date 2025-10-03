@@ -1,14 +1,14 @@
 # VERSATIL Framework Test Report
 
-**Generated:** 9/28/2025, 10:12:36 PM
+**Generated:** 9/29/2025, 2:00:41 AM
 **Framework:** VERSATIL SDLC Framework v1.2.1
 **Test Runner:** Enhanced Test Runner
 
 ## Summary
 
-- **Total Phases:** 3/4 passed
-- **Success Rate:** 75.0%
-- **Total Duration:** 46.96s
+- **Total Phases:** 1/7 passed
+- **Success Rate:** 14.3%
+- **Total Duration:** 20.00s
 - **System:** darwin arm64
 - **Node Version:** v24.7.0
 
@@ -16,10 +16,13 @@
 
 | Phase | Status | Duration | Details |
 |-------|--------|----------|---------|
-| Script Validation (Phase 1) | ❌ Fail | 32.23s | Command failed: npm run validate:scripts |
-| Enhanced Maria Integration (Phase 2) | ✅ Pass | 0.93s | - |
-| End-to-End Integration (Phase 3) | ✅ Pass | 7.32s | - |
-| TypeScript Build | ✅ Pass | 6.06s | - |
+| Script Validation (Phase 1) | ❌ Fail | 0.60s | Command failed: npm run validate:scripts |
+| Enhanced Maria Integration (Phase 2) | ❌ Fail | 2.94s | Command failed: npm run test:phase2 |
+| End-to-End Integration (Phase 3) | ❌ Fail | 7.38s | Command failed: npm run test:phase3 |
+| Jest Unit Tests | ❌ Fail | 2.32s | Command failed: npm run test:unit |
+| Jest Integration Tests | ❌ Fail | 1.66s | Command failed: npm run test:integration |
+| Demo Scenarios | ✅ Pass | 0.29s | - |
+| TypeScript Build | ❌ Fail | 4.10s | Command failed: npm run build |
 
 ---
 

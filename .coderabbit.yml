@@ -1,0 +1,231 @@
+# CodeRabbit Configuration for VERSATIL SDLC Framework
+# AI-powered code review optimized for BMAD methodology and framework patterns
+
+language: en-US
+early_access: false
+
+# Review Configuration
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: true
+  review_status: true
+  collapse_walkthrough: false
+
+  # Automatic Review Settings
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+      - master
+      - develop
+      - release/*
+
+  # Path-based review customization
+  path_filters:
+    # Focus on core framework files
+    high_priority:
+      - src/orchestration/**
+      - src/agents/**
+      - src/testing/**
+      - src/audit/**
+      - src/onboarding/**
+      - src/automation/**
+      - .cursor/**
+      - .versatil/**
+
+    # Documentation and configuration
+    medium_priority:
+      - docs/**
+      - README.md
+      - CLAUDE.md
+      - package.json
+      - tsconfig.json
+      - playwright.config.ts
+
+    # Test files (important but different focus)
+    test_files:
+      - test/**
+      - __tests__/**
+      - "**/*.test.*"
+      - "**/*.spec.*"
+
+# Chat Configuration
+chat:
+  auto_reply: true
+
+# Custom Instructions for VERSATIL Framework
+tone_instructions: |
+  You are reviewing code for the VERSATIL SDLC Framework - an advanced AI-native development framework
+  implementing the BMAD (Business-Managed Agile Development) methodology.
+
+  **Primary Focus Areas:**
+
+  🎯 **Framework Architecture:**
+  - Agent coordination patterns and handoff mechanisms
+  - Rule integration compliance (5 core rules)
+  - Event-driven architecture and EventEmitter usage
+  - TypeScript strict mode adherence
+  - Memory management and resource optimization
+
+  🤖 **BMAD Methodology Compliance:**
+  - Agent specialization boundaries (Maria-QA, James-Frontend, Marcus-Backend, etc.)
+  - Context preservation during agent switches
+  - Quality gates enforcement at 80%+ coverage
+  - Cross-agent collaboration protocols
+  - Zero-context-loss architecture
+
+  📋 **Five Rules System Integration:**
+  1. **Parallel Execution**: Check for collision detection, resource management
+  2. **Stress Testing**: Validate test generation patterns, coverage strategies
+  3. **Daily Audit**: Ensure health monitoring, trend analysis accuracy
+  4. **Intelligent Onboarding**: Review user experience flows, automation quality
+  5. **Bug Collection/Release**: Validate automation patterns, release logic
+
+  🔧 **Technical Standards:**
+  - TypeScript best practices and strict typing
+  - Async/await patterns and error handling
+  - Dependency injection and modularity
+  - Performance optimization (especially for parallel operations)
+  - Security considerations (no hardcoded secrets, proper validation)
+  - Logging and monitoring integration
+
+  🚀 **Code Quality Expectations:**
+  - Clean, self-documenting code with meaningful names
+  - Comprehensive error handling and graceful degradation
+  - Proper separation of concerns and single responsibility
+  - Interface-driven design and dependency inversion
+  - Unit test coverage for critical paths
+
+  **Review Approach:**
+  - Be constructive and provide specific, actionable suggestions
+  - Highlight any violations of framework conventions or BMAD principles
+  - Focus on maintainability, scalability, and performance
+  - Ensure documentation adequacy for complex algorithms
+  - Validate integration points between different framework components
+  - Check for proper agent coordination and rule compliance
+
+  **Special Attention For:**
+  - Agent handoff logic and context preservation
+  - Rule execution coordination and conflict prevention
+  - Memory store operations and RAG integration
+  - Parallel execution safety and resource management
+  - User onboarding flows and automation accuracy
+  - Bug collection algorithms and release automation
+
+  Always consider the framework's goal of providing zero-context-loss AI assistance
+  and maintaining the highest quality standards for open-source excellence.
+
+# File-specific review instructions
+path_instructions:
+  - path: "src/orchestration/**"
+    instructions: |
+      Focus on:
+      - Agent coordination logic and handoff mechanisms
+      - Event emission patterns and listener management
+      - Resource allocation and conflict detection
+      - Cross-rule interaction patterns
+      - Performance optimization for parallel operations
+
+  - path: "src/agents/**"
+    instructions: |
+      Focus on:
+      - Agent specialization boundaries and role clarity
+      - Configuration pattern consistency
+      - Auto-activation logic and trigger conditions
+      - Tool integration and dependency management
+      - Rule-specific trigger implementations
+
+  - path: "src/testing/**"
+    instructions: |
+      Focus on:
+      - Test generation algorithms and coverage strategies
+      - Stress test scenario creation and validation
+      - Integration with Maria-QA agent patterns
+      - Performance testing implementation
+      - Test result analysis and reporting
+
+  - path: "src/audit/**"
+    instructions: |
+      Focus on:
+      - Health monitoring algorithms and metric collection
+      - Trend analysis accuracy and prediction logic
+      - Audit scheduling and automation patterns
+      - Report generation and actionable insights
+      - Integration with daily workflow automation
+
+  - path: "src/onboarding/**"
+    instructions: |
+      Focus on:
+      - User experience flow and automation quality
+      - Project analysis accuracy and technology detection
+      - Configuration generation and validation
+      - Error handling and recovery mechanisms
+      - Progress tracking and user feedback
+
+  - path: "src/automation/**"
+    instructions: |
+      Focus on:
+      - Bug collection algorithms and pattern recognition
+      - Release automation logic and version management
+      - GitHub API integration and error handling
+      - CodeRabbit integration patterns
+      - Security considerations for automated operations
+
+  - path: ".cursor/**"
+    instructions: |
+      Focus on:
+      - Cursor AI integration correctness
+      - MCP configuration accuracy
+      - Settings optimization for development workflow
+      - Framework update context completeness
+
+  - path: ".versatil/**"
+    instructions: |
+      Focus on:
+      - Agent configuration consistency
+      - Project configuration validation
+      - Memory store structure and integrity
+      - Rule integration accuracy
+
+  - path: "test/**"
+    instructions: |
+      Focus on:
+      - Test coverage adequacy and edge case handling
+      - Integration test completeness
+      - Performance test accuracy
+      - Mock and stub quality
+      - Test data management and cleanup
+
+# Ignore patterns (files not to review)
+ignore:
+  - "node_modules/**"
+  - "dist/**"
+  - "build/**"
+  - ".git/**"
+  - "*.log"
+  - "coverage/**"
+  - ".nyc_output/**"
+  - "**/*.min.js"
+  - "**/*.bundle.js"
+
+# Security and performance focus
+security_review: true
+performance_review: true
+
+# Enable learning from repository patterns
+learn_from_repository: true
+
+# Quality gate settings
+quality_gate:
+  min_score: 85
+  fail_on_security_issues: true
+  fail_on_performance_regressions: true
+
+# Collaboration settings
+collaboration:
+  enable_suggestions: true
+  enable_discussions: true
+  notify_on_changes: true

@@ -1,52 +1,52 @@
 {
-  "timestamp": "2025-09-28T13:46:09.348Z",
+  "timestamp": "2025-09-28T23:26:41.368Z",
   "totalTests": 12,
-  "passedTests": 9,
-  "failedTests": 3,
+  "passedTests": 4,
+  "failedTests": 8,
   "testSuites": {
     "Build System Stability": {
       "name": "Build System Stability",
-      "startTime": 1759067169349,
+      "startTime": 1759102001369,
       "tests": [
         {
           "name": "Clean Build",
-          "status": "PASSED",
-          "duration": 1347,
-          "result": "Build completed successfully"
+          "status": "FAILED",
+          "duration": 2229,
+          "error": "Command failed: npm run build"
         },
         {
           "name": "Incremental Build",
-          "status": "PASSED",
-          "duration": 2104,
-          "result": "Incremental build completed"
+          "status": "FAILED",
+          "duration": 4220,
+          "error": "Command failed: npm run build"
         },
         {
           "name": "Build Artifacts Validation",
-          "status": "PASSED",
+          "status": "FAILED",
           "duration": 0,
-          "result": "All 6 build artifacts present"
+          "error": "Missing build artifacts: dist/mcp-server.js"
         }
       ],
-      "passed": 3,
-      "failed": 0,
+      "passed": 0,
+      "failed": 3,
       "errors": [],
       "warnings": [],
-      "duration": 3451
+      "duration": 6449
     },
     "MCP Server Stability": {
       "name": "MCP Server Stability",
-      "startTime": 1759067172800,
+      "startTime": 1759102007818,
       "tests": [
         {
           "name": "MCP Server Startup",
           "status": "FAILED",
-          "duration": 60003,
+          "duration": 60004,
           "error": "Server startup timeout (60s)"
         },
         {
           "name": "MCP Tools Availability",
           "status": "FAILED",
-          "duration": 30017,
+          "duration": 30002,
           "error": "MCP tools test timeout"
         }
       ],
@@ -54,16 +54,16 @@
       "failed": 2,
       "errors": [],
       "warnings": [],
-      "duration": 90021
+      "duration": 90008
     },
     "Agent System Stability": {
       "name": "Agent System Stability",
-      "startTime": 1759067262821,
+      "startTime": 1759102097826,
       "tests": [
         {
           "name": "Agent Registry Loading",
           "status": "PASSED",
-          "duration": 1,
+          "duration": 0,
           "result": "All 6 agents available"
         },
         {
@@ -77,50 +77,50 @@
       "failed": 0,
       "errors": [],
       "warnings": [],
-      "duration": 1
+      "duration": 0
     },
     "ES Module Stability": {
       "name": "ES Module Stability",
-      "startTime": 1759067262822,
+      "startTime": 1759102097826,
       "tests": [
         {
           "name": "Import Resolution",
           "status": "FAILED",
-          "duration": 12,
-          "error": "ES module import issues found: dist/adaptive-agent-creator.js: import { VERSATILAgentDispatcher } from './agent-dispatcher', dist/agents/agent-registry.js: import { EnhancedMaria } from './enhanced-maria', dist/agents/agent-registry.js: import { EnhancedJames } from './enhanced-james', dist/agents/agent-registry.js: import { EnhancedMarcus } from './enhanced-marcus', dist/agents/agent-registry.js: import { SarahPm } from './sarah-pm' (and 28 more)"
+          "duration": 11,
+          "error": "ES module import issues found: dist/adaptive-agent-creator.js: import { VERSATILAgentDispatcher } from './agent-dispatcher', dist/agents/introspective/enhanced-introspective-agent.js: import { BaseAgent } from '../base-agent', dist/agents/introspective/enhanced-introspective-agent.js: import { vectorMemoryStore } from '../../rag/vector-memory-store', dist/agents/introspective/enhanced-introspective-agent.js: import { environmentScanner } from '../../environment/environment-scanner', dist/agents/introspective/full-context-introspective-agent.js: import { BaseAgent } from '../base-agent' (and 3 more)"
         }
       ],
       "passed": 0,
       "failed": 1,
       "errors": [],
       "warnings": [],
-      "duration": 12
+      "duration": 11
     },
     "TypeScript Compilation": {
       "name": "TypeScript Compilation",
-      "startTime": 1759067262834,
+      "startTime": 1759102097837,
       "tests": [
         {
           "name": "TypeScript Type Check",
-          "status": "PASSED",
-          "duration": 1344,
-          "result": "TypeScript compilation clean"
+          "status": "FAILED",
+          "duration": 917,
+          "error": "TypeScript compilation has 6 errors"
         }
       ],
-      "passed": 1,
-      "failed": 0,
+      "passed": 0,
+      "failed": 1,
       "errors": [],
       "warnings": [],
-      "duration": 1344
+      "duration": 917
     },
     "File System Operations": {
       "name": "File System Operations",
-      "startTime": 1759067264178,
+      "startTime": 1759102098754,
       "tests": [
         {
           "name": "Directory Operations",
           "status": "PASSED",
-          "duration": 0,
+          "duration": 1,
           "result": "File system operations working"
         }
       ],
@@ -128,31 +128,28 @@
       "failed": 0,
       "errors": [],
       "warnings": [],
-      "duration": 0
+      "duration": 1
     },
     "Performance Benchmarks": {
       "name": "Performance Benchmarks",
-      "startTime": 1759067264179,
+      "startTime": 1759102098755,
       "tests": [
         {
           "name": "Build Performance",
-          "status": "PASSED",
-          "duration": 1232,
-          "result": "Build completed in 1232ms",
-          "performance": {
-            "buildTime": 1232
-          }
+          "status": "FAILED",
+          "duration": 2063,
+          "error": "Command failed: npm run build"
         }
       ],
-      "passed": 1,
-      "failed": 0,
+      "passed": 0,
+      "failed": 1,
       "errors": [],
       "warnings": [],
-      "duration": 1232
+      "duration": 2063
     },
     "Integration Tests": {
       "name": "Integration Tests",
-      "startTime": 1759067265411,
+      "startTime": 1759102100818,
       "tests": [
         {
           "name": "E2E Framework Integration",

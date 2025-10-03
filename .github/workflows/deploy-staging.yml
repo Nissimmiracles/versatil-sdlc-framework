@@ -1,0 +1,258 @@
+name: 🚀 Deploy to Staging
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment even if tests fail'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+  VERSATIL_ENV: staging
+
+jobs:
+  pre-deployment:
+    name: 🔍 Pre-Deployment Validation
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.validation.outputs.should_deploy }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build for Staging
+        run: |
+          export VERSATIL_ENV=staging
+          npm run build
+
+      - name: 🧪 Run Critical Tests
+        run: |
+          npm run test:critical
+          npm run test:integration:staging
+
+      - name: 🔍 Deployment Validation
+        id: validation
+        run: |
+          # Check if deployment should proceed
+          if [[ "${{ github.event.inputs.force_deploy }}" == "true" ]]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          else
+            # Run comprehensive validation
+            npm run validate:deployment:staging
+            if [ $? -eq 0 ]; then
+              echo "should_deploy=true" >> $GITHUB_OUTPUT
+            else
+              echo "should_deploy=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: 📝 Generate Version
+        id: version
+        run: |
+          VERSION=$(npm run version:generate --silent)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+  deploy-staging:
+    name: 🚀 Deploy to Staging Environment
+    runs-on: ubuntu-latest
+    needs: pre-deployment
+    if: needs.pre-deployment.outputs.should_deploy == 'true'
+    environment:
+      name: staging
+      url: https://staging.versatil.dev
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔧 Configure Staging Environment
+        run: |
+          cp config/environments/staging.json .versatil/current-env.json
+          echo "VERSATIL_ENV=staging" >> $GITHUB_ENV
+
+      - name: 🏗️ Build for Staging
+        run: npm run build:staging
+        env:
+          VERSATIL_ENV: staging
+          SUPABASE_URL: ${{ secrets.SUPABASE_STAGING_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_STAGING_ANON_KEY }}
+
+      - name: 🚀 Deploy Infrastructure
+        run: |
+          # Deploy using your preferred method (Docker, Kubernetes, etc.)
+          npm run deploy:infrastructure:staging
+        env:
+          DEPLOY_TOKEN: ${{ secrets.STAGING_DEPLOY_TOKEN }}
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+
+      - name: 🚀 Deploy Application
+        run: |
+          npm run deploy:app:staging
+        env:
+          DEPLOY_TOKEN: ${{ secrets.STAGING_DEPLOY_TOKEN }}
+
+      - name: ⏳ Wait for Deployment
+        run: |
+          echo "Waiting for deployment to be ready..."
+          npm run wait:deployment:staging --timeout=300
+
+      - name: 🩺 Health Check
+        run: |
+          npm run health:check:staging
+          if [ $? -ne 0 ]; then
+            echo "❌ Health check failed"
+            exit 1
+          fi
+
+  post-deployment:
+    name: 📊 Post-Deployment Validation
+    runs-on: ubuntu-latest
+    needs: [pre-deployment, deploy-staging]
+    if: success()
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Smoke Tests
+        run: |
+          npm run test:smoke:staging
+        env:
+          STAGING_URL: https://staging.versatil.dev
+
+      - name: ⚡ Performance Tests
+        run: |
+          npm run test:performance:staging
+          npx lighthouse https://staging.versatil.dev --output json --output-path lighthouse-staging.json
+
+      - name: 🔒 Security Validation
+        run: |
+          npm run test:security:staging
+          # OWASP ZAP baseline scan
+          docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py \
+            -t https://staging.versatil.dev -J staging-security-report.json
+
+      - name: 📊 Generate Deployment Report
+        run: |
+          mkdir -p deployment-reports
+          echo "# 🚀 Staging Deployment Report" > deployment-reports/staging-report.md
+          echo "## 📅 Deployment Date: $(date)" >> deployment-reports/staging-report.md
+          echo "## 📝 Version: ${{ needs.pre-deployment.outputs.version }}" >> deployment-reports/staging-report.md
+          echo "## 🔗 URL: https://staging.versatil.dev" >> deployment-reports/staging-report.md
+
+          # Add performance metrics
+          if [ -f lighthouse-staging.json ]; then
+            PERFORMANCE_SCORE=$(cat lighthouse-staging.json | jq '.lhr.categories.performance.score * 100')
+            echo "## ⚡ Performance Score: ${PERFORMANCE_SCORE}/100" >> deployment-reports/staging-report.md
+          fi
+
+      - name: 📤 Upload Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: staging-deployment-reports
+          path: |
+            deployment-reports/
+            lighthouse-staging.json
+            staging-security-report.json
+
+      - name: 📧 Notify Team
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          text: |
+            🚀 Staging deployment completed successfully!
+            📝 Version: ${{ needs.pre-deployment.outputs.version }}
+            🔗 URL: https://staging.versatil.dev
+            📊 Reports available in GitHub Actions artifacts
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  rollback:
+    name: 🔄 Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, post-deployment]
+    if: failure()
+    steps:
+      - name: 📂 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔄 Rollback Deployment
+        run: |
+          echo "🔄 Rolling back staging deployment..."
+          npm run rollback:staging
+        env:
+          DEPLOY_TOKEN: ${{ secrets.STAGING_DEPLOY_TOKEN }}
+
+      - name: 🩺 Verify Rollback
+        run: |
+          npm run health:check:staging
+          if [ $? -eq 0 ]; then
+            echo "✅ Rollback successful"
+          else
+            echo "❌ Rollback failed - manual intervention required"
+            exit 1
+          fi
+
+      - name: 🚨 Alert on Rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "text": "🚨 Staging deployment failed and was rolled back",
+              "color": "danger",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🔄 *Staging Rollback Alert*\n\nDeployment failed and has been automatically rolled back.\n\n*Action Required:* Please review the failed deployment logs."
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

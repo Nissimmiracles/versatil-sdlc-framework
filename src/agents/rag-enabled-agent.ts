@@ -7,9 +7,9 @@
  * - Generate context-aware prompts with historical knowledge
  */
 
-import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent.js';
-import { EnhancedVectorMemoryStore, MemoryDocument, RAGQuery } from '../rag/enhanced-vector-memory-store.js';
-import { AnalysisResult } from '../intelligence/pattern-analyzer.js';
+import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent';
+import { EnhancedVectorMemoryStore, MemoryDocument, RAGQuery } from '../rag/enhanced-vector-memory-store';
+import { AnalysisResult } from '../intelligence/pattern-analyzer';
 
 export interface RAGConfig {
   maxExamples: number;
@@ -420,10 +420,10 @@ export abstract class RAGEnabledAgent extends BaseAgent {
   }
 
   protected detectFramework(content: string): string {
-    if (content.includes('react') || content.includes('useState')) return 'React';
-    if (content.includes('vue') || content.includes('Vue')) return 'Vue';
-    if (content.includes('angular')) return 'Angular';
-    if (content.includes('express') || content.includes('app.get')) return 'Express';
+    if (content.includes('react') || content.includes('useState')) return 'react';
+    if (content.includes('vue') || content.includes('Vue')) return 'vue';
+    if (content.includes('angular')) return 'angular';
+    if (content.includes('express') || content.includes('app.get')) return 'express';
     return '';
   }
 
@@ -467,6 +467,14 @@ export abstract class RAGEnabledAgent extends BaseAgent {
   }
 
   protected calculatePriorityWithRAG(analysis: AnalysisResult, ragContext?: AgentRAGContext): string {
+    // Check for critical severity issues first
+    const hasCritical = analysis.patterns.some(p => p.severity === 'critical');
+    if (hasCritical) return 'critical';
+
+    const hasHigh = analysis.patterns.some(p => p.severity === 'high');
+    if (hasHigh) return 'high';
+
+    // Fall back to score-based priority
     let basePriority = analysis.score < 60 ? 'high' : analysis.score < 80 ? 'medium' : 'low';
 
     // Boost priority if RAG context shows this is a recurring issue

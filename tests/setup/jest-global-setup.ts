@@ -3,9 +3,14 @@
  * Enhanced Maria-QA Unit Testing Initialization
  */
 
+// Extend global type without breaking Jest
 declare global {
+  // eslint-disable-next-line no-var
   var bmadJestConfig: any;
 }
+
+// Required for TypeScript to treat this as a module
+export {};
 
 export default async function jestGlobalSetup() {
   console.log('🧪 VERSATIL SDLC Framework - Starting Jest Global Setup');

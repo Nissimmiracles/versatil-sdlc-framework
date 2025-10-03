@@ -1,0 +1,130 @@
+# VERSATIL Framework v3.0.0 - Docker Compose Configuration
+# Multi-service deployment with framework, database, and RAG memory
+
+version: '3.8'
+
+services:
+  # VERSATIL Framework Core
+  versatil-framework:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: versatil-sdlc-framework:3.0.0
+    container_name: versatil-framework
+    ports:
+      - "3000:3000"  # Framework API
+      - "8080:8080"  # Admin dashboard
+      - "9090:9090"  # Metrics endpoint
+    environment:
+      - NODE_ENV=production
+      - VERSATIL_HOME=/app
+      - DATABASE_URL=postgresql://versatil:versatil@postgres:5432/versatil
+      - REDIS_URL=redis://redis:6379
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - versatil-data:/app/data
+      - versatil-logs:/app/.versatil/logs
+    networks:
+      - versatil-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "dist/index.js", "--health-check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL Database (for distributed RAG memory)
+  postgres:
+    image: postgres:15-alpine
+    container_name: versatil-postgres
+    environment:
+      - POSTGRES_DB=versatil
+      - POSTGRES_USER=versatil
+      - POSTGRES_PASSWORD=versatil
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - versatil-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U versatil"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (for caching and distributed state)
+  redis:
+    image: redis:7-alpine
+    container_name: versatil-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - versatil-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # BMAD Agent - Maria-QA (dedicated container for testing)
+  maria-qa-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: versatil-sdlc-framework:3.0.0
+    container_name: maria-qa-agent
+    environment:
+      - NODE_ENV=production
+      - AGENT_MODE=maria-qa
+      - DATABASE_URL=postgresql://versatil:versatil@postgres:5432/versatil
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - versatil-network
+    restart: unless-stopped
+    command: ["--agent", "maria-qa", "--watch"]
+
+  # BMAD Agent - Marcus-Backend (dedicated container for backend orchestration)
+  marcus-backend-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: versatil-sdlc-framework:3.0.0
+    container_name: marcus-backend-agent
+    environment:
+      - NODE_ENV=production
+      - AGENT_MODE=marcus-backend
+      - DATABASE_URL=postgresql://versatil:versatil@postgres:5432/versatil
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - versatil-network
+    restart: unless-stopped
+    command: ["--agent", "marcus-backend", "--watch"]
+
+networks:
+  versatil-network:
+    driver: bridge
+
+volumes:
+  versatil-data:
+    driver: local
+  versatil-logs:
+    driver: local
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local

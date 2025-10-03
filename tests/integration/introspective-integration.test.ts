@@ -2,15 +2,53 @@
  * Integration tests for IntrospectiveAgent with the VERSATIL framework
  */
 
-import { IntrospectiveAgent } from '../../src/agents/introspective-agent';
+import {
+  IntrospectiveAgent,
+  TestFileSystemProvider,
+  TestCommandExecutor
+} from '../../src/agents/introspective-agent';
 import { agentRegistry } from '../../src/agents/agent-registry';
 import { createIntrospectiveScheduler } from '../../src/utils/introspective-scheduler';
 
 describe('IntrospectiveAgent Integration', () => {
   let agent: IntrospectiveAgent;
+  let testFS: TestFileSystemProvider;
+  let testExec: TestCommandExecutor;
+  let scheduler: any;
 
   beforeEach(() => {
-    agent = new IntrospectiveAgent();
+    // Create test implementations for integration tests
+    testFS = new TestFileSystemProvider({
+      'package.json': JSON.stringify({ name: 'test-integration', version: '1.0.0' }),
+      'tsconfig.json': JSON.stringify({ compilerOptions: {} }),
+      'jest.config.cjs': 'module.exports = {};',
+      'src/index.ts': 'export const test = true;',
+      '.versatil-project.json': JSON.stringify({ projectId: 'integration-test' })
+    });
+
+    testExec = new TestCommandExecutor();
+    testExec.setResponse('npm run build', '✓ Build successful in 2.5s', '', 100);
+    testExec.setResponse('npm test -- --silent', '✓ 50 tests passed', '', 50);
+    testExec.setResponse('npm run lint', '✓ No linting errors', '', 25);
+    testExec.setResponse(
+      'npm audit --json',
+      JSON.stringify({
+        metadata: {
+          vulnerabilities: { total: 0, low: 0, moderate: 0, high: 0, critical: 0 }
+        }
+      }),
+      '',
+      25
+    );
+
+    agent = new IntrospectiveAgent(testFS, testExec);
+  });
+
+  afterEach(() => {
+    // Clean up scheduler if created
+    if (scheduler && scheduler.stop) {
+      scheduler.stop();
+    }
   });
 
   describe('Framework Integration', () => {
@@ -41,7 +79,7 @@ describe('IntrospectiveAgent Integration', () => {
 
   describe('Scheduler Integration', () => {
     it('should create scheduler successfully', () => {
-      const scheduler = createIntrospectiveScheduler(agent);
+      scheduler = createIntrospectiveScheduler(agent, { autoStart: false });
       expect(scheduler).toBeDefined();
 
       const metrics = scheduler.getMetrics();
@@ -50,7 +88,7 @@ describe('IntrospectiveAgent Integration', () => {
     });
 
     it('should provide dashboard functionality', () => {
-      const scheduler = createIntrospectiveScheduler(agent, { autoStart: false });
+      scheduler = createIntrospectiveScheduler(agent, { autoStart: false });
       const dashboard = scheduler.generateDashboard();
 
       expect(dashboard.status).toBe('stopped');

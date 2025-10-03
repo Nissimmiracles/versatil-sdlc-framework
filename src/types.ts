@@ -10,6 +10,7 @@ export interface AgentResponse {
   handoffTo: string[];
   context: any;
   data?: any;
+  analysis?: any;
 }
 
 export interface AgentActivationContext {
@@ -38,4 +39,6 @@ export interface Recommendation {
   priority: string;
   message: string;
   actions?: string[];
+  estimatedEffort?: string;
+  autoFixable?: boolean;
 }

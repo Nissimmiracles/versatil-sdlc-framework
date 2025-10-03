@@ -7,7 +7,11 @@
       "env": {
         "NODE_ENV": "production",
         "VERSATIL_MCP_MODE": "true",
-        "VERSATIL_HOME": "~/.versatil"
+        "VERSATIL_HOME": "~/.versatil",
+        "VERSATIL_RULES_ENABLED": "true",
+        "RULE_1_PARALLEL_EXECUTION": "true",
+        "RULE_2_STRESS_TESTING": "true",
+        "RULE_3_DAILY_AUDIT": "true"
       }
     },
     "claude-code-mcp": {
@@ -16,6 +20,133 @@
       "env": {
         "MCP_CLAUDE_DEBUG": "false"
       }
+    }
+  },
+  "versatil_rule_integration": {
+    "rule_1_parallel_execution": {
+      "mcp_tools": [
+        "parallel_task_manager",
+        "collision_detector",
+        "resource_monitor",
+        "agent_coordinator"
+      ],
+      "ai_assistance": {
+        "suggest_parallelization": true,
+        "detect_conflicts": true,
+        "optimize_resources": true,
+        "balance_workload": true
+      },
+      "monitoring": {
+        "real_time_tracking": true,
+        "performance_metrics": true,
+        "collision_alerts": true,
+        "optimization_suggestions": true
+      }
+    },
+    "rule_2_stress_testing": {
+      "mcp_tools": [
+        "stress_test_generator",
+        "test_orchestrator",
+        "performance_analyzer",
+        "regression_detector"
+      ],
+      "ai_assistance": {
+        "generate_scenarios": true,
+        "identify_bottlenecks": true,
+        "recommend_patterns": true,
+        "predict_scaling": true
+      },
+      "integration": {
+        "maria_qa_coordination": true,
+        "real_time_feedback": true,
+        "baseline_tracking": true,
+        "quality_gates": true
+      }
+    },
+    "rule_3_daily_audit": {
+      "mcp_tools": [
+        "audit_orchestrator",
+        "health_monitor",
+        "compliance_checker",
+        "trend_analyzer"
+      ],
+      "ai_assistance": {
+        "health_analysis": true,
+        "predictive_detection": true,
+        "remediation_suggestions": true,
+        "compliance_monitoring": true
+      },
+      "notifications": {
+        "cursor_alerts": true,
+        "threshold_warnings": true,
+        "trend_reports": true,
+        "executive_summaries": true
+      }
+    }
+  },
+  "cross_rule_coordination": {
+    "enabled": true,
+    "orchestrator": "versatil_orchestrator",
+    "rule_interactions": {
+      "rule_1_to_2": {
+        "trigger": "task_completion",
+        "action": "generate_stress_tests",
+        "ai_role": "suggest_test_scenarios"
+      },
+      "rule_2_to_3": {
+        "trigger": "performance_issues",
+        "action": "trigger_audit",
+        "ai_role": "analyze_results"
+      },
+      "rule_3_to_1": {
+        "trigger": "optimization_opportunities",
+        "action": "create_parallel_tasks",
+        "ai_role": "recommend_strategies"
+      }
+    },
+    "ai_enhancements": {
+      "rule_aware_suggestions": true,
+      "cross_rule_optimization": true,
+      "predictive_assistance": true,
+      "conflict_resolution": true
+    }
+  },
+  "mcp_tool_mappings": {
+    "parallel_execution": {
+      "namespace": "versatil.rules.parallel",
+      "tools": [
+        "execute_parallel_tasks",
+        "detect_collisions",
+        "optimize_resources",
+        "monitor_performance"
+      ]
+    },
+    "stress_testing": {
+      "namespace": "versatil.rules.stress",
+      "tools": [
+        "generate_stress_tests",
+        "execute_tests",
+        "analyze_results",
+        "track_regression"
+      ]
+    },
+    "daily_audit": {
+      "namespace": "versatil.rules.audit",
+      "tools": [
+        "run_audit",
+        "monitor_health",
+        "check_compliance",
+        "analyze_trends"
+      ]
+    },
+    "orchestration": {
+      "namespace": "versatil.orchestrator",
+      "tools": [
+        "coordinate_rules",
+        "optimize_cross_rule",
+        "resolve_conflicts",
+        "track_metrics"
+      ]
     }
   }
 }
