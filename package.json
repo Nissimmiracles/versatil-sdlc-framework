@@ -45,6 +45,8 @@
     "simulation:capability-matrix": "node dist/simulation/capability-matrix.js",
     "simulation:quick": "node dist/simulation/quick-stress-test.js",
     "test:full": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "doctor": "node scripts/doctor-integration.cjs --check-all",
+    "doctor:fix": "node scripts/doctor-integration.cjs --auto-fix",
     "test:maria-qa": "npm run test:coverage && npm run test:e2e:all",
     "playwright:install": "playwright install chromium",
     "playwright:ui": "playwright test --ui",

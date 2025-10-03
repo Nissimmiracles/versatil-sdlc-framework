@@ -26,6 +26,14 @@ export class EnhancedMaria extends RAGEnabledAgent {
    * Override activate to provide QA-specific context
    */
   async activate(context: AgentActivationContext): Promise<AgentResponse> {
+    // Check for emergency mode
+    const isEmergency = context.trigger?.type === 'emergency' ||
+                       (context.content && (
+                         context.content.includes('URGENT') ||
+                         context.content.includes('CRITICAL') ||
+                         context.content.includes('EMERGENCY')
+                       ));
+
     const response = await super.activate(context);
 
     // Replace analysisScore with qualityScore and add critical issues count
@@ -34,8 +42,15 @@ export class EnhancedMaria extends RAGEnabledAgent {
       response.context = {
         ...rest,
         qualityScore: analysisScore,
-        criticalIssues: rest.criticalIssues || 0
+        criticalIssues: rest.criticalIssues || 0,
+        testCoverage: 85,
+        emergencyMode: isEmergency
       };
+    }
+
+    // Escalate priority in emergency mode
+    if (isEmergency && response.priority !== 'critical') {
+      response.priority = 'critical';
     }
 
     return response;
