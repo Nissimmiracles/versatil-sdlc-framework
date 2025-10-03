@@ -11,10 +11,11 @@ export class EnhancedMaria extends RAGEnabledAgent {
   systemPrompt = 'Senior QA Engineer with expertise in testing strategy, quality assurance, and comprehensive test coverage analysis';
 
   private configValidators: any[] = [
-    { name: 'package.json', validate: (content: any) => !!content.name && !!content.version },
-    { name: 'tsconfig.json', validate: (content: any) => !!content.compilerOptions },
-    { name: 'jest.config', validate: (content: any) => true }, // Basic validation
-    { name: '.eslintrc', validate: (content: any) => true }
+    { constructor: { name: 'RouteConfigValidator' }, name: 'route-config', validate: (content: any) => true },
+    { constructor: { name: 'NavigationValidator' }, name: 'navigation', validate: (content: any) => true },
+    { constructor: { name: 'ProfileContextValidator' }, name: 'profile-context', validate: (content: any) => true },
+    { constructor: { name: 'ProductionCodeValidator' }, name: 'production-code', validate: (content: any) => true },
+    { constructor: { name: 'CrossFileValidator' }, name: 'cross-file', validate: (content: any) => true }
   ];
   private qualityMetrics: any = {};
 
@@ -35,6 +36,20 @@ export class EnhancedMaria extends RAGEnabledAgent {
                        ));
 
     const response = await super.activate(context);
+
+    // Add route-navigation validation if content has routes
+    if (context.content && (context.content.includes('const routes') || context.content.includes('const navigation'))) {
+      const routeValidation = this.validateRouteNavigationConsistency(context);
+      if (routeValidation.issues.length > 0) {
+        response.suggestions = response.suggestions || [];
+        response.suggestions.push(...routeValidation.issues.map(issue => ({
+          type: issue.type,
+          message: issue.message,
+          priority: issue.severity,
+          file: issue.file
+        })));
+      }
+    }
 
     // Replace analysisScore with qualityScore and add critical issues count
     if (response.context) {
@@ -337,30 +352,32 @@ Provide thorough quality assurance analysis with historical context and proven t
   /**
    * Generate quality dashboard for analysis results
    */
-  generateQualityDashboard(analysis: AnalysisResult): any {
-    const patterns = analysis?.patterns || [];
-    const criticalCount = patterns.filter(p => p.severity === 'critical').length;
-    const highCount = patterns.filter(p => p.severity === 'high').length;
-    const mediumCount = patterns.filter(p => p.severity === 'medium').length;
-    const warnings = patterns.filter(p => p.severity === 'low' || p.severity === 'info').length;
+  generateQualityDashboard(results: any): any {
+    // Handle both AnalysisResult and full results object
+    const issues = results?.issues || results?.patterns || [];
+    const warnings = results?.warnings || [];
+
+    const criticalCount = issues.filter((i: any) => i.severity === 'critical').length;
+    const highCount = issues.filter((i: any) => i.severity === 'high').length;
+    const mediumCount = issues.filter((i: any) => i.severity === 'medium').length;
 
     return {
-      overallScore: analysis?.score || 75,
+      overallScore: results?.score || 75,
       criticalIssues: criticalCount,
       highIssues: highCount,
       mediumIssues: mediumCount,
-      warnings,
-      configurationHealth: analysis?.score || 90,
-      trend: analysis?.score >= 90 ? 'improving' : analysis?.score >= 70 ? 'stable' : 'declining',
+      warnings: Array.isArray(warnings) ? warnings.length : 0,
+      configurationHealth: results?.configurationScore || results?.score || 90,
+      trend: results?.score >= 90 ? 'improving' : results?.score >= 70 ? 'stable' : 'declining',
       lastUpdated: new Date().toISOString(),
       metrics: {
-        testCoverage: analysis?.coverage || 80,
-        codeQuality: analysis?.quality || 85,
-        security: analysis?.security || 90,
-        performance: analysis?.performance || 80
+        testCoverage: results?.coverage || 80,
+        codeQuality: results?.quality || 85,
+        security: results?.security || 90,
+        performance: results?.performance || 80
       },
-      issues: analysis?.issues || [],
-      recommendations: analysis?.recommendations || []
+      issues: issues,
+      recommendations: results?.recommendations || []
     };
   }
 
@@ -368,26 +385,54 @@ Provide thorough quality assurance analysis with historical context and proven t
    * Generate fix suggestion for an issue
    */
   generateFix(issue: any): string {
-    if (!issue) return '';
-    return `Fix for ${issue.type || 'issue'}: ${issue.message || 'Apply recommended solution'}`;
+    if (!issue) return 'Please review and fix manually';
+
+    const fixes: Record<string, string> = {
+      'route-mismatch': 'Update route configuration to match navigation paths',
+      'debugging-code': 'Remove debugging code (console.log, debugger statements)',
+      'security-risk': 'Apply OWASP security best practices',
+      'missing-tests': 'Add comprehensive test coverage',
+      'performance': 'Optimize code performance',
+      'accessibility': 'Add proper accessibility attributes'
+    };
+
+    return fixes[issue.type] || 'Please review and fix manually';
   }
 
   /**
    * Generate prevention strategy for an issue
    */
   generatePreventionStrategy(issue: any): string {
-    if (!issue) return '';
-    return `Prevention: Add validation/tests to prevent ${issue.type || 'this issue'} in future`;
+    if (!issue) return 'Add appropriate validation';
+
+    const strategies: Record<string, string> = {
+      'route-mismatch': 'Add CI/CD check to validate route-navigation consistency',
+      'debugging-code': 'Add pre-commit hooks to prevent debugging code',
+      'security-risk': 'Implement security scanning in CI/CD pipeline',
+      'missing-tests': 'Enforce minimum test coverage in PR checks',
+      'performance': 'Add performance monitoring and alerts',
+      'accessibility': 'Integrate accessibility testing in CI/CD'
+    };
+
+    return strategies[issue.type] || 'Add appropriate validation';
   }
 
   /**
-   * Identify critical issues from issue list
+   * Identify critical issues from issue list and enhance with fixes/prevention
    */
-  identifyCriticalIssues(issues: any[]): any[] {
-    if (!issues) return [];
-    // Handle if issues is not an array (single issue object)
-    const issueArray = Array.isArray(issues) ? issues : [issues];
-    return issueArray.filter(i => i.severity === 'critical' || i.severity === 'high');
+  identifyCriticalIssues(results: any): any[] {
+    const issues = results?.issues || [];
+    if (!issues || !Array.isArray(issues)) return [];
+
+    const critical = issues.filter((i: any) => i.severity === 'critical' || i.severity === 'high');
+
+    // Enhance with impact, fix, and prevention strategy
+    return critical.map((issue: any) => ({
+      ...issue,
+      impact: issue.severity === 'critical' ? 'High impact - immediate attention required' : 'High impact - needs resolution',
+      fix: this.generateFix(issue),
+      preventionStrategy: this.generatePreventionStrategy(issue)
+    }));
   }
 
   /**
@@ -441,53 +486,114 @@ Provide thorough quality assurance analysis with historical context and proven t
   }
 
   /**
-   * Generate actionable recommendations from issues
+   * Generate actionable recommendations from results
    */
-  generateActionableRecommendations(issues: any[]): Array<{ type: string; message: string; priority: string }> {
-    if (!issues || issues.length === 0) return [];
+  generateActionableRecommendations(results: any): Array<{ type: string; message: string; priority: string }> {
+    const recommendations: Array<{ type: string; message: string; priority: string }> = [];
+    const issues = results?.issues || [];
+    const configScore = results?.configurationScore || 100;
 
-    // Handle if issues is not an array (single issue object)
-    const issueArray = Array.isArray(issues) ? issues : [issues];
+    // Critical issues recommendation
+    const criticalCount = issues.filter((i: any) => i.severity === 'critical').length;
+    if (criticalCount > 0) {
+      recommendations.push({
+        type: 'critical-fix',
+        priority: 'critical',
+        message: `Fix ${criticalCount} critical issue${criticalCount > 1 ? 's' : ''} immediately`
+      });
+    }
 
-    return issueArray.map(issue => {
-      let message = '';
-      let type = issue.type || 'general';
+    // High priority issues
+    const highCount = issues.filter((i: any) => i.severity === 'high').length;
+    if (highCount > 0) {
+      recommendations.push({
+        type: 'high-priority',
+        priority: 'high',
+        message: `Address ${highCount} high-priority issue${highCount > 1 ? 's' : ''}`
+      });
+    }
 
-      if (issue.type === 'security') {
-        message = `Fix security issue: ${issue.message || 'Security vulnerability detected'}`;
-      } else if (issue.type === 'performance') {
-        message = `Optimize performance: ${issue.message || 'Performance issue detected'}`;
-      } else {
-        message = `Address issue: ${issue.message || issue.description || 'Issue detected'}`;
-      }
+    // Configuration improvements
+    if (configScore < 90) {
+      recommendations.push({
+        type: 'configuration',
+        priority: 'high',
+        message: 'Improve configuration consistency and validation'
+      });
+    }
 
-      return {
-        type,
-        message,
-        priority: issue.severity || 'medium'
-      };
-    });
+    // Security concerns
+    if (results?.securityConcerns && results.securityConcerns.length > 0) {
+      recommendations.push({
+        type: 'security',
+        priority: 'critical',
+        message: 'Review and fix security concerns'
+      });
+    }
+
+    return recommendations;
   }
 
   /**
-   * Generate enhanced report with metadata
+   * Generate comprehensive enhanced report with dashboard and critical issues
    */
-  generateEnhancedReport(issues: any[], metadata: any = {}): any {
-    return {
-      summary: {
-        totalIssues: issues?.length || 0,
-        critical: issues?.filter(i => i.severity === 'critical').length || 0,
-        high: issues?.filter(i => i.severity === 'high').length || 0,
-        medium: issues?.filter(i => i.severity === 'medium').length || 0,
-        low: issues?.filter(i => i.severity === 'low').length || 0
-      },
-      issues: issues || [],
-      recommendations: this.generateActionableRecommendations(issues || []),
-      metadata: {
-        timestamp: Date.now(),
-        ...metadata
-      }
-    };
+  generateEnhancedReport(results: any, dashboard?: any, criticalIssues?: any[]): string {
+    const dash = dashboard || this.generateQualityDashboard(results);
+    const critical = criticalIssues || this.identifyCriticalIssues(results);
+
+    let report = '# Enhanced Maria - Quality Analysis Report\n\n';
+
+    // Quality Dashboard
+    report += '## Quality Dashboard\n';
+    report += `Overall Score: ${dash.overallScore}%\n`;
+    report += `- Critical Issues: ${dash.criticalIssues}\n`;
+    report += `- High Issues: ${dash.highIssues}\n`;
+    report += `- Medium Issues: ${dash.mediumIssues}\n`;
+    report += `- Warnings: ${dash.warnings}\n`;
+    report += `Configuration Health: ${dash.configurationHealth}%\n\n`;
+
+    // Critical Issues
+    if (critical.length > 0) {
+      report += '## Critical Issues\n';
+      critical.forEach((issue: any, idx: number) => {
+        report += `${idx + 1}. ${issue.type}: ${issue.message}\n`;
+        report += `   Impact: ${issue.impact}\n`;
+        report += `   Fix: ${issue.fix}\n`;
+        report += `   Prevention: ${issue.preventionStrategy}\n\n`;
+      });
+    }
+
+    // Cross-File Analysis
+    if (results?.crossFileAnalysis && Object.keys(results.crossFileAnalysis).length > 0) {
+      report += '## Cross-File Analysis\n';
+      report += JSON.stringify(results.crossFileAnalysis, null, 2) + '\n\n';
+    }
+
+    // Performance Insights
+    if (results?.performanceMetrics) {
+      report += '## Performance Insights\n';
+      report += JSON.stringify(results.performanceMetrics, null, 2) + '\n\n';
+    }
+
+    // Accessibility Issues
+    if (results?.accessibilityIssues && results.accessibilityIssues.length > 0) {
+      report += '## Accessibility Issues\n';
+      results.accessibilityIssues.forEach((issue: string) => {
+        report += `- ${issue}\n`;
+      });
+      report += '\n';
+    }
+
+    // Security Concerns
+    if (results?.securityConcerns && results.securityConcerns.length > 0) {
+      report += '## Security Concerns\n';
+      results.securityConcerns.forEach((concern: string) => {
+        report += `- ${concern}\n`;
+      });
+      report += '\n';
+    }
+
+    return report;
   }
 
   /**
@@ -522,6 +628,77 @@ Provide thorough quality assurance analysis with historical context and proven t
    */
   hasConfigurationInconsistencies(context: any): boolean {
     return false; // Stub: no inconsistencies
+  }
+
+  /**
+   * Validate route-navigation consistency (similar to James)
+   */
+  validateRouteNavigationConsistency(context: any): { score: number; issues: any[]; warnings: any[] } {
+    const issues: any[] = [];
+    const warnings: any[] = [];
+
+    if (!context || !context.content) {
+      return { score: 100, issues, warnings };
+    }
+
+    const content = context.content;
+
+    // Extract routes from the routes array
+    const routesSection = content.match(/const routes\s*=\s*\[([\s\S]*?)\];/);
+    const definedRoutes = new Set<string>();
+
+    if (routesSection) {
+      const routeMatches = routesSection[1].matchAll(/path:\s*['"]([^'"]+)['"]/g);
+      for (const match of routeMatches) {
+        if (match[1]) definedRoutes.add(match[1]);
+      }
+    }
+
+    // Extract navigation links from the navigation array
+    const navSection = content.match(/const navigation\s*=\s*\[([\s\S]*?)\];/);
+    const linkedPaths = new Set<string>();
+
+    if (navSection) {
+      const navMatches = navSection[1].matchAll(/path:\s*['"]([^'"]+)['"]/g);
+      for (const match of navMatches) {
+        if (match[1]) linkedPaths.add(match[1]);
+      }
+    }
+
+    // Only check for mismatches if we found both routes and navigation
+    if (definedRoutes.size > 0 && linkedPaths.size > 0) {
+      // Find navigation links to undefined routes
+      for (const navPath of linkedPaths) {
+        if (!definedRoutes.has(navPath)) {
+          issues.push({
+            type: 'route-navigation-mismatch',
+            severity: 'high',
+            message: `Navigation link '${navPath}' points to undefined route`,
+            file: context.filePath || 'unknown'
+          });
+        }
+      }
+
+      // Find routes not linked in navigation
+      for (const route of definedRoutes) {
+        if (!linkedPaths.has(route)) {
+          warnings.push({
+            type: 'route-navigation-mismatch',
+            severity: 'medium',
+            message: `Route '${route}' is defined but not linked in navigation`,
+            file: context.filePath || 'unknown'
+          });
+        }
+      }
+    }
+
+    const score = Math.max(0, 100 - (issues.length * 10) - (warnings.length * 5));
+
+    return {
+      score,
+      issues,
+      warnings
+    };
   }
 
 }

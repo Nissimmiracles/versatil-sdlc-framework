@@ -3,10 +3,16 @@ import { AgentResponse, AgentActivationContext, ValidationResults, Issue, Recomm
 export { AgentResponse, AgentActivationContext, ValidationResults, Issue, Recommendation };
 
 export abstract class BaseAgent {
-  abstract name: string;
-  abstract id: string;
-  abstract specialization: string;
+  name: string;
+  id: string;
+  specialization: string;
   abstract systemPrompt: string;
+
+  constructor(id?: string, specialization?: string) {
+    this.id = id || 'base-agent';
+    this.specialization = specialization || 'Base Agent';
+    this.name = this.extractAgentName(this.id);
+  }
 
   abstract activate(context: AgentActivationContext): Promise<AgentResponse>;
 
@@ -37,27 +43,28 @@ export abstract class BaseAgent {
     // Security issue detection
     if (content.includes('eval(') || content.includes('Function(')) {
       issues.push({
-        type: 'security',
-        severity: 'critical',
-        message: 'Use of eval() or Function() poses security risk',
+        type: 'security-risk',
+        severity: 'high',
+        message: 'Use of eval() detected - security risk',
         file: context.filePath || 'unknown'
       });
     }
 
     if (content.match(/innerHTML\s*=/)) {
       issues.push({
-        type: 'security',
+        type: 'security-risk',
         severity: 'high',
         message: 'Direct innerHTML assignment can lead to XSS',
         file: context.filePath || 'unknown'
       });
     }
 
-    if (content.includes('password') && content.includes('console')) {
+    // Detect hardcoded passwords
+    if (content.match(/password\s*=\s*["'][^"']+["']/i)) {
       issues.push({
-        type: 'security',
+        type: 'security-risk',
         severity: 'critical',
-        message: 'Potential password exposure in logs',
+        message: 'Hardcoded password detected',
         file: context.filePath || 'unknown'
       });
     }
@@ -67,7 +74,7 @@ export abstract class BaseAgent {
       issues.push({
         type: 'performance',
         severity: 'medium',
-        message: 'Nested loops detected - potential O(n²) complexity',
+        message: 'Nested loops detected - potential performance issue',
         file: context.filePath || 'unknown'
       });
     }
@@ -122,11 +129,22 @@ export abstract class BaseAgent {
 
     const score = Math.max(0, 100 - (issues.length * 10) - (warnings.length * 5));
 
+    // Extract security concerns
+    const securityConcerns = issues
+      .filter(i => i.type === 'security-risk')
+      .map(i => i.message);
+
     return {
       score,
       issues,
       warnings,
-      recommendations: []
+      recommendations: [],
+      crossFileAnalysis: this.analyzeCrossFileConsistency(context),
+      performanceMetrics: {
+        analysisTime: Date.now(),
+        issueCount: issues.length
+      },
+      securityConcerns
     };
   }
 
@@ -237,8 +255,8 @@ export abstract class BaseAgent {
 
   protected getScoreEmoji(score: number): string {
     if (score >= 90) return '🟢';
-    if (score >= 70) return '🟡';
-    if (score >= 50) return '🟠';
+    if (score >= 80) return '🟡';
+    if (score >= 70) return '🟠';
     return '🔴';
   }
 }
