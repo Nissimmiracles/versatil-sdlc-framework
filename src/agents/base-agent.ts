@@ -232,7 +232,8 @@ export abstract class BaseAgent {
   }
 
   protected hasConfigurationInconsistencies(context: any): boolean {
-    const content = context?.content || '';
+    // Handle both string and object with content property
+    const content = typeof context === 'string' ? context : (context?.content || '');
 
     // Detect mixed environment variable and hardcoded values
     if (content.includes('process.env') && content.match(/["']http:\/\/[^"']+["']/)) {

@@ -39,7 +39,7 @@ export class EnhancedMaria extends RAGEnabledAgent {
 
     // Check for configuration inconsistencies
     if (this.hasConfigurationInconsistencies(context)) {
-      response.message += ' Configuration inconsistencies detected.';
+      response.message += ' configuration inconsistencies detected.';
       response.suggestions = response.suggestions || [];
       response.suggestions.push({
         type: 'configuration-inconsistency',
@@ -642,7 +642,8 @@ Provide thorough quality assurance analysis with historical context and proven t
    * Check for configuration inconsistencies
    */
   hasConfigurationInconsistencies(context: any): boolean {
-    const content = context?.content || '';
+    // Handle both string and object with content property
+    const content = typeof context === 'string' ? context : (context?.content || '');
 
     // Detect mixed environment variable and hardcoded values
     if (content.includes('process.env') && content.match(/["']http:\/\/[^"']+["']/)) {

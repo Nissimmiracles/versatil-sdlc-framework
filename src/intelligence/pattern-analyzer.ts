@@ -341,7 +341,7 @@ export class PatternAnalyzer {
       if (line.includes('SELECT') || line.includes('INSERT') || line.includes('UPDATE')) {
         if (line.includes('${') || line.includes('+')) {
           patterns.push({
-            type: 'sql-injection',
+            type: 'security-risk',
             severity: 'critical',
             line: lineNum,
             column: 0,
