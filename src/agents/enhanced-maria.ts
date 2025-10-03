@@ -79,7 +79,11 @@ export class EnhancedMaria extends RAGEnabledAgent {
    * Override message generation to include agent name
    */
   protected generateEnhancedMessage(analysis: AnalysisResult, ragContext?: any): string {
-    let message = `Enhanced Maria - QA Analysis Complete: Score ${analysis.score}/100. ${analysis.patterns.length} issues found.`;
+    const criticalCount = analysis.patterns.filter(p => p.severity === 'critical').length;
+
+    let message = criticalCount > 0
+      ? `Enhanced Maria - Critical Issues Detected: ${criticalCount} critical issues found.`
+      : `Enhanced Maria - QA Analysis Complete: Score ${analysis.score}/100. ${analysis.patterns.length} issues found.`;
 
     if (ragContext) {
       const ragInsights = [];

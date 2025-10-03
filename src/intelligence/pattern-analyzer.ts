@@ -296,6 +296,47 @@ export class PatternAnalyzer {
     lines.forEach((line, index) => {
       const lineNum = index + 1;
 
+      // Detect debugging code in API routes
+      if (line.includes('console.log') || line.includes('console.warn') || line.includes('console.debug')) {
+        patterns.push({
+          type: 'debugging-code',
+          severity: 'critical',
+          line: lineNum,
+          column: 0,
+          message: 'Console.log detected in backend - remove before production',
+          suggestion: 'Remove debug logging or use proper logger (Winston, Pino)',
+          code: line.trim(),
+          category: 'bug'
+        });
+      }
+
+      if (line.includes('debugger')) {
+        patterns.push({
+          type: 'debugging-code',
+          severity: 'critical',
+          line: lineNum,
+          column: 0,
+          message: 'Debugger statement detected - remove before production',
+          suggestion: 'Remove debugger statement',
+          code: line.trim(),
+          category: 'bug'
+        });
+      }
+
+      // Detect Fastify framework
+      if (line.includes('fastify()') || line.includes('require(\'fastify\')') || line.includes('import fastify')) {
+        patterns.push({
+          type: 'fastify-framework',
+          severity: 'info',
+          line: lineNum,
+          column: 0,
+          message: 'Fastify framework detected',
+          suggestion: 'Ensure proper security middleware (helmet, cors)',
+          code: line.trim(),
+          category: 'best-practice'
+        });
+      }
+
       // Detect SQL injection vulnerabilities
       if (line.includes('SELECT') || line.includes('INSERT') || line.includes('UPDATE')) {
         if (line.includes('${') || line.includes('+')) {

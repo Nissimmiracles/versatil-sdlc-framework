@@ -29,6 +29,18 @@ export class EnhancedJames extends RAGEnabledAgent {
       };
     }
 
+    // Add route-navigation validation to suggestions
+    const navValidation = this.validateNavigationIntegrity(context);
+    if (navValidation.issues.length > 0) {
+      response.suggestions = response.suggestions || [];
+      response.suggestions.push(...navValidation.issues.map(issue => ({
+        type: issue.type,
+        message: issue.message,
+        priority: issue.severity,
+        file: issue.file
+      })));
+    }
+
     return response;
   }
 
@@ -402,10 +414,70 @@ Provide comprehensive frontend analysis with historical component patterns and p
    * Validate navigation integrity
    */
   validateNavigationIntegrity(context: any): { score: number; issues: any[]; warnings: any[] } {
+    const issues: any[] = [];
+    const warnings: any[] = [];
+
+    if (!context || !context.content) {
+      return { score: 100, issues, warnings };
+    }
+
+    const content = context.content;
+
+    // Extract routes from the routes array (look for "component:" keyword to identify route definitions)
+    const routesSection = content.match(/const routes\s*=\s*\[([\s\S]*?)\];/);
+    const definedRoutes = new Set<string>();
+
+    if (routesSection) {
+      const routeMatches = routesSection[1].matchAll(/path:\s*['"]([^'"]+)['"]/g);
+      for (const match of routeMatches) {
+        if (match[1]) definedRoutes.add(match[1]);
+      }
+    }
+
+    // Extract navigation links from the navigation array (look for "label:" to identify nav definitions)
+    const navSection = content.match(/const navigation\s*=\s*\[([\s\S]*?)\];/);
+    const linkedPaths = new Set<string>();
+
+    if (navSection) {
+      const navMatches = navSection[1].matchAll(/path:\s*['"]([^'"]+)['"]/g);
+      for (const match of navMatches) {
+        if (match[1]) linkedPaths.add(match[1]);
+      }
+    }
+
+    // Only check for mismatches if we found both routes and navigation
+    if (definedRoutes.size > 0 && linkedPaths.size > 0) {
+      // Find navigation links to undefined routes (this is the critical mismatch)
+      for (const navPath of linkedPaths) {
+        if (!definedRoutes.has(navPath)) {
+          issues.push({
+            type: 'route-navigation-mismatch',
+            severity: 'high',
+            message: `Navigation link '${navPath}' points to undefined route`,
+            file: context.filePath || 'unknown'
+          });
+        }
+      }
+
+      // Find routes not linked in navigation (less critical)
+      for (const route of definedRoutes) {
+        if (!linkedPaths.has(route)) {
+          warnings.push({
+            type: 'route-navigation-mismatch',
+            severity: 'medium',
+            message: `Route '${route}' is defined but not linked in navigation`,
+            file: context.filePath || 'unknown'
+          });
+        }
+      }
+    }
+
+    const score = Math.max(0, 100 - (issues.length * 10) - (warnings.length * 5));
+
     return {
-      score: 95,
-      issues: [],
-      warnings: []
+      score,
+      issues,
+      warnings
     };
   }
 
@@ -438,9 +510,20 @@ Provide comprehensive frontend analysis with historical component patterns and p
     const handoffs: string[] = [];
     if (!issues) return handoffs;
 
-    const hasSecurityIssue = issues.some(i => i.type === 'security');
-    const hasPerformanceIssue = issues.some(i => i.type === 'performance');
-    const hasBackendIssue = issues.some(i => i.type === 'api' || i.type === 'backend');
+    const hasSecurityIssue = issues.some(i =>
+      i.type === 'security' ||
+      i.type === 'security-risk' ||
+      i.category === 'security'
+    );
+    const hasPerformanceIssue = issues.some(i =>
+      i.type === 'performance' ||
+      i.category === 'performance'
+    );
+    const hasBackendIssue = issues.some(i =>
+      i.type === 'api' ||
+      i.type === 'backend' ||
+      i.type === 'api-integration'
+    );
 
     if (hasSecurityIssue) handoffs.push('security-sam');
     if (hasPerformanceIssue) handoffs.push('enhanced-marcus');

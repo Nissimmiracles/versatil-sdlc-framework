@@ -55,7 +55,11 @@ export class EnhancedMarcus extends RAGEnabledAgent {
    * Override message generation to include agent name
    */
   protected generateEnhancedMessage(analysis: AnalysisResult, ragContext?: any): string {
-    let message = `Enhanced Marcus - Backend Analysis Complete: Score ${analysis.score}/100. ${analysis.patterns.length} issues found.`;
+    const criticalCount = analysis.patterns.filter(p => p.severity === 'critical').length;
+
+    let message = criticalCount > 0
+      ? `Enhanced Marcus - Critical Issues Detected: ${criticalCount} critical issues found.`
+      : `Enhanced Marcus - Backend Analysis Complete: Score ${analysis.score}/100. ${analysis.patterns.length} issues found.`;
 
     if (ragContext) {
       const ragInsights = [];
@@ -468,9 +472,20 @@ Provide comprehensive backend analysis with historical architecture patterns and
     const handoffs: string[] = [];
     if (!issues) return handoffs;
 
-    const hasSecurityIssue = issues.some(i => i.type === 'security');
-    const hasPerformanceIssue = issues.some(i => i.type === 'performance');
-    const hasFrontendIssue = issues.some(i => i.type === 'ui' || i.type === 'frontend');
+    const hasSecurityIssue = issues.some(i =>
+      i.type === 'security' ||
+      i.type === 'security-risk' ||
+      i.category === 'security'
+    );
+    const hasPerformanceIssue = issues.some(i =>
+      i.type === 'performance' ||
+      i.category === 'performance'
+    );
+    const hasFrontendIssue = issues.some(i =>
+      i.type === 'ui' ||
+      i.type === 'frontend' ||
+      i.type === 'frontend-integration'
+    );
 
     if (hasSecurityIssue) handoffs.push('security-sam');
     if (hasPerformanceIssue) handoffs.push('devops-dan');
