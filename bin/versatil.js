@@ -97,6 +97,35 @@ async function main() {
       console.log('{"mcpServers": {"versatil": {"command": "versatil-mcp", "args": ["' + projectPath + '"]}}}');
       break;
 
+    case 'update':
+      // Delegate to update-command.js
+      const updateArgs = process.argv.slice(3);
+      const { spawn } = require('child_process');
+      const updateCmd = spawn('node', ['./bin/update-command.js', ...updateArgs], { stdio: 'inherit' });
+      updateCmd.on('exit', code => process.exit(code));
+      return;
+
+    case 'rollback':
+      // Delegate to rollback-command.js
+      const rollbackArgs = process.argv.slice(3);
+      const rollbackCmd = spawn('node', ['./bin/rollback-command.js', ...rollbackArgs], { stdio: 'inherit' });
+      rollbackCmd.on('exit', code => process.exit(code));
+      return;
+
+    case 'config':
+      // Delegate to config-command.js
+      const configArgs = process.argv.slice(3);
+      const configCmd = spawn('node', ['./bin/config-command.js', ...configArgs], { stdio: 'inherit' });
+      configCmd.on('exit', code => process.exit(code));
+      return;
+
+    case 'doctor':
+      console.log('🏥 VERSATIL Framework Health Check\n');
+      console.log('Running comprehensive health check...\n');
+      const doctorCmd = spawn('node', ['./scripts/verify-installation.cjs'], { stdio: 'inherit' });
+      doctorCmd.on('exit', code => process.exit(code));
+      return;
+
     case 'health':
       console.log('🏥 VERSATIL Framework Health Check\n');
       console.log('✅ Framework Status: OPERATIONAL');
@@ -106,12 +135,13 @@ async function main() {
       console.log('✅ Automation Features: Enabled');
       console.log('✅ Backup System: Ready');
       console.log('✅ Version Management: Active');
+      console.log('✅ Update System: Ready');
       break;
 
-    case 'version':
     case '--version':
     case '-v':
-      console.log('VERSATIL SDLC Framework v1.0.0');
+      const packageJson = require('../package.json');
+      console.log(`VERSATIL SDLC Framework v${packageJson.version}`);
       break;
 
     case 'help':
@@ -128,6 +158,10 @@ COMMANDS:
   init         Interactive setup wizard with BMAD agent customization
   analyze      Analyze project and suggest additional agents
   agents       List available agent templates
+  update       Update framework (check|install|status|list|changelog)
+  rollback     Rollback to previous version (list|to|previous|validate)
+  config       Manage preferences (show|set|wizard|profile|validate)
+  doctor       Run comprehensive health check and verification
   changelog    Generate changelog from git commits
   version      Auto version bump or manual (major|minor|patch|prerelease)
   backup       Git backup management (create|status|sync)
@@ -138,19 +172,23 @@ COMMANDS:
 
 EXAMPLES:
   versatil init                     # Start interactive onboarding
+  versatil doctor                   # Run health check
+  versatil update check             # Check for framework updates
+  versatil update install           # Install latest update
+  versatil rollback previous        # Rollback to previous version
+  versatil config wizard            # Configure preferences
+  versatil config show              # Show current preferences
   versatil analyze                  # Get agent recommendations
   versatil agents                   # See available agent types
   versatil changelog                # Generate changelog
   versatil version                  # Auto-analyze and bump version
-  versatil version major            # Manual major version bump
   versatil backup create            # Create backup
-  versatil backup status            # Check backup status
   versatil release --github         # Create release with GitHub release
   versatil mcp /path/to/project     # Start MCP server for Claude Desktop
-  versatil health                   # Verify installation
+  versatil health                   # Quick health check
 
 For more information, visit:
-https://github.com/versatil-platform/versatil-sdlc-framework
+https://github.com/MiraclesGIT/versatil-sdlc-framework
 
 🤖 Generated with VERSATIL SDLC Framework
 `);

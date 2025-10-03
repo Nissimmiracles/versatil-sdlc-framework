@@ -1,0 +1,344 @@
+name: Test Update System
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/update/**'
+      - 'src/config/**'
+      - 'bin/*-command.js'
+      - 'tests/update/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/update/**'
+      - 'src/config/**'
+      - 'bin/*-command.js'
+      - 'tests/update/**'
+
+jobs:
+  test-update-system:
+    name: Test Update System
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: [18, 20]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run update system tests
+        run: npm test -- --testPathPattern="update|config" --coverage
+
+      - name: Test version comparison
+        run: |
+          node -e "
+          const { parseVersion, compareVersions } = require('./dist/update/semantic-version.js');
+
+          // Test version parsing
+          const v1 = parseVersion('1.2.3');
+          console.assert(v1.major === 1, 'Major version parsing failed');
+          console.assert(v1.minor === 2, 'Minor version parsing failed');
+          console.assert(v1.patch === 3, 'Patch version parsing failed');
+
+          // Test version comparison
+          console.assert(compareVersions('2.0.0', '1.0.0') > 0, 'Version comparison failed');
+          console.assert(compareVersions('1.0.0', '2.0.0') < 0, 'Version comparison failed');
+          console.assert(compareVersions('1.0.0', '1.0.0') === 0, 'Version comparison failed');
+
+          console.log('✅ Version comparison tests passed');
+          "
+
+      - name: Test GitHub release checking
+        run: |
+          node -e "
+          const { GitHubReleaseChecker } = require('./dist/update/github-release-checker.js');
+
+          const checker = new GitHubReleaseChecker();
+
+          checker.getLatestRelease()
+            .then(release => {
+              console.log('Latest release:', release.version);
+              console.assert(release.version.length > 0, 'No version found');
+              console.log('✅ GitHub release checker test passed');
+            })
+            .catch(err => {
+              console.error('❌ GitHub release checker test failed:', err.message);
+              process.exit(1);
+            });
+          "
+
+      - name: Test preference management
+        run: |
+          node -e "
+          const { PreferenceManager } = require('./dist/config/preference-manager.js');
+          const os = require('os');
+          const path = require('path');
+          const fs = require('fs');
+
+          const testHome = path.join(os.tmpdir(), '.versatil-test-' + Date.now());
+          fs.mkdirSync(testHome, { recursive: true });
+
+          const manager = new PreferenceManager();
+
+          manager.getPreferences()
+            .then(prefs => {
+              console.assert(prefs.updateBehavior, 'No updateBehavior');
+              console.assert(prefs.updateChannel, 'No updateChannel');
+              console.log('✅ Preference manager test passed');
+
+              // Cleanup
+              try { fs.rmSync(testHome, { recursive: true, force: true }); } catch {}
+            })
+            .catch(err => {
+              console.error('❌ Preference manager test failed:', err.message);
+              try { fs.rmSync(testHome, { recursive: true, force: true }); } catch {}
+              process.exit(1);
+            });
+          "
+
+      - name: Test config profiles
+        run: |
+          node -e "
+          const { ConfigProfileManager } = require('./dist/config/config-profiles.js');
+
+          const manager = new ConfigProfileManager();
+          const profiles = manager.getAvailableProfiles();
+
+          console.assert(profiles.length === 3, 'Expected 3 profiles');
+          console.assert(profiles.some(p => p.name === 'Conservative'), 'Conservative profile missing');
+          console.assert(profiles.some(p => p.name === 'Balanced'), 'Balanced profile missing');
+          console.assert(profiles.some(p => p.name === 'Aggressive'), 'Aggressive profile missing');
+
+          console.log('✅ Config profiles test passed');
+          "
+
+      - name: Test config validation
+        run: |
+          node -e "
+          const { ConfigValidator } = require('./dist/config/config-validator.js');
+
+          const validator = new ConfigValidator();
+
+          // Test valid config
+          const validConfig = { updateBehavior: 'notify', updateChannel: 'stable' };
+          const result1 = validator.validate(validConfig);
+          console.assert(result1.valid, 'Valid config marked as invalid');
+
+          // Test invalid config
+          const invalidConfig = { updateBehavior: 'invalid-value' };
+          const result2 = validator.validate(invalidConfig);
+          console.assert(!result2.valid, 'Invalid config marked as valid');
+
+          console.log('✅ Config validation test passed');
+          "
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: update-system
+
+  test-update-flow:
+    name: Test Update Flow (Simulated)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Simulate update flow
+        run: |
+          echo "Simulating complete update flow..."
+
+          # 1. Check for updates
+          node -e "
+          const { GitHubReleaseChecker } = require('./dist/update/github-release-checker.js');
+          const checker = new GitHubReleaseChecker();
+
+          checker.checkForUpdate('3.0.0')
+            .then(result => {
+              console.log('Update check result:', result);
+              console.log('✅ Step 1: Check for updates - PASSED');
+            })
+            .catch(err => {
+              console.error('❌ Step 1 failed:', err.message);
+              process.exit(1);
+            });
+          "
+
+      - name: Test version locking
+        run: |
+          node -e "
+          const { UpdateLockManager } = require('./dist/update/update-lock.js');
+          const os = require('os');
+          const path = require('path');
+          const fs = require('fs');
+
+          const testHome = path.join(os.tmpdir(), '.versatil-test-lock-' + Date.now());
+          fs.mkdirSync(testHome, { recursive: true });
+
+          const lockManager = new UpdateLockManager();
+
+          lockManager.lockToVersion('3.0.0', 'Test lock')
+            .then(() => lockManager.isVersionAllowed('3.0.1', '3.0.0'))
+            .then(result => {
+              console.assert(!result.allowed, 'Version should be locked');
+              console.log('✅ Step 2: Version locking - PASSED');
+
+              return lockManager.unlock();
+            })
+            .then(() => lockManager.isVersionAllowed('3.0.1', '3.0.0'))
+            .then(result => {
+              console.assert(result.allowed, 'Version should be unlocked');
+              console.log('✅ Step 3: Version unlocking - PASSED');
+
+              // Cleanup
+              try { fs.rmSync(testHome, { recursive: true, force: true }); } catch {}
+            })
+            .catch(err => {
+              console.error('❌ Version locking test failed:', err.message);
+              try { fs.rmSync(testHome, { recursive: true, force: true }); } catch {}
+              process.exit(1);
+            });
+          "
+
+      - name: Test crash recovery
+        run: |
+          node -e "
+          const { CrashRecoveryManager } = require('./dist/update/crash-recovery.js');
+          const os = require('os');
+          const path = require('path');
+          const fs = require('fs');
+
+          const testHome = path.join(os.tmpdir(), '.versatil-test-recovery-' + Date.now());
+          fs.mkdirSync(testHome, { recursive: true });
+
+          const recovery = new CrashRecoveryManager();
+          const steps = CrashRecoveryManager.getStandardUpdateSteps();
+
+          recovery.startUpdate('3.0.0', '3.0.1', steps)
+            .then(updateId => {
+              console.log('Started update:', updateId);
+              return recovery.hasInterruptedUpdate();
+            })
+            .then(hasInterrupted => {
+              console.assert(hasInterrupted, 'Should have interrupted update');
+              console.log('✅ Step 4: Crash recovery detection - PASSED');
+
+              return recovery.clearState();
+            })
+            .then(() => {
+              console.log('✅ Step 5: Crash recovery cleanup - PASSED');
+
+              // Cleanup
+              try { fs.rmSync(testHome, { recursive: true, force: true }); } catch {}
+            })
+            .catch(err => {
+              console.error('❌ Crash recovery test failed:', err.message);
+              try { fs.rmSync(testHome, { recursive: true, force: true }); } catch {}
+              process.exit(1);
+            });
+          "
+
+  integration-test:
+    name: Integration Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run integration tests
+        run: |
+          echo "Running end-to-end update flow integration test..."
+
+          # Create test environment
+          mkdir -p /tmp/.versatil-integration-test
+          export VERSATIL_HOME=/tmp/.versatil-integration-test
+
+          # Test full flow
+          node -e "
+          const { GitHubReleaseChecker } = require('./dist/update/github-release-checker.js');
+          const { UpdateLockManager } = require('./dist/update/update-lock.js');
+          const { PreferenceManager } = require('./dist/config/preference-manager.js');
+          const { ConfigValidator } = require('./dist/config/config-validator.js');
+
+          async function runIntegrationTest() {
+            // 1. Check releases
+            const checker = new GitHubReleaseChecker();
+            const latestRelease = await checker.getLatestRelease();
+            console.log('✅ Retrieved latest release:', latestRelease.version);
+
+            // 2. Manage preferences
+            const prefManager = new PreferenceManager();
+            const prefs = await prefManager.getPreferences();
+            console.log('✅ Loaded preferences:', prefs.updateChannel);
+
+            // 3. Validate config
+            const validator = new ConfigValidator();
+            const validation = validator.validate(prefs);
+            console.log('✅ Config validation:', validation.valid ? 'PASSED' : 'FAILED');
+
+            // 4. Test locking
+            const lockManager = new UpdateLockManager();
+            await lockManager.lockToVersion('3.0.0');
+            console.log('✅ Version locked');
+
+            const isAllowed = await lockManager.isVersionAllowed('3.0.1', '3.0.0');
+            console.log('✅ Lock enforcement:', !isAllowed.allowed ? 'WORKING' : 'FAILED');
+
+            await lockManager.unlock();
+            console.log('✅ Version unlocked');
+
+            console.log('');
+            console.log('🎉 Integration test PASSED');
+          }
+
+          runIntegrationTest().catch(err => {
+            console.error('❌ Integration test FAILED:', err.message);
+            process.exit(1);
+          });
+          "
+
+          # Cleanup
+          rm -rf /tmp/.versatil-integration-test

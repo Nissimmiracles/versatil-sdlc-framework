@@ -7,11 +7,17 @@
   "bin": {
     "versatil": "./bin/versatil.js",
     "versatil-mcp": "./bin/versatil-mcp.js",
-    "versatil-sdlc": "./dist/index-enhanced.js"
+    "versatil-sdlc": "./dist/index-enhanced.js",
+    "versatil-update": "./bin/update-command.js",
+    "versatil-rollback": "./bin/rollback-command.js",
+    "versatil-config": "./bin/config-command.js",
+    "versatil-uninstall": "./scripts/uninstall.cjs"
   },
   "scripts": {
-    "postinstall": "node scripts/validate-isolation.cjs && node scripts/setup-supabase-auto.cjs || true",
+    "postinstall": "node scripts/postinstall-wizard.cjs || true",
+    "verify:install": "node scripts/verify-installation.cjs",
     "validate:isolation": "node scripts/validate-isolation.cjs",
+    "validate:update": "node scripts/validate-update.cjs",
     "recover": "node scripts/recover-framework.cjs",
     "build": "VERSATIL_OPERATION='Building framework' node scripts/show-framework-active.cjs --quick && tsc",
     "build:security": "VERSATIL_OPERATION='Building security modules' node scripts/show-framework-active.cjs --quick && tsc && echo 'Security modules compiled'",
@@ -146,7 +152,14 @@
     "release:dry": "node scripts/release.cjs patch --dry-run",
     "preversion": "npm run validate && npm run version:check",
     "postversion": "git push && git push --tags",
-    "prepublishOnly": "npm run build:release"
+    "prepublishOnly": "npm run build:release",
+    "update:check": "versatil-update check",
+    "update:install": "versatil-update install",
+    "update:status": "versatil-update status",
+    "rollback": "versatil-rollback previous",
+    "rollback:list": "versatil-rollback list",
+    "config:wizard": "versatil-config wizard",
+    "config:show": "versatil-config show"
   },
   "keywords": [
     "ai-native",
