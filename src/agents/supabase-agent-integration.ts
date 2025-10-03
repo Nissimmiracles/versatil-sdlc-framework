@@ -21,6 +21,9 @@ export interface SupabaseRAGConfig {
   enableCollaboration?: boolean;
   patternQualityThreshold?: number;
   solutionEffectivenessThreshold?: number;
+  embeddingModel?: string;
+  maxRetries?: number;
+  retryDelay?: number;
 }
 
 export interface SupabaseRAGInsights {

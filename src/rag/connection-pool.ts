@@ -142,15 +142,7 @@ export class SupabaseConnectionPool {
    */
   private waitForConnection(): Promise<SupabaseClient> {
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        const index = this.waitQueue.findIndex(item => item.resolve === resolve);
-        if (index !== -1) {
-          this.waitQueue.splice(index, 1);
-        }
-        reject(new Error('Connection acquisition timeout'));
-      }, this.config.acquireTimeout);
-
-      this.waitQueue.push({
+      const waitItem = {
         resolve: (conn: ConnectionWrapper) => {
           clearTimeout(timeout);
           resolve(conn.client);
@@ -160,7 +152,17 @@ export class SupabaseConnectionPool {
           reject(error);
         },
         timestamp: Date.now()
-      });
+      };
+
+      const timeout = setTimeout(() => {
+        const index = this.waitQueue.indexOf(waitItem);
+        if (index !== -1) {
+          this.waitQueue.splice(index, 1);
+        }
+        reject(new Error('Connection acquisition timeout'));
+      }, this.config.acquireTimeout);
+
+      this.waitQueue.push(waitItem);
     });
   }
 

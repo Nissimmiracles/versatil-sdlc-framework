@@ -408,20 +408,6 @@ Provide comprehensive backend analysis with historical architecture patterns and
     return 'database';
   }
 
-  /**
-   * Run backend validation on context
-   */
-  async runBackendValidation(context: any): Promise<any> {
-    return {
-      issues: [],
-      score: 85,
-      security: { score: 90, issues: [] },
-      performance: { score: 85, issues: [] },
-      api: { score: 80, issues: [] },
-      warnings: [],
-      recommendations: []
-    };
-  }
 
   /**
    * Validate API integration

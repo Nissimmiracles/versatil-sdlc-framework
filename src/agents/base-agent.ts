@@ -139,10 +139,13 @@ export abstract class BaseAgent {
       issues,
       warnings,
       recommendations: [],
-      crossFileAnalysis: this.analyzeCrossFileConsistency(context),
+      crossFileAnalysis: {
+        inconsistencies: [],
+        suggestions: []
+      },
       performanceMetrics: {
         analysisTime: Date.now(),
-        issueCount: issues.length
+        filesAnalyzed: 1
       },
       securityConcerns
     };

@@ -244,14 +244,18 @@ export class ParallelTaskManager extends EventEmitter {
       const resourceConflict = this.checkResourceConflict(newTask, task);
       if (resourceConflict.hasConflict) {
         conflictingTasks.push(task.id);
-        severity = Math.min(severity, CollisionSeverity.WARNING);
+        if (this.getSeverityLevel(CollisionSeverity.WARNING) > this.getSeverityLevel(severity)) {
+          severity = CollisionSeverity.WARNING;
+        }
       }
 
       // Check SDLC phase violations
       if (this.checkSDLCPhaseConflict(newTask, task)) {
         conflictingTasks.push(task.id);
         collisionType = CollisionType.SDLC_PHASE_VIOLATION;
-        severity = Math.min(severity, CollisionSeverity.ERROR);
+        if (this.getSeverityLevel(CollisionSeverity.ERROR) > this.getSeverityLevel(severity)) {
+          severity = CollisionSeverity.ERROR;
+        }
       }
 
       // Check agent overload
@@ -260,7 +264,9 @@ export class ParallelTaskManager extends EventEmitter {
         if (currentLoad >= 3) { // Max 3 concurrent tasks per agent
           conflictingTasks.push(task.id);
           collisionType = CollisionType.AGENT_OVERLOAD;
-          severity = Math.min(severity, CollisionSeverity.WARNING);
+          if (this.getSeverityLevel(CollisionSeverity.WARNING) > this.getSeverityLevel(severity)) {
+            severity = CollisionSeverity.WARNING;
+          }
         }
       }
     }
@@ -509,7 +515,7 @@ export class ParallelTaskManager extends EventEmitter {
   private async executeDeploymentTask(task: Task): Promise<any> {
     // Coordinate deployment with environment manager
     const env = await this.environmentManager.getCurrentEnvironment();
-    return { status: 'completed', type: 'deployment', environment: env.name as string };
+    return { status: 'completed', type: 'deployment', environment: env };
   }
 
   private async executeQualityAssuranceTask(task: Task): Promise<any> {
@@ -561,6 +567,16 @@ export class ParallelTaskManager extends EventEmitter {
         activeTasks: this.executions.size
       });
     }, 5000);
+  }
+
+  private getSeverityLevel(severity: CollisionSeverity): number {
+    const levels = {
+      [CollisionSeverity.INFO]: 1,
+      [CollisionSeverity.WARNING]: 2,
+      [CollisionSeverity.ERROR]: 3,
+      [CollisionSeverity.CRITICAL]: 4
+    };
+    return levels[severity] || 0;
   }
 
   private async validateTask(task: Task): Promise<{ isValid: boolean; errors: string[] }> {

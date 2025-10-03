@@ -25,6 +25,15 @@ export interface ValidationResults {
   issues: any[];
   warnings: string[];
   recommendations: any[];
+  crossFileAnalysis?: {
+    inconsistencies: any[];
+    suggestions: string[];
+  };
+  performanceMetrics?: {
+    analysisTime: number;
+    filesAnalyzed: number;
+  };
+  securityConcerns?: any[];
 }
 
 export interface Issue {

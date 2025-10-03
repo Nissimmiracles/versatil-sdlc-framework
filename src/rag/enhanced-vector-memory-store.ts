@@ -12,7 +12,7 @@ import { createClient } from '@supabase/supabase-js';
 export interface MemoryDocument {
   id: string;
   content: string;
-  contentType: 'text' | 'code' | 'image' | 'diagram' | 'mixed';
+  contentType: 'text' | 'code' | 'image' | 'diagram' | 'mixed' | 'handoff' | 'context-metadata' | 'web-learned-pattern' | 'interaction' | 'meta-learning' | 'winning-pattern' | 'anti-pattern' | 'team-style';
   embedding?: number[];
   metadata: {
     agentId: string;
@@ -25,6 +25,8 @@ export interface MemoryDocument {
     framework?: string;
     imageData?: string; // base64 for images
     mimeType?: string;
+    // Additional metadata fields for extended functionality
+    [key: string]: any;
   };
 }
 

@@ -510,6 +510,7 @@ export class VectorStoreMigration {
       solution: memory.content,
       explanation: `Migrated solution from memory ${memory.id}`,
       score: memory.metadata.relevanceScore || 0.8,
+      context: memory.metadata || {},
       effectiveness_score: this.calculateEffectivenessScore(memory),
       metadata: {
         migratedFrom: 'enhanced-vector-memory-store',

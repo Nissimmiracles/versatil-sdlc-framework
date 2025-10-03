@@ -408,7 +408,7 @@ export class DailyAuditSystem extends EventEmitter {
       const environment = await this.environmentManager.getCurrentEnvironment();
 
       // Create comprehensive audit configuration
-      const auditConfig = await this.createDailyAuditConfig(environment.name);
+      const auditConfig = await this.createDailyAuditConfig(environment);
 
       // Execute audit
       const result = await this.executeAudit(auditConfig);

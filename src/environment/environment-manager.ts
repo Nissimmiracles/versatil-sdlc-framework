@@ -44,6 +44,7 @@ export interface EnvironmentConfig {
       migrations?: boolean;
       readReplicas?: boolean;
       connectionTimeout?: number;
+      resetOnStart?: boolean;
     };
     supabase: {
       url: string;
@@ -431,7 +432,7 @@ export class EnvironmentManager {
       validation.warnings.push('Test coverage threshold should be at least 80% in testing environment');
     }
 
-    if (!config.database.resetOnStart) {
+    if (!config.services.database.resetOnStart) {
       validation.recommendations.push('Consider enabling database reset on start for testing environment');
     }
   }

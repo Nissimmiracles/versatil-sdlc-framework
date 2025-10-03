@@ -50,6 +50,7 @@ export interface AgentSolution {
   context: Record<string, any>;
   embedding?: number[];
   effectiveness_score?: number;
+  metadata?: Record<string, any>;
   created_at?: string;
 }
 
@@ -145,7 +146,7 @@ export class SupabaseVectorStore extends EventEmitter {
       this.embeddingModel = await pipeline(
         'feature-extraction',
         'Xenova/all-MiniLM-L6-v2',
-        { device: 'cpu' } // Ensure CPU usage for broader compatibility
+        { device: 'cpu' } as any // Ensure CPU usage for broader compatibility
       );
       this.logger.info('Local embeddings initialized', { model: 'all-MiniLM-L6-v2' }, 'supabase-vector-store');
     } catch (error) {
@@ -563,6 +564,61 @@ export class SupabaseVectorStore extends EventEmitter {
       grouped[agent].avgScore = grouped[agent].totalScore / grouped[agent].count;
     });
     return grouped;
+  }
+
+  // Migration support methods
+  async hasExistingData(): Promise<boolean> {
+    try {
+      const { count } = await this.supabase
+        .from('code_patterns')
+        .select('*', { count: 'exact', head: true });
+      return (count || 0) > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  async initialize(): Promise<void> {
+    // Already initialized in constructor
+    return Promise.resolve();
+  }
+
+  getEmbeddingProvider(): string {
+    return this.config.openaiKey ? 'openai' : 'local';
+  }
+
+  getFeatures(): string[] {
+    return ['patterns', 'solutions', 'interactions', 'cross-agent-learning'];
+  }
+
+  async storeSolution(solution: AgentSolution): Promise<void> {
+    try {
+      const { error } = await this.supabase
+        .from('agent_solutions')
+        .insert([solution]);
+
+      if (error) throw error;
+
+      this.emit('solution_stored', { solution });
+    } catch (error) {
+      this.logger.error('Failed to store solution', { error }, 'supabase-vector-store');
+      throw error;
+    }
+  }
+
+  async addSolution(solution: any): Promise<void> {
+    await this.storeSolution(solution);
+  }
+
+  async getPatternCount(): Promise<number> {
+    try {
+      const { count } = await this.supabase
+        .from('code_patterns')
+        .select('*', { count: 'exact', head: true });
+      return count || 0;
+    } catch {
+      return 0;
+    }
   }
 }
 

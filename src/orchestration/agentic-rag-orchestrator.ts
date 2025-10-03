@@ -773,6 +773,7 @@ export class AgenticRAGOrchestrator extends EventEmitter {
     // Store in rule execution memory store
     await this.memoryStores.rule_execution.storeMemory({
       content: JSON.stringify(memory.content),
+      contentType: 'text',
       metadata: {
         agentId: memory.agentId,
         timestamp: memory.timestamp,
@@ -820,6 +821,7 @@ export class AgenticRAGOrchestrator extends EventEmitter {
     // Store in cross-rule memory store
     await this.memoryStores.cross_rule_optimization.storeMemory({
       content: JSON.stringify(memory.content),
+      contentType: 'text',
       metadata: {
         agentId: memory.agentId,
         timestamp: memory.timestamp,
@@ -902,22 +904,22 @@ export class AgenticRAGOrchestrator extends EventEmitter {
    * Update rule execution metrics
    */
   private updateRuleMetrics(ruleType: string, executionData: any): void {
-    const metrics = this.ruleExecutionMetrics[ruleType as keyof typeof this.ruleExecutionMetrics];
+    const metrics: any = this.ruleExecutionMetrics[ruleType as keyof typeof this.ruleExecutionMetrics];
     if (!metrics) return;
 
-    if (executionData.success) {
+    if (executionData.success && 'successes' in metrics) {
       metrics.successes++;
-    } else {
+    } else if ('failures' in metrics) {
       metrics.failures++;
     }
 
     // Update specific metrics based on rule type
-    if (ruleType === 'parallel_execution') {
+    if (ruleType === 'parallel_execution' && 'avgTime' in metrics) {
       if (executionData.avgTime) {
         metrics.avgTime = (metrics.avgTime + executionData.avgTime) / 2;
       }
       if (executionData.collisions) {
-        (metrics as any).collisions += executionData.collisions;
+        metrics.collisions += executionData.collisions;
       }
     } else if (ruleType === 'stress_testing') {
       if (executionData.testsGenerated) {

@@ -239,7 +239,7 @@ export class VersatilOrchestrator extends EventEmitter {
       await this.environmentManager.initialize();
       const environment = await this.environmentManager.getCurrentEnvironment();
 
-      this.emit('startup:environment_initialized', { environment: environment.name });
+      this.emit('startup:environment_initialized', { environment });
 
       // Start subsystems in parallel
       await Promise.all([
@@ -260,7 +260,7 @@ export class VersatilOrchestrator extends EventEmitter {
       this.isRunning = true;
       this.emit('startup:completed', {
         version: this.config.version,
-        environment: environment.name,
+        environment,
         rules_enabled: this.getEnabledRulesCount()
       });
 
@@ -966,7 +966,7 @@ export class VersatilOrchestrator extends EventEmitter {
 
   private calculateSuccessRate(results: any): number {
     const total = Object.values(results).filter(r => r !== null).length;
-    const successful = Object.values(results).filter(r => r !== null && !r.error).length;
+    const successful = Object.values(results).filter(r => r !== null && !(r as any).error).length;
     return total > 0 ? (successful / total) * 100 : 0;
   }
 

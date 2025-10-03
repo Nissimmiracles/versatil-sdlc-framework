@@ -55,9 +55,9 @@ export class SecurityDaemon extends EventEmitter {
   }
 
   private initializeSecuritySystems(): void {
-    // All security systems only accept frameworkRoot as constructor parameter
+    // Initialize security systems with appropriate parameters
     this.orchestrator = new IntegratedSecurityOrchestrator(this.config.frameworkRoot);
-    this.microsegmentation = new MicrosegmentationFramework(this.config.frameworkRoot);
+    this.microsegmentation = new MicrosegmentationFramework();
     this.zeroTrust = new ZeroTrustProjectIsolation(this.config.frameworkRoot);
     this.boundaryEngine = new BoundaryEnforcementEngine(this.config.frameworkRoot);
     this.pathPrevention = new PathTraversalPrevention(this.config.frameworkRoot);

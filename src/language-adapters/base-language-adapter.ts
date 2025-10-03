@@ -161,25 +161,30 @@ export abstract class BaseLanguageAdapter {
 }
 
 /**
+ * Type for concrete language adapter classes (not abstract)
+ */
+export type ConcreteLanguageAdapter = new (rootPath: string) => BaseLanguageAdapter;
+
+/**
  * Language Adapter Registry
  *
  * Manages all registered language adapters
  */
 export class LanguageAdapterRegistry {
-  private static adapters: Map<string, typeof BaseLanguageAdapter> = new Map();
+  private static adapters: Map<string, ConcreteLanguageAdapter> = new Map();
   private static instances: Map<string, BaseLanguageAdapter> = new Map();
 
   /**
    * Register a language adapter
    */
-  static register(language: string, adapter: typeof BaseLanguageAdapter): void {
+  static register(language: string, adapter: ConcreteLanguageAdapter): void {
     this.adapters.set(language.toLowerCase(), adapter);
   }
 
   /**
    * Get adapter for a language
    */
-  static get(language: string): typeof BaseLanguageAdapter | undefined {
+  static get(language: string): ConcreteLanguageAdapter | undefined {
     return this.adapters.get(language.toLowerCase());
   }
 
