@@ -657,4 +657,28 @@ Provide comprehensive backend analysis with historical architecture patterns and
   checkDatabaseIndexes(context: any): any[] {
     return [];
   }
+
+  /**
+   * Run backend-specific validation using PatternAnalyzer
+   */
+  async runBackendValidation(context: any): Promise<any> {
+    const analysis = PatternAnalyzer.analyzeBackend(context.content, context.filePath);
+    return {
+      score: analysis.score,
+      issues: analysis.patterns,
+      warnings: []
+    };
+  }
+
+  /**
+   * Detect framework from content
+   */
+  protected detectFramework(content: string): string {
+    if (content.includes('fastify')) return 'fastify';
+    if (content.includes('express')) return 'express';
+    if (content.includes('koa')) return 'koa';
+    if (content.includes('hapi')) return 'hapi';
+    if (content.includes('nestjs') || content.includes('@nestjs')) return 'nestjs';
+    return '';
+  }
 }

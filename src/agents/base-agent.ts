@@ -158,7 +158,9 @@ export abstract class BaseAgent {
     if (results.issues && results.issues.length > 0) {
       const criticalIssues = results.issues.filter(i => i.severity === 'critical');
       const highIssues = results.issues.filter(i => i.severity === 'high');
-      const securityIssues = results.issues.filter(i => i.type === 'security');
+      const securityIssues = results.issues.filter(i =>
+        i.type === 'security' || i.type === 'security-risk' || i.type?.includes('security')
+      );
 
       if (criticalIssues.length > 0) {
         recommendations.push({
@@ -222,12 +224,28 @@ export abstract class BaseAgent {
   }
 
   protected analyzeCrossFileConsistency(context: AgentActivationContext): Record<string, string> {
+    // Extract filename from path
+    const filename = context.filePath?.split('/').pop() || context.filePath || 'unknown';
     return {
-      [context.filePath]: context.content || ''
+      [filename]: this.specialization
     };
   }
 
   protected hasConfigurationInconsistencies(context: any): boolean {
+    const content = context?.content || '';
+
+    // Detect mixed environment variable and hardcoded values
+    if (content.includes('process.env') && content.match(/["']http:\/\/[^"']+["']/)) {
+      return true;
+    }
+
+    // Detect inconsistent configuration patterns
+    if (content.includes('const config') && content.includes('fallback')) {
+      if (content.includes('process.env') && content.match(/:\s*["'][^"']+["']/)) {
+        return true;
+      }
+    }
+
     return false;
   }
 
@@ -242,7 +260,22 @@ export abstract class BaseAgent {
       target.recommendations = [...(target.recommendations || []), ...source.recommendations];
     }
     if (source.score !== undefined) {
-      target.score = (target.score + source.score) / 2;
+      target.score = Math.min(target.score, source.score); // Take the lower score
+    }
+    if (source.crossFileAnalysis) {
+      target.crossFileAnalysis = {
+        ...(target.crossFileAnalysis || {}),
+        ...source.crossFileAnalysis
+      };
+    }
+    if (source.performanceMetrics) {
+      target.performanceMetrics = {
+        ...(target.performanceMetrics || {}),
+        ...source.performanceMetrics
+      };
+    }
+    if (source.securityConcerns) {
+      target.securityConcerns = [...(target.securityConcerns || []), ...source.securityConcerns];
     }
   }
 

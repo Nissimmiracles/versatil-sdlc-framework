@@ -37,6 +37,18 @@ export class EnhancedMaria extends RAGEnabledAgent {
 
     const response = await super.activate(context);
 
+    // Check for configuration inconsistencies
+    if (this.hasConfigurationInconsistencies(context)) {
+      response.message += ' Configuration inconsistencies detected.';
+      response.suggestions = response.suggestions || [];
+      response.suggestions.push({
+        type: 'configuration-inconsistency',
+        message: 'Mixed environment variables and hardcoded values detected',
+        priority: 'high',
+        file: context.filePath || 'unknown'
+      });
+    }
+
     // Add route-navigation validation if content has routes
     if (context.content && (context.content.includes('const routes') || context.content.includes('const navigation'))) {
       const routeValidation = this.validateRouteNavigationConsistency(context);
@@ -630,7 +642,21 @@ Provide thorough quality assurance analysis with historical context and proven t
    * Check for configuration inconsistencies
    */
   hasConfigurationInconsistencies(context: any): boolean {
-    return false; // Stub: no inconsistencies
+    const content = context?.content || '';
+
+    // Detect mixed environment variable and hardcoded values
+    if (content.includes('process.env') && content.match(/["']http:\/\/[^"']+["']/)) {
+      return true;
+    }
+
+    // Detect mixed configuration patterns
+    if (content.includes('const config') && content.includes('fallback')) {
+      if (content.includes('process.env') && content.match(/:\s*["'][^"']+["']/)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
