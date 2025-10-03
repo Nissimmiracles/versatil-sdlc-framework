@@ -448,31 +448,34 @@ Provide thorough quality assurance analysis with historical context and proven t
   }
 
   /**
-   * Determine agent handoffs based on issues
+   * Determine agent handoffs based on results object
    */
-  determineHandoffs(issues: any[]): string[] {
+  determineHandoffs(results: any): string[] {
     const handoffs: string[] = [];
-    if (!issues) return handoffs;
 
-    // Handle if issues is not an array (single issue object)
-    const issueArray = Array.isArray(issues) ? issues : [issues];
+    // Handle both array of issues and full results object
+    const issues = Array.isArray(results) ? results : (results?.issues || []);
+    const securityConcerns = results?.securityConcerns || [];
 
-    const hasSecurityIssue = issueArray.some(i =>
+    if (!issues || issues.length === 0) return handoffs;
+
+    const hasSecurityIssue = issues.some((i: any) =>
       i.type === 'security' || i.type === 'security-risk' || i.type?.includes('security')
-    );
-    const hasPerformanceIssue = issueArray.some(i =>
+    ) || securityConcerns.length > 0;
+
+    const hasPerformanceIssue = issues.some((i: any) =>
       i.type === 'performance' || i.type?.includes('performance')
     );
-    const hasUIIssue = issueArray.some(i =>
+    const hasUIIssue = issues.some((i: any) =>
       i.type === 'ui' || i.type === 'accessibility' || i.type?.includes('ui')
     );
-    const hasRouteIssue = issueArray.some(i =>
+    const hasRouteIssue = issues.some((i: any) =>
       i.type === 'route-mismatch' || i.type?.includes('route')
     );
-    const hasAPIIssue = issueArray.some(i =>
+    const hasAPIIssue = issues.some((i: any) =>
       i.type === 'api-error' || i.type?.includes('api')
     );
-    const hasHighSeverity = issueArray.some(i =>
+    const hasHighSeverity = issues.some((i: any) =>
       i.severity === 'high' || i.severity === 'critical'
     );
 
@@ -480,7 +483,7 @@ Provide thorough quality assurance analysis with historical context and proven t
     if (hasPerformanceIssue || hasAPIIssue) handoffs.push('marcus-backend');
     if (hasUIIssue || hasRouteIssue) handoffs.push('james-frontend');
     if (hasSecurityIssue || hasAPIIssue) handoffs.push('devops-dan');
-    if (hasHighSeverity || issueArray.length > 5) handoffs.push('sarah-pm');
+    if (hasHighSeverity || issues.length > 5) handoffs.push('sarah-pm');
 
     return [...new Set(handoffs)]; // Remove duplicates
   }
