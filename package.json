@@ -1,6 +1,6 @@
 {
   "name": "@versatil/sdlc-framework",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "type": "module",
   "description": "🚀 AI-Native SDLC framework with RAG memory, OPERA autonomous orchestration, and 6 specialized agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
   "main": "dist/index.js",
@@ -204,12 +204,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MiraclesGIT/versatil-sdlc-framework.git"
+    "url": "https://github.com/Nissimmiracles/versatil-sdlc-framework.git"
   },
   "bugs": {
-    "url": "https://github.com/MiraclesGIT/versatil-sdlc-framework/issues"
+    "url": "https://github.com/Nissimmiracles/versatil-sdlc-framework/issues"
   },
-  "homepage": "https://github.com/MiraclesGIT/versatil-sdlc-framework#readme",
+  "homepage": "https://github.com/Nissimmiracles/versatil-sdlc-framework#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.2",
     "@octokit/graphql": "^7.1.1",
