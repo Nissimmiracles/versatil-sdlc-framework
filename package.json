@@ -1,6 +1,6 @@
 {
   "name": "@versatil/sdlc-framework",
-  "version": "3.1.10",
+  "version": "3.1.11",
   "type": "module",
   "description": "🚀 AI-Native SDLC framework with RAG memory, OPERA autonomous orchestration, and 6 specialized agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
   "main": "dist/index.js",

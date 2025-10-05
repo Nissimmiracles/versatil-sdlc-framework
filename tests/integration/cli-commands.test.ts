@@ -20,7 +20,7 @@ import {
   createStdinMock,
   TestEnvironment,
   CommandResult,
-} from './__helpers__/test-helpers';
+} from './helpers/test-helpers';
 import * as path from 'path';
 
 describe('CLI Commands Integration Tests', () => {
@@ -38,17 +38,17 @@ describe('CLI Commands Integration Tests', () => {
   });
 
   describe('versatil --version', () => {
-    test.skip('should display correct version', async () => {
+    test('should display correct version', async () => {
       const result = await execShellCommand('node bin/versatil.js --version', {
         cwd: frameworkRoot,
       });
 
       assertCommandSuccess(result);
       assertOutputMatches(result, /VERSATIL SDLC Framework v\d+\.\d+\.\d+/);
-      expect(result.stdout).toContain('3.0.0');
+      expect(result.stdout).toContain('3.1.10');
     }, 30000);
 
-    test.skip('should work with -v flag', async () => {
+    test('should work with -v flag', async () => {
       const result = await execShellCommand('node bin/versatil.js -v', {
         cwd: frameworkRoot,
       });
@@ -253,7 +253,7 @@ describe('CLI Commands Integration Tests', () => {
   });
 
   describe('versatil-config show', () => {
-    test.skip('should display configuration', async () => {
+    test('should display configuration', async () => {
       const result = await execShellCommand('node bin/config-command.js show', {
         cwd: frameworkRoot,
         timeout: 30000,
@@ -264,7 +264,7 @@ describe('CLI Commands Integration Tests', () => {
       expect(output.length).toBeGreaterThan(0);
     }, 30000);
 
-    test.skip('should show preferences', async () => {
+    test('should show preferences', async () => {
       const result = await execShellCommand('node bin/config-command.js show', {
         cwd: frameworkRoot,
         timeout: 30000,
@@ -306,7 +306,7 @@ describe('CLI Commands Integration Tests', () => {
       expect(result.exitCode).toBeGreaterThanOrEqual(0);
     }, 30000);
 
-    test.skip('versatil-config with invalid option should show error', async () => {
+    test('versatil-config with invalid option should show error', async () => {
       const result = await execShellCommand('node bin/config-command.js invalid', {
         cwd: frameworkRoot,
       });
@@ -385,7 +385,7 @@ describe('CLI Commands Integration Tests', () => {
   });
 
   describe('Cross-command integration', () => {
-    test.skip('should maintain consistency across commands', async () => {
+    test('should maintain consistency across commands', async () => {
       // Get version from versatil
       const versionResult = await execShellCommand('node bin/versatil.js --version', {
         cwd: frameworkRoot,
@@ -410,7 +410,7 @@ describe('CLI Command Validation', () => {
       expect(result.exitCode).toBeGreaterThanOrEqual(0);
     }, 30000);
 
-    test.skip('should handle missing arguments gracefully', async () => {
+    test('should handle missing arguments gracefully', async () => {
       const result = await execShellCommand('node bin/config-command.js set', {
         cwd: process.cwd(),
         timeout: 30000,

@@ -142,6 +142,10 @@ module.exports = {
       transformIgnorePatterns: [
         'node_modules/(?!(@modelcontextprotocol)/)'
       ],
+      testPathIgnorePatterns: [
+        '/node_modules/',
+        '/tests/integration/helpers/'
+      ],
       moduleNameMapper: {
         // Handle .js extensions in TypeScript imports (ESM compatibility)
         '^(\\.{1,2}/.*)\\.js$': '$1',
@@ -157,9 +161,10 @@ module.exports = {
         '<rootDir>/tests/integration/**/*.{ts,tsx}',
         '<rootDir>/tests/agents/**/*.{ts,tsx}',
         '<rootDir>/tests/update/**/*.{ts,tsx}',
-        // Exclude Playwright integration tests
+        // Exclude Playwright integration tests and helper files
         '!<rootDir>/tests/integration/**/*.e2e.{ts,tsx}',
-        '!<rootDir>/tests/integration/**/*.playwright.{ts,tsx}'
+        '!<rootDir>/tests/integration/**/*.playwright.{ts,tsx}',
+        '!<rootDir>/tests/integration/helpers/**'
       ],
       coverageDirectory: '<rootDir>/coverage/integration',
       maxWorkers: process.env.CI ? 1 : '50%'

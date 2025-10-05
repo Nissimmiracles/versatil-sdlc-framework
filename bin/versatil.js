@@ -5,24 +5,28 @@
  * Command-line interface for setup, agent management, and project initialization
  */
 
-import { runOnboardingWizard } from '../dist/onboarding-wizard.js';
-import { adaptiveAgentCreator } from '../dist/adaptive-agent-creator.js';
-import { VERSATILAgentDispatcher } from '../dist/agent-dispatcher.js';
-import { changelogGenerator } from '../dist/changelog-generator.js';
-import { versionManager } from '../dist/version-manager.js';
-import { gitBackupManager } from '../dist/git-backup-manager.js';
+import { spawn } from 'child_process';
+import { readFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 async function main() {
   const command = process.argv[2];
 
   switch (command) {
-    case 'init':
+    case 'init': {
       console.log('🚀 Starting VERSATIL Framework Setup...\n');
+      const { runOnboardingWizard } = await import('../dist/onboarding-wizard.js');
       await runOnboardingWizard();
       break;
+    }
 
-    case 'analyze':
+    case 'analyze': {
       console.log('🔍 Analyzing project for agent recommendations...\n');
+      const { adaptiveAgentCreator } = await import('../dist/adaptive-agent-creator.js');
       const suggestions = await adaptiveAgentCreator.analyzeProjectNeeds(process.cwd());
       if (suggestions.length > 0) {
         console.log('💡 Recommended agents:');
@@ -34,22 +38,28 @@ async function main() {
         console.log('✅ No additional agents recommended. Your setup looks good!');
       }
       break;
+    }
 
-    case 'agents':
+    case 'agents': {
       console.log('🤖 Available agent templates:');
+      const { adaptiveAgentCreator } = await import('../dist/adaptive-agent-creator.js');
       const templates = adaptiveAgentCreator.getAvailableTemplates();
       templates.forEach(template => {
         console.log(`   • ${template.name} - ${template.specialization}`);
       });
       break;
+    }
 
-    case 'changelog':
+    case 'changelog': {
       console.log('📝 Generating changelog...\n');
+      const { changelogGenerator } = await import('../dist/changelog-generator.js');
       await changelogGenerator.autoGenerateChangelog();
       break;
+    }
 
-    case 'version':
+    case 'version': {
       const versionType = process.argv[3] || 'auto';
+      const { versionManager } = await import('../dist/version-manager.js');
       if (['major', 'minor', 'patch', 'prerelease'].includes(versionType)) {
         console.log(`📦 Manual version bump: ${versionType}\n`);
         await versionManager.bumpVersionManual(versionType);
@@ -58,9 +68,11 @@ async function main() {
         await versionManager.autoVersion();
       }
       break;
+    }
 
-    case 'backup':
+    case 'backup': {
       const backupAction = process.argv[3] || 'create';
+      const { gitBackupManager } = await import('../dist/git-backup-manager.js');
       if (backupAction === 'create') {
         console.log('💾 Creating backup...\n');
         await gitBackupManager.createBackup();
@@ -76,9 +88,11 @@ async function main() {
         await gitBackupManager.syncWithRemote();
       }
       break;
+    }
 
-    case 'release':
+    case 'release': {
       console.log('🚀 Creating release...\n');
+      const { versionManager } = await import('../dist/version-manager.js');
       const releaseConfig = {
         autoTag: true,
         autoChangelog: true,
@@ -87,6 +101,7 @@ async function main() {
       };
       await versionManager.autoVersion(releaseConfig);
       break;
+    }
 
     case 'mcp':
       console.log('🔗 Starting VERSATIL MCP Server...\n');
@@ -100,7 +115,6 @@ async function main() {
     case 'update':
       // Delegate to update-command.js
       const updateArgs = process.argv.slice(3);
-      const { spawn } = require('child_process');
       const updateCmd = spawn('node', ['./bin/update-command.js', ...updateArgs], { stdio: 'inherit' });
       updateCmd.on('exit', code => process.exit(code));
       return;
@@ -140,7 +154,8 @@ async function main() {
 
     case '--version':
     case '-v':
-      const packageJson = require('../package.json');
+      const pkgPath = join(__dirname, '..', 'package.json');
+      const packageJson = JSON.parse(await readFile(pkgPath, 'utf-8'));
       console.log(`VERSATIL SDLC Framework v${packageJson.version}`);
       break;
 
