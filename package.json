@@ -1,8 +1,8 @@
 {
   "name": "@versatil/sdlc-framework",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "type": "module",
-  "description": "🚀 AI-Native SDLC framework with RAG memory, OPERA autonomous orchestration, and 6 specialized agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
+  "description": "🚀 AI-Native SDLC framework with 11-MCP ecosystem, RAG memory, OPERA orchestration, and 6 specialized agents achieving ZERO CONTEXT LOSS. Features 3-phase MCP integration (Core, AI/ML, Automation), intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
   "main": "dist/index.js",
   "bin": {
     "versatil": "./bin/versatil.js",
