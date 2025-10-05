@@ -15,9 +15,11 @@ import { SimulationQa } from './simulation-qa.js';
 
 export class AgentRegistry {
   private agents = new Map<string, BaseAgent>();
-  
-  constructor() {
-    this.registerAllAgents();
+
+  constructor(private logger?: any, skipAutoRegister: boolean = false) {
+    if (!skipAutoRegister) {
+      this.registerAllAgents();
+    }
   }
   
   private registerAllAgents(): void {
@@ -47,8 +49,55 @@ export class AgentRegistry {
     return this.getAllAgents();
   }
 
-  registerAgent(id: string, agent: BaseAgent): void {
-    this.agents.set(id, agent);
+  registerAgent(agentOrId: BaseAgent | string, agent?: BaseAgent): void {
+    let id: string;
+    let agentToRegister: BaseAgent;
+
+    if (typeof agentOrId === 'string') {
+      // Old signature: registerAgent(id, agent)
+      id = agentOrId;
+      agentToRegister = agent!;
+    } else {
+      // New signature: registerAgent(agent)
+      agentToRegister = agentOrId;
+      id = agentToRegister.id;
+    }
+
+    if (this.agents.has(id)) {
+      throw new Error(`Agent with ID ${id} is already registered`);
+    }
+    this.agents.set(id, agentToRegister);
+  }
+
+  getRegisteredAgents(): BaseAgent[] {
+    return this.getAllAgents();
+  }
+
+  getAgentForFile(filePath: string): BaseAgent | null {
+    // Check each registered agent's activation patterns
+    for (const agent of this.agents.values()) {
+      const patterns = (agent as any).activationPatterns;
+      if (!patterns || !Array.isArray(patterns)) {
+        continue;
+      }
+
+      for (const pattern of patterns) {
+        if (this.matchesPattern(filePath, pattern)) {
+          return agent;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private matchesPattern(filePath: string, pattern: string): boolean {
+    const regexPattern = pattern
+      .replace(/\*\*/g, '.*')
+      .replace(/\*/g, '[^/]*')
+      .replace(/\./g, '\\.');
+
+    return new RegExp(regexPattern).test(filePath);
   }
 
   getAgentsForFilePattern(pattern: string): BaseAgent[] {

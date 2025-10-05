@@ -21,11 +21,11 @@ describe('AgentRegistry', () => {
       error: jest.fn()
     } as any;
 
-    registry = new AgentRegistry(mockLogger);
+    registry = new AgentRegistry(mockLogger, true); // Skip auto-registration for testing
   });
 
   describe('registerAgent', () => {
-    it.skip('should register a new agent successfully', () => {
+    it('should register a new agent successfully', () => {
       const mockAgent = {
         id: 'test-agent',
         name: 'Test Agent',
@@ -41,7 +41,7 @@ describe('AgentRegistry', () => {
       expect(agents[0].id).toBe('test-agent');
     });
 
-    it.skip('should prevent duplicate agent registration', () => {
+    it('should prevent duplicate agent registration', () => {
       const mockAgent1 = {
         id: 'duplicate-agent',
         name: 'First Agent',
@@ -63,7 +63,7 @@ describe('AgentRegistry', () => {
   });
 
   describe('getAgentForFile', () => {
-    it.skip('should return appropriate agent for file pattern', () => {
+    it('should return appropriate agent for file pattern', () => {
       const mockAgent = {
         id: 'test-agent',
         name: 'Test Agent',
@@ -78,7 +78,7 @@ describe('AgentRegistry', () => {
       expect(agent?.id).toBe('test-agent');
     });
 
-    it.skip('should return null for unmatched file patterns', () => {
+    it('should return null for unmatched file patterns', () => {
       const mockAgent = {
         id: 'specific-agent',
         name: 'Specific Agent',
@@ -103,7 +103,7 @@ describe('AgentRegistry', () => {
       expect(process.env.NODE_ENV).toBe('test');
     });
 
-    it.skip('should meet BMAD methodology quality standards', () => {
+    it('should meet BMAD methodology quality standards', () => {
       // Enhanced Maria-QA standards applied to framework itself
       const startTime = Date.now();
 

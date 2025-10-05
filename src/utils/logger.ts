@@ -11,15 +11,18 @@ export class VERSATILLogger {
   }
 
   info(message: string, context?: any, component?: string): void {
-    console.log(`[${component || this.component || 'VERSATIL'}] ${message}`);
+    const logMessage = this.formatMessage('INFO', message, context, component);
+    console.log(logMessage);
   }
 
   error(message: string, context?: any, component?: string): void {
-    console.error(`[${component || this.component || 'VERSATIL'}] ERROR: ${message}`);
+    const logMessage = this.formatMessage('ERROR', message, context, component);
+    console.error(logMessage);
   }
 
   warn(message: string, context?: any, component?: string): void {
-    console.warn(`[${component || this.component || 'VERSATIL'}] WARN: ${message}`);
+    const logMessage = this.formatMessage('WARN', message, context, component);
+    console.warn(logMessage);
   }
 
   warning(message: string, context?: any, component?: string): void {
@@ -27,9 +30,19 @@ export class VERSATILLogger {
   }
 
   debug(message: string, context?: any, component?: string): void {
-    if (process.env.DEBUG) {
-      console.debug(`[${component || this.component || 'VERSATIL'}] DEBUG: ${message}`);
+    const logMessage = this.formatMessage('DEBUG', message, context, component);
+    console.log(logMessage);
+  }
+
+  private formatMessage(level: string, message: string, context?: any, component?: string): string {
+    const comp = component || this.component || 'VERSATIL';
+    let formatted = `[${comp}] ${level}: ${message}`;
+
+    if (context && Object.keys(context).length > 0) {
+      formatted += ` ${JSON.stringify(context)}`;
     }
+
+    return formatted;
   }
 }
 
