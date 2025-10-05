@@ -2,7 +2,7 @@
  * VERSATIL SDLC Framework - Adaptive Learning & Auto-Improvement System
  *
  * This system learns from user interactions and automatically improves
- * the Enhanced BMAD agents based on real usage patterns, feedback, and outcomes.
+ * the Enhanced OPERA agents based on real usage patterns, feedback, and outcomes.
  */
 
 import { EventEmitter } from 'events';

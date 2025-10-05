@@ -4,7 +4,7 @@
  * Enables VERSATIL to work with Java projects, supporting Maven, Gradle, JUnit,
  * Checkstyle, SpotBugs, and the entire Java ecosystem.
  *
- * BMAD agents can now orchestrate Java development workflows.
+ * OPERA agents can now orchestrate Java development workflows.
  */
 
 import { exec } from 'child_process';
@@ -460,7 +460,7 @@ export class JavaAdapter extends BaseLanguageAdapter {
   }
 
   /**
-   * Get recommended BMAD agents for Java projects
+   * Get recommended OPERA agents for Java projects
    */
   getRecommendedAgents(): string[] {
     return [

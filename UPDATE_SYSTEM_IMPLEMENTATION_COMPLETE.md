@@ -757,7 +757,7 @@ git push --tags
 5. **Verification** (health checks)
 6. **Project Initialization**
 7. **Understanding Setup** (where files are, isolation)
-8. **Meet BMAD Agents** (all 6 agents explained)
+8. **Meet OPERA Agents** (all 6 agents explained)
 9. **Essential Commands** (complete command reference)
 10. **Update Channels** (stable/beta/alpha)
 11. **Update Behavior** (auto/notify/manual)

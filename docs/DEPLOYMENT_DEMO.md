@@ -7,7 +7,7 @@ This document demonstrates the complete deployment process for VERSATIL SDLC Fra
 ## Prerequisites Completed ✅
 
 1. **Edge Function Infrastructure**: All 7 functions implemented
-   - `bmad-agent` (Unified BMAD Agent Router)
+   - `opera-agent` (Unified OPERA Agent Router)
    - `maria-rag` (QA-specific RAG)
    - `james-rag` (Frontend-specific RAG)
    - `marcus-rag` (Backend-specific RAG)
@@ -73,8 +73,8 @@ npm run edge:deploy:verify
 #
 # 📦 Deploying edge functions...
 #
-# Deploying bmad-agent...
-# ✅ bmad-agent deployed successfully
+# Deploying opera-agent...
+# ✅ opera-agent deployed successfully
 #
 # Deploying maria-rag...
 # ✅ maria-rag deployed successfully
@@ -106,7 +106,7 @@ npm run edge:deploy:verify
 # ❌ Failed deployments: 0
 #
 # Successful:
-#   ✅ bmad-agent
+#   ✅ opera-agent
 #   ✅ maria-rag
 #   ✅ james-rag
 #   ✅ marcus-rag
@@ -126,7 +126,7 @@ npm run edge:health
 # Expected output:
 # 🏥 Edge Function Health Check
 #
-# bmad-agent: ✅ Healthy
+# opera-agent: ✅ Healthy
 # maria-rag: ✅ Healthy
 # james-rag: ✅ Healthy
 # marcus-rag: ✅ Healthy
@@ -147,7 +147,7 @@ npm run test:edge-functions
 # 🧪 VERSATIL Edge Function Integration Tests
 #
 # 📋 Running Health Checks Tests...
-#     ✅ Health check: bmad-agent
+#     ✅ Health check: opera-agent
 #     ✅ Health check: maria-rag
 #     ✅ Health check: james-rag
 #     ✅ Health check: marcus-rag
@@ -156,14 +156,14 @@ npm run test:edge-functions
 #     ✅ Health check: context-fusion
 # ✅ Health Checks tests completed
 #
-# 📋 Running BMAD Agent Functionality Tests...
-#     ✅ BMAD Agent: enhanced-maria
-#     ✅ BMAD Agent: enhanced-james
-#     ✅ BMAD Agent: enhanced-marcus
-#     ✅ BMAD Agent: enhanced-sarah
-#     ✅ BMAD Agent: enhanced-alex
-#     ✅ BMAD Agent: enhanced-dr-ai
-# ✅ BMAD Agent Functionality tests completed
+# 📋 Running OPERA Agent Functionality Tests...
+#     ✅ OPERA Agent: enhanced-maria
+#     ✅ OPERA Agent: enhanced-james
+#     ✅ OPERA Agent: enhanced-marcus
+#     ✅ OPERA Agent: enhanced-sarah
+#     ✅ OPERA Agent: enhanced-alex
+#     ✅ OPERA Agent: enhanced-dr-ai
+# ✅ OPERA Agent Functionality tests completed
 #
 # 📋 Running Rate Limiting Tests...
 #     ✅ Rate limiting active (12/50 requests limited)
@@ -201,7 +201,7 @@ npm run test:edge-functions
 #
 # 📋 Test Suite Breakdown:
 #   Health Checks: 7/7 (100.0%)
-#   BMAD Agent Functionality: 6/6 (100.0%)
+#   OPERA Agent Functionality: 6/6 (100.0%)
 #   Rate Limiting: 1/1 (100.0%)
 #   Caching Behavior: 1/1 (100.0%)
 #   Performance Benchmarks: 1/1 (100.0%)
@@ -226,7 +226,7 @@ npm run edge:monitor --duration 10
 #
 # 📊 Live Monitoring (45s elapsed)
 #
-# bmad-agent: 100.0% healthy, avg 156ms response
+# opera-agent: 100.0% healthy, avg 156ms response
 # maria-rag: 100.0% healthy, avg 203ms response
 # james-rag: 100.0% healthy, avg 178ms response
 # marcus-rag: 100.0% healthy, avg 189ms response
@@ -239,26 +239,26 @@ npm run edge:monitor --duration 10
 
 ## Post-Deployment Endpoints
 
-### Primary BMAD Agent Router
+### Primary OPERA Agent Router
 ```
-https://your-project-ref.supabase.co/functions/v1/bmad-agent
+https://your-project-ref.supabase.co/functions/v1/opera-agent
 ```
 
 **Health Check:**
 ```bash
-curl https://your-project-ref.supabase.co/functions/v1/bmad-agent/health \
+curl https://your-project-ref.supabase.co/functions/v1/opera-agent/health \
   -H "Authorization: Bearer YOUR_ANON_KEY"
 ```
 
 **Metrics:**
 ```bash
-curl https://your-project-ref.supabase.co/functions/v1/bmad-agent/metrics \
+curl https://your-project-ref.supabase.co/functions/v1/opera-agent/metrics \
   -H "Authorization: Bearer YOUR_ANON_KEY"
 ```
 
 ### Agent Request Example
 ```bash
-curl -X POST https://your-project-ref.supabase.co/functions/v1/bmad-agent \
+curl -X POST https://your-project-ref.supabase.co/functions/v1/opera-agent \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_ANON_KEY" \
   -d '{
@@ -364,7 +364,7 @@ npm run edge:deploy:verify
 1. **High Response Times**
    ```bash
    # Check cache hit rate
-   curl https://your-project-ref.supabase.co/functions/v1/bmad-agent/metrics
+   curl https://your-project-ref.supabase.co/functions/v1/opera-agent/metrics
 
    # If cache hit rate < 70%, consider adjusting cache TTL
    ```
@@ -383,7 +383,7 @@ npm run edge:deploy:verify
    npm run edge:health --verbose
 
    # Redeploy specific function if needed
-   supabase functions deploy bmad-agent
+   supabase functions deploy opera-agent
    ```
 
 ## Success Confirmation
@@ -394,7 +394,7 @@ npm run edge:deploy:verify
 ✅ **Performance Targets Met**
 ✅ **Monitoring and Alerting Configured**
 
-**The VERSATIL SDLC Framework Edge Functions are now production-ready and serving Enhanced BMAD agents globally with enterprise-grade performance! 🚀**
+**The VERSATIL SDLC Framework Edge Functions are now production-ready and serving Enhanced OPERA agents globally with enterprise-grade performance! 🚀**
 
 ---
 

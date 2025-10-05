@@ -35,7 +35,7 @@ export class VERSATILMCPServerV2 {
   private registerTools(): void {
     this.server.tool(
       'versatil_activate_agent',
-      'Activate a specific BMAD agent with context',
+      'Activate a specific OPERA agent with context',
       {
         agentId: z.enum([
           'enhanced-maria',

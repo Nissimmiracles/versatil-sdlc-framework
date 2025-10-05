@@ -446,7 +446,7 @@ function testPackageJsonClean(projectPath) {
 
     // Check if framework is a dependency (it shouldn't be for isolation)
     const hasFrameworkDep = Object.keys(deps).some(dep =>
-      dep.includes('versatil') || dep.includes('bmad')
+      dep.includes('versatil') || dep.includes('opera')
     );
 
     if (hasFrameworkDep) {

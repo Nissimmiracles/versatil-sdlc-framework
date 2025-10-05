@@ -22,7 +22,7 @@
 - **Self-Healing Capabilities**: Automatic recovery from failures with alternative plans
 - **Real-Time Monitoring**: Track goal progress and agent performance
 
-### 🚀 **Enhanced BMAD Integration**
+### 🚀 **Enhanced OPERA Integration**
 - **Context-Aware Agents**: Every agent now has access to relevant memories
 - **Pattern Detection**: Automatically identify and respond to recurring issues
 - **Autonomous Actions**: Agents can trigger workflows independently
@@ -87,10 +87,10 @@ const results = await vectorMemoryStore.queryMemories({
 
 ### Opera Goals
 ```typescript
-import { enhancedBMAD } from 'versatil-sdlc-framework';
+import { enhancedOPERA } from 'versatil-sdlc-framework';
 
 // Create autonomous goal
-await enhancedBMAD.executeBMADWorkflow(
+await enhancedOPERA.executeOPERAWorkflow(
   'project-id',
   'Build secure authentication system'
 );
@@ -99,7 +99,7 @@ await enhancedBMAD.executeBMADWorkflow(
 ### Enhanced Agents
 ```typescript
 // Get enhanced agent with memory
-const agent = enhancedBMAD.getEnhancedAgent('enhanced-marcus');
+const agent = enhancedOPERA.getEnhancedAgent('enhanced-marcus');
 const response = await agent.activate(context);
 
 // Response includes memories, learnings, and autonomous actions
@@ -120,13 +120,13 @@ const response = await agent.activate(context);
 
 2. **Enable New Features (Optional)**
    ```typescript
-   import { enhancedBMAD } from 'versatil-sdlc-framework';
+   import { enhancedOPERA } from 'versatil-sdlc-framework';
    
    // Enable RAG memory
-   enhancedBMAD.setRAGEnabled(true);
+   enhancedOPERA.setRAGEnabled(true);
    
    // Enable autonomous mode
-   enhancedBMAD.setAutonomousMode(true);
+   enhancedOPERA.setAutonomousMode(true);
    ```
 
 3. **Use Enhanced Features**
@@ -141,7 +141,7 @@ const response = await agent.activate(context);
 ### 1. **Autonomous Bug Resolution**
 ```typescript
 // AI automatically investigates, fixes, and tests bugs
-await enhancedBMAD.executeBMADWorkflow(
+await enhancedOPERA.executeOPERAWorkflow(
   'bugfix-project',
   'Fix memory leak in user service'
 );

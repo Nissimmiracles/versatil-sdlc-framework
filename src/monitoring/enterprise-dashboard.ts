@@ -623,7 +623,7 @@ export class EnterpriseDashboard extends EventEmitter {
       adoption: {
         'rag-memory': 75 + Math.random() * 25,
         'opera-orchestrator': 60 + Math.random() * 40,
-        'bmad-agents': 85 + Math.random() * 15
+        'opera-agents': 85 + Math.random() * 15
       },
       usage: {
         'ui-testing': Math.floor(Math.random() * 1000),

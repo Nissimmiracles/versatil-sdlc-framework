@@ -2,7 +2,7 @@
  * VERSATIL SDLC Framework - Development Environment Integration
  * Connects theoretical agent dispatcher to actual Claude Code/Cursor environment
  *
- * This service makes the BMAD methodology work in practice by:
+ * This service makes the OPERA methodology work in practice by:
  * - Monitoring actual file system changes
  * - Triggering real MCP tool activations
  * - Running actual quality gates

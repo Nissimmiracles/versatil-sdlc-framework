@@ -3,9 +3,9 @@ name: agent-documentation
 type: documentation
 ---
 
-# BMAD Agent Team - Detailed Configuration
+# OPERA Agent Team - Detailed Configuration
 
-This document defines the detailed configuration for all 6 BMAD agents in the VERSATIL SDLC Framework.
+This document defines the detailed configuration for all 6 OPERA agents in the VERSATIL SDLC Framework.
 
 ---
 
@@ -183,7 +183,7 @@ Responsibilities:
   - Resource allocation optimization
 
 Management_Framework:
-  - Methodology: Agile/Scrum with BMAD principles
+  - Methodology: Agile/Scrum with OPERA principles
   - Sprint Duration: 2 weeks
   - Quality Gates: Mandatory at each phase
   - Communication: Daily standups, weekly reviews

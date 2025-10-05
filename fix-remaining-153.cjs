@@ -25,19 +25,19 @@ const fixed = agenticRagContent.replace(/new EnhancedVectorMemoryStore\([^)]+\)/
 fs.writeFileSync(agenticRagFile, fixed);
 console.log('✓ Fixed EnhancedVectorMemoryStore constructor calls');
 
-// Fix 3: MultimodalArchonOrchestrator - add estimateComplexity
-const multimodalFile = 'src/archon/multimodal-archon-orchestrator.ts';
+// Fix 3: MultimodalOperaOrchestrator - add estimateComplexity
+const multimodalFile = 'src/opera/multimodal-opera-orchestrator.ts';
 if (fs.existsSync(multimodalFile)) {
   let content = fs.readFileSync(multimodalFile, 'utf8');
   if (!content.includes('estimateComplexity')) {
     content = content.replace(
-      /export class MultimodalArchonOrchestrator[^}]+}/s,
+      /export class MultimodalOperaOrchestrator[^}]+}/s,
       (match) => match.replace(/}$/, `
   private estimateComplexity(data: any): number { return 50; }
 }`)
     );
     fs.writeFileSync(multimodalFile, content);
-    console.log('✓ Added estimateComplexity to MultimodalArchonOrchestrator');
+    console.log('✓ Added estimateComplexity to MultimodalOperaOrchestrator');
   }
 }
 

@@ -1,6 +1,6 @@
 # VERSATIL Basic Project Setup
 
-This is a basic project template configured with the VERSATIL SDLC Framework and BMAD methodology.
+This is a basic project template configured with the VERSATIL SDLC Framework and OPERA methodology.
 
 ## 🤖 Active Agents
 
@@ -33,7 +33,7 @@ versatil-basic-project/
 ├── server.js             # Marcus-Backend Express server
 ├── tests/                # Maria-QA test suites
 ├── .cursorrules          # Auto-agent activation
-├── CLAUDE.md            # BMAD methodology
+├── CLAUDE.md            # OPERA methodology
 └── package.json         # Dependencies & scripts
 ```
 
@@ -91,7 +91,7 @@ NODE_ENV=production npm start
 ## 📚 Learn More
 
 - [VERSATIL Framework Documentation](../../docs/)
-- [BMAD Methodology](../../CLAUDE.md)
+- [OPERA Methodology](../../CLAUDE.md)
 - [Agent Reference](../../docs/agent-reference.md)
 
 ## 🆘 Support

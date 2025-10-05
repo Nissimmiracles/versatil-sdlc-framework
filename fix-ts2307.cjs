@@ -43,7 +43,7 @@ async function fixTS2307() {
       'src/orchestration',
       'src/monitoring', 
       'src/collaboration',
-      'src/bmad',
+      'src/opera',
       'src/mcp'
     ];
     
@@ -110,17 +110,17 @@ export default AgentCollaborationHub;`
       fixCount++;
     }
     
-    // Create bmad/enhanced-bmad-coordinator.ts
-    if (missingModules.has('../bmad/enhanced-bmad-coordinator')) {
+    // Create opera/enhanced-opera-coordinator.ts
+    if (missingModules.has('../opera/enhanced-opera-coordinator')) {
       await fs.writeFile(
-        path.join(__dirname, 'src/bmad/enhanced-bmad-coordinator.ts'),
+        path.join(__dirname, 'src/opera/enhanced-opera-coordinator.ts'),
         `import { EventEmitter } from 'events';
 
-export class EnhancedBMADCoordinator extends EventEmitter {
+export class EnhancedOPERACoordinator extends EventEmitter {
   private agents = new Map();
   
   async initialize(): Promise<void> {
-    console.log('BMAD Coordinator initialized');
+    console.log('OPERA Coordinator initialized');
   }
   
   async coordinatePhase(phase: string): Promise<any> {
@@ -128,31 +128,31 @@ export class EnhancedBMADCoordinator extends EventEmitter {
   }
 }
 
-export default EnhancedBMADCoordinator;`
+export default EnhancedOPERACoordinator;`
       );
-      console.log('  ✓ Created enhanced-bmad-coordinator.ts');
+      console.log('  ✓ Created enhanced-opera-coordinator.ts');
       fixCount++;
     }
     
-    // Create mcp/archon-mcp.ts
-    if (missingModules.has('./mcp/archon-mcp')) {
+    // Create mcp/opera-mcp.ts
+    if (missingModules.has('./mcp/opera-mcp')) {
       await fs.writeFile(
-        path.join(__dirname, 'src/mcp/archon-mcp.ts'),
-        `export class ArchonMCP {
+        path.join(__dirname, 'src/mcp/opera-mcp.ts'),
+        `export class OperaMCP {
   async start(): Promise<void> {
-    console.log('Archon MCP started');
+    console.log('Opera MCP started');
   }
   
   async stop(): Promise<void> {
-    console.log('Archon MCP stopped');
+    console.log('Opera MCP stopped');
   }
 }
 
-export function createArchonMCP(config?: any): ArchonMCP {
-  return new ArchonMCP();
+export function createOperaMCP(config?: any): OperaMCP {
+  return new OperaMCP();
 }`
       );
-      console.log('  ✓ Created archon-mcp.ts');
+      console.log('  ✓ Created opera-mcp.ts');
       fixCount++;
     }
     
@@ -221,7 +221,7 @@ export class CrossFileValidator implements ConfigValidator {
     // Fix any files with wrong import paths
     const filesToFix = [
       'src/agents/enhanced-maria.ts',
-      'src/archon/enhanced-archon-orchestrator.ts'
+      'src/opera/enhanced-opera-orchestrator.ts'
     ];
     
     for (const file of filesToFix) {

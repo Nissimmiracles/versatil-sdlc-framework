@@ -21,7 +21,7 @@ body:
       description: Which parts of the VERSATIL framework are affected?
       options:
         - label: Agent Dispatcher (Auto-agent activation)
-        - label: BMAD Agents (Maria, James, Marcus, Sarah, Alex, Dr.AI)
+        - label: OPERA Agents (Maria, James, Marcus, Sarah, Alex, Dr.AI)
         - label: Quality Gates System
         - label: Emergency Response Protocol
         - label: Version Management

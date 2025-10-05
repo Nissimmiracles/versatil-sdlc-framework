@@ -18,9 +18,9 @@
 
 ## 🚀 Run These Working Tests:
 
-### Full Enhanced BMAD Test
+### Full Enhanced OPERA Test
 ```bash
-node test-enhanced-bmad-working.cjs
+node test-enhanced-opera-working.cjs
 ```
 Shows all v1.2.0 features working together!
 
@@ -67,7 +67,7 @@ The one "failure" was actually the introspective test doing exactly what it shou
 
 ## 🎯 Next Steps
 
-1. Run `node test-enhanced-bmad-working.cjs` to see all features
+1. Run `node test-enhanced-opera-working.cjs` to see all features
 2. The framework is production-ready with v1.2.0
 3. Introspective testing will keep it healthy
 4. You can build with confidence!

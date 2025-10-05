@@ -84,7 +84,7 @@
    - **Fix:** Update all documentation with correct GitHub URL
 
 2. **Installation Documentation Fragmentation**
-   - Multiple guides: `README.md`, `INSTALLATION.md`, `QUICKSTART.md`, `BMAD-QUICK-START.md`
+   - Multiple guides: `README.md`, `INSTALLATION.md`, `QUICKSTART.md`, `OPERA-QUICK-START.md`
    - **Issue:** No clear "start here" for new users
    - **Impact:** Decision paralysis for new users
    - **Fix:** Create single entry point that routes to appropriate guide

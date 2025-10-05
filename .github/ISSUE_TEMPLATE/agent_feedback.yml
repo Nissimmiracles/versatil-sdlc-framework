@@ -1,20 +1,20 @@
 name: 🤖 Agent Feedback
-description: Provide feedback on BMAD agent performance or behavior
+description: Provide feedback on OPERA agent performance or behavior
 title: "[AGENT] "
-labels: ["agent-feedback", "bmad"]
+labels: ["agent-feedback", "opera"]
 assignees: []
 
 body:
   - type: markdown
     attributes:
       value: |
-        Help us improve the BMAD agents! Your feedback on agent performance, accuracy, and helpfulness is valuable.
+        Help us improve the OPERA agents! Your feedback on agent performance, accuracy, and helpfulness is valuable.
 
   - type: dropdown
     id: agent
     attributes:
       label: Which Agent?
-      description: Which BMAD agent is this feedback about?
+      description: Which OPERA agent is this feedback about?
       options:
         - Maria (QA Lead)
         - James (Frontend)

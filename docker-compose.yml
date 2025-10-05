@@ -75,7 +75,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # BMAD Agent - Maria-QA (dedicated container for testing)
+  # OPERA Agent - Maria-QA (dedicated container for testing)
   maria-qa-agent:
     build:
       context: .
@@ -95,7 +95,7 @@ services:
     restart: unless-stopped
     command: ["--agent", "maria-qa", "--watch"]
 
-  # BMAD Agent - Marcus-Backend (dedicated container for backend orchestration)
+  # OPERA Agent - Marcus-Backend (dedicated container for backend orchestration)
   marcus-backend-agent:
     build:
       context: .

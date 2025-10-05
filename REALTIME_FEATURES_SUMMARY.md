@@ -5,13 +5,13 @@
 ### 1. **Opera MCP** (`/src/mcp/opera-mcp.ts`)
 - ✅ Full MCP interface for Opera orchestration
 - ✅ 7 MCP tools exposed:
-  - `archon_create_goal` - Create and queue goals
-  - `archon_goal_status` - Monitor goal progress
-  - `archon_decision_history` - Access decision reasoning
-  - `archon_learning_insights` - Get AI learning patterns
-  - `archon_override_goal` - Manual intervention
-  - `archon_get_context` - Current environment context
-  - `archon_performance_metrics` - Performance analytics
+  - `opera_create_goal` - Create and queue goals
+  - `opera_goal_status` - Monitor goal progress
+  - `opera_decision_history` - Access decision reasoning
+  - `opera_learning_insights` - Get AI learning patterns
+  - `opera_override_goal` - Manual intervention
+  - `opera_get_context` - Current environment context
+  - `opera_performance_metrics` - Performance analytics
 - ✅ **Automatic updates** with configurable intervals
 - ✅ Self-improving through learned patterns
 
@@ -115,7 +115,7 @@
 ```javascript
 const tracker = new RealTimeSDLCTracker(
   sdlcOrchestrator,
-  bmadCoordinator,
+  operaCoordinator,
   agentRegistry,
   {
     updateInterval: 1000,
@@ -138,7 +138,7 @@ ws.on('message', (data) => {
 ### 3. Create Opera Goal via MCP
 ```bash
 # Using MCP client
-mcp call archon_create_goal '{
+mcp call opera_create_goal '{
   "type": "feature",
   "description": "Add user authentication",
   "priority": "high"

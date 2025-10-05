@@ -1,6 +1,6 @@
 # Get Started with VERSATIL SDLC Framework
 
-🚀 **AI-Native Development Framework** with BMAD Methodology, RAG Memory, and Zero Context Loss
+🚀 **AI-Native Development Framework** with OPERA Methodology, RAG Memory, and Zero Context Loss
 
 This guide will help you install and configure VERSATIL in **less than 5 minutes**.
 
@@ -198,7 +198,7 @@ versatil init
 
 This will:
 1. Detect your project type (React, Vue, Node.js, etc.)
-2. Configure BMAD agents for your stack
+2. Configure OPERA agents for your stack
 3. Create `.versatil-project.json` (the ONLY file added to your project)
 4. Set up quality gates and automation
 
@@ -249,7 +249,7 @@ versatil config reset
 
 ---
 
-## Meet the BMAD Agents
+## Meet the OPERA Agents
 
 The framework includes **6 specialized agents** that work proactively:
 

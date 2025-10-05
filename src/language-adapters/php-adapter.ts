@@ -4,7 +4,7 @@
  * Enables VERSATIL to work with PHP projects, supporting Composer, PHPUnit,
  * PHP_CodeSniffer, PHPStan, and the entire PHP ecosystem.
  *
- * BMAD agents can now orchestrate PHP development workflows.
+ * OPERA agents can now orchestrate PHP development workflows.
  */
 
 import { exec } from 'child_process';

@@ -13,7 +13,7 @@ import { createOrchestrator } from './dist/intelligence/agent-orchestrator.js';
 console.log(`
 ╔══════════════════════════════════════════════════════════════╗
 ║     VERSATIL Intelligence System Integration Test           ║
-║        BMAD + Claude Agents - Complete Demo                 ║
+║        OPERA + Claude Agents - Complete Demo                 ║
 ╚══════════════════════════════════════════════════════════════╝
 `);
 

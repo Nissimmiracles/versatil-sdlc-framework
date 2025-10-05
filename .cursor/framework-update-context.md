@@ -2,14 +2,14 @@
 
 ## 🎯 Framework Update Overview
 
-This guide provides comprehensive context for Cursor AI when performing framework updates on the VERSATIL SDLC Framework with Enhanced BMAD methodology and Chrome MCP integration.
+This guide provides comprehensive context for Cursor AI when performing framework updates on the VERSATIL SDLC Framework with Enhanced OPERA methodology and Chrome MCP integration.
 
 ---
 
 ## 📋 Current Framework State
 
 ### Core Technologies
-- **Framework**: VERSATIL SDLC with Enhanced BMAD methodology
+- **Framework**: VERSATIL SDLC with Enhanced OPERA methodology
 - **TypeScript**: 5.0+ with strict mode enabled
 - **Testing**: Hybrid Jest (unit) + Playwright (e2e) with Chrome MCP
 - **Node.js**: 18.0+
@@ -48,8 +48,8 @@ VERSATIL SDLC FW/
 ├── jest.config.js             # Jest unit testing config
 ├── tsconfig.json              # Main TypeScript config
 ├── tests/tsconfig.json        # Test-specific TypeScript config
-├── .cursorrules               # BMAD agent activation rules
-└── CLAUDE.md                  # BMAD methodology configuration
+├── .cursorrules               # OPERA agent activation rules
+└── CLAUDE.md                  # OPERA methodology configuration
 ```
 
 ### Key Settings
@@ -57,14 +57,14 @@ VERSATIL SDLC FW/
 #### Cursor AI Settings (`.cursor/settings.json`)
 - Model: claude-3.5-sonnet
 - TypeScript SDK: workspace version
-- Path intellisense with BMAD structure mapping
+- Path intellisense with OPERA structure mapping
 - Chrome MCP integration enabled
-- BMAD agent auto-activation
+- OPERA agent auto-activation
 
 #### TypeScript Configuration (Enhanced)
 - Strict mode: enabled
 - Target: ES2022
-- Enhanced path mapping for BMAD structure
+- Enhanced path mapping for OPERA structure
 - Playwright types included
 - Project references for test separation
 
@@ -76,7 +76,7 @@ VERSATIL SDLC FW/
 
 #### Jest (Unit Testing)
 ```javascript
-// Coverage thresholds enhanced for BMAD compliance
+// Coverage thresholds enhanced for OPERA compliance
 coverageThreshold: {
   global: { branches: 80, functions: 80, lines: 80, statements: 80 },
   'src/agents/': { branches: 85, functions: 85, lines: 85, statements: 85 },
@@ -94,7 +94,7 @@ projects: [
   'performance',           // Performance monitoring
   'accessibility',         // A11y compliance
   'security',              // Security validation
-  'bmad-integration'       // BMAD methodology testing
+  'opera-integration'       // OPERA methodology testing
 ]
 ```
 
@@ -107,7 +107,7 @@ projects: [
 
 ---
 
-## 🎯 BMAD Methodology Integration
+## 🎯 OPERA Methodology Integration
 
 ### Agent Activation Rules (`.cursorrules`)
 
@@ -179,7 +179,7 @@ Rule_1_Cursor_Features:
 #### Configuration Files Affected
 - `.cursor/settings.json` - Rule 1 AI assistance settings
 - `src/orchestration/parallel-task-manager.ts` - Core implementation
-- `src/agents/enhanced-bmad-config.ts` - Agent rule configurations
+- `src/agents/enhanced-opera-config.ts` - Agent rule configurations
 - `src/core/versatil-orchestrator.ts` - Central coordination
 
 ### Rule 2: Automated Stress Test Generation
@@ -211,7 +211,7 @@ Rule_2_Cursor_Features:
 
 #### Configuration Files Affected
 - `src/testing/automated-stress-test-generator.ts` - Core implementation
-- `src/agents/enhanced-bmad-config.ts` - Maria-QA rule configuration
+- `src/agents/enhanced-opera-config.ts` - Maria-QA rule configuration
 - `test/integration/three-rules-integration.test.ts` - Test validation
 
 ### Rule 3: Daily Audit and Health Check System
@@ -294,7 +294,7 @@ AI_Enhancement_Strategies:
 
 ### When Updating Dependencies
 
-1. **Always Preserve BMAD Structure**
+1. **Always Preserve OPERA Structure**
    ```bash
    # Maintain agent-specific configurations
    # Preserve Chrome MCP integration
@@ -325,7 +325,7 @@ AI_Enhancement_Strategies:
 - [ ] All tests passing (Jest + Playwright)
 - [ ] TypeScript compilation successful
 - [ ] Chrome MCP server connectivity
-- [ ] BMAD agent activation working
+- [ ] OPERA agent activation working
 - [ ] Quality gates enforced
 
 #### Post-Update Validation
@@ -333,7 +333,7 @@ AI_Enhancement_Strategies:
 - [ ] TypeScript strict mode still enabled
 - [ ] Hybrid testing framework functional
 - [ ] Chrome MCP integration working
-- [ ] BMAD methodology preserved
+- [ ] OPERA methodology preserved
 - [ ] Quality thresholds maintained
 
 ### Emergency Rollback Procedure
@@ -374,7 +374,7 @@ npx playwright test --project=chromium-desktop
 3. Ensure performance budgets realistic
 4. Verify accessibility audit setup
 
-### BMAD Agent Activation Problems
+### OPERA Agent Activation Problems
 1. Check `.cursorrules` syntax
 2. Validate file pattern matching
 3. Ensure agent context preservation
@@ -396,7 +396,7 @@ npx playwright test --project=chromium-desktop
 - Performance score: 90+ (Lighthouse)
 - Accessibility score: 95+ (axe)
 - Security score: A+ (headers validation)
-- BMAD compliance: 100%
+- OPERA compliance: 100%
 
 ---
 
@@ -406,11 +406,11 @@ npx playwright test --project=chromium-desktop
 1. **Context Awareness**: Always reference this guide during updates
 2. **Incremental Updates**: Update one component at a time
 3. **Validation Steps**: Run tests after each change
-4. **Quality Preservation**: Maintain BMAD standards throughout
+4. **Quality Preservation**: Maintain OPERA standards throughout
 5. **Documentation**: Update this guide if structure changes
 
 ### IDE Integration
-- **Auto-completion**: Configured for BMAD structure
+- **Auto-completion**: Configured for OPERA structure
 - **Type checking**: Real-time with strict mode
 - **Testing**: Integrated Jest + Playwright support
 - **Debugging**: Chrome DevTools integration via MCP
@@ -421,7 +421,7 @@ npx playwright test --project=chromium-desktop
 ## 📚 Reference Documentation
 
 ### Key Files to Understand
-- `CLAUDE.md`: Complete BMAD methodology configuration
+- `CLAUDE.md`: Complete OPERA methodology configuration
 - `.cursorrules`: Agent activation and collaboration rules
 - `playwright.config.ts`: Chrome MCP and testing configuration
 - `jest.config.js`: Unit testing and coverage configuration
@@ -445,7 +445,7 @@ npx playwright test --project=chromium-desktop
 - Preserve authentication patterns
 - Keep sensitive data out of configurations
 
-### BMAD Security Integration
+### OPERA Security Integration
 - Security-Sam agent activation for security-related changes
 - Automated vulnerability scanning
 - Configuration security validation
@@ -454,7 +454,7 @@ npx playwright test --project=chromium-desktop
 
 ---
 
-*This context guide ensures Cursor AI maintains the integrity and quality of the VERSATIL SDLC Framework during all updates while preserving the Enhanced BMAD methodology and Chrome MCP integration capabilities.*
+*This context guide ensures Cursor AI maintains the integrity and quality of the VERSATIL SDLC Framework during all updates while preserving the Enhanced OPERA methodology and Chrome MCP integration capabilities.*
 
 **Framework Version**: 1.0.0
 **Last Updated**: 2024-01-15

@@ -255,7 +255,7 @@ Let me ask a few questions to optimize your setup...
           multimodal: this.detected.requirements.features?.includes('visual'),
           vectorDB: this.detected.existingTools.supabase ? 'supabase' : 'local'
         },
-        archon: {
+        opera: {
           enabled: true,
           ...scenario.config,
           multimodal: this.detected.requirements.features?.includes('visual'),
@@ -291,7 +291,7 @@ Let me ask a few questions to optimize your setup...
       };
       
       config.features.introspection.priority = 'critical';
-      config.features.archon.carefulMode = true;
+      config.features.opera.carefulMode = true;
     }
     
     return config;
@@ -425,14 +425,14 @@ Let me ask a few questions to optimize your setup...
       console.log('Next steps:');
       console.log('1. Run: npm run verify:context');
       console.log('2. Run: npm run demo:context');
-      console.log('3. Start developing with: @archon improve versatil framework');
+      console.log('3. Start developing with: @opera improve versatil framework');
       console.log('4. Monitor with: @introspect health-check\n');
     } else {
       console.log(`Optimized for: ${scenario.name}\n`);
       
       console.log('Next steps:');
       console.log('1. Test your setup: npm run test:enhanced');
-      console.log('2. Start with: @archon <your first goal>');
+      console.log('2. Start with: @opera <your first goal>');
       console.log('3. Query knowledge: @memory <topic>');
       console.log('4. Check health: @introspect status\n');
     }
@@ -477,7 +477,7 @@ Let me ask a few questions to optimize your setup...
     if (config.features.selfReferential?.enabled) {
       recommendations.push('Run framework self-tests regularly');
       recommendations.push('Monitor introspection logs closely');
-      recommendations.push('Use @archon carefully for self-modifications');
+      recommendations.push('Use @opera carefully for self-modifications');
     }
     
     if (!config.features.rag.vectorDB === 'supabase') {

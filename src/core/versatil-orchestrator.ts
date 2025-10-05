@@ -17,7 +17,7 @@ import { EventEmitter } from 'events';
 import { ParallelTaskManager, Task, TaskType, Priority, SDLCPhase } from '../orchestration/parallel-task-manager.js';
 import { AutomatedStressTestGenerator, StressTestConfig, TargetType } from '../testing/automated-stress-test-generator.js';
 import { DailyAuditSystem, AuditConfig, AuditType } from '../audit/daily-audit-system.js';
-import { EnhancedBMADConfigManager, EnhancedAgentConfig } from '../agents/enhanced-bmad-config.js';
+import { EnhancedOPERAConfigManager, EnhancedAgentConfig } from '../agents/enhanced-opera-config.js';
 import { EnvironmentManager } from '../environment/environment-manager.js';
 
 export interface VersatilConfig {
@@ -196,7 +196,7 @@ export class VersatilOrchestrator extends EventEmitter {
   private taskManager: ParallelTaskManager;
   private stressTestGenerator: AutomatedStressTestGenerator;
   private auditSystem: DailyAuditSystem;
-  private configManager: EnhancedBMADConfigManager;
+  private configManager: EnhancedOPERAConfigManager;
   private environmentManager: EnvironmentManager;
 
   private metrics: VersatilMetrics;
@@ -214,7 +214,7 @@ export class VersatilOrchestrator extends EventEmitter {
     this.taskManager = new ParallelTaskManager();
     this.stressTestGenerator = new AutomatedStressTestGenerator();
     this.auditSystem = new DailyAuditSystem();
-    this.configManager = new EnhancedBMADConfigManager();
+    this.configManager = new EnhancedOPERAConfigManager();
     this.environmentManager = new EnvironmentManager();
 
     this.metrics = this.initializeMetrics();
@@ -1111,7 +1111,7 @@ export class VersatilOrchestrator extends EventEmitter {
     return this.auditSystem;
   }
 
-  public getConfigManager(): EnhancedBMADConfigManager {
+  public getConfigManager(): EnhancedOPERAConfigManager {
     return this.configManager;
   }
 

@@ -67,7 +67,7 @@
 **Root Directory** (.cjs): 39 files
 ```
 ✅ test-opera-mcp.cjs (fixed, shows notice)
-✅ test-bmad-completeness.cjs
+✅ test-opera-completeness.cjs
 ✅ healthcheck.cjs
 ✅ run-demo.cjs
 ... (all 39 working)
@@ -76,7 +76,7 @@
 **ESM Files** (.mjs): 3 files
 ```
 ✅ init-opera-mcp.mjs (ESM, working)
-✅ test-enhanced-bmad.mjs (ESM, working)
+✅ test-enhanced-opera.mjs (ESM, working)
 ✅ test-full-framework.mjs (ESM, working)
 ```
 
@@ -88,7 +88,7 @@
 
 ```bash
 # Infrastructure
-npm run show-agents          # ✅ Shows 6 BMAD agents
+npm run show-agents          # ✅ Shows 6 OPERA agents
 npm run agents               # ✅ Alias works
 npm run init                 # ✅ Agent setup
 npm run version:check        # ✅ Version validation
@@ -100,7 +100,7 @@ npm run opera:start          # ✅ Server start
 npm run opera:update         # ✅ Update check
 
 # Testing
-npm run test:enhanced        # ✅ Enhanced BMAD test
+npm run test:enhanced        # ✅ Enhanced OPERA test
 npm run test:opera-mcp       # ✅ Shows helpful notice
 node test-full-framework.mjs # ✅ 24/24 tests pass
 
@@ -197,7 +197,7 @@ npm run opera:update    # Check updates
 ### Testing
 ```bash
 node test-full-framework.mjs  # Full test (24 tests)
-npm run test:enhanced         # Enhanced BMAD test
+npm run test:enhanced         # Enhanced OPERA test
 npm run test:unit             # Unit tests
 ```
 

@@ -57,7 +57,7 @@
 ├── sarah-pm.md              ✅ Sarah-PM project coordination
 ├── alex-ba.md               ✅ Alex-BA requirements analysis
 ├── dr-ai-ml.md              ✅ Dr.AI-ML machine learning
-├── bmad/
+├── opera/
 │   ├── parallel.md          ✅ Rule 1 parallel execution
 │   ├── stress-test.md       ✅ Rule 2 stress testing
 │   └── audit.md             ✅ Rule 3 health audit
@@ -477,7 +477,7 @@ export class ProactiveAgentOrchestrator extends EventEmitter {
 #### 2. Standalone Agent Containers
 **Status**: ❌ **NOT IMPLEMENTED**
 
-**Requirement**: Each BMAD agent as standalone Docker container
+**Requirement**: Each OPERA agent as standalone Docker container
 **Reality**: Zero agent-specific Dockerfiles
 
 **Gap**: No containerization of agents
@@ -714,7 +714,7 @@ Q4 2026 (Oct-Dec): V3.0.0 Testing + Release
    - Create migration guide for multi-language projects
    - Add TypeScript compilation for language adapters
    - Write unit tests for Python/Go/Rust/Java/Ruby/PHP adapters
-   - Update BMAD agents to leverage language detection
+   - Update OPERA agents to leverage language detection
 
 ---
 

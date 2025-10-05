@@ -130,9 +130,9 @@ await check('RAG Memory Domain Separation', async () => {
   }
 });
 
-// Check 6: Archon with Environment Context
-await check('Archon Environment-Aware Planning', async () => {
-  const mockArchon = {
+// Check 6: Opera with Environment Context
+await check('Opera Environment-Aware Planning', async () => {
+  const mockOpera = {
     planWithContext: (goal, context) => {
       const plan = { agents: [] };
       
@@ -153,27 +153,27 @@ await check('Archon Environment-Aware Planning', async () => {
     quality: { testCoverage: 50 }
   };
   
-  const plan = mockArchon.planWithContext({}, context);
+  const plan = mockOpera.planWithContext({}, context);
   
   if (plan.agents.length !== 2) {
-    throw new Error('Archon not using context properly');
+    throw new Error('Opera not using context properly');
   }
 });
 
 // Check 7: Introspective Agent Full Access
 await check('Introspective Agent - Full Access', async () => {
   const mockIntrospective = {
-    archon: { addGoal: () => ({ id: 'goal-1' }) },
+    opera: { addGoal: () => ({ id: 'goal-1' }) },
     rag: { queryMemories: () => ({ documents: [] }) },
     scanner: { scanEnvironment: () => ({}) },
     
     performCheck: async function() {
       // Should have access to all components
-      if (!this.archon || !this.rag || !this.scanner) {
+      if (!this.opera || !this.rag || !this.scanner) {
         throw new Error('Missing component access');
       }
       
-      await this.archon.addGoal({});
+      await this.opera.addGoal({});
       await this.rag.queryMemories({});
       await this.scanner.scanEnvironment();
       

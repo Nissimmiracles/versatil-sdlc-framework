@@ -10,7 +10,7 @@
 ## 📊 INTELLIGENCE COLLECTION EVIDENCE
 
 ### ✅ **Real-Time Agent Activity**
-- **Configuration Updates**: Every ~4 seconds across all 6 BMAD agents
+- **Configuration Updates**: Every ~4 seconds across all 6 OPERA agents
 - **Enhanced Maria Intelligence**: Continuous extraction with pattern analysis
 - **Background Processes**: 25+ Node.js processes running agent coordination
 - **Intelligence Files**: Multiple JSON reports generated with detailed analysis

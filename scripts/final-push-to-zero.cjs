@@ -73,7 +73,7 @@ if (fs.existsSync(enhancedIntrospectivePath)) {
 
 // Fix 4: Fix SDLCOrchestrator constructor calls
 const filesToFix = [
-  'src/bmad/enhanced-bmad-coordinator.ts',
+  'src/opera/enhanced-opera-coordinator.ts',
   'src/enhanced-server.ts',
   'src/mcp-server.ts'
 ];
@@ -88,8 +88,8 @@ filesToFix.forEach(file => {
   // Fix SDLCOrchestrator constructor - remove second argument
   content = content.replace(/new SDLCOrchestrator\(([^,]+),\s*[^)]+\)/g, 'new SDLCOrchestrator($1)');
 
-  // Fix ArchonOrchestrator getInstance call - remove argument
-  content = content.replace(/ArchonOrchestrator\.getInstance\([^)]+\)/g, 'ArchonOrchestrator.getInstance()');
+  // Fix OperaOrchestrator getInstance call - remove argument
+  content = content.replace(/OperaOrchestrator\.getInstance\([^)]+\)/g, 'OperaOrchestrator.getInstance()');
 
   // Fix MCPServer constructor
   content = content.replace(/new MCPServer\(\{([^}]+)\},\s*\{/g, 'new MCPServer({\n$1,\n');
@@ -126,7 +126,7 @@ if (fs.existsSync(sdlcPath)) {
 // Fix 6: Add missing methods to various classes
 const methodFixes = [
   {
-    file: 'src/archon/multimodal-archon-orchestrator.ts',
+    file: 'src/opera/multimodal-opera-orchestrator.ts',
     check: 'estimateComplexity',
     method: `
   private estimateComplexity(goal: any): number {

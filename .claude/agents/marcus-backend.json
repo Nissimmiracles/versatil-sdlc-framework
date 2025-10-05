@@ -30,5 +30,5 @@
   },
   "maxConcurrentTasks": 3,
   "priority": "high",
-  "tags": ["backend", "api", "bmad", "security", "database"]
+  "tags": ["backend", "api", "opera", "security", "database"]
 }

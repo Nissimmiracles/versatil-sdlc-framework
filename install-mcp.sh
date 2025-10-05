@@ -65,7 +65,7 @@ class VERSATILMCPServer {
         tools: [
           {
             name: 'versatil_activate_agent',
-            description: 'Activate a specific BMAD agent with context',
+            description: 'Activate a specific OPERA agent with context',
             inputSchema: {
               type: 'object',
               properties: {
@@ -464,7 +464,7 @@ echo "   • $CLAUDE_CONFIG_FILE (Claude Desktop config)"
 echo "   • $CURSOR_CONFIG_FILE (Cursor config)"
 echo ""
 echo "🔧 Available MCP Tools:"
-echo "   • versatil_activate_agent - Activate BMAD agents"
+echo "   • versatil_activate_agent - Activate OPERA agents"
 echo "   • versatil_orchestrate_sdlc - Manage SDLC phases"
 echo "   • versatil_quality_gate - Execute quality checks"
 echo "   • versatil_framework_status - Get framework status"

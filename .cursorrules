@@ -848,11 +848,11 @@ All agents now have memory! They learn from every interaction.
 - View agent memories: @<agent> memory
 - Patterns are learned and applied automatically
 
-## 🤖 Archon Orchestrator
-Set goals, not tasks! Archon handles the rest autonomously.
-- Set goal: @archon <goal description>
-- Example: @archon Build user authentication with JWT and 2FA
-- Archon will plan, coordinate agents, and execute
+## 🤖 Opera Orchestrator
+Set goals, not tasks! Opera handles the rest autonomously.
+- Set goal: @opera <goal description>
+- Example: @opera Build user authentication with JWT and 2FA
+- Opera will plan, coordinate agents, and execute
 
 ## ⚡ Enhanced Agent Commands
 Your existing agents now have superpowers:
@@ -870,13 +870,13 @@ On file save:
 
 ## 🎯 Goal-Based Development
 Try these:
-- @archon Create REST API for user management
-- @archon Fix all security vulnerabilities
-- @archon Add comprehensive test coverage
-- @archon Optimize database performance
+- @opera Create REST API for user management
+- @opera Fix all security vulnerabilities
+- @opera Add comprehensive test coverage
+- @opera Optimize database performance
 
 ## 💡 Tips
 - Let agents learn - every interaction improves them
-- Trust Archon's autonomy - it gets smarter
+- Trust Opera's autonomy - it gets smarter
 - Check memories before implementing: @memory <topic>
 - Use @introspect if something seems wrong

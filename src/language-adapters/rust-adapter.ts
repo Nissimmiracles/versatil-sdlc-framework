@@ -4,7 +4,7 @@
  * Enables VERSATIL to work with Rust projects, supporting cargo test, cargo build,
  * clippy, rustfmt, and the entire Rust toolchain.
  *
- * BMAD agents can now orchestrate Rust development workflows.
+ * OPERA agents can now orchestrate Rust development workflows.
  */
 
 import { exec } from 'child_process';
@@ -436,7 +436,7 @@ export class RustAdapter extends BaseLanguageAdapter {
   }
 
   /**
-   * Get recommended BMAD agents for Rust projects
+   * Get recommended OPERA agents for Rust projects
    */
   getRecommendedAgents(): string[] {
     return [

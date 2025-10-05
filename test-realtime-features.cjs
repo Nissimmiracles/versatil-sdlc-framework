@@ -10,7 +10,7 @@ const { EnhancedOperaOrchestrator } = require('./dist/opera/enhanced-opera-orche
 const { createOperaMCP } = require('./dist/mcp/opera-mcp');
 const { AgentRegistry } = require('./dist/agents/agent-registry');
 const { SDLCOrchestrator } = require('./dist/flywheel/sdlc-orchestrator');
-const { EnhancedBMADCoordinator } = require('./dist/bmad/enhanced-bmad-coordinator');
+const { EnhancedOPERACoordinator } = require('./dist/opera/enhanced-opera-coordinator');
 const { RealTimeSDLCTracker } = require('./dist/tracking/realtime-sdlc-tracker');
 
 async function testRealTimeFeatures() {
@@ -26,8 +26,8 @@ async function testRealTimeFeatures() {
     // Initialize SDLC Orchestrator
     const sdlcOrchestrator = new SDLCOrchestrator(agentRegistry, logger);
     
-    // Initialize Enhanced BMAD Coordinator
-    const bmadCoordinator = new EnhancedBMADCoordinator({
+    // Initialize Enhanced OPERA Coordinator
+    const operaCoordinator = new EnhancedOPERACoordinator({
       ragEnabled: true,
       operaEnabled: true,
       autonomousMode: true
@@ -74,7 +74,7 @@ async function testRealTimeFeatures() {
     
     const realtimeTracker = new RealTimeSDLCTracker(
       sdlcOrchestrator,
-      bmadCoordinator,
+      operaCoordinator,
       agentRegistry,
       {
         updateInterval: 1000, // 1 second updates

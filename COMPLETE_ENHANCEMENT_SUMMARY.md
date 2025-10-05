@@ -23,7 +23,7 @@ Your three requirements have been fully addressed with comprehensive solutions:
 - n8n MCP (workflow automation)
 - VERSATIL SDLC MCP (framework integration)
 - Chrome MCP (browser automation)
-- BMAD MCP (methodology)
+- OPERA MCP (methodology)
 - Playwright MCP (testing)
 - Supabase MCP (database)
 - Vercel MCP (deployment)

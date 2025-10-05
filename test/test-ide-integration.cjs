@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 /**
  * VERSATIL SDLC Framework - IDE Integration Tests
- * Tests BMAD coordinator's ability to generate IDE-ready prompts
+ * Tests OPERA coordinator's ability to generate IDE-ready prompts
  */
 
 console.log(`
 ╔══════════════════════════════════════════════════════════════╗
 ║              IDE Integration Test Suite                     ║
-║                  BMAD Coordinator Testing                   ║
+║                  OPERA Coordinator Testing                   ║
 ╚══════════════════════════════════════════════════════════════╝
 `);
 
-// BMAD Coordinator simulation (simplified)
-class BMADCoordinator {
+// OPERA Coordinator simulation (simplified)
+class OPERACoordinator {
   async processRequest(userRequest, context) {
     // Import the actual orchestrator
     const { createOrchestrator } = await import('../dist/intelligence/agent-orchestrator.js');
@@ -193,13 +193,13 @@ async function testIDEIntegration() {
 
   console.log(`Running ${tests.length} IDE integration tests...\n`);
 
-  const bmad = new BMADCoordinator();
+  const opera = new OPERACoordinator();
 
   for (const test of tests) {
     process.stdout.write(`${test.name}... `);
 
     try {
-      const result = await bmad.processRequest(
+      const result = await opera.processRequest(
         test.input.request,
         test.input.context
       );
@@ -243,7 +243,7 @@ async function testIDEIntegration() {
 
   if (passed === tests.length) {
     console.log(`✅ ALL IDE INTEGRATION TESTS PASSED!\n`);
-    console.log(`🎉 BMAD Coordinator ready for IDE integration\n`);
+    console.log(`🎉 OPERA Coordinator ready for IDE integration\n`);
     process.exit(0);
   } else {
     console.log(`❌ SOME TESTS FAILED\n`);

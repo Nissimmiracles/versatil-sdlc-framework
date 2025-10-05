@@ -127,7 +127,7 @@ Idle ⏸️  →  Starting ⚙️  →  Working ⚙️  →  Complete ✅  →  
 
 ## 🎯 What You See
 
-### Agent Operations (6 BMAD Agents)
+### Agent Operations (6 OPERA Agents)
 
 Each agent shows:
 1. **Name**: Maria-QA, James-Frontend, Marcus-Backend, etc.

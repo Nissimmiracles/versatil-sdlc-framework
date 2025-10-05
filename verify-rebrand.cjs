@@ -2,7 +2,7 @@
 
 /**
  * VERSATIL Opera MCP - Rebranding Verification Script
- * Verifies that all Archon references have been replaced with Opera
+ * Verifies that all Opera references have been replaced with Opera
  */
 
 const fs = require('fs');
@@ -30,9 +30,9 @@ check('Opera directory exists (src/opera/)', () => {
   return fs.existsSync('src/opera');
 });
 
-// Check 2: Archon directory removed
-check('Archon directory removed (src/archon/)', () => {
-  return !fs.existsSync('src/archon');
+// Check 2: Opera directory removed
+check('Opera directory removed (src/opera/)', () => {
+  return !fs.existsSync('src/opera');
 });
 
 // Check 3: Opera files exist
@@ -52,11 +52,11 @@ check('Package.json contains "Opera"', () => {
   return pkg.description.includes('Opera');
 });
 
-// Check 5: No archon references in source files (excluding backups)
-check('No "archon" in source code (case-insensitive)', () => {
+// Check 5: No opera references in source files (excluding backups)
+check('No "opera" in source code (case-insensitive)', () => {
   try {
     const result = execSync(
-      'find src -type f -name "*.ts" -o -name "*.js" | xargs grep -i "archon" | grep -v ".bak" | wc -l',
+      'find src -type f -name "*.ts" -o -name "*.js" | xargs grep -i "opera" | grep -v ".bak" | wc -l',
       { encoding: 'utf8' }
     ).trim();
     return parseInt(result) === 0;
@@ -85,8 +85,8 @@ check('Backup directory created', () => {
 });
 
 // Check 8: Build artifacts cleaned
-check('Old archon build artifacts removed from dist', () => {
-  if (!fs.existsSync('dist/archon')) {
+check('Old opera build artifacts removed from dist', () => {
+  if (!fs.existsSync('dist/opera')) {
     return true;
   }
   return false;

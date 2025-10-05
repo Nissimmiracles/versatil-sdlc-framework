@@ -26,12 +26,12 @@ This document provides a comprehensive guide for integrating **VERSATIL SDLC Fra
 ### Goals:
 - ✅ Native Claude Code 2.0 feature support
 - ✅ Zero breaking changes for existing users
-- ✅ Enhanced BMAD agent integration
+- ✅ Enhanced OPERA agent integration
 - ✅ Improved developer experience
 - ✅ Maintained 85%+ test coverage
 
 ### Key Improvements:
-1. **Custom Slash Commands** - BMAD agent shortcuts
+1. **Custom Slash Commands** - OPERA agent shortcuts
 2. **Hooks System** - Automated quality gates
 3. **Custom Subagents** - @-mentionable agents
 4. **Background Commands** - Rule 1 parallel execution
@@ -52,7 +52,7 @@ VERSATIL SDLC FW/
 ├── .cursor/                    # Cursor AI config (existing)
 │   └── settings.json
 ├── src/                        # Framework source
-│   ├── agents/                 # BMAD agents
+│   ├── agents/                 # OPERA agents
 │   ├── rag/                    # RAG memory
 │   └── orchestration/          # Opera orchestrator
 ├── scripts/                    # Automation scripts
@@ -70,7 +70,7 @@ VERSATIL SDLC FW/
 │   │   ├── sarah-pm.md
 │   │   ├── alex-ba.md
 │   │   ├── dr-ai-ml.md
-│   │   ├── bmad/
+│   │   ├── opera/
 │   │   │   ├── parallel.md
 │   │   │   ├── stress-test.md
 │   │   │   └── audit.md
@@ -102,7 +102,7 @@ VERSATIL SDLC FW/
 │   │   ├── sarah-pm.json
 │   │   ├── alex-ba.json
 │   │   └── dr-ai-ml.json
-│   ├── output-styles/          # ⭐ BMAD output styles
+│   ├── output-styles/          # ⭐ OPERA output styles
 │   │   ├── maria-qa.json
 │   │   ├── james-frontend.json
 │   │   ├── marcus-backend.json
@@ -126,7 +126,7 @@ VERSATIL SDLC FW/
 
 #### Files to Create:
 
-##### 1.1 BMAD Agent Commands
+##### 1.1 OPERA Agent Commands
 
 **File**: `.claude/commands/maria-qa.md`
 ```markdown
@@ -159,9 +159,9 @@ This command activates Maria-QA with:
 
 **Estimated Lines**: 25-30 lines per agent command
 
-##### 1.2 BMAD Workflow Commands
+##### 1.2 OPERA Workflow Commands
 
-**File**: `.claude/commands/bmad/parallel.md`
+**File**: `.claude/commands/opera/parallel.md`
 ```markdown
 ---
 description: "Enable Rule 1 parallel task execution"
@@ -209,7 +209,7 @@ Run the **VERSATIL Framework Doctor** to diagnose and fix issues.
 
 ## What Gets Checked:
 ✅ Isolation validation (framework-project separation)
-✅ Agent health (all 6 BMAD agents operational)
+✅ Agent health (all 6 OPERA agents operational)
 ✅ MCP server status (connection and tool availability)
 ✅ Rule enablement (Rules 1-5 configuration)
 ✅ Test coverage (85%+ threshold)
@@ -238,12 +238,12 @@ Runs: `npm run validate:isolation && npm run healthcheck`
 
 1. **Create directory structure**:
 ```bash
-mkdir -p .claude/commands/bmad
+mkdir -p .claude/commands/opera
 mkdir -p .claude/commands/framework
 ```
 
 2. **Create all 10 slash commands**:
-   - 6 BMAD agent commands
+   - 6 OPERA agent commands
    - 3 workflow commands (parallel, stress-test, audit)
    - 3 framework commands (validate, isolate, doctor)
 
@@ -347,7 +347,7 @@ echo '{"decision": "allow"}'
 ```bash
 #!/bin/bash
 # VERSATIL Agent Coordinator Hook
-# Routes tasks to appropriate BMAD agent
+# Routes tasks to appropriate OPERA agent
 
 set -euo pipefail
 
@@ -500,7 +500,7 @@ if [[ -f ".versatil-project.json" ]]; then
 
   cat <<EOF
 {
-  "systemMessage": "🚀 VERSATIL Framework Initialized\n\nProject: $PROJECT_NAME\nFramework: v$(versatil-sdlc --version)\nAgents: 6 BMAD agents ready\nRules: 1-5 enabled\n\n✨ Ready for AI-native development!"
+  "systemMessage": "🚀 VERSATIL Framework Initialized\n\nProject: $PROJECT_NAME\nFramework: v$(versatil-sdlc --version)\nAgents: 6 OPERA agents ready\nRules: 1-5 enabled\n\n✨ Ready for AI-native development!"
 }
 EOF
 else
@@ -516,7 +516,7 @@ fi
 ```bash
 #!/bin/bash
 # VERSATIL Agent Health Check Hook
-# Validates all BMAD agents are operational
+# Validates all OPERA agents are operational
 
 set -euo pipefail
 
@@ -537,7 +537,7 @@ if [[ ${#UNHEALTHY_AGENTS[@]} -gt 0 ]]; then
 }
 EOF
 else
-  echo '{"systemMessage": "✅ All 6 BMAD agents healthy"}'
+  echo '{"systemMessage": "✅ All 6 OPERA agents healthy"}'
 fi
 ```
 
@@ -678,7 +678,7 @@ echo '{"tool_name":"Write","tool_input":{"path":".versatil/test"}}' | .claude/ho
   "name": "Maria-QA",
   "description": "Quality Assurance Lead - Comprehensive testing, quality gates, and code review",
   "model": "claude-sonnet-4-5",
-  "systemPrompt": "You are Maria-QA, the Quality Assurance Lead for the VERSATIL SDLC Framework.\n\n## Your Role:\n- Enforce 80%+ test coverage on all code\n- Run comprehensive test suites (unit, integration, e2e)\n- Validate quality gates before deployment\n- Review code for security vulnerabilities\n- Ensure accessibility compliance (WCAG 2.1 AA)\n- Perform cross-browser testing\n- Generate detailed quality reports\n\n## Your Standards:\n- Test Coverage: >= 80%\n- Performance Budget: Enforced via Lighthouse\n- Security: OWASP Top 10 compliance\n- Accessibility: axe-core validation\n- Code Quality: ESLint + Prettier enforced\n\n## Tools You Use:\n- Jest for unit/integration testing\n- Playwright for e2e testing\n- Chrome MCP for browser automation\n- Lighthouse for performance audits\n- axe-core for accessibility\n\n## Communication Style:\n- Precise and thorough\n- Focus on quality metrics\n- Provide actionable recommendations\n- Flag blockers immediately\n\nYou coordinate with other BMAD agents to ensure zero-defect delivery.",
+  "systemPrompt": "You are Maria-QA, the Quality Assurance Lead for the VERSATIL SDLC Framework.\n\n## Your Role:\n- Enforce 80%+ test coverage on all code\n- Run comprehensive test suites (unit, integration, e2e)\n- Validate quality gates before deployment\n- Review code for security vulnerabilities\n- Ensure accessibility compliance (WCAG 2.1 AA)\n- Perform cross-browser testing\n- Generate detailed quality reports\n\n## Your Standards:\n- Test Coverage: >= 80%\n- Performance Budget: Enforced via Lighthouse\n- Security: OWASP Top 10 compliance\n- Accessibility: axe-core validation\n- Code Quality: ESLint + Prettier enforced\n\n## Tools You Use:\n- Jest for unit/integration testing\n- Playwright for e2e testing\n- Chrome MCP for browser automation\n- Lighthouse for performance audits\n- axe-core for accessibility\n\n## Communication Style:\n- Precise and thorough\n- Focus on quality metrics\n- Provide actionable recommendations\n- Flag blockers immediately\n\nYou coordinate with other OPERA agents to ensure zero-defect delivery.",
   "tools": [
     "Bash(npm test*)",
     "Bash(npm run test:*)",
@@ -710,7 +710,7 @@ echo '{"tool_name":"Write","tool_input":{"path":".versatil/test"}}' | .claude/ho
   },
   "maxConcurrentTasks": 3,
   "priority": "high",
-  "tags": ["testing", "quality", "bmad", "qa"]
+  "tags": ["testing", "quality", "opera", "qa"]
 }
 ```
 
@@ -748,7 +748,7 @@ echo '{"tool_name":"Write","tool_input":{"path":".versatil/test"}}' | .claude/ho
   },
   "maxConcurrentTasks": 3,
   "priority": "high",
-  "tags": ["frontend", "ui", "bmad", "react", "vue"]
+  "tags": ["frontend", "ui", "opera", "react", "vue"]
 }
 ```
 
@@ -787,7 +787,7 @@ echo '{"tool_name":"Write","tool_input":{"path":".versatil/test"}}' | .claude/ho
   },
   "maxConcurrentTasks": 3,
   "priority": "high",
-  "tags": ["backend", "api", "bmad", "security", "database"]
+  "tags": ["backend", "api", "opera", "security", "database"]
 }
 ```
 
@@ -797,7 +797,7 @@ echo '{"tool_name":"Write","tool_input":{"path":".versatil/test"}}' | .claude/ho
   "name": "Sarah-PM",
   "description": "Project Manager & Coordinator - Agile methodologies, stakeholder management, process optimization",
   "model": "claude-sonnet-4-5",
-  "systemPrompt": "You are Sarah-PM, the Project Manager and Coordinator for the VERSATIL SDLC Framework.\n\n## Your Role:\n- Project planning and milestone tracking\n- Team coordination and communication\n- Documentation strategy and maintenance\n- Risk management and mitigation\n- Stakeholder communication\n- Process improvement initiatives\n- Quality assurance oversight\n- Resource allocation optimization\n\n## Your Framework:\n- Methodology: Agile/Scrum with BMAD principles\n- Sprint Duration: 2 weeks\n- Quality Gates: Mandatory at each phase\n- Communication: Daily standups, weekly reviews\n- Documentation: Living documents approach\n- Metrics: Velocity, quality, satisfaction tracking\n\n## Tools You Use:\n- GitHub Projects / Issues\n- Markdown documentation\n- Mermaid diagrams\n- Status reports and dashboards\n\n## Communication Style:\n- Clear and organized\n- Focus on deliverables and timelines\n- Facilitate collaboration\n- Keep stakeholders informed\n\nYou coordinate ALL agent activities and ensure alignment with business objectives.",
+  "systemPrompt": "You are Sarah-PM, the Project Manager and Coordinator for the VERSATIL SDLC Framework.\n\n## Your Role:\n- Project planning and milestone tracking\n- Team coordination and communication\n- Documentation strategy and maintenance\n- Risk management and mitigation\n- Stakeholder communication\n- Process improvement initiatives\n- Quality assurance oversight\n- Resource allocation optimization\n\n## Your Framework:\n- Methodology: Agile/Scrum with OPERA principles\n- Sprint Duration: 2 weeks\n- Quality Gates: Mandatory at each phase\n- Communication: Daily standups, weekly reviews\n- Documentation: Living documents approach\n- Metrics: Velocity, quality, satisfaction tracking\n\n## Tools You Use:\n- GitHub Projects / Issues\n- Markdown documentation\n- Mermaid diagrams\n- Status reports and dashboards\n\n## Communication Style:\n- Clear and organized\n- Focus on deliverables and timelines\n- Facilitate collaboration\n- Keep stakeholders informed\n\nYou coordinate ALL agent activities and ensure alignment with business objectives.",
   "model": "claude-sonnet-4-5",
   "tools": [
     "Read",
@@ -822,7 +822,7 @@ echo '{"tool_name":"Write","tool_input":{"path":".versatil/test"}}' | .claude/ho
   },
   "maxConcurrentTasks": 5,
   "priority": "high",
-  "tags": ["project-management", "coordination", "bmad", "documentation"]
+  "tags": ["project-management", "coordination", "opera", "documentation"]
 }
 ```
 
@@ -854,7 +854,7 @@ echo '{"tool_name":"Write","tool_input":{"path":".versatil/test"}}' | .claude/ho
   },
   "maxConcurrentTasks": 3,
   "priority": "medium",
-  "tags": ["business-analysis", "requirements", "bmad", "user-stories"]
+  "tags": ["business-analysis", "requirements", "opera", "user-stories"]
 }
 ```
 
@@ -890,7 +890,7 @@ echo '{"tool_name":"Write","tool_input":{"path":".versatil/test"}}' | .claude/ho
   },
   "maxConcurrentTasks": 2,
   "priority": "medium",
-  "tags": ["machine-learning", "ai", "bmad", "data-science", "python"]
+  "tags": ["machine-learning", "ai", "opera", "data-science", "python"]
 }
 ```
 

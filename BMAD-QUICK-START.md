@@ -1,4 +1,4 @@
-# BMAD UI/UX Testing Flywheel - Quick Start Guide
+# OPERA UI/UX Testing Flywheel - Quick Start Guide
 
 ## 🚀 Start Using the Flywheel in 5 Minutes
 
@@ -15,7 +15,7 @@ npm run test:maria-qa
 
 ## 📋 5 MCP Tools for UI/UX Testing
 
-### 1. **Trigger UI/UX Testing** (`bmad_trigger_ui_test`)
+### 1. **Trigger UI/UX Testing** (`opera_trigger_ui_test`)
 
 **When to use**: After making changes to UI components, routes, styles, or configuration
 
@@ -26,7 +26,7 @@ npm run test:maria-qa
 **Example**:
 ```json
 {
-  "tool": "bmad_trigger_ui_test",
+  "tool": "opera_trigger_ui_test",
   "parameters": {
     "filePath": "src/components/UserProfile.tsx",
     "changeType": "component"
@@ -53,7 +53,7 @@ npm run test:maria-qa
 
 ---
 
-### 2. **Get Quality Metrics** (`bmad_get_quality_metrics`)
+### 2. **Get Quality Metrics** (`opera_get_quality_metrics`)
 
 **When to use**: Check current framework quality status, agent utilization, and recent workflows
 
@@ -64,7 +64,7 @@ npm run test:maria-qa
 **Example**:
 ```json
 {
-  "tool": "bmad_get_quality_metrics",
+  "tool": "opera_get_quality_metrics",
   "parameters": {
     "includeHistory": true,
     "limit": 5
@@ -95,7 +95,7 @@ npm run test:maria-qa
 
 ---
 
-### 3. **Get Agent Status** (`bmad_get_agent_status`)
+### 3. **Get Agent Status** (`opera_get_agent_status`)
 
 **When to use**: Check if specific agents are available or see overall agent health
 
@@ -105,7 +105,7 @@ npm run test:maria-qa
 **Example (All Agents)**:
 ```json
 {
-  "tool": "bmad_get_agent_status",
+  "tool": "opera_get_agent_status",
   "parameters": {}
 }
 ```
@@ -113,7 +113,7 @@ npm run test:maria-qa
 **Example (Specific Agent)**:
 ```json
 {
-  "tool": "bmad_get_agent_status",
+  "tool": "opera_get_agent_status",
   "parameters": {
     "agentName": "enhanced-maria"
   }
@@ -154,7 +154,7 @@ npm run test:maria-qa
 
 ---
 
-### 4. **Generate Quality Report** (`bmad_generate_quality_report`)
+### 4. **Generate Quality Report** (`opera_generate_quality_report`)
 
 **When to use**: Create comprehensive quality reports for stakeholders or review sessions
 
@@ -165,7 +165,7 @@ npm run test:maria-qa
 **Example**:
 ```json
 {
-  "tool": "bmad_generate_quality_report",
+  "tool": "opera_generate_quality_report",
   "parameters": {
     "reportType": "detailed",
     "timeRange": "24h"
@@ -201,7 +201,7 @@ npm run test:maria-qa
 
 ---
 
-### 5. **Execute Quality Check** (`bmad_execute_quality_check`)
+### 5. **Execute Quality Check** (`opera_execute_quality_check`)
 
 **When to use**: Run immediate quality validation on current codebase state
 
@@ -213,7 +213,7 @@ npm run test:maria-qa
 **Example**:
 ```json
 {
-  "tool": "bmad_execute_quality_check",
+  "tool": "opera_execute_quality_check",
   "parameters": {
     "scope": "changed-files",
     "includePerformance": true,
@@ -255,19 +255,19 @@ npm run test:maria-qa
 ### Use Case 1: After Component Update
 ```bash
 # 1. Trigger testing for component change
-bmad_trigger_ui_test {
+opera_trigger_ui_test {
   "filePath": "src/components/Button.tsx",
   "changeType": "component"
 }
 
 # 2. Check results
-bmad_get_quality_metrics {
+opera_get_quality_metrics {
   "includeHistory": true,
   "limit": 1
 }
 
 # 3. If issues found, generate detailed report
-bmad_generate_quality_report {
+opera_generate_quality_report {
   "reportType": "detailed",
   "timeRange": "1h"
 }
@@ -276,17 +276,17 @@ bmad_generate_quality_report {
 ### Use Case 2: Pre-Deployment Check
 ```bash
 # 1. Execute comprehensive quality check
-bmad_execute_quality_check {
+opera_execute_quality_check {
   "scope": "full",
   "includePerformance": true,
   "includeAccessibility": true
 }
 
 # 2. Check agent availability
-bmad_get_agent_status {}
+opera_get_agent_status {}
 
 # 3. Generate deployment report
-bmad_generate_quality_report {
+opera_generate_quality_report {
   "reportType": "summary",
   "timeRange": "24h"
 }
@@ -295,17 +295,17 @@ bmad_generate_quality_report {
 ### Use Case 3: Monitoring Agent Health
 ```bash
 # 1. Check specific agent status
-bmad_get_agent_status {
+opera_get_agent_status {
   "agentName": "enhanced-maria"
 }
 
 # 2. Get current metrics
-bmad_get_quality_metrics {
+opera_get_quality_metrics {
   "includeHistory": false
 }
 
 # 3. View trends
-bmad_generate_quality_report {
+opera_generate_quality_report {
   "reportType": "trends",
   "timeRange": "7d"
 }
@@ -314,13 +314,13 @@ bmad_generate_quality_report {
 ### Use Case 4: Style/CSS Changes
 ```bash
 # 1. Trigger visual regression testing
-bmad_trigger_ui_test {
+opera_trigger_ui_test {
   "filePath": "src/styles/theme.css",
   "changeType": "style"
 }
 
 # 2. Monitor visual regression status
-bmad_get_quality_metrics {
+opera_get_quality_metrics {
   "includeHistory": false
 }
 # Check: visualRegressionStatus should be "passing"
@@ -329,14 +329,14 @@ bmad_get_quality_metrics {
 ### Use Case 5: Route Changes
 ```bash
 # 1. Trigger E2E testing for route changes
-bmad_trigger_ui_test {
+opera_trigger_ui_test {
   "filePath": "src/routes/user-profile.ts",
   "changeType": "route"
 }
 
 # 2. Wait for workflow completion (async)
 # 3. Check quality metrics
-bmad_get_quality_metrics {}
+opera_get_quality_metrics {}
 ```
 
 ---
@@ -346,11 +346,11 @@ bmad_get_quality_metrics {}
 ### 1. **Always Check Agent Status Before Triggering Tests**
 ```bash
 # Good practice
-bmad_get_agent_status {} # Check availability first
-bmad_trigger_ui_test {...} # Then trigger
+opera_get_agent_status {} # Check availability first
+opera_trigger_ui_test {...} # Then trigger
 
 # Bad practice
-bmad_trigger_ui_test {...} # Direct trigger without checking
+opera_trigger_ui_test {...} # Direct trigger without checking
 ```
 
 ### 2. **Use Appropriate Change Types**
@@ -368,13 +368,13 @@ bmad_trigger_ui_test {...} # Direct trigger without checking
 ### 4. **Generate Reports Regularly**
 ```bash
 # Daily summary
-bmad_generate_quality_report {
+opera_generate_quality_report {
   "reportType": "summary",
   "timeRange": "24h"
 }
 
 # Weekly trends
-bmad_generate_quality_report {
+opera_generate_quality_report {
   "reportType": "trends",
   "timeRange": "7d"
 }
@@ -392,10 +392,10 @@ The flywheel enforces these thresholds:
 ## 🔧 Configuration
 
 ### Dashboard Configuration
-Located in `src/dashboard/bmad-quality-dashboard.ts`:
+Located in `src/dashboard/opera-quality-dashboard.ts`:
 
 ```typescript
-const dashboard = new BMADQualityDashboard({
+const dashboard = new OPERAQualityDashboard({
   refreshInterval: 5000, // 5 seconds
   enableRealTimeUpdates: true,
   qualityThresholds: {
@@ -413,10 +413,10 @@ const dashboard = new BMADQualityDashboard({
 ```
 
 ### MCP Server Integration
-The BMAD tools are automatically registered when the MCP server starts:
+The OPERA tools are automatically registered when the MCP server starts:
 
 ```bash
-# Start MCP server with BMAD integration
+# Start MCP server with OPERA integration
 npm run build && node dist/index.js
 ```
 
@@ -479,8 +479,8 @@ npm run test:maria-qa
 
 ### Automated Testing
 ```bash
-# Run BMAD-specific tests
-npm run test:bmad
+# Run OPERA-specific tests
+npm run test:opera
 
 # Run complete validation
 npm run validate
@@ -490,25 +490,25 @@ npm run validate
 
 ## 🆘 Troubleshooting
 
-### Issue: "BMAD MCP Integration is not active"
+### Issue: "OPERA MCP Integration is not active"
 **Solution**: Ensure the MCP server has started properly
 ```bash
 npm run build
 node dist/index.js
-# Look for: "🎯 BMAD Quality Dashboard integrated and active"
+# Look for: "🎯 OPERA Quality Dashboard integrated and active"
 ```
 
 ### Issue: Low Quality Scores
 **Solution**: Check specific metrics and address issues
 ```bash
-bmad_get_quality_metrics {}
+opera_get_quality_metrics {}
 # Review: performanceScore, accessibilityScore, securityScore
 ```
 
 ### Issue: Agent Not Responding
 **Solution**: Check agent status
 ```bash
-bmad_get_agent_status { "agentName": "enhanced-maria" }
+opera_get_agent_status { "agentName": "enhanced-maria" }
 # If activeJobs > 5, agent may be overloaded
 ```
 
@@ -516,7 +516,7 @@ bmad_get_agent_status { "agentName": "enhanced-maria" }
 
 ## 📚 Additional Resources
 
-- **Full Documentation**: `BMAD-FLYWHEEL-COMPLETE.md`
+- **Full Documentation**: `OPERA-FLYWHEEL-COMPLETE.md`
 - **Integration Report**: `.versatil/INTEGRATION_REPORT.md`
 - **VERSATIL v1.2.0 Guide**: `.versatil/MIGRATION_GUIDE.md`
 - **Agent Registry**: Run `npm run show-agents`
@@ -529,7 +529,7 @@ You now have an operational UI/UX testing flywheel with real-time quality monito
 
 Start by triggering your first test:
 ```bash
-bmad_trigger_ui_test {
+opera_trigger_ui_test {
   "filePath": "your-component.tsx",
   "changeType": "component"
 }

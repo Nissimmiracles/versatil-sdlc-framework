@@ -105,7 +105,7 @@ V3.0 is **NOT a rewrite** - it's an **enhancement layer** built on v2.0 foundati
 ```
 V2.0 Foundation (What Exists)          V3.0 Enhancement (What's Added)
 ================================       ===================================
-✅ 6 BMAD Agents                    → ✅ Same agents + AI vision analysis
+✅ 6 OPERA Agents                    → ✅ Same agents + AI vision analysis
 ✅ RAG Memory System                 → ✅ Enhanced RAG with competitive patterns
 ✅ Agent Coordination                → ✅ + Question-driven workflow
 ✅ Chrome MCP Testing                → ✅ + Competitive scraping engine
@@ -123,7 +123,7 @@ V2.0 Foundation (What Exists)          V3.0 Enhancement (What's Added)
 
 | Feature | V2.0 Status | V3.0 Enhancement |
 |---------|-------------|------------------|
-| **BMAD Agents** | ✅ 6 agents configured | + GPT-4 Vision analysis |
+| **OPERA Agents** | ✅ 6 agents configured | + GPT-4 Vision analysis |
 | **RAG Memory** | ✅ Vector store with embeddings | + Competitive pattern library |
 | **Testing** | ✅ Maria-QA with quality gates | + Persona simulation (5+ types) |
 | **Code Generation** | ✅ Template-based | + Zero-mock validation |
@@ -252,7 +252,7 @@ class ProactiveTransparencyDashboard {
 ### 5. Enhanced Agent Intelligence 🧠
 
 **V2.0 Foundation**:
-- ✅ All 6 BMAD agents implemented with specializations
+- ✅ All 6 OPERA agents implemented with specializations
 - ✅ RAG memory system stores patterns and context
 - ✅ Agent coordination and handoffs working
 
@@ -405,7 +405,7 @@ ROI: 📈 High
 ## 🎯 What Makes V3.0 Achievable
 
 ### 1. Strong V2.0 Foundation ✅
-- 6 BMAD agents already implemented
+- 6 OPERA agents already implemented
 - RAG memory system already working
 - Testing infrastructure already present
 - Agent coordination already functional

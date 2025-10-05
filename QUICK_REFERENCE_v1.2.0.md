@@ -26,7 +26,7 @@ const memories = await vectorMemoryStore.queryMemories({
 ## 🤖 Opera Goals
 ```javascript
 // Set autonomous goal
-await archon.addGoal({
+await opera.addGoal({
   type: 'feature',
   description: 'Add user authentication',
   priority: 'high',
@@ -35,37 +35,37 @@ await archon.addGoal({
 });
 
 // Check status
-const state = archon.getState();
+const state = opera.getState();
 ```
 
-## 🎮 Enhanced BMAD
+## 🎮 Enhanced OPERA
 ```javascript
 // Execute autonomous workflow
-await enhancedBMAD.executeBMADWorkflow(
+await enhancedOPERA.executeOPERAWorkflow(
   'project-id',
   'Build a REST API for user management'
 );
 
 // Enable full autonomous mode
-enhancedBMAD.setAutonomousMode(true);
+enhancedOPERA.setAutonomousMode(true);
 ```
 
 ## 📡 MCP Tools
 ```yaml
 versatil_memory_store     # Store knowledge
 versatil_memory_query     # Search memories  
-versatil_archon_goal      # Set dev goals
-versatil_archon_status    # Check progress
-versatil_bmad_autonomous  # Full auto mode
+versatil_opera_goal      # Set dev goals
+versatil_opera_status    # Check progress
+versatil_opera_autonomous  # Full auto mode
 ```
 
 ## 🌐 REST Endpoints
 ```
 POST   /api/memory/store     # Store knowledge
 POST   /api/memory/query     # Query memories
-POST   /api/archon/goal      # Add goal
-GET    /api/archon/status    # Get status
-POST   /api/bmad/execute     # Run workflow
+POST   /api/opera/goal      # Add goal
+GET    /api/opera/status    # Get status
+POST   /api/opera/execute     # Run workflow
 ```
 
 ## 📊 Key Metrics
@@ -78,7 +78,7 @@ POST   /api/bmad/execute     # Run workflow
 
 ### Fix Production Bug
 ```javascript
-archon.addGoal({
+opera.addGoal({
   type: 'bug_fix',
   description: 'Memory leak in user service',
   priority: 'critical',
@@ -88,7 +88,7 @@ archon.addGoal({
 
 ### Build New Feature  
 ```javascript
-enhancedBMAD.executeBMADWorkflow(
+enhancedOPERA.executeOPERAWorkflow(
   'chat-feature',
   'Add real-time chat with WebSockets'
 );
@@ -96,7 +96,7 @@ enhancedBMAD.executeBMADWorkflow(
 
 ### Refactor Legacy Code
 ```javascript
-archon.addGoal({
+opera.addGoal({
   type: 'refactor',
   description: 'Modernize payment module',
   priority: 'medium',

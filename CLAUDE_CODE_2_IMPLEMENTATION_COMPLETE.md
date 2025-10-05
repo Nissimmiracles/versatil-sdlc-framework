@@ -25,7 +25,7 @@ Successfully integrated **Claude Code 2.0 native features** into the VERSATIL SD
 Created 5 comprehensive GitHub Issues for tracking:
 
 1. **Issue #1**: [Custom Slash Commands](https://github.com/MiraclesGIT/versatil-sdlc-framework/issues/1)
-   - 10 BMAD agent and framework commands
+   - 10 OPERA agent and framework commands
    - Priority: P0 (Critical)
    - Status: Implemented
 
@@ -35,7 +35,7 @@ Created 5 comprehensive GitHub Issues for tracking:
    - Status: Implemented
 
 3. **Issue #3**: [Custom Subagents](https://github.com/MiraclesGIT/versatil-sdlc-framework/issues/3)
-   - 6 BMAD agent configurations
+   - 6 OPERA agent configurations
    - Priority: P0 (Critical)
    - Status: Implemented
 
@@ -55,7 +55,7 @@ Created 5 comprehensive GitHub Issues for tracking:
 
 **Directory**: `.claude/commands/`
 
-#### BMAD Agent Commands (6 files):
+#### OPERA Agent Commands (6 files):
 ```
 .claude/commands/
 ├── maria-qa.md           # /maria - Activate Maria-QA for testing
@@ -68,7 +68,7 @@ Created 5 comprehensive GitHub Issues for tracking:
 
 #### Workflow Commands (3 files):
 ```
-.claude/commands/bmad/
+.claude/commands/opera/
 ├── parallel.md           # /parallel - Enable Rule 1 parallel execution
 ├── stress-test.md        # /stress-test - Generate automated stress tests
 └── audit.md              # /audit - Run comprehensive health check
@@ -126,7 +126,7 @@ Created 5 comprehensive GitHub Issues for tracking:
 ```
 .claude/hooks/session-start/
 ├── framework-init.sh          # Initializes VERSATIL environment
-├── agent-health-check.sh      # Validates BMAD agent configs
+├── agent-health-check.sh      # Validates OPERA agent configs
 └── rule-enablement.sh         # Checks Rules 1-5 status
 ```
 
@@ -150,7 +150,7 @@ Created 5 comprehensive GitHub Issues for tracking:
 
 **Directory**: `.claude/agents/`
 
-#### BMAD Agent Configurations (6 files):
+#### OPERA Agent Configurations (6 files):
 ```
 .claude/agents/
 ├── maria-qa.json          # QA Lead - Testing, quality gates, security
@@ -176,7 +176,7 @@ Created 5 comprehensive GitHub Issues for tracking:
   },
   "maxConcurrentTasks": 3,
   "priority": "high",
-  "tags": ["testing", "quality", "bmad", "qa"]
+  "tags": ["testing", "quality", "opera", "qa"]
 }
 ```
 
@@ -241,7 +241,7 @@ npm start:enhanced         # Start with enhanced agents
 #### Health Check Components:
 
 1. **Isolation Validation**: Checks for framework files in user project
-2. **BMAD Agents Health**: Validates all 6 agent configs exist
+2. **OPERA Agents Health**: Validates all 6 agent configs exist
 3. **MCP Servers Status**: Checks MCP configuration
 4. **Rules Enablement**: Verifies Rules 1-5 configuration
 5. **Test Coverage**: Reads coverage data (85%+ target)
@@ -261,8 +261,8 @@ npm start:enhanced         # Start with enhanced agents
 🏥 VERSATIL Framework Doctor
 
 ✅ Isolation: Framework properly isolated in ~/.versatil/
-✅ Agents: All 6 BMAD agents healthy
-⚠️  MCP Servers: 1 server disconnected (archon-mcp)
+✅ Agents: All 6 OPERA agents healthy
+⚠️  MCP Servers: 1 server disconnected (opera-mcp)
 ✅ Rules: 3/3 enabled (Parallel, Stress Test, Audit)
 ✅ Tests: 87% coverage (target: 85%+)
 ✅ Security: 0 vulnerabilities
@@ -289,7 +289,7 @@ Auto-fixable: 1
 │   ├── sarah-pm.md
 │   ├── alex-ba.md
 │   ├── dr-ai-ml.md
-│   ├── bmad/
+│   ├── opera/
 │   │   ├── parallel.md
 │   │   ├── stress-test.md
 │   │   └── audit.md
@@ -356,12 +356,12 @@ CLAUDE_CODE_2_IMPLEMENTATION_COMPLETE.md  # This file
 - [x] Context preservation (saves agent state)
 
 ### Custom Subagents ✅
-- [x] All 6 BMAD agents configured
+- [x] All 6 OPERA agents configured
 - [x] Model routing (claude-sonnet-4-5 for all)
 - [x] Tool access restrictions defined
 - [x] Directory scoping configured
 - [x] Context rules specified
-- [x] System prompts with BMAD methodology
+- [x] System prompts with OPERA methodology
 
 ### Background Commands ✅
 - [x] Documentation created
@@ -397,7 +397,7 @@ CLAUDE_CODE_2_IMPLEMENTATION_COMPLETE.md  # This file
 ### Medium-term (This Month):
 1. Implement Priority 2 features:
    - Enhanced memory integration (# quick add)
-   - Output styles (BMAD-specific)
+   - Output styles (OPERA-specific)
    - Status line customization
 2. Gather user feedback on Priority 1 features
 3. Address any bugs or issues discovered

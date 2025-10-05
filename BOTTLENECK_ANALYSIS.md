@@ -436,7 +436,7 @@ After implementing these optimizations:
     "incrementalScanThreshold": 10,
     "maxFileSizeToAnalyze": 1048576
   },
-  "archon": {
+  "opera": {
     "maxConcurrentGoals": 3,
     "decisionCacheTime": 120000,
     "memoryQueryBatchSize": 50

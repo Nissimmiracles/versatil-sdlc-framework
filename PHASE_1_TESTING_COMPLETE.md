@@ -12,7 +12,7 @@
 **Result**: **PASS**
 
 ```
-✅ Listed 12 BMAD agents:
+✅ Listed 12 OPERA agents:
    - Enhanced Maria (QA Lead) - Active, Auto-Activate
    - Enhanced James (Frontend) - Active, Auto-Activate
    - Enhanced Marcus (Backend) - Active, Auto-Activate

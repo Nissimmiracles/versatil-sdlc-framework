@@ -190,7 +190,7 @@ npm run dashboard:background
 🏥 VERSATIL Framework Doctor
 
 ✅ Isolation: Framework properly isolated
-✅ Agents: All 6 BMAD agents healthy
+✅ Agents: All 6 OPERA agents healthy
 ✅ MCP Servers: All servers operational
 ✅ Rules: Rules 1-5 enabled
 ✅ Tests: Coverage above 80%

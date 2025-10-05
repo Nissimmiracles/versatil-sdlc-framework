@@ -121,7 +121,7 @@ Health: Excellent (100%)  ← NEW!
    - Keyboard shortcuts reminder
 
 4. **Agent Activity (Right Panel)**
-   - 6 BMAD agents status
+   - 6 OPERA agents status
    - Live status indicators
    - ● Maria-QA
    - ● James-Frontend

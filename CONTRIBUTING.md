@@ -32,7 +32,7 @@ We're building the world's first AI-Native SDLC framework that achieves zero con
 
 ### 💻 Code Contributions
 - Fix bugs and implement features
-- Add new BMAD agents
+- Add new OPERA agents
 - Enhance MCP integration
 - Improve CLI tools and automation
 
@@ -261,7 +261,7 @@ For critical issues affecting production deployments:
 ## 🎯 Project Roadmap
 
 ### Current Focus
-- Expanding BMAD agent ecosystem
+- Expanding OPERA agent ecosystem
 - Enhanced MCP integration capabilities
 - Enterprise-grade security features
 - Performance optimization

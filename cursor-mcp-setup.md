@@ -4,7 +4,7 @@
 - ✅ MCP Server: Production binary `bin/versatil-mcp.js`
 - ✅ VS Code configuration: `.vscode/settings.json`
 - ✅ Cursor configuration: `.cursor/settings.json` (cleaned)
-- ✅ Framework integration: Complete BMAD agent system
+- ✅ Framework integration: Complete OPERA agent system
 
 ## Recommended MCP Configuration
 
@@ -40,7 +40,7 @@ For use with Claude Desktop:
 
 ## Available MCP Tools
 
-1. **versatil_activate_agent** - Activate specific BMAD agents
+1. **versatil_activate_agent** - Activate specific OPERA agents
 2. **versatil_orchestrate_sdlc** - Manage SDLC phases
 3. **versatil_quality_gate** - Execute quality checks
 4. **versatil_framework_status** - Get framework status
@@ -53,9 +53,9 @@ cd "/Users/nissimmenashe/VERSATIL SDLC FW"
 echo '{"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}' | node bin/versatil-mcp.js .
 ```
 
-## Available BMAD Agents via MCP
+## Available OPERA Agents via MCP
 
-The production server provides access to all BMAD agents:
+The production server provides access to all OPERA agents:
 - **enhanced-maria**: Quality assurance and testing
 - **enhanced-james**: Frontend development and UI
 - **enhanced-marcus**: Backend architecture and APIs

@@ -103,7 +103,7 @@ scripts/migrate-to-1.2.0.cjs
 
 **Root CommonJS (.cjs)**: 38 files ✅
 ```
-test-bmad-completeness.cjs
+test-opera-completeness.cjs
 healthcheck.cjs
 run-demo.cjs
 ... (all working)
@@ -113,7 +113,7 @@ run-demo.cjs
 ```
 ✅ init-opera-mcp.mjs (working - fixed require.main)
 ❌ test-opera-mcp.mjs (broken - has require())
-✅ test-enhanced-bmad.mjs (not tested, might have same issue)
+✅ test-enhanced-opera.mjs (not tested, might have same issue)
 ✅ test-full-framework.mjs (working - pure ESM)
 ```
 
@@ -132,7 +132,7 @@ run-demo.cjs
 
 **Broken**:
 - ❌ test-opera-mcp.mjs (has require())
-- ❓ test-enhanced-bmad.mjs (not tested, might have require())
+- ❓ test-enhanced-opera.mjs (not tested, might have require())
 
 ---
 
@@ -159,7 +159,7 @@ run-demo.cjs
 - ✅ 15 script files working
 - ✅ 38 root CommonJS files working
 - ✅ 2 ESM files working (init-opera-mcp.mjs, test-full-framework.mjs)
-- ❌ 1-2 ESM files need fixing (test-opera-mcp.mjs, possibly test-enhanced-bmad.mjs)
+- ❌ 1-2 ESM files need fixing (test-opera-mcp.mjs, possibly test-enhanced-opera.mjs)
 
 ### Success Rate
 - **96.5%** of files working (56/58)
@@ -203,7 +203,7 @@ mv test-opera-mcp.mjs test-opera-mcp.cjs
 # "test:opera-mcp": "node test-opera-mcp.cjs"
 ```
 
-Or check if test-enhanced-bmad.mjs has same issue:
+Or check if test-enhanced-opera.mjs has same issue:
 
 ```bash
 # Check for require() in .mjs files
@@ -225,7 +225,7 @@ grep -l "require(" *.mjs
 ### Test Scripts: 90% Working ⚠️
 - test-full-framework.mjs ✅
 - test-opera-mcp.mjs ❌ (require in ESM)
-- test-enhanced-bmad.mjs ❓ (not verified)
+- test-enhanced-opera.mjs ❓ (not verified)
 
 ### Overall: 96.5% Success Rate
 56 out of 58 files working correctly
@@ -239,7 +239,7 @@ Even after fixing, I claimed "all scripts working" without testing every single 
 The "sure?" method revealed:
 - Most scripts DO work
 - One test script definitely broken
-- Need to verify test-enhanced-bmad.mjs
+- Need to verify test-enhanced-opera.mjs
 - Should have tested ALL scripts before claiming 100%
 
 ---

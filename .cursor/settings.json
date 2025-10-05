@@ -73,7 +73,7 @@
 
   "files.associations": {
     "*.mcp.spec.ts": "typescript",
-    "*.bmad": "markdown",
+    "*.opera": "markdown",
     "*.versatil": "json",
     ".cursorrules": "yaml",
     "CLAUDE.md": "markdown"
@@ -157,7 +157,7 @@
     "performance_insights": true,
     "quality_gate_integration": true,
     "agent_collaboration_hints": true,
-    "bmad_methodology_enforcement": true
+    "opera_methodology_enforcement": true
   },
 
   "versatil.monitoring": {

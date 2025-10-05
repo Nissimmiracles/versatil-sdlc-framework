@@ -18,10 +18,10 @@ const fixes = [
     ]
   },
   {
-    file: 'src/archon/archon-orchestrator.ts',
+    file: 'src/opera/opera-orchestrator.ts',
     replacements: [
       {
-        old: `  async createGoal(goal: any): Promise<ArchonGoal> {
+        old: `  async createGoal(goal: any): Promise<OperaGoal> {
     return {
       id: Date.now().toString(),
       type: goal.type || 'feature',
@@ -30,7 +30,7 @@ const fixes = [
       priority: goal.priority || 'medium'
     };
   }`,
-        new: `  async createGoal(goal: any): Promise<ArchonGoal> {
+        new: `  async createGoal(goal: any): Promise<OperaGoal> {
     return {
       id: Date.now().toString(),
       type: goal.type || 'feature',
@@ -96,7 +96,7 @@ const fixes = [
     ]
   },
   {
-    file: 'src/bmad/enhanced-bmad-coordinator.ts',
+    file: 'src/opera/enhanced-opera-coordinator.ts',
     replacements: [
       {
         old: `    for (const agent of this.agentRegistry.getAllAgents()) {`,
@@ -118,16 +118,16 @@ const fixes = [
       successCriteria: ['Improved framework performance or capabilities']`
       },
       {
-        old: `    const archonState = this.archonOrchestrator.getState();
-    const activeGoals = archonState.currentGoals || [];
-    const autonomousDecisions = archonState.activeDecisions || [];
-    const executionQueue = archonState.executionQueue || [];
-    const performance = archonState.performance || {};`,
-        new: `    const archonState = await this.archonOrchestrator.getState();
-    const activeGoals = archonState.currentGoals || [];
-    const autonomousDecisions = archonState.activeDecisions || [];
-    const executionQueue = archonState.executionQueue || [];
-    const performance = archonState.performance || {};`
+        old: `    const operaState = this.operaOrchestrator.getState();
+    const activeGoals = operaState.currentGoals || [];
+    const autonomousDecisions = operaState.activeDecisions || [];
+    const executionQueue = operaState.executionQueue || [];
+    const performance = operaState.performance || {};`,
+        new: `    const operaState = await this.operaOrchestrator.getState();
+    const activeGoals = operaState.currentGoals || [];
+    const autonomousDecisions = operaState.activeDecisions || [];
+    const executionQueue = operaState.executionQueue || [];
+    const performance = operaState.performance || {};`
       }
     ]
   },
@@ -209,9 +209,9 @@ const fixes = [
             successCriteria: [\`Issue \${fix.id} resolved\`]`
       },
       {
-        old: `    const state = this.archonOrchestrator.getState();
+        old: `    const state = this.operaOrchestrator.getState();
     const performance = state.performance || {};`,
-        new: `    const state = await this.archonOrchestrator.getState();
+        new: `    const state = await this.operaOrchestrator.getState();
     const performance = state.performance || {};`
       }
     ]
@@ -284,7 +284,7 @@ const fixes = [
     ]
   },
   {
-    file: 'src/archon/multimodal-archon-orchestrator.ts',
+    file: 'src/opera/multimodal-opera-orchestrator.ts',
     replacements: [
       {
         old: `      relatedGoal: goal.id,`,

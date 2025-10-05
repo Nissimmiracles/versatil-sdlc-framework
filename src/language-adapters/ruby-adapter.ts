@@ -4,7 +4,7 @@
  * Enables VERSATIL to work with Ruby projects, supporting Bundler, RSpec,
  * RuboCop, and the entire Ruby ecosystem.
  *
- * BMAD agents can now orchestrate Ruby development workflows.
+ * OPERA agents can now orchestrate Ruby development workflows.
  */
 
 import { exec } from 'child_process';

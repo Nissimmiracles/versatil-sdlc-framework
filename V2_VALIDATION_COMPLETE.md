@@ -22,7 +22,7 @@
 🏥 VERSATIL Framework Doctor
 
 ❌ Isolation: Found framework files in project: .versatil/
-✅ Agents: All 6 BMAD agents healthy
+✅ Agents: All 6 OPERA agents healthy
 ⚠️  MCP Servers: No MCP configuration found
 ⚠️  Rules: 0/3 rules enabled
 ✅ Tests: Skipped in quick mode
@@ -94,7 +94,7 @@ Auto-fixable: 1
 ### Health Status: ⚠️ GOOD (with minor issues)
 
 **Positive Findings**:
-- ✅ All 6 BMAD agents healthy
+- ✅ All 6 OPERA agents healthy
 - ✅ All configuration files valid
 - ✅ Core framework operational
 
@@ -340,7 +340,7 @@ With 2 slash commands validated, we have high confidence that:
 
 **For Users**:
 - ✅ Can start using slash commands immediately
-- ✅ BMAD agents accessible via simple commands
+- ✅ OPERA agents accessible via simple commands
 - ✅ Quality checks automated
 
 **For Framework**:

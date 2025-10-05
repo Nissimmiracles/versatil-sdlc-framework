@@ -134,13 +134,13 @@ class IntrospectiveTestAgent {
     console.log('\n📋 Testing basic enhanced functionality...\n');
     
     // Test mock implementations
-    const mockBMAD = {
+    const mockOPERA = {
       executedWorkflows: [],
       createContext: async function(id) { 
         this.executedWorkflows.push(id);
         return { id, created: true };
       },
-      executeBMADWorkflow: async function(id, req) {
+      executeOPERAWorkflow: async function(id, req) {
         this.executedWorkflows.push({ id, req });
         return { success: true };
       }
@@ -181,10 +181,10 @@ class IntrospectiveTestAgent {
       return `Found ${results.documents.length} memories`;
     });
 
-    // Test BMAD workflow
-    await this.runTest('BMAD Workflow', async () => {
-      await mockBMAD.executeBMADWorkflow('test-project', 'Test requirements');
-      if (mockBMAD.executedWorkflows.length === 0) throw new Error('Workflow not executed');
+    // Test OPERA workflow
+    await this.runTest('OPERA Workflow', async () => {
+      await mockOPERA.executeOPERAWorkflow('test-project', 'Test requirements');
+      if (mockOPERA.executedWorkflows.length === 0) throw new Error('Workflow not executed');
       return 'Workflow executed successfully';
     });
   }
@@ -243,12 +243,12 @@ class IntrospectiveTestAgent {
     // Test critical files exist
     console.log('📁 Checking critical files...');
     await this.testFileExists('package.json', 'Package configuration');
-    await this.testFileExists('test-enhanced-bmad.js', 'Enhanced BMAD test');
+    await this.testFileExists('test-enhanced-opera.js', 'Enhanced OPERA test');
     await this.testFileExists('tests/enhanced-demo-suite.js', 'Demo suite');
     
     // Test if scripts are executable
     console.log('\n🚀 Testing executability...');
-    await this.testFileExecutable('test-enhanced-bmad.js', 'Enhanced BMAD test');
+    await this.testFileExecutable('test-enhanced-opera.js', 'Enhanced OPERA test');
     
     // Test basic functionality
     await this.testBasicFunctionality();
@@ -295,7 +295,7 @@ async function addIntrospectiveCapability() {
       framework: ['file-integrity', 'imports', 'functionality'],
       agents: ['availability', 'response-time', 'memory-usage'],
       memory: ['storage', 'retrieval', 'persistence'],
-      archon: ['goal-planning', 'execution', 'monitoring']
+      opera: ['goal-planning', 'execution', 'monitoring']
     }
   };
 

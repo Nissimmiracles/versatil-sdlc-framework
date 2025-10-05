@@ -57,7 +57,7 @@ git push origin --tags
 
 **Beta Testing Checklist**:
 - [ ] Core functionality testing
-- [ ] BMAD agent activation testing
+- [ ] OPERA agent activation testing
 - [ ] MCP integration verification
 - [ ] Cross-platform compatibility
 - [ ] Performance benchmarking
@@ -210,7 +210,7 @@ We follow [Keep a Changelog](https://keepachangelog.com/) format:
 
 ## 🎯 Highlights
 
-This release introduces two powerful new BMAD agents and significantly improves framework performance.
+This release introduces two powerful new OPERA agents and significantly improves framework performance.
 
 ### 🤖 New Agents
 - **DevOps-Dan**: Infrastructure & deployment specialist
@@ -338,7 +338,7 @@ Thanks to all contributors! 🙏
 ```
 🚀 VERSATIL v1.1.0 is here!
 
-✨ 2 new BMAD agents
+✨ 2 new OPERA agents
 ⚡ 40% faster performance
 🔒 Enhanced security
 

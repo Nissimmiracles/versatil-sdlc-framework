@@ -124,7 +124,7 @@ argument-hint: "[task description]"
   ],
   "allowedDirectories": ["tests/", "test/", "__tests__/"],
   "priority": "high",
-  "tags": ["testing", "quality", "bmad", "qa"]
+  "tags": ["testing", "quality", "opera", "qa"]
 }
 ```
 
@@ -223,7 +223,7 @@ Total: 16 hooks (exceeds target of 12)
    → Known issue: Legacy .versatil/ directory exists
    → Recommendation: Clean up or move to ~/.versatil/
 
-✅ Agents: All 6 BMAD agents healthy
+✅ Agents: All 6 OPERA agents healthy
    → maria-qa.json ✅
    → james-frontend.json ✅
    → marcus-backend.json ✅

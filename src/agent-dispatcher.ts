@@ -2,7 +2,7 @@
  * VERSATIL SDLC Framework - Auto-Agent Dispatcher
  * Real-time agent activation based on file patterns, context, and triggers
  *
- * This is the core missing piece that makes BMAD methodology truly autonomous
+ * This is the core missing piece that makes OPERA methodology truly autonomous
  */
 
 import { EventEmitter } from 'events';
@@ -67,7 +67,7 @@ class VERSATILAgentDispatcher extends EventEmitter {
   }
 
   /**
-   * Initialize BMAD Agents with Enhanced Triggers
+   * Initialize OPERA Agents with Enhanced Triggers
    */
   private initializeAgents(): void {
     // James - Frontend Agent

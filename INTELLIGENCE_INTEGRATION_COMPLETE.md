@@ -8,13 +8,13 @@
 
 ## 🎯 Complete Integration Strategy Implemented
 
-The VERSATIL SDLC Framework now features a **complete 3-tier intelligence system** that combines BMAD framework infrastructure with Claude Code/Cursor AI capabilities.
+The VERSATIL SDLC Framework now features a **complete 3-tier intelligence system** that combines OPERA framework infrastructure with Claude Code/Cursor AI capabilities.
 
 ### Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────┐
-│        BMAD Framework Layer (100%)          │
+│        OPERA Framework Layer (100%)          │
 │  • Agent Discovery & Registration           │
 │  • Context Management & Routing             │
 │  • Multi-Agent Orchestration               │
@@ -392,9 +392,9 @@ The infrastructure is ready. To add intelligence to remaining agents:
 
 ### Cursor/Claude Code Commands (Future)
 Create `.cursor/commands/` directory with:
-- `bmad-analyze.js`: Automatic analysis on file save
-- `bmad-review.js`: Comprehensive code review
-- `bmad-handoff.js`: Coordinate agent handoffs
+- `opera-analyze.js`: Automatic analysis on file save
+- `opera-review.js`: Comprehensive code review
+- `opera-handoff.js`: Coordinate agent handoffs
 
 ---
 

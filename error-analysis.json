@@ -217,7 +217,7 @@
       "message": "Type 'AgentRegistry' has no properties in common with type 'EventEmitterOptions'.",
       "examples": [
         {
-          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "file": "\nsrc/opera/enhanced-opera-coordinator.ts",
           "line": 75,
           "message": "Type 'AgentRegistry' has no properties in common with type 'EventEmitterOptions'."
         }
@@ -229,7 +229,7 @@
       "message": "Type 'BaseAgent' must have a '[Symbol.iterator]()' method that returns an iterator.",
       "examples": [
         {
-          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "file": "\nsrc/opera/enhanced-opera-coordinator.ts",
           "line": 91,
           "message": "Type 'BaseAgent' must have a '[Symbol.iterator]()' method that returns an iterator."
         }
@@ -354,48 +354,48 @@
       ]
     },
     {
-      "file": "\nbmad/enhanced-bmad-coordinator.ts",
+      "file": "\nopera/enhanced-opera-coordinator.ts",
       "count": 13,
       "errors": [
         {
-          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "file": "\nsrc/opera/enhanced-opera-coordinator.ts",
           "line": 75,
           "column": 56,
           "code": "TS2559",
           "message": "Type 'AgentRegistry' has no properties in common with type 'EventEmitterOptions'.",
-          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(75,56): error TS2559: Type 'AgentRegistry' has no properties in common with type 'EventEmitterOptions'."
+          "fullMatch": "\nsrc/opera/enhanced-opera-coordinator.ts(75,56): error TS2559: Type 'AgentRegistry' has no properties in common with type 'EventEmitterOptions'."
         },
         {
-          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "file": "\nsrc/opera/enhanced-opera-coordinator.ts",
           "line": 91,
           "column": 16,
           "code": "TS2488",
           "message": "Type 'BaseAgent' must have a '[Symbol.iterator]()' method that returns an iterator.",
-          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(91,16): error TS2488: Type 'BaseAgent' must have a '[Symbol.iterator]()' method that returns an iterator."
+          "fullMatch": "\nsrc/opera/enhanced-opera-coordinator.ts(91,16): error TS2488: Type 'BaseAgent' must have a '[Symbol.iterator]()' method that returns an iterator."
         },
         {
-          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "file": "\nsrc/opera/enhanced-opera-coordinator.ts",
           "line": 96,
           "column": 26,
           "code": "TS2339",
           "message": "Property 'registerAgent' does not exist on type 'AgentRegistry'.",
-          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(96,26): error TS2339: Property 'registerAgent' does not exist on type 'AgentRegistry'."
+          "fullMatch": "\nsrc/opera/enhanced-opera-coordinator.ts(96,26): error TS2339: Property 'registerAgent' does not exist on type 'AgentRegistry'."
         },
         {
-          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "file": "\nsrc/opera/enhanced-opera-coordinator.ts",
           "line": 240,
           "column": 45,
           "code": "TS2339",
           "message": "Property 'queryMemories' does not exist on type '{ initialize(): Promise<void>; storeMemory(memory: any): Promise<void>; searchMemories(query: string): Promise<any[]>; }'.",
-          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(240,45): error TS2339: Property 'queryMemories' does not exist on type '{ initialize(): Promise<void>; storeMemory(memory: any): Promise<void>; searchMemories(query: string): Promise<any[]>; }'."
+          "fullMatch": "\nsrc/opera/enhanced-opera-coordinator.ts(240,45): error TS2339: Property 'queryMemories' does not exist on type '{ initialize(): Promise<void>; storeMemory(memory: any): Promise<void>; searchMemories(query: string): Promise<any[]>; }'."
         },
         {
-          "file": "\nsrc/bmad/enhanced-bmad-coordinator.ts",
+          "file": "\nsrc/opera/enhanced-opera-coordinator.ts",
           "line": 369,
           "column": 7,
           "code": "TS2353",
           "message": "Object literal may only specify known properties, and 'constraints' does not exist in type 'OperaGoal'.",
-          "fullMatch": "\nsrc/bmad/enhanced-bmad-coordinator.ts(369,7): error TS2353: Object literal may only specify known properties, and 'constraints' does not exist in type 'OperaGoal'."
+          "fullMatch": "\nsrc/opera/enhanced-opera-coordinator.ts(369,7): error TS2353: Object literal may only specify known properties, and 'constraints' does not exist in type 'OperaGoal'."
         }
       ]
     },

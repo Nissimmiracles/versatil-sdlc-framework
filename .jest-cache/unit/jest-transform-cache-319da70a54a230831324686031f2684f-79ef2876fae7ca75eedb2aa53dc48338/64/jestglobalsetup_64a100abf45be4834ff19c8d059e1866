@@ -1,0 +1,36 @@
+c925449d579c5c7a090367f2dd5dd851
+/**
+ * VERSATIL SDLC Framework - Jest Global Setup
+ * Enhanced Maria-QA Unit Testing Initialization
+ */
+module.exports = async function jestGlobalSetup() {
+    console.log('🧪 VERSATIL SDLC Framework - Starting Jest Global Setup');
+    console.log('👩‍🔬 Enhanced Maria-QA Unit Testing Initialization');
+    // Set global test environment variables
+    process.env.NODE_ENV = 'test';
+    process.env.JEST_WORKER_ID = process.env.JEST_WORKER_ID || '1';
+    // BMAD methodology configuration
+    global.bmadJestConfig = {
+        agent: 'Enhanced Maria-QA',
+        framework: 'VERSATIL SDLC',
+        testType: 'unit',
+        startTime: Date.now(),
+        qualityGates: {
+            coverage: {
+                threshold: 80,
+                enforced: true
+            },
+            performance: {
+                maxTestTime: 15000,
+                enforced: true
+            }
+        }
+    };
+    // Enhanced testing capabilities
+    console.log('🎯 BMAD Unit Testing Standards:');
+    console.log('   📊 Coverage Threshold: 80%+');
+    console.log('   ⏱️  Max Test Time: 15s');
+    console.log('   🔧 Hybrid Jest + Playwright Integration');
+    console.log('✅ Jest Global Setup Complete');
+};
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiL1VzZXJzL25pc3NpbW1lbmFzaGUvVkVSU0FUSUwgU0RMQyBGVy90ZXN0cy9zZXR1cC9qZXN0LWdsb2JhbC1zZXR1cC5qcyIsIm1hcHBpbmdzIjoiQUFBQTs7O0dBR0c7QUFFSCxNQUFNLENBQUMsT0FBTyxHQUFHLEtBQUssVUFBVSxlQUFlO0lBQzdDLE9BQU8sQ0FBQyxHQUFHLENBQUMseURBQXlELENBQUMsQ0FBQztJQUN2RSxPQUFPLENBQUMsR0FBRyxDQUFDLHFEQUFxRCxDQUFDLENBQUM7SUFFbkUsd0NBQXdDO0lBQ3hDLE9BQU8sQ0FBQyxHQUFHLENBQUMsUUFBUSxHQUFHLE1BQU0sQ0FBQztJQUM5QixPQUFPLENBQUMsR0FBRyxDQUFDLGNBQWMsR0FBRyxPQUFPLENBQUMsR0FBRyxDQUFDLGNBQWMsSUFBSSxHQUFHLENBQUM7SUFFL0QsaUNBQWlDO0lBQ2pDLE1BQU0sQ0FBQyxjQUFjLEdBQUc7UUFDdEIsS0FBSyxFQUFFLG1CQUFtQjtRQUMxQixTQUFTLEVBQUUsZUFBZTtRQUMxQixRQUFRLEVBQUUsTUFBTTtRQUNoQixTQUFTLEVBQUUsSUFBSSxDQUFDLEdBQUcsRUFBRTtRQUNyQixZQUFZLEVBQUU7WUFDWixRQUFRLEVBQUU7Z0JBQ1IsU0FBUyxFQUFFLEVBQUU7Z0JBQ2IsUUFBUSxFQUFFLElBQUk7YUFDZjtZQUNELFdBQVcsRUFBRTtnQkFDWCxXQUFXLEVBQUUsS0FBSztnQkFDbEIsUUFBUSxFQUFFLElBQUk7YUFDZjtTQUNGO0tBQ0YsQ0FBQztJQUVGLGdDQUFnQztJQUNoQyxPQUFPLENBQUMsR0FBRyxDQUFDLGlDQUFpQyxDQUFDLENBQUM7SUFDL0MsT0FBTyxDQUFDLEdBQUcsQ0FBQyxnQ0FBZ0MsQ0FBQyxDQUFDO0lBQzlDLE9BQU8sQ0FBQyxHQUFHLENBQUMsMkJBQTJCLENBQUMsQ0FBQztJQUN6QyxPQUFPLENBQUMsR0FBRyxDQUFDLDRDQUE0QyxDQUFDLENBQUM7SUFFMUQsT0FBTyxDQUFDLEdBQUcsQ0FBQyw4QkFBOEIsQ0FBQyxDQUFDO0FBQzlDLENBQUMsQ0FBQyIsIm5hbWVzIjpbXSwic291cmNlcyI6WyIvVXNlcnMvbmlzc2ltbWVuYXNoZS9WRVJTQVRJTCBTRExDIEZXL3Rlc3RzL3NldHVwL2plc3QtZ2xvYmFsLXNldHVwLmpzIl0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogVkVSU0FUSUwgU0RMQyBGcmFtZXdvcmsgLSBKZXN0IEdsb2JhbCBTZXR1cFxuICogRW5oYW5jZWQgTWFyaWEtUUEgVW5pdCBUZXN0aW5nIEluaXRpYWxpemF0aW9uXG4gKi9cblxubW9kdWxlLmV4cG9ydHMgPSBhc3luYyBmdW5jdGlvbiBqZXN0R2xvYmFsU2V0dXAoKSB7XG4gIGNvbnNvbGUubG9nKCfwn6eqIFZFUlNBVElMIFNETEMgRnJhbWV3b3JrIC0gU3RhcnRpbmcgSmVzdCBHbG9iYWwgU2V0dXAnKTtcbiAgY29uc29sZS5sb2coJ/CfkanigI3wn5SsIEVuaGFuY2VkIE1hcmlhLVFBIFVuaXQgVGVzdGluZyBJbml0aWFsaXphdGlvbicpO1xuXG4gIC8vIFNldCBnbG9iYWwgdGVzdCBlbnZpcm9ubWVudCB2YXJpYWJsZXNcbiAgcHJvY2Vzcy5lbnYuTk9ERV9FTlYgPSAndGVzdCc7XG4gIHByb2Nlc3MuZW52LkpFU1RfV09SS0VSX0lEID0gcHJvY2Vzcy5lbnYuSkVTVF9XT1JLRVJfSUQgfHwgJzEnO1xuXG4gIC8vIEJNQUQgbWV0aG9kb2xvZ3kgY29uZmlndXJhdGlvblxuICBnbG9iYWwuYm1hZEplc3RDb25maWcgPSB7XG4gICAgYWdlbnQ6ICdFbmhhbmNlZCBNYXJpYS1RQScsXG4gICAgZnJhbWV3b3JrOiAnVkVSU0FUSUwgU0RMQycsXG4gICAgdGVzdFR5cGU6ICd1bml0JyxcbiAgICBzdGFydFRpbWU6IERhdGUubm93KCksXG4gICAgcXVhbGl0eUdhdGVzOiB7XG4gICAgICBjb3ZlcmFnZToge1xuICAgICAgICB0aHJlc2hvbGQ6IDgwLFxuICAgICAgICBlbmZvcmNlZDogdHJ1ZVxuICAgICAgfSxcbiAgICAgIHBlcmZvcm1hbmNlOiB7XG4gICAgICAgIG1heFRlc3RUaW1lOiAxNTAwMCxcbiAgICAgICAgZW5mb3JjZWQ6IHRydWVcbiAgICAgIH1cbiAgICB9XG4gIH07XG5cbiAgLy8gRW5oYW5jZWQgdGVzdGluZyBjYXBhYmlsaXRpZXNcbiAgY29uc29sZS5sb2coJ/Cfjq8gQk1BRCBVbml0IFRlc3RpbmcgU3RhbmRhcmRzOicpO1xuICBjb25zb2xlLmxvZygnICAg8J+TiiBDb3ZlcmFnZSBUaHJlc2hvbGQ6IDgwJSsnKTtcbiAgY29uc29sZS5sb2coJyAgIOKPse+4jyAgTWF4IFRlc3QgVGltZTogMTVzJyk7XG4gIGNvbnNvbGUubG9nKCcgICDwn5SnIEh5YnJpZCBKZXN0ICsgUGxheXdyaWdodCBJbnRlZ3JhdGlvbicpO1xuXG4gIGNvbnNvbGUubG9nKCfinIUgSmVzdCBHbG9iYWwgU2V0dXAgQ29tcGxldGUnKTtcbn07Il0sInZlcnNpb24iOjN9

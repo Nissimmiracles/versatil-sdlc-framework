@@ -14,7 +14,7 @@ We actively support the following versions of the VERSATIL SDLC Framework with s
 The VERSATIL SDLC Framework prioritizes security at every level:
 
 ### 🛡️ Framework Security
-- **Agent Isolation**: Each BMAD agent operates in isolated contexts
+- **Agent Isolation**: Each OPERA agent operates in isolated contexts
 - **MCP Security**: Secure Model Context Protocol implementation
 - **Input Validation**: All user inputs are validated and sanitized
 - **Secrets Management**: No hardcoded credentials or secrets
@@ -64,7 +64,7 @@ npm install versatil-sdlc-framework@1.0.0 --exact
 npm update
 ```
 
-### 🤖 BMAD Agent Security
+### 🤖 OPERA Agent Security
 - **Context Isolation**: Agents don't share sensitive context
 - **Permission Management**: Configure agent access appropriately
 - **Audit Trails**: Monitor agent activations and decisions
@@ -112,7 +112,7 @@ For enterprise deployments, additional security measures include:
 ### 🎯 Scope
 **In Scope:**
 - VERSATIL framework core functionality
-- BMAD agent implementations
+- OPERA agent implementations
 - MCP integration components
 - CLI tools and utilities
 - Documentation security issues
@@ -172,7 +172,7 @@ For sensitive reports, we support:
 
 ### 📚 Security Documentation
 - [Secure Development Guidelines](docs/security/secure-development.md)
-- [BMAD Agent Security Model](docs/security/agent-security.md)
+- [OPERA Agent Security Model](docs/security/agent-security.md)
 - [MCP Security Architecture](docs/security/mcp-security.md)
 
 ### 🛠️ Security Tools

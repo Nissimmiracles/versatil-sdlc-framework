@@ -8,7 +8,7 @@
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0+-blue.svg)
 ![MCP](https://img.shields.io/badge/MCP-integrated-purple.svg)
-![BMAD](https://img.shields.io/badge/BMAD-methodology-orange.svg)
+![OPERA](https://img.shields.io/badge/OPERA-methodology-orange.svg)
 ![Security](https://img.shields.io/badge/security-enterprise%20grade-red.svg)
 ![Test Coverage](https://img.shields.io/badge/coverage-85%25+-brightgreen.svg)
 
@@ -113,7 +113,7 @@ docker-compose up -d
 
 ## 🎯 What is VERSATIL SDLC Framework?
 
-A **production-ready AI-Native Software Development Lifecycle framework** that transforms how development teams work with AI agents. Built on the **Enhanced BMAD Methodology** (Business-Managed Agile Development), this framework provides:
+A **production-ready AI-Native Software Development Lifecycle framework** that transforms how development teams work with AI agents. Built on the **Enhanced OPERA Methodology** (Business-Managed Agile Development), this framework provides:
 
 ### 🤖 Core Features
 
@@ -132,7 +132,7 @@ A **production-ready AI-Native Software Development Lifecycle framework** that t
 - **🔄 Self-Healing Execution** with automatic failure recovery (v1.2.0)
 - **🎯 Goal-Based Development** - describe what you want, not how (v1.2.0)
 
-### 🎪 The Enhanced BMAD Agent Team
+### 🎪 The Enhanced OPERA Agent Team
 
 #### 1. **Enhanced Maria-QA** 🕵️‍♀️ *Quality Guardian*
 ```typescript
@@ -323,9 +323,9 @@ PERFORMANCE_MONITORING=true npm start
 
 ## 📚 Core Concepts
 
-### 🔄 The Enhanced BMAD Methodology
+### 🔄 The Enhanced OPERA Methodology
 
-**BMAD** (Business-Managed Agile Development) is our revolutionary approach to AI-native development:
+**OPERA** (Business-Managed Agile Development) is our revolutionary approach to AI-native development:
 
 #### **Context Preservation Protocol**
 ```typescript
@@ -780,7 +780,7 @@ await maria.activate(context);
 await marcus.activate(context);
 
 // New way: Autonomous execution
-await enhancedBMAD.executeBMADWorkflow(
+await enhancedOPERA.executeOPERAWorkflow(
   'my-project',
   'Build a secure user authentication system with JWT'
 );

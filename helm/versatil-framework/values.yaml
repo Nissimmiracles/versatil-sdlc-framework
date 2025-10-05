@@ -71,7 +71,7 @@ tolerations: []
 
 affinity: {}
 
-# BMAD Agents Configuration
+# OPERA Agents Configuration
 agents:
   mariaQA:
     enabled: true

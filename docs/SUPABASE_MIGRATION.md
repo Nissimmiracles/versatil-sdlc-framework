@@ -156,7 +156,7 @@ node scripts/migrate-vector-store.cjs migrate \
 After successful migration, update agent configurations to use Supabase:
 
 ```typescript
-// Update Enhanced BMAD agents
+// Update Enhanced OPERA agents
 import { createSupabaseEnhancedAgent } from './src/agents/supabase-agent-integration.js';
 import { supabaseConfig } from './src/config/supabase-config.js';
 

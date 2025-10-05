@@ -145,7 +145,7 @@ export class VERSATILMCPClient {
     const result: MockAgentResponse = {
       success: true,
       agentId,
-      agentType: 'bmad-agent',
+      agentType: 'opera-agent',
       suggestions: ['Agent activation simulated via MCP'],
       metadata: { mcpActivation: true }
     };

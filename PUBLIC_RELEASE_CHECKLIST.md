@@ -6,7 +6,7 @@ Ensure the public release has **ALL needed capabilities** for full framework fun
 
 Users should be able to:
 ✅ Install and run immediately
-✅ Use all 6 BMAD agents
+✅ Use all 6 OPERA agents
 ✅ Access RAG intelligence system
 ✅ Integrate with their codebase
 ✅ Customize for their needs
@@ -16,7 +16,7 @@ Users should be able to:
 
 ## 📦 Core Capabilities Required in Public Release
 
-### 1. Agent System (6 BMAD Agents) ✅
+### 1. Agent System (6 OPERA Agents) ✅
 
 **Required Files**:
 ```
@@ -644,7 +644,7 @@ npx versatil init
 
 ### Core Capabilities
 
-- [ ] **All 6 BMAD Agents**
+- [ ] **All 6 OPERA Agents**
   - [ ] Enhanced Maria (QA)
   - [ ] Enhanced James (Frontend)
   - [ ] Enhanced Marcus (Backend)

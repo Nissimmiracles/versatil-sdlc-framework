@@ -70,7 +70,7 @@ if (checkFiles('Test 1: Slash Commands Infrastructure', [
   '.claude/commands/dr-ai-ml.md'
 ])) {
   score++;
-  console.log('\n   ✅ PASS: All 6 BMAD agent slash commands exist');
+  console.log('\n   ✅ PASS: All 6 OPERA agent slash commands exist');
 } else {
   console.log('\n   ❌ FAIL: Missing slash command files');
 }

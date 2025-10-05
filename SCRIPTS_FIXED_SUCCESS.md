@@ -44,8 +44,8 @@ Added `"type": "module"` to package.json to fix agent imports
 
 ### Root Directory CommonJS (19 files → .cjs)
 ```
-✅ test-bmad-completeness.cjs
-✅ test-bmad-sync.cjs
+✅ test-opera-completeness.cjs
+✅ test-opera-sync.cjs
 ✅ healthcheck.cjs
 ✅ test-adaptive-behavior.cjs
 ✅ run-demo.cjs
@@ -67,7 +67,7 @@ Added `"type": "module"` to package.json to fix agent imports
 ```
 ✅ init-opera-mcp.mjs (was .cjs, uses import)
 ✅ test-opera-mcp.mjs (was .cjs, uses import)
-✅ test-enhanced-bmad.mjs (was .cjs, uses import)
+✅ test-enhanced-opera.mjs (was .cjs, uses import)
 ✅ quick-test.mjs (was .cjs, uses import)
 ✅ test-full-framework.mjs (already was .mjs)
 ```
@@ -85,7 +85,7 @@ Added `"type": "module"` to package.json to fix agent imports
     "test:stability:ci": "node scripts/run-stability-tests.cjs --ci",
     "agents": "node scripts/show-agents-simple.cjs",
     "show-agents": "node scripts/show-agents-simple.cjs",
-    "test:enhanced": "node test-enhanced-bmad.mjs",
+    "test:enhanced": "node test-enhanced-opera.mjs",
     "test:opera-mcp": "node test-opera-mcp.mjs",
     "migrate": "node scripts/migrate-to-1.2.0.cjs",
     "start:opera-mcp": "node init-opera-mcp.mjs",
@@ -115,11 +115,11 @@ Added `"type": "module"` to package.json to fix agent imports
 $ npm run show-agents
 
 ╔══════════════════════════════════════════════════════════════╗
-║                    VERSATIL BMAD AGENTS                     ║
+║                    VERSATIL OPERA AGENTS                     ║
 ║                     Currently Active                        ║
 ╚══════════════════════════════════════════════════════════════╝
 
-🤖 Active BMAD Agents:
+🤖 Active OPERA Agents:
 【Maria-QA】 ✅ Active | 🔄 Auto-Activate
 【James-Frontend】 ✅ Active | 🔄 Auto-Activate
 【Marcus-Backend】 ✅ Active | 🔄 Auto-Activate

@@ -1,6 +1,6 @@
 # Getting Started with VERSATIL SDLC Framework
 
-Welcome to the VERSATIL SDLC Framework! This guide will help you get up and running with AI-native development using the BMAD methodology and specialized agents.
+Welcome to the VERSATIL SDLC Framework! This guide will help you get up and running with AI-native development using the OPERA methodology and specialized agents.
 
 ## 🚀 Quick Start
 

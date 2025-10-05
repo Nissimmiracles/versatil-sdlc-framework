@@ -69,7 +69,7 @@ async function runSelfReferentialTest() {
         isolatedMemory: true
       },
       
-      archon: {
+      opera: {
         enabled: true,
         autonomousMode: true,
         selfReferentialMode: true,
@@ -162,7 +162,7 @@ async function runSelfReferentialTest() {
       srcPath: './src',
       testPath: './tests',
       fileCount: 156,  // Approximate
-      directories: ['src/agents', 'src/archon', 'src/rag', 'src/environment']
+      directories: ['src/agents', 'src/opera', 'src/rag', 'src/environment']
     },
     technology: {
       language: 'typescript',
@@ -228,7 +228,7 @@ async function runSelfReferentialTest() {
     ]
   };
   
-  console.log('🎯 Archon: Goal received:', improvementGoal.description);
+  console.log('🎯 Opera: Goal received:', improvementGoal.description);
   console.log('   📋 Analyzing with self-referential context...');
   console.log('   🧠 Using knowledge of our own codebase...');
   
@@ -305,7 +305,7 @@ async function runSelfReferentialTest() {
   
   console.log('\n📚 Next Steps:');
   console.log('1. Review: .versatil-self/config.json');
-  console.log('2. Try: @archon improve versatil error handling');
+  console.log('2. Try: @opera improve versatil error handling');
   console.log('3. Ask: @introspect analyze framework architecture');
   console.log('4. Explore: The framework improving itself!');
   

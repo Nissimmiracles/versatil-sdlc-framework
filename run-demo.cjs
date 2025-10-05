@@ -15,7 +15,7 @@ const __dirname = dirname(__filename);
 const demos = {
   '1': { file: 'working-demo.cjs', name: 'Working Demo' },
   '2': { file: 'introspective-test.cjs', name: 'Introspective Test' },
-  '3': { file: 'test-enhanced-bmad.js', name: 'Enhanced BMAD Test' }
+  '3': { file: 'test-enhanced-opera.js', name: 'Enhanced OPERA Test' }
 };
 
 console.log(`
@@ -27,7 +27,7 @@ Select a demo to run:
 
 1. Working Demo - See learning, bug fixes, transformations
 2. Introspective Test - Framework self-testing
-3. Enhanced BMAD Test - Original enhanced test
+3. Enhanced OPERA Test - Original enhanced test
 
 Enter your choice (1-3): `);
 

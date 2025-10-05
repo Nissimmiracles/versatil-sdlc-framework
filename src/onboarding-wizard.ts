@@ -1,6 +1,6 @@
 /**
  * VERSATIL Framework Onboarding Wizard
- * Interactive setup experience for new developers with BMAD agent customization
+ * Interactive setup experience for new developers with OPERA agent customization
  */
 
 import * as readline from 'readline';
@@ -45,7 +45,7 @@ export class OnboardingWizard {
     console.log(`
 🚀 Welcome to VERSATIL SDLC Framework!
 
-Let's set up your AI-native development environment with the perfect BMAD agent configuration.
+Let's set up your AI-native development environment with the perfect OPERA agent configuration.
 This will take 3-5 minutes and will create a personalized development experience.
 
 Press Enter to continue...`);
@@ -58,8 +58,8 @@ Press Enter to continue...`);
     // Team and experience setup
     await this.setupTeamContext();
 
-    // BMAD agent customization
-    await this.customizeBMADAgents();
+    // OPERA agent customization
+    await this.customizeOPERAAgents();
 
     // MCP tool preferences
     await this.configureMCPTools();
@@ -153,12 +153,12 @@ Enter numbers (e.g., 1,3,4): `);
   }
 
   /**
-   * Customize BMAD agents based on user preferences
+   * Customize OPERA agents based on user preferences
    */
-  private async customizeBMADAgents(): Promise<void> {
-    console.log(`\n🤖 Step 3: BMAD Agent Customization\n`);
+  private async customizeOPERAAgents(): Promise<void> {
+    console.log(`\n🤖 Step 3: OPERA Agent Customization\n`);
 
-    console.log(`The BMAD methodology includes 6 specialized agents. Let's customize them for your workflow:\n`);
+    console.log(`The OPERA methodology includes 6 specialized agents. Let's customize them for your workflow:\n`);
 
     const agentCustomizations = new Map<string, AgentCustomization>();
 
@@ -223,7 +223,7 @@ Enter numbers (e.g., 1,3,4): `);
     }
 
     this.responses.agentCustomizations = agentCustomizations;
-    console.log(`✅ BMAD agents customized: ${agentCustomizations.size} agents configured`);
+    console.log(`✅ OPERA agents customized: ${agentCustomizations.size} agents configured`);
   }
 
   /**
@@ -324,7 +324,7 @@ Choose (1-5): `);
    .versatil/config.json - Main configuration
    .versatil/agents/ - Agent definitions
    .cursorrules - IDE integration
-   CLAUDE.md - BMAD methodology guide
+   CLAUDE.md - OPERA methodology guide
    versatil.log - Framework activity log
 
 🚀 Next Steps:
@@ -334,7 +334,7 @@ Choose (1-5): `);
 
 💡 Pro Tip: Your agents will auto-activate based on the file patterns you configured!
 
-🎯 Your BMAD agents are ready:
+🎯 Your OPERA agents are ready:
 ${Array.from(config.agentCustomizations.keys()).map(agent => `   • ${agent}`).join('\n')}
 
 Happy coding with VERSATIL! 🚀
@@ -471,7 +471,7 @@ ${agentName.toLowerCase()}_triggers:
   }
 
   private generateClaudeGuide(config: OnboardingResponse): string {
-    return `# VERSATIL BMAD Methodology Guide
+    return `# VERSATIL OPERA Methodology Guide
 
 ## Your Customized Agent Team
 

@@ -2,7 +2,7 @@
 const { emergencyProductionFix } = require('./tests/real-world-scenarios.js');
 
 console.log('🚨 VERSATIL v1.2.0 - Emergency Production Fix Demo\n');
-console.log('Watch how Archon handles a critical production outage...\n');
+console.log('Watch how Opera handles a critical production outage...\n');
 
 emergencyProductionFix()
   .then(() => {

@@ -1,7 +1,7 @@
 {
   "name": "versatil-sdlc-framework",
   "version": "1.0.0",
-  "description": "VERSATIL SDLC Framework MCP Server - Complete BMAD methodology with adaptive agents",
+  "description": "VERSATIL SDLC Framework MCP Server - Complete OPERA methodology with adaptive agents",
   "author": "VERSATIL Development Team",
   "license": "MIT",
   "repository": {
@@ -21,7 +21,7 @@
     "tools": [
       {
         "name": "versatil_activate_agent",
-        "description": "Activate specific BMAD agents (Enhanced Maria, James, Marcus, Architecture Dan, etc.)",
+        "description": "Activate specific OPERA agents (Enhanced Maria, James, Marcus, Architecture Dan, etc.)",
         "category": "agent-management"
       },
       {
@@ -46,7 +46,7 @@
       "Adaptive Agent Behavior",
       "Real-time Quality Gates",
       "Emergency Response System",
-      "BMAD Methodology Implementation",
+      "OPERA Methodology Implementation",
       "Context Preservation"
     ],
     "requirements": {

@@ -99,7 +99,7 @@ imported from '.../dist/agents/enhanced-maria.js'
    - Tries to use agents
    - Fails when accessing agent methods
 
-4. **BMAD Methodology**
+4. **OPERA Methodology**
    - The core framework concept
    - Completely broken at runtime
    - Works only in documentation
@@ -162,22 +162,22 @@ Use esbuild/rollup to create single bundle
 
 ### Framework Claims
 - "Army of agents handling everything" ✅ Claimed
-- "Self-managing via BMAD agents" ✅ Claimed
+- "Self-managing via OPERA agents" ✅ Claimed
 - "Zero context loss" ✅ Claimed
-- "Enhanced BMAD agents achieving..." ✅ Claimed
+- "Enhanced OPERA agents achieving..." ✅ Claimed
 
 ### Framework Reality
 - Army of agents: ❌ None work
 - Self-managing: ❌ Can't load agents
 - Zero context loss: ❓ Untestable (agents don't work)
-- Enhanced BMAD: ❌ Non-functional
+- Enhanced OPERA: ❌ Non-functional
 
 ### What the Framework Can Actually Do
 1. ✅ Opera MCP Server (1 server, 6 tools)
 2. ✅ TypeScript compilation
 3. ✅ Show nice agent descriptions
 4. ❌ Run any agent
-5. ❌ Execute BMAD methodology
+5. ❌ Execute OPERA methodology
 6. ❌ Use the "army" for anything
 
 ---
@@ -260,6 +260,6 @@ The "army" exists as **architecture and code** but not as **functioning runtime 
 
 **Fix Status**: Not started (needs ~2-3 hours)
 **Priority**: **CRITICAL** - This is the core framework feature
-**Blocker**: Blocks VERSATIL MCP V2, BMAD methodology, SDLC orchestration
+**Blocker**: Blocks VERSATIL MCP V2, OPERA methodology, SDLC orchestration
 
 **After Fix**: Framework would actually deliver on its core promises

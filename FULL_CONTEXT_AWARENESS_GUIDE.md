@@ -23,7 +23,7 @@ Provides comprehensive project analysis:
 
 ### 2. **Enhanced Opera Orchestrator**
 ```typescript
-// src/archon/enhanced-archon-orchestrator.ts
+// src/opera/enhanced-opera-orchestrator.ts
 ```
 
 Now includes:
@@ -221,7 +221,7 @@ This shows:
       "continuous": true,
       "watchFiles": true
     },
-    "archon": {
+    "opera": {
       "contextAware": true,
       "adaptToProject": true,
       "learnFromEnvironment": true
@@ -280,7 +280,7 @@ decision.environmentContext // Contains project specifics
 ### 3. **Test Introspective Access**
 ```javascript
 // Introspective agent can:
-await this.archon.addGoal(goal); // ✅ Create goals
+await this.opera.addGoal(goal); // ✅ Create goals
 await vectorMemoryStore.query(); // ✅ Access memories
 await environmentScanner.scan(); // ✅ Scan environment
 ```

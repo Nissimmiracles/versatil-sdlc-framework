@@ -6,9 +6,9 @@
  */
 
 // Mock implementations for demo
-const enhancedBMAD = {
+const enhancedOPERA = {
   createContext: async (id) => console.log(`🔧 Creating context: ${id}`),
-  executeBMADWorkflow: async (id, req) => console.log(`⚡ Executing workflow: ${req}`)
+  executeOPERAWorkflow: async (id, req) => console.log(`⚡ Executing workflow: ${req}`)
 };
 
 const vectorMemoryStore = {

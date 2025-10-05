@@ -29,5 +29,5 @@
   },
   "maxConcurrentTasks": 3,
   "priority": "high",
-  "tags": ["frontend", "ui", "bmad", "react", "vue"]
+  "tags": ["frontend", "ui", "opera", "react", "vue"]
 }

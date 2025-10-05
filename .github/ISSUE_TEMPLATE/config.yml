@@ -12,7 +12,7 @@ contact_links:
   - name: 🔗 MCP Integration Guide
     url: https://github.com/MiraclesGIT/versatil-sdlc-framework/blob/main/docs/mcp-integration.md
     about: Learn how to integrate VERSATIL with Claude Desktop via MCP
-  - name: 🤖 BMAD Methodology
+  - name: 🤖 OPERA Methodology
     url: https://github.com/MiraclesGIT/versatil-sdlc-framework/blob/main/CLAUDE.md
     about: Understand the Business-Managed Agile Development methodology
   - name: 🔒 Security Issues

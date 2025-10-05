@@ -109,7 +109,7 @@ import { BaseAgent } from './base-agent';  // ❌ Should be './base-agent.js'
 - **Files**: `dist/agents/*.js`
 - **Status**: Multiple import resolution issues
 - **Why it fails**: Missing `.js` extensions in import paths
-- **Impact**: Blocks V2 server, affects entire BMAD system
+- **Impact**: Blocks V2 server, affects entire OPERA system
 
 ---
 

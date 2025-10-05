@@ -73,7 +73,7 @@ The following tools are available via MCP:
 
 ```javascript
 // Create a new goal
-await mcp.call('archon_create_goal', {
+await mcp.call('opera_create_goal', {
   type: 'feature',
   description: 'Implement user authentication',
   priority: 'high',
@@ -89,7 +89,7 @@ await mcp.call('archon_create_goal', {
 
 ```javascript
 // Analyze project comprehensively
-await mcp.call('archon_analyze_project', {
+await mcp.call('opera_analyze_project', {
   depth: 'comprehensive'  // basic, detailed, or comprehensive
 });
 ```
@@ -98,18 +98,18 @@ await mcp.call('archon_analyze_project', {
 
 ```javascript
 // Check for updates
-await mcp.call('archon_check_updates', {
+await mcp.call('opera_check_updates', {
   channel: 'stable'
 });
 
 // Apply an update
-await mcp.call('archon_apply_update', {
+await mcp.call('opera_apply_update', {
   version: '1.2.1',
   backup: true
 });
 
 // Rollback if needed
-await mcp.call('archon_rollback', {
+await mcp.call('opera_rollback', {
   version: '1.2.0'
 });
 ```
@@ -118,19 +118,19 @@ await mcp.call('archon_rollback', {
 
 ```javascript
 // Get active goals
-const goals = await mcp.read('archon://goals');
+const goals = await mcp.read('opera://goals');
 
 // View execution plans
-const plans = await mcp.read('archon://plans');
+const plans = await mcp.read('opera://plans');
 
 // Check performance metrics
-const metrics = await mcp.read('archon://metrics');
+const metrics = await mcp.read('opera://metrics');
 
 // Review environmental context
-const context = await mcp.read('archon://context');
+const context = await mcp.read('opera://context');
 
 // View update history
-const updates = await mcp.read('archon://updates');
+const updates = await mcp.read('opera://updates');
 ```
 
 ## Auto-Update Process
@@ -186,7 +186,7 @@ The system automatically discovers and suggests MCPs based on your project:
    - Vercel MCP (deployment)
 
 4. **Specialized MCPs**
-   - BMAD MCP (methodology)
+   - OPERA MCP (methodology)
    - Cursor MCP (IDE integration)
    - Docker MCP (containerization)
 
@@ -264,24 +264,24 @@ await mcp.call('mcp_install_recommended', {
 
 | Tool | Description | Parameters |
 |------|-------------|------------|
-| `archon_create_goal` | Create new orchestration goal | type, description, priority, criteria |
-| `archon_execute_plan` | Execute generated plan | planId, async |
-| `archon_get_status` | Get current status | - |
-| `archon_update_context` | Update environmental context | context |
-| `archon_analyze_project` | Analyze project | depth |
-| `archon_check_updates` | Check for updates | channel |
-| `archon_apply_update` | Apply update | version, backup |
-| `archon_rollback` | Rollback version | version |
+| `opera_create_goal` | Create new orchestration goal | type, description, priority, criteria |
+| `opera_execute_plan` | Execute generated plan | planId, async |
+| `opera_get_status` | Get current status | - |
+| `opera_update_context` | Update environmental context | context |
+| `opera_analyze_project` | Analyze project | depth |
+| `opera_check_updates` | Check for updates | channel |
+| `opera_apply_update` | Apply update | version, backup |
+| `opera_rollback` | Rollback version | version |
 
 ### Opera MCP Resources
 
 | URI | Description | Format |
 |-----|-------------|--------|
-| `archon://goals` | Active goals | JSON |
-| `archon://plans` | Execution plans | JSON |
-| `archon://metrics` | Performance metrics | JSON |
-| `archon://context` | Environmental context | JSON |
-| `archon://updates` | Update history | JSON |
+| `opera://goals` | Active goals | JSON |
+| `opera://plans` | Execution plans | JSON |
+| `opera://metrics` | Performance metrics | JSON |
+| `opera://context` | Environmental context | JSON |
+| `opera://updates` | Update history | JSON |
 
 ## Security Considerations
 

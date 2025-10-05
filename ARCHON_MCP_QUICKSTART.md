@@ -22,7 +22,7 @@ npm install
 cp .env.example .env
 
 # Start Opera MCP
-npm run archon:start
+npm run opera:start
 ```
 
 ## 🎯 Quick Examples
@@ -31,7 +31,7 @@ npm run archon:start
 
 ```javascript
 // Create a feature goal
-const goal = await callMCPTool('archon_create_goal', {
+const goal = await callMCPTool('opera_create_goal', {
   type: 'feature',
   description: 'Build user registration API',
   priority: 'high',
@@ -48,13 +48,13 @@ const goal = await callMCPTool('archon_create_goal', {
 
 ```javascript
 // Check for updates
-const updates = await callMCPTool('archon_check_updates', {
+const updates = await callMCPTool('opera_check_updates', {
   channel: 'stable'
 });
 
 // Apply update if available
 if (updates) {
-  await callMCPTool('archon_apply_update', {
+  await callMCPTool('opera_apply_update', {
     version: updates.version,
     backup: true
   });
@@ -65,7 +65,7 @@ if (updates) {
 
 ```javascript
 // Quick project analysis
-const analysis = await callMCPTool('archon_analyze_project', {
+const analysis = await callMCPTool('opera_analyze_project', {
   depth: 'basic'
 });
 
@@ -91,7 +91,7 @@ MCP_AUTO_DISCOVERY=true
 
 1. **Start the MCP server:**
    ```bash
-   npm run archon:start
+   npm run opera:start
    ```
 
 2. **In Cursor, configure MCP:**
@@ -99,7 +99,7 @@ MCP_AUTO_DISCOVERY=true
    {
      "mcp": {
        "servers": {
-         "archon": {
+         "opera": {
            "command": "node",
            "args": ["init-opera-mcp.js"],
            "env": {}
@@ -110,7 +110,7 @@ MCP_AUTO_DISCOVERY=true
    ```
 
 3. **Use in your IDE:**
-   - Type: `@archon create a new feature`
+   - Type: `@opera create a new feature`
    - The AI will use Opera MCP tools automatically
 
 ## 🎮 Interactive Demo
@@ -125,13 +125,13 @@ npm run demo:opera-mcp
 
 ```bash
 # Start Opera MCP
-npm run archon:start
+npm run opera:start
 
 # Check health status
-npm run archon:health
+npm run opera:health
 
 # Check for updates
-npm run archon:update
+npm run opera:update
 
 # Discover MCPs
 npm run mcp:discover
@@ -146,13 +146,13 @@ Access Opera resources:
 
 ```javascript
 // View active goals
-const goals = await readMCPResource('archon://goals');
+const goals = await readMCPResource('opera://goals');
 
 // Check metrics
-const metrics = await readMCPResource('archon://metrics');
+const metrics = await readMCPResource('opera://metrics');
 
 // Review context
-const context = await readMCPResource('archon://context');
+const context = await readMCPResource('opera://context');
 ```
 
 ## 🔍 Troubleshooting
@@ -163,16 +163,16 @@ const context = await readMCPResource('archon://context');
 lsof -i :3000
 
 # Use different port
-OPERA_MCP_PORT=3001 npm run archon:start
+OPERA_MCP_PORT=3001 npm run opera:start
 ```
 
 ### Updates failing
 ```bash
 # Disable auto-update temporarily
-OPERA_AUTO_UPDATE=false npm run archon:start
+OPERA_AUTO_UPDATE=false npm run opera:start
 
 # Manual rollback
-npm run archon:rollback -- --version=1.2.0
+npm run opera:rollback -- --version=1.2.0
 ```
 
 ### MCP not discovered
@@ -195,7 +195,7 @@ tail -f .versatil/logs/mcp-discovery.log
 
 1. **Enable Learning Mode**: Set `OPERA_LEARNING_MODE=adaptive` for smarter orchestration
 2. **Use Update Channels**: Stay on `stable` for production, try `beta` for new features
-3. **Monitor Performance**: Check `archon://metrics` regularly
+3. **Monitor Performance**: Check `opera://metrics` regularly
 4. **Backup Strategy**: Keep `OPERA_MAX_BACKUPS=5` for safe rollbacks
 5. **Integrate MCPs**: Let auto-discovery find tools for your stack
 

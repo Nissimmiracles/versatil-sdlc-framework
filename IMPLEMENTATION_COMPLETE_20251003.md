@@ -16,7 +16,7 @@
 ### 2. ✅ Project Configuration Created
 **File**: `.versatil-project.json`
 **Contents**:
-- All 6 BMAD agents configured
+- All 6 OPERA agents configured
 - All 5 Rules enabled
 - Quality gates: 85% coverage, 80+ score
 - Proactive mode enabled
@@ -65,7 +65,7 @@
 
 ### Framework Features ✅
 1. **Isolation Enforcement**: Clean project separation
-2. **Agent System**: All 6 BMAD agents functional
+2. **Agent System**: All 6 OPERA agents functional
 3. **Claude Code Integration**: 41 files in .claude/
 4. **RAG Memory**: Enhanced vector store ready
 5. **Orchestration**: Parallel task manager + proactive orchestrator

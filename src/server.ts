@@ -2,7 +2,7 @@
 
 /**
  * VERSATIL SDLC Framework - Production Server
- * Enhanced BMAD agent system with health monitoring
+ * Enhanced OPERA agent system with health monitoring
  */
 
 import express from 'express';
@@ -54,7 +54,7 @@ app.get('/ready', (req, res) => {
     checks: {
       filesystem: checkFilesystem(),
       memory: checkMemory(),
-      bmadAgents: checkBMADAgents()
+      operaAgents: checkOPERAAgents()
     }
   };
 
@@ -80,7 +80,7 @@ app.get('/metrics', (req, res) => {
   return res.send(metrics);
 });
 
-// Enhanced BMAD agent status endpoint
+// Enhanced OPERA agent status endpoint
 app.get('/agents/status', (req, res) => {
   if (!ENHANCED_AGENTS_ENABLED) {
     return res.status(404).json({ error: 'Enhanced agents disabled' });
@@ -175,7 +175,7 @@ function checkMemory(): { status: string; usage?: any; message?: string } {
   };
 }
 
-function checkBMADAgents(): { status: string; message?: string } {
+function checkOPERAAgents(): { status: string; message?: string } {
   if (!ENHANCED_AGENTS_ENABLED) {
     return { status: 'disabled', message: 'Enhanced agents not enabled' };
   }

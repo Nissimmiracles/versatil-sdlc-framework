@@ -6,7 +6,7 @@ The VERSATIL SDLC Framework includes comprehensive **Model Context Protocol (MCP
 
 VERSATIL's MCP server provides:
 - **Full Repository Access**: Read any file in your project through MCP
-- **Agent Control**: Activate and manage all 6 BMAD agents remotely
+- **Agent Control**: Activate and manage all 6 OPERA agents remotely
 - **Quality Gates**: Run quality checks and view status via MCP
 - **Emergency Response**: Trigger emergency protocols through MCP
 - **Automation Tools**: Version management, changelog generation, backups
@@ -41,7 +41,7 @@ The VERSATIL MCP server will now be available in Claude Desktop!
 ## 🛠️ Available MCP Tools
 
 - `versatil_analyze_project` - Analyze and recommend agents
-- `versatil_activate_agent` - Control BMAD agents
+- `versatil_activate_agent` - Control OPERA agents
 - `versatil_quality_gates` - Run quality checks
 - `versatil_emergency_response` - Trigger emergency protocols
 - `versatil_version_bump` - Automatic version management

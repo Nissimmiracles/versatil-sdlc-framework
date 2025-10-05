@@ -5,7 +5,7 @@
  * Python, Go, Rust, Java, and other languages beyond TypeScript.
  *
  * Each language adapter implements this interface to provide language-specific
- * functionality while maintaining BMAD methodology across all languages.
+ * functionality while maintaining OPERA methodology across all languages.
  */
 
 export interface ProjectStructure {
@@ -136,7 +136,7 @@ export abstract class BaseLanguageAdapter {
   }>;
 
   /**
-   * Get recommended BMAD agents for this language
+   * Get recommended OPERA agents for this language
    */
   abstract getRecommendedAgents(): string[];
 

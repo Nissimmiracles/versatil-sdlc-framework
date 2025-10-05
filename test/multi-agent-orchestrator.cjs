@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * VERSATIL SDLC Framework - Multi-Agent Testing Orchestrator
- * Coordinates all BMAD agents to test their respective domains
+ * Coordinates all OPERA agents to test their respective domains
  */
 
 const { execSync } = require('child_process');
@@ -367,7 +367,7 @@ npm run dev
   }
 
   async loadAgents() {
-    console.log(colors.blue('📥 Loading BMAD Agents...'));
+    console.log(colors.blue('📥 Loading OPERA Agents...'));
 
     for (const [agentId, agentInfo] of Object.entries(this.agents)) {
       try {

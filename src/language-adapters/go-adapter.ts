@@ -4,7 +4,7 @@
  * Enables VERSATIL to work with Go projects, supporting go test, go build,
  * golint, gofmt, and the entire Go toolchain.
  *
- * BMAD agents can now orchestrate Go development workflows.
+ * OPERA agents can now orchestrate Go development workflows.
  */
 
 import { exec } from 'child_process';
@@ -411,7 +411,7 @@ export class GoAdapter extends BaseLanguageAdapter {
   }
 
   /**
-   * Get recommended BMAD agents for Go projects
+   * Get recommended OPERA agents for Go projects
    */
   getRecommendedAgents(): string[] {
     return [

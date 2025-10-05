@@ -1,0 +1,311 @@
+539b2fea6c5e174945f8fb3b289a1d7e
+"use strict";
+
+/* istanbul ignore next */
+function cov_vwhcnh5ur() {
+  var path = "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/simulation-qa.ts";
+  var hash = "d3bdda9e190bdde72465faefaf656cb4d7836096";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/simulation-qa.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 2,
+          column: 0
+        },
+        end: {
+          line: 2,
+          column: 62
+        }
+      },
+      "1": {
+        start: {
+          line: 3,
+          column: 0
+        },
+        end: {
+          line: 3,
+          column: 53
+        }
+      },
+      "2": {
+        start: {
+          line: 4,
+          column: 21
+        },
+        end: {
+          line: 4,
+          column: 44
+        }
+      },
+      "3": {
+        start: {
+          line: 7,
+          column: 8
+        },
+        end: {
+          line: 7,
+          column: 28
+        }
+      },
+      "4": {
+        start: {
+          line: 8,
+          column: 8
+        },
+        end: {
+          line: 8,
+          column: 35
+        }
+      },
+      "5": {
+        start: {
+          line: 9,
+          column: 8
+        },
+        end: {
+          line: 9,
+          column: 34
+        }
+      },
+      "6": {
+        start: {
+          line: 10,
+          column: 8
+        },
+        end: {
+          line: 10,
+          column: 50
+        }
+      },
+      "7": {
+        start: {
+          line: 11,
+          column: 8
+        },
+        end: {
+          line: 11,
+          column: 31
+        }
+      },
+      "8": {
+        start: {
+          line: 14,
+          column: 8
+        },
+        end: {
+          line: 21,
+          column: 10
+        }
+      },
+      "9": {
+        start: {
+          line: 24,
+          column: 8
+        },
+        end: {
+          line: 24,
+          column: 20
+        }
+      },
+      "10": {
+        start: {
+          line: 27,
+          column: 0
+        },
+        end: {
+          line: 27,
+          column: 36
+        }
+      },
+      "11": {
+        start: {
+          line: 28,
+          column: 0
+        },
+        end: {
+          line: 28,
+          column: 36
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 6,
+            column: 4
+          },
+          end: {
+            line: 6,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 6,
+            column: 18
+          },
+          end: {
+            line: 12,
+            column: 5
+          }
+        },
+        line: 6
+      },
+      "1": {
+        name: "(anonymous_1)",
+        decl: {
+          start: {
+            line: 13,
+            column: 4
+          },
+          end: {
+            line: 13,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 13,
+            column: 28
+          },
+          end: {
+            line: 22,
+            column: 5
+          }
+        },
+        line: 13
+      },
+      "2": {
+        name: "(anonymous_2)",
+        decl: {
+          start: {
+            line: 23,
+            column: 4
+          },
+          end: {
+            line: 23,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 23,
+            column: 32
+          },
+          end: {
+            line: 25,
+            column: 5
+          }
+        },
+        line: 23
+      }
+    },
+    branchMap: {},
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0,
+      "2": 0
+    },
+    b: {},
+    inputSourceMap: {
+      file: "/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/simulation-qa.ts",
+      mappings: ";;;AA0BA,6CAAgF;AAEhF,MAAa,YAAa,SAAQ,sBAAS;IAA3C;;QACE,SAAI,GAAG,cAAc,CAAC;QACtB,OAAE,GAAG,eAAe,CAAC;QACrB,mBAAc,GAAG,mBAAmB,CAAC;QACrC,iBAAY,GAAG,EAAE,CAAC;IAgBpB,CAAC;IAdC,KAAK,CAAC,QAAQ,CAAC,OAA+B;QAC5C,OAAO;YACL,OAAO,EAAE,IAAI,CAAC,EAAE;YAChB,OAAO,EAAE,GAAG,IAAI,CAAC,IAAI,YAAY;YACjC,WAAW,EAAE,EAAE;YACf,QAAQ,EAAE,QAAQ;YAClB,SAAS,EAAE,EAAE;YACb,OAAO,EAAE,EAAE;SACZ,CAAC;IACJ,CAAC;IAED,KAAK,CAAC,mBAAmB;QACvB,OAAO,IAAI,CAAC;IACd,CAAC;CACF;AApBD,oCAoBC;AAxBwB,oCAAY",
+      names: [],
+      sources: ["/Users/nissimmenashe/VERSATIL SDLC FW/src/agents/simulation-qa.ts"],
+      sourcesContent: ["export interface SimulationScenario {\n  id: string;\n  name: string;\n  status: string;\n  featureName?: string;\n  evidence?: any;\n  confidence?: number;\n  testCases?: TestCase[];\n  promise?: string;\n  expectedBehavior?: string;\n  actualBehavior?: string;\n}\nexport interface TestCase {\n  id: string;\n  name: string;\n  description?: string;\n  timestamp?: number;\n  passed?: boolean;\n  actualResult?: any;\n  executionTime?: number;\n  action?: string;\n  expectedResult?: any;\n}\nexport interface CapabilityMatrix { [key: string]: any; }\nexport { SimulationQa as SimulationQA };\n\nimport { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent';\n\nexport class SimulationQa extends BaseAgent {\n  name = 'SimulationQa';\n  id = 'simulation-qa';\n  specialization = 'Specialized Agent';\n  systemPrompt = '';\n\n  async activate(context: AgentActivationContext): Promise<AgentResponse> {\n    return {\n      agentId: this.id,\n      message: `${this.name} activated`,\n      suggestions: [],\n      priority: 'medium',\n      handoffTo: [],\n      context: {}\n    };\n  }\n\n  async getCapabilityMatrix(): Promise<CapabilityMatrix | null> {\n    return null;\n  }\n}\n"],
+      version: 3
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "d3bdda9e190bdde72465faefaf656cb4d7836096"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_vwhcnh5ur = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_vwhcnh5ur();
+cov_vwhcnh5ur().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_vwhcnh5ur().s[1]++;
+exports.SimulationQa = exports.SimulationQA = void 0;
+const base_agent_1 =
+/* istanbul ignore next */
+(cov_vwhcnh5ur().s[2]++, require("./base-agent"));
+class SimulationQa extends
+/* istanbul ignore next */
+(base_agent_1.BaseAgent) {
+  constructor() {
+    /* istanbul ignore next */
+    cov_vwhcnh5ur().f[0]++;
+    cov_vwhcnh5ur().s[3]++;
+    super(...arguments);
+    /* istanbul ignore next */
+    cov_vwhcnh5ur().s[4]++;
+    this.name = 'SimulationQa';
+    /* istanbul ignore next */
+    cov_vwhcnh5ur().s[5]++;
+    this.id = 'simulation-qa';
+    /* istanbul ignore next */
+    cov_vwhcnh5ur().s[6]++;
+    this.specialization = 'Specialized Agent';
+    /* istanbul ignore next */
+    cov_vwhcnh5ur().s[7]++;
+    this.systemPrompt = '';
+  }
+  async activate(context) {
+    /* istanbul ignore next */
+    cov_vwhcnh5ur().f[1]++;
+    cov_vwhcnh5ur().s[8]++;
+    return {
+      agentId: this.id,
+      message: `${this.name} activated`,
+      suggestions: [],
+      priority: 'medium',
+      handoffTo: [],
+      context: {}
+    };
+  }
+  async getCapabilityMatrix() {
+    /* istanbul ignore next */
+    cov_vwhcnh5ur().f[2]++;
+    cov_vwhcnh5ur().s[9]++;
+    return null;
+  }
+}
+/* istanbul ignore next */
+cov_vwhcnh5ur().s[10]++;
+exports.SimulationQa = SimulationQa;
+/* istanbul ignore next */
+cov_vwhcnh5ur().s[11]++;
+exports.SimulationQA = SimulationQa;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfdndoY25oNXVyIiwiYWN0dWFsQ292ZXJhZ2UiLCJzIiwiYmFzZV9hZ2VudF8xIiwicmVxdWlyZSIsIlNpbXVsYXRpb25RYSIsIkJhc2VBZ2VudCIsImNvbnN0cnVjdG9yIiwiZiIsIm5hbWUiLCJpZCIsInNwZWNpYWxpemF0aW9uIiwic3lzdGVtUHJvbXB0IiwiYWN0aXZhdGUiLCJjb250ZXh0IiwiYWdlbnRJZCIsIm1lc3NhZ2UiLCJzdWdnZXN0aW9ucyIsInByaW9yaXR5IiwiaGFuZG9mZlRvIiwiZ2V0Q2FwYWJpbGl0eU1hdHJpeCIsImV4cG9ydHMiLCJTaW11bGF0aW9uUUEiXSwic291cmNlcyI6WyIvVXNlcnMvbmlzc2ltbWVuYXNoZS9WRVJTQVRJTCBTRExDIEZXL3NyYy9hZ2VudHMvc2ltdWxhdGlvbi1xYS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgaW50ZXJmYWNlIFNpbXVsYXRpb25TY2VuYXJpbyB7XG4gIGlkOiBzdHJpbmc7XG4gIG5hbWU6IHN0cmluZztcbiAgc3RhdHVzOiBzdHJpbmc7XG4gIGZlYXR1cmVOYW1lPzogc3RyaW5nO1xuICBldmlkZW5jZT86IGFueTtcbiAgY29uZmlkZW5jZT86IG51bWJlcjtcbiAgdGVzdENhc2VzPzogVGVzdENhc2VbXTtcbiAgcHJvbWlzZT86IHN0cmluZztcbiAgZXhwZWN0ZWRCZWhhdmlvcj86IHN0cmluZztcbiAgYWN0dWFsQmVoYXZpb3I/OiBzdHJpbmc7XG59XG5leHBvcnQgaW50ZXJmYWNlIFRlc3RDYXNlIHtcbiAgaWQ6IHN0cmluZztcbiAgbmFtZTogc3RyaW5nO1xuICBkZXNjcmlwdGlvbj86IHN0cmluZztcbiAgdGltZXN0YW1wPzogbnVtYmVyO1xuICBwYXNzZWQ/OiBib29sZWFuO1xuICBhY3R1YWxSZXN1bHQ/OiBhbnk7XG4gIGV4ZWN1dGlvblRpbWU/OiBudW1iZXI7XG4gIGFjdGlvbj86IHN0cmluZztcbiAgZXhwZWN0ZWRSZXN1bHQ/OiBhbnk7XG59XG5leHBvcnQgaW50ZXJmYWNlIENhcGFiaWxpdHlNYXRyaXggeyBba2V5OiBzdHJpbmddOiBhbnk7IH1cbmV4cG9ydCB7IFNpbXVsYXRpb25RYSBhcyBTaW11bGF0aW9uUUEgfTtcblxuaW1wb3J0IHsgQmFzZUFnZW50LCBBZ2VudFJlc3BvbnNlLCBBZ2VudEFjdGl2YXRpb25Db250ZXh0IH0gZnJvbSAnLi9iYXNlLWFnZW50JztcblxuZXhwb3J0IGNsYXNzIFNpbXVsYXRpb25RYSBleHRlbmRzIEJhc2VBZ2VudCB7XG4gIG5hbWUgPSAnU2ltdWxhdGlvblFhJztcbiAgaWQgPSAnc2ltdWxhdGlvbi1xYSc7XG4gIHNwZWNpYWxpemF0aW9uID0gJ1NwZWNpYWxpemVkIEFnZW50JztcbiAgc3lzdGVtUHJvbXB0ID0gJyc7XG5cbiAgYXN5bmMgYWN0aXZhdGUoY29udGV4dDogQWdlbnRBY3RpdmF0aW9uQ29udGV4dCk6IFByb21pc2U8QWdlbnRSZXNwb25zZT4ge1xuICAgIHJldHVybiB7XG4gICAgICBhZ2VudElkOiB0aGlzLmlkLFxuICAgICAgbWVzc2FnZTogYCR7dGhpcy5uYW1lfSBhY3RpdmF0ZWRgLFxuICAgICAgc3VnZ2VzdGlvbnM6IFtdLFxuICAgICAgcHJpb3JpdHk6ICdtZWRpdW0nLFxuICAgICAgaGFuZG9mZlRvOiBbXSxcbiAgICAgIGNvbnRleHQ6IHt9XG4gICAgfTtcbiAgfVxuXG4gIGFzeW5jIGdldENhcGFiaWxpdHlNYXRyaXgoKTogUHJvbWlzZTxDYXBhYmlsaXR5TWF0cml4IHwgbnVsbD4ge1xuICAgIHJldHVybiBudWxsO1xuICB9XG59XG4iXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7SUFxQ007SUFBQUEsYUFBQSxZQUFBQSxDQUFBO01BQUEsT0FBQUMsY0FBQTtJQUFBO0VBQUE7RUFBQSxPQUFBQSxjQUFBO0FBQUE7QUFBQUQsYUFBQTtBQUFBQSxhQUFBLEdBQUFFLENBQUE7Ozs7Ozs7QUFYTixNQUFBQyxZQUFBO0FBQUE7QUFBQSxDQUFBSCxhQUFBLEdBQUFFLENBQUEsT0FBQUUsT0FBQTtBQUVBLE1BQWFDLFlBQWE7QUFBQTtBQUFBLENBQVFGLFlBQUEsQ0FBQUcsU0FBUztFQUEzQ0MsWUFBQTtJQUFBO0lBQUFQLGFBQUEsR0FBQVEsQ0FBQTtJQUFBUixhQUFBLEdBQUFFLENBQUE7Ozs7SUFDRSxLQUFBTyxJQUFJLEdBQUcsY0FBYztJQUFDO0lBQUFULGFBQUEsR0FBQUUsQ0FBQTtJQUN0QixLQUFBUSxFQUFFLEdBQUcsZUFBZTtJQUFDO0lBQUFWLGFBQUEsR0FBQUUsQ0FBQTtJQUNyQixLQUFBUyxjQUFjLEdBQUcsbUJBQW1CO0lBQUM7SUFBQVgsYUFBQSxHQUFBRSxDQUFBO0lBQ3JDLEtBQUFVLFlBQVksR0FBRyxFQUFFO0VBZ0JuQjtFQWRFLE1BQU1DLFFBQVFBLENBQUNDLE9BQStCO0lBQUE7SUFBQWQsYUFBQSxHQUFBUSxDQUFBO0lBQUFSLGFBQUEsR0FBQUUsQ0FBQTtJQUM1QyxPQUFPO01BQ0xhLE9BQU8sRUFBRSxJQUFJLENBQUNMLEVBQUU7TUFDaEJNLE9BQU8sRUFBRSxHQUFHLElBQUksQ0FBQ1AsSUFBSSxZQUFZO01BQ2pDUSxXQUFXLEVBQUUsRUFBRTtNQUNmQyxRQUFRLEVBQUUsUUFBUTtNQUNsQkMsU0FBUyxFQUFFLEVBQUU7TUFDYkwsT0FBTyxFQUFFO0tBQ1Y7RUFDSDtFQUVBLE1BQU1NLG1CQUFtQkEsQ0FBQTtJQUFBO0lBQUFwQixhQUFBLEdBQUFRLENBQUE7SUFBQVIsYUFBQSxHQUFBRSxDQUFBO0lBQ3ZCLE9BQU8sSUFBSTtFQUNiOztBQUNEO0FBQUFGLGFBQUEsR0FBQUUsQ0FBQTtBQXBCRG1CLE9BQUEsQ0FBQWhCLFlBQUEsR0FBQUEsWUFBQTtBQW9CQztBQUFBTCxhQUFBLEdBQUFFLENBQUE7QUF4QndCbUIsT0FBQSxDQUFBQyxZQUFBLEdBQUFqQixZQUFBIiwiaWdub3JlTGlzdCI6W119

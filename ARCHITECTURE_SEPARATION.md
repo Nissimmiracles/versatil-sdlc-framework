@@ -166,7 +166,7 @@ src/
 │   ├── learning/
 │   └── analytics/
 ├── orchestration/      # Coordination
-│   ├── archon/
+│   ├── opera/
 │   ├── agents/
 │   └── registry/
 ├── environment/        # Context Collection

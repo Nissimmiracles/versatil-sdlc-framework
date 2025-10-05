@@ -216,7 +216,7 @@ TypeError: Cannot read properties of null (reading 'split')
 # V2.0.0-beta.1 - Production-Ready Core
 
 ## What's Working ✅
-- All 6 BMAD agents via slash commands
+- All 6 OPERA agents via slash commands
 - Error recovery and self-healing
 - Framework isolation (multi-project ready)
 - Real-time observability

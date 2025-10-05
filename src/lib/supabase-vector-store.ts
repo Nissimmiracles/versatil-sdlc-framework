@@ -5,7 +5,7 @@
  * - Dual embedding support (OpenAI + local Transformers.js)
  * - Real-time agent collaboration via Supabase channels
  * - Production-ready pattern storage and retrieval
- * - Seamless integration with existing Enhanced BMAD agents
+ * - Seamless integration with existing Enhanced OPERA agents
  */
 
 import { createClient, SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';

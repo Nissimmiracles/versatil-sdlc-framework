@@ -453,7 +453,7 @@ export * from './orchestrator/versatil-orchestrator';
     console.log('\n🚀 Quick start commands:');
     console.log('  npm run test:self-referential  # Test on itself');
     console.log('  npm run onboard               # Interactive setup');
-    console.log('  npm run archon:start          # Start Archon MCP');
+    console.log('  npm run opera:start          # Start Opera MCP');
     console.log('  npm run demo:context          # Context awareness demo');
 
   } catch (error) {

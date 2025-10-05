@@ -10,7 +10,7 @@
 The VERSATIL SDLC Framework is now **fully optimized for Cursor AI** with comprehensive testing capabilities that provide **extended understanding** of interface behavior, user expectations, and contextual validation. This setup enables seamless development from initial planning to production deployment.
 
 ### Key Achievements
-- ✅ **Zero Context Loss**: BMAD methodology preserves context across agent handoffs
+- ✅ **Zero Context Loss**: OPERA methodology preserves context across agent handoffs
 - ✅ **Extended Interface Testing**: Chrome MCP integration for deep UI understanding
 - ✅ **User Expectation Validation**: Tests validate against real user needs and context
 - ✅ **AI-Native Development**: Optimized for Cursor and other AI IDEs
@@ -42,7 +42,7 @@ npm run test:visual         # Visual regression with extended analysis
 npm run test:performance    # Performance validation with user metrics
 npm run test:accessibility  # WCAG compliance with contextual validation
 npm run test:security      # Security validation with threat modeling
-npm run test:bmad          # BMAD workflow validation
+npm run test:opera          # OPERA workflow validation
 ```
 
 ### 3. Cursor AI Integration Features
@@ -116,7 +116,7 @@ test('should demonstrate clean AI-assisted development', async ({ page }) => {
 
 ---
 
-## 🤖 BMAD Agent Integration for Extended Testing
+## 🤖 OPERA Agent Integration for Extended Testing
 
 ### Enhanced Maria-QA: The Extended Testing Orchestrator
 
@@ -162,7 +162,7 @@ Enhanced Maria-QA provides **comprehensive interface understanding** through mul
 
 5. **Business Logic Understanding**
    ```bash
-   npm run test:bmad
+   npm run test:opera
    ```
    - End-to-end workflow validation
    - User journey completion
@@ -302,7 +302,7 @@ npm run health-check
 The framework is specifically optimized for Cursor AI with:
 
 - **Smart Code Completion**: Enhanced TypeScript configuration with strict mode
-- **Context-Aware Suggestions**: BMAD agent patterns for intelligent recommendations
+- **Context-Aware Suggestions**: OPERA agent patterns for intelligent recommendations
 - **Real-Time Validation**: Instant feedback on code quality and user expectations
 - **Automated Testing**: One-command validation of all quality gates
 
@@ -369,7 +369,7 @@ interface ExtendedInterfaceAnalysis {
 ## 🚀 Getting Started Checklist
 
 ### For New Projects
-- [ ] Run `npm run init` to set up BMAD agents
+- [ ] Run `npm run init` to set up OPERA agents
 - [ ] Configure user and business context in `CLAUDE.md`
 - [ ] Set up Chrome MCP for extended interface testing
 - [ ] Establish performance and accessibility baselines
@@ -377,7 +377,7 @@ interface ExtendedInterfaceAnalysis {
 
 ### For Existing Projects
 - [ ] Run framework update preparation (`npm run cursor:update`)
-- [ ] Migrate existing tests to BMAD structure
+- [ ] Migrate existing tests to OPERA structure
 - [ ] Set up hybrid Jest + Playwright testing
 - [ ] Configure agent activation rules in `.cursorrules`
 - [ ] Validate all quality gates pass
@@ -405,7 +405,7 @@ Your VERSATIL SDLC Framework is now **fully optimized** for:
 
 1. **Run your first test**: `npm run test:maria-qa`
 2. **Update your framework**: Use Cursor's framework update feature
-3. **Start developing**: Let the BMAD agents guide your development
+3. **Start developing**: Let the OPERA agents guide your development
 4. **Deploy with confidence**: All quality gates ensure production readiness
 
 ---

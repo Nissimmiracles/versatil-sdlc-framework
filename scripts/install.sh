@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # VERSATIL SDLC Framework - One-Command Installation Script
-# This script sets up the complete VERSATIL SDLC Framework with BMAD methodology
+# This script sets up the complete VERSATIL SDLC Framework with OPERA methodology
 
 set -e  # Exit on any error
 
@@ -45,7 +45,7 @@ show_header() {
     echo "╚══════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
     echo ""
-    echo "🤖 BMAD Methodology with 6 Specialized AI Agents"
+    echo "🤖 OPERA Methodology with 6 Specialized AI Agents"
     echo "🧪 Chrome MCP Primary Testing Framework"
     echo "⚡ Auto-Agent Activation & Context Preservation"
     echo "📊 Real-time Quality Gates & Performance Monitoring"
@@ -576,7 +576,7 @@ marcus-backend security
 ## 🔧 Configuration Files
 
 - \`.cursorrules\` - Auto-agent activation rules
-- \`CLAUDE.md\` - BMAD methodology documentation
+- \`CLAUDE.md\` - OPERA methodology documentation
 - \`.versatil/\` - Framework configuration
 - \`playwright.config.js\` - Testing configuration
 
@@ -584,7 +584,7 @@ marcus-backend security
 
 - [Agent Reference](../docs/agent-reference.md)
 - [Chrome MCP Integration](../.versatil/chrome-mcp-config.md)
-- [BMAD Methodology](../CLAUDE.md)
+- [OPERA Methodology](../CLAUDE.md)
 
 ## 🆘 Support
 

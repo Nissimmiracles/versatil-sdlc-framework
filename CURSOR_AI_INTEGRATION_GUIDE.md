@@ -18,7 +18,7 @@ Create `.cursorrules` in your project root:
 # VERSATIL-Enhanced Cursor Rules
 system_prompt: |
   You have access to the VERSATIL SDLC Framework v1.2.0 with:
-  - Enhanced BMAD agents (Maria, Marcus, James, etc.)
+  - Enhanced OPERA agents (Maria, Marcus, James, etc.)
   - RAG memory system for learning
   - Opera autonomous orchestrator
   - Introspective self-testing
@@ -37,7 +37,7 @@ context_providers:
 
 tools:
   - versatil_memory_query
-  - versatil_archon_goal
+  - versatil_opera_goal
   - versatil_agent_activate
 ```
 
@@ -55,7 +55,7 @@ npx versatil-sdlc init
   "version": "1.2.0",
   "features": {
     "rag": { "enabled": true },
-    "archon": { "enabled": true },
+    "opera": { "enabled": true },
     "enhancedAgents": { "enabled": true },
     "introspection": { "enabled": true }
   },
@@ -95,7 +95,7 @@ In Cursor chat:
 ### 3. **Set Autonomous Goals**
 
 ```
-@archon Build a REST API for user management with:
+@opera Build a REST API for user management with:
 - JWT authentication
 - Rate limiting
 - Full test coverage
@@ -122,7 +122,7 @@ Add to Cursor settings:
   "keyboard.shortcuts": {
     "versatil.maria": "cmd+shift+m",
     "versatil.marcus": "cmd+shift+b", 
-    "versatil.archon": "cmd+shift+a",
+    "versatil.opera": "cmd+shift+a",
     "versatil.memory": "cmd+shift+r"
   }
 }
@@ -145,7 +145,7 @@ npx versatil-sdlc goal "Build user profile feature with avatar upload"
 ### Workflow 2: Debugging Production Issue
 ```bash
 # 1. Report issue
-@archon Production API timeout on /users endpoint
+@opera Production API timeout on /users endpoint
 
 # 2. Opera coordinates:
 #    - Maria analyzes logs
@@ -310,7 +310,7 @@ npm install versatil-sdlc-framework@latest
 npx versatil-sdlc init
 
 # 3. In Cursor, type:
-@archon Build a todo API with authentication
+@opera Build a todo API with authentication
 
 # 4. Watch the magic happen!
 ```

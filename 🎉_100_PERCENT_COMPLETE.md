@@ -152,7 +152,7 @@
 
 ## 🎯 Framework Features - 100% Operational
 
-### ✅ 6 BMAD Agents
+### ✅ 6 OPERA Agents
 - [x] Maria-QA - Quality Guardian
 - [x] Marcus-Backend - API Architect
 - [x] James-Frontend - UI/UX Expert
@@ -332,7 +332,7 @@ versatil init
 **Primary Developer**: Claude (Anthropic AI Assistant)
 **Framework Designer**: VERSATIL Development Team
 **Testing Framework**: Jest + TypeScript
-**Methodology**: BMAD (Business Analyst + Marcus + Alex + Development)
+**Methodology**: OPERA (Business Analyst + Marcus + Alex + Development)
 **Version**: 3.0.0
 
 ---

@@ -3,7 +3,7 @@
  * Connects .cursorrules agent patterns to actual Claude Code agent invocation
  *
  * This bridges the gap between Cursor's .cursorrules and Claude Code's agent system
- * making the BMAD methodology work consistently across both tools
+ * making the OPERA methodology work consistently across both tools
  */
 
 import { versatilDispatcher, AgentActivationContext } from './agent-dispatcher.js';
@@ -144,7 +144,7 @@ class CursorClaudeBridge {
    * Load Default Rules if .cursorrules parsing fails
    */
   private loadDefaultRules(): void {
-    console.log('⚠️ Loading default BMAD agent rules');
+    console.log('⚠️ Loading default OPERA agent rules');
 
     this.cursorRules.set('maria', {
       agent: 'Maria (QA)',

@@ -307,7 +307,7 @@ Rule_5_Implementation:
     - Post-release monitoring and validation
 
   coderabbit_features:
-    - AI-powered PR reviews with BMAD methodology awareness
+    - AI-powered PR reviews with OPERA methodology awareness
     - Code quality scoring and trend analysis (85+ threshold)
     - Security vulnerability detection and prevention
     - Performance optimization suggestions
@@ -402,7 +402,7 @@ Continuous_Loop:
 
 ### Agent Enhancement with Rules
 
-All BMAD agents are enhanced with Rule support:
+All OPERA agents are enhanced with Rule support:
 
 ```yaml
 Enhanced_Maria-QA:

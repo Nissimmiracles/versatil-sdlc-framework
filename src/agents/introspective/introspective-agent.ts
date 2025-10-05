@@ -90,7 +90,7 @@ You have a unique perspective - you can see the framework from the inside and en
   private isFrameworkFile(filePath: string): boolean {
     return filePath.includes('versatil') || 
            filePath.includes('agent') || 
-           filePath.includes('bmad') ||
+           filePath.includes('opera') ||
            filePath.includes('opera') ||
            filePath.includes('rag');
   }
@@ -150,7 +150,7 @@ You have a unique perspective - you can see the framework from the inside and en
       const criticalFiles = [
         'package.json',
         'src/agents/agent-registry.ts',
-        'src/bmad/enhanced-bmad-coordinator.ts',
+        'src/opera/enhanced-opera-coordinator.ts',
         'src/rag/vector-memory-store.ts',
         'src/opera/opera-orchestrator.ts'
       ];
@@ -285,7 +285,7 @@ You have a unique perspective - you can see the framework from the inside and en
     const modules = [
       '../agent-registry',
       '../../utils/logger',
-      '../../bmad/enhanced-bmad-coordinator'
+      '../../opera/enhanced-opera-coordinator'
     ];
 
     // In real implementation, this would test actual imports

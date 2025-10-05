@@ -12,11 +12,44 @@ module.exports = {
     color: 'cyan'
   },
 
+  // Root directory resolution
+  rootDir: __dirname,
+
+  // Preset and environment
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+
+  // TypeScript transformation
+  transform: {
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: 'tsconfig.test.json',
+      isolatedModules: true,
+      useESM: false,
+      babelConfig: false,
+      diagnostics: false
+    }],
+    '^.+\\.(js|jsx)$': ['ts-jest', {
+      tsconfig: 'tsconfig.test.json',
+      isolatedModules: true,
+      useESM: false,
+      babelConfig: false
+    }]
+  },
+
+  // Module file extensions
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+
+  // Transform ES modules
+  transformIgnorePatterns: [
+    'node_modules/(?!(@modelcontextprotocol)/)'
+  ],
+
   // Unit test matching patterns
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{ts,tsx,js}',
     '<rootDir>/src/**/*.test.{ts,tsx,js}',
     '<rootDir>/src/**/*.spec.{ts,tsx,js}',
+    '<rootDir>/tests/unit/**/*.{ts,tsx,js}',
     // Explicitly exclude e2e and integration tests
     '!**/*.e2e.{ts,tsx,js}',
     '!**/*.playwright.{ts,tsx,js}',
@@ -40,6 +73,21 @@ module.exports = {
     '!src/**/__tests__/**'
   ],
 
+  // Module name mapper for path aliases
+  moduleNameMapper: {
+    // Handle .js extensions in TypeScript imports (ESM compatibility)
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^@/types/(.*)$': '<rootDir>/src/types/$1',
+    '^@/agents/(.*)$': '<rootDir>/src/agents/$1',
+    '^@/services/(.*)$': '<rootDir>/src/services/$1',
+    '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
+    '^@/tests/(.*)$': '<rootDir>/tests/$1'
+  },
+
+  // Setup files
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+
   // Unit test specific coverage thresholds
   coverageThreshold: {
     global: {
@@ -49,6 +97,9 @@ module.exports = {
       statements: 75
     }
   },
+
+  // Coverage directory for unit tests
+  coverageDirectory: '<rootDir>/coverage/unit',
 
   // Unit tests should be fast - run in parallel
   maxWorkers: '50%',

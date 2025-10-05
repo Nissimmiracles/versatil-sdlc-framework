@@ -78,8 +78,8 @@ export default { MCPServer, MCPTool, MCPResource, createMCPServer };
     // Step 3: Fix ALL Timer type issues
     console.log('\n⏰ Step 3: Fixing all Timer/Timeout issues...');
     const filesToFixTimers = [
-      'src/archon/archon-mcp-server.ts',
-      'src/archon/enhanced-archon-orchestrator.ts',
+      'src/opera/opera-mcp-server.ts',
+      'src/opera/enhanced-opera-orchestrator.ts',
       'src/agents/introspective/enhanced-introspective-agent.ts'
     ];
     
@@ -152,7 +152,7 @@ export interface ValidationResults {
   recommendations: Recommendation[];
 }
 
-export interface ArchonGoal {
+export interface OperaGoal {
   id: string;
   type: string;
   description: string;
@@ -161,7 +161,7 @@ export interface ArchonGoal {
   acceptanceCriteria?: string[];
 }
 
-export interface ArchonDecision {
+export interface OperaDecision {
   id: string;
   timestamp: number;
   goalId: string;
@@ -473,7 +473,7 @@ export class ${agent.class} extends BaseAgent {
     
     const introspectiveContent = `import { BaseAgent, AgentResponse, AgentActivationContext } from '../base-agent';
 import { VERSATILLogger } from '../../utils/logger';
-import { ArchonOrchestrator } from '../../archon/archon-orchestrator';
+import { OperaOrchestrator } from '../../opera/opera-orchestrator';
 import { AgentRegistry } from '../agent-registry';
 import { ProjectContext } from '../agent-types';
 
@@ -484,15 +484,15 @@ export class EnhancedIntrospectiveAgent extends BaseAgent {
   systemPrompt = '';
   
   private logger: VERSATILLogger;
-  private archon: ArchonOrchestrator;
+  private opera: OperaOrchestrator;
   private agentRegistry: AgentRegistry;
   private projectContext: ProjectContext | null = null;
   private monitoringInterval?: NodeJS.Timeout;
   
-  constructor(logger: VERSATILLogger, archon: ArchonOrchestrator, agentRegistry: AgentRegistry) {
+  constructor(logger: VERSATILLogger, opera: OperaOrchestrator, agentRegistry: AgentRegistry) {
     super();
     this.logger = logger;
-    this.archon = archon;
+    this.opera = opera;
     this.agentRegistry = agentRegistry;
   }
   
@@ -579,7 +579,7 @@ export class AgentRegistry {
   }
   
   private registerAllAgents(): void {
-    console.log('🤖 Registering Enhanced BMAD Agents...');
+    console.log('🤖 Registering Enhanced OPERA Agents...');
     
     this.registerAgent(new EnhancedMaria(), {
       id: 'enhanced-maria',
@@ -660,16 +660,16 @@ export const log = console;
     await fs.writeFile(path.join(__dirname, 'src/agents/agent-registry.ts'), registryContent);
     console.log('  ✓ Created complete agent registry');
 
-    // Step 10: Fix all archon files
-    console.log('\n🎯 Step 10: Fixing Archon orchestrators...');
+    // Step 10: Fix all opera files
+    console.log('\n🎯 Step 10: Fixing Opera orchestrators...');
     
-    // Enhanced Archon Orchestrator
-    const enhancedArchonContent = `import { EventEmitter } from 'events';
+    // Enhanced Opera Orchestrator
+    const enhancedOperaContent = `import { EventEmitter } from 'events';
 import { VERSATILLogger } from '../utils/logger';
 import { AgentRegistry } from '../agents/agent-registry';
 import { 
-  ArchonGoal, 
-  ArchonDecision, 
+  OperaGoal, 
+  OperaDecision, 
   ExecutionStep, 
   SDLCPhase, 
   FlywheelState, 
@@ -678,20 +678,20 @@ import {
   RAGQuery 
 } from '../agents/agent-types';
 
-export { ArchonGoal, ArchonDecision, ExecutionStep };
+export { OperaGoal, OperaDecision, ExecutionStep };
 
-interface ArchonState {
-  currentGoals: ArchonGoal[];
-  activeDecisions: ArchonDecision[];
+interface OperaState {
+  currentGoals: OperaGoal[];
+  activeDecisions: OperaDecision[];
   executionQueue: ExecutionStep[];
   completedSteps: string[];
   performance: any;
 }
 
-export class EnhancedArchonOrchestrator extends EventEmitter {
+export class EnhancedOperaOrchestrator extends EventEmitter {
   private logger: VERSATILLogger;
   private agentRegistry?: AgentRegistry;
-  private state: ArchonState;
+  private state: OperaState;
   private projectContext: ProjectContext | null = null;
   private autonomousTimer?: NodeJS.Timeout;
   private decisionHistory = new Map();
@@ -702,11 +702,11 @@ export class EnhancedArchonOrchestrator extends EventEmitter {
   
   constructor(logger?: VERSATILLogger) {
     super();
-    this.logger = logger || new VERSATILLogger('Archon');
+    this.logger = logger || new VERSATILLogger('Opera');
     this.state = this.initializeState();
   }
   
-  private initializeState(): ArchonState {
+  private initializeState(): OperaState {
     return {
       currentGoals: [],
       activeDecisions: [],
@@ -721,11 +721,11 @@ export class EnhancedArchonOrchestrator extends EventEmitter {
   }
   
   async initialize(): Promise<void> {
-    this.logger.info('Initializing Enhanced Archon Orchestrator');
+    this.logger.info('Initializing Enhanced Opera Orchestrator');
   }
   
-  async createGoal(goal: Partial<ArchonGoal>): Promise<ArchonGoal> {
-    const newGoal: ArchonGoal = {
+  async createGoal(goal: Partial<OperaGoal>): Promise<OperaGoal> {
+    const newGoal: OperaGoal = {
       id: this.generateId('goal'),
       type: goal.type || 'feature',
       description: goal.description || '',
@@ -749,7 +749,7 @@ export class EnhancedArchonOrchestrator extends EventEmitter {
     };
   }
   
-  async getState(): Promise<ArchonState> {
+  async getState(): Promise<OperaState> {
     return this.state;
   }
   
@@ -764,7 +764,7 @@ export class EnhancedArchonOrchestrator extends EventEmitter {
     this.projectContext = context;
   }
   
-  async getActiveGoals(): Promise<ArchonGoal[]> {
+  async getActiveGoals(): Promise<OperaGoal[]> {
     return this.state.currentGoals.filter(g => g.status === 'active');
   }
   
@@ -790,8 +790,8 @@ export class EnhancedArchonOrchestrator extends EventEmitter {
 }
 `;
     
-    await fs.writeFile(path.join(__dirname, 'src/archon/enhanced-archon-orchestrator.ts'), enhancedArchonContent);
-    console.log('  ✓ Fixed Enhanced Archon Orchestrator');
+    await fs.writeFile(path.join(__dirname, 'src/opera/enhanced-opera-orchestrator.ts'), enhancedOperaContent);
+    console.log('  ✓ Fixed Enhanced Opera Orchestrator');
 
     // Fix other necessary files
     console.log('\n📁 Step 11: Creating remaining modules...');
@@ -914,15 +914,15 @@ export class MCPAutoDiscoveryAgent extends BaseAgent {
 }
 `);
 
-    // Fix Archon MCP server
-    const archonMCPContent = `import { MCPServer } from '../mocks/mcp-sdk';
-import { EnhancedArchonOrchestrator } from './enhanced-archon-orchestrator';
+    // Fix Opera MCP server
+    const operaMCPContent = `import { MCPServer } from '../mocks/mcp-sdk';
+import { EnhancedOperaOrchestrator } from './enhanced-opera-orchestrator';
 import { VERSATILLogger } from '../utils/logger';
 import { MCPAutoDiscoveryAgent } from '../agents/mcp/mcp-auto-discovery-agent';
 import * as http from 'http';
 import * as express from 'express';
 
-export interface ArchonMCPConfig {
+export interface OperaMCPConfig {
   name?: string;
   version?: string;
   autoUpdate?: boolean;
@@ -932,22 +932,22 @@ export interface ArchonMCPConfig {
   port?: number;
 }
 
-export class ArchonMCPServer {
+export class OperaMCPServer {
   private server: MCPServer;
   private httpServer?: http.Server;
   private app: express.Application;
-  private archon: EnhancedArchonOrchestrator;
+  private opera: EnhancedOperaOrchestrator;
   private logger: VERSATILLogger;
-  private config: ArchonMCPConfig;
+  private config: OperaMCPConfig;
   private updateTimer?: NodeJS.Timeout;
   private mcpDiscovery: MCPAutoDiscoveryAgent;
   
-  constructor(archon: EnhancedArchonOrchestrator, config?: Partial<ArchonMCPConfig>) {
-    this.archon = archon;
-    this.logger = new VERSATILLogger('ArchonMCP');
+  constructor(opera: EnhancedOperaOrchestrator, config?: Partial<OperaMCPConfig>) {
+    this.opera = opera;
+    this.logger = new VERSATILLogger('OperaMCP');
     this.mcpDiscovery = new MCPAutoDiscoveryAgent(this.logger);
     this.config = {
-      name: 'archon-mcp',
+      name: 'opera-mcp',
       version: '1.2.0',
       port: 3000,
       ...config
@@ -971,7 +971,7 @@ export class ArchonMCPServer {
   async start(port?: number): Promise<void> {
     const serverPort = port || this.config.port || 3000;
     this.httpServer = this.app.listen(serverPort, () => {
-      this.logger.info(\`Archon MCP server started on port \${serverPort}\`);
+      this.logger.info(\`Opera MCP server started on port \${serverPort}\`);
     });
   }
   
@@ -984,7 +984,7 @@ export class ArchonMCPServer {
   }
   
   async getMetrics(): Promise<any> {
-    return this.archon.getMetrics();
+    return this.opera.getMetrics();
   }
   
   // Tool handlers
@@ -1022,23 +1022,23 @@ export class ArchonMCPServer {
   
   // Resource handlers
   private async handleReadGoals() {
-    return { contents: [{ uri: 'archon://goals', mimeType: 'application/json', text: '[]' }] };
+    return { contents: [{ uri: 'opera://goals', mimeType: 'application/json', text: '[]' }] };
   }
   
   private async handleReadPlans() {
-    return { contents: [{ uri: 'archon://plans', mimeType: 'application/json', text: '[]' }] };
+    return { contents: [{ uri: 'opera://plans', mimeType: 'application/json', text: '[]' }] };
   }
   
   private async handleReadMetrics() {
-    return { contents: [{ uri: 'archon://metrics', mimeType: 'application/json', text: '{}' }] };
+    return { contents: [{ uri: 'opera://metrics', mimeType: 'application/json', text: '{}' }] };
   }
   
   private async handleReadContext() {
-    return { contents: [{ uri: 'archon://context', mimeType: 'application/json', text: '{}' }] };
+    return { contents: [{ uri: 'opera://context', mimeType: 'application/json', text: '{}' }] };
   }
   
   private async handleReadUpdates() {
-    return { contents: [{ uri: 'archon://updates', mimeType: 'application/json', text: '[]' }] };
+    return { contents: [{ uri: 'opera://updates', mimeType: 'application/json', text: '[]' }] };
   }
   
   private checkForUpdates(channel: string): Promise<any> {
@@ -1054,13 +1054,13 @@ export class ArchonMCPServer {
   }
 }
 
-export function createArchonMCPServer(archon: EnhancedArchonOrchestrator, config?: Partial<ArchonMCPConfig>): ArchonMCPServer {
-  return new ArchonMCPServer(archon, config);
+export function createOperaMCPServer(opera: EnhancedOperaOrchestrator, config?: Partial<OperaMCPConfig>): OperaMCPServer {
+  return new OperaMCPServer(opera, config);
 }
 `;
     
-    await fs.writeFile(path.join(__dirname, 'src/archon/archon-mcp-server.ts'), archonMCPContent);
-    console.log('  ✓ Fixed Archon MCP Server');
+    await fs.writeFile(path.join(__dirname, 'src/opera/opera-mcp-server.ts'), operaMCPContent);
+    console.log('  ✓ Fixed Opera MCP Server');
 
     // Step 12: Final build
     console.log('\n🏗️ Step 12: Building project...');

@@ -23,5 +23,5 @@
   },
   "maxConcurrentTasks": 3,
   "priority": "medium",
-  "tags": ["business-analysis", "requirements", "bmad", "user-stories"]
+  "tags": ["business-analysis", "requirements", "opera", "user-stories"]
 }

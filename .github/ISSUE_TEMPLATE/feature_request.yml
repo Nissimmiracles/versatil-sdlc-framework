@@ -16,7 +16,7 @@ body:
       description: What area of the framework would this feature enhance?
       options:
         - Agent System (New agents or agent improvements)
-        - BMAD Methodology (Business process enhancements)
+        - OPERA Methodology (Business process enhancements)
         - Quality Gates (Testing and validation improvements)
         - MCP Integration (Claude Desktop enhancements)
         - CLI Tools (Command-line interface improvements)
@@ -115,7 +115,7 @@ body:
       description: Check any implementation aspects that should be considered.
       options:
         - label: Should work with Claude Desktop MCP integration
-        - label: Needs to integrate with existing BMAD agents
+        - label: Needs to integrate with existing OPERA agents
         - label: Requires quality gate validation
         - label: Should support emergency response protocols
         - label: Needs comprehensive documentation

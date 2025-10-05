@@ -91,7 +91,7 @@ OPENAI_API_KEY=your_key  # For real embeddings
 - **Diagram storage** with annotations
 - **Cross-modal search** capabilities
 
-#### Opera Multimodel (`multimodal-archon-orchestrator.ts`):
+#### Opera Multimodel (`multimodal-opera-orchestrator.ts`):
 - **4 AI models** configured:
   - Claude 3 Opus (reasoning + vision)
   - GPT-4 Vision (UI analysis)
@@ -213,7 +213,7 @@ const results = await vectorMemoryStore.queryMemories({
 
 ### 2. **Multimodal Opera**
 ```javascript
-import { multimodalOpera } from './src/archon/multimodal-archon-orchestrator';
+import { multimodalOpera } from './src/opera/multimodal-opera-orchestrator';
 
 await multimodalOpera.analyzeScreenshotForBug(
   screenshotBase64,
@@ -239,7 +239,7 @@ node enhanced-onboarding.cjs
 node test-self-referential.cjs
 
 # Then use:
-@archon improve versatil error handling
+@opera improve versatil error handling
 @introspect analyze framework performance
 ```
 
@@ -266,7 +266,7 @@ node test-self-referential.cjs
 
 4. **Start Building**:
    ```bash
-   @archon Build amazing things with full context
+   @opera Build amazing things with full context
    ```
 
 ---

@@ -29,7 +29,7 @@
 ### ✅ Complete Edge Functions Infrastructure
 ```
 supabase/functions/
-├── bmad-agent/         # Unified BMAD agent router
+├── opera-agent/         # Unified OPERA agent router
 ├── maria-rag/          # QA-specific RAG
 ├── james-rag/          # Frontend-specific RAG
 ├── marcus-rag/         # Backend-specific RAG
@@ -73,7 +73,7 @@ test/
 
 ### ✅ Production Features Now Available
 - **🌐 Global Edge Computing**: 8 Supabase Edge Functions ready for deployment
-- **🤖 Enhanced BMAD Agents**: Complete agent ecosystem with RAG integration
+- **🤖 Enhanced OPERA Agents**: Complete agent ecosystem with RAG integration
 - **⚡ Enterprise Performance**: Sub-200ms response times with auto-scaling
 - **🔒 Production Security**: Rate limiting, CORS, and comprehensive validation
 - **📊 Real-time Monitoring**: Health checks, metrics, and performance tracking
@@ -108,7 +108,7 @@ test/
 - **Complete Automation**: CI/CD pipeline ready for integration
 
 ### 🎯 For AI Developers
-- **BMAD Methodology**: Revolutionary AI-native development approach
+- **OPERA Methodology**: Revolutionary AI-native development approach
 - **RAG Integration**: Enhanced agents with retrieval augmented generation
 - **Zero Context Loss**: Seamless agent handoffs and collaboration
 - **Production AI**: Real-world AI agent deployment patterns
@@ -120,7 +120,7 @@ test/
 ### 🔧 Core Framework
 ```
 src/
-├── agents/                    # Enhanced BMAD agents
+├── agents/                    # Enhanced OPERA agents
 ├── intelligence/              # AI integration and orchestration
 ├── rag/                      # RAG implementation
 ├── opera/                    # Opera MCP server

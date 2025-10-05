@@ -4,7 +4,7 @@ Complete reference for all VERSATIL SDLC Framework agents, their capabilities, a
 
 ## 🎯 Overview
 
-The VERSATIL SDLC Framework employs 6 specialized AI agents following the **BMAD (Business-Managed Agile Development)** methodology. Each agent brings unique expertise while working collaboratively to deliver exceptional software products.
+The VERSATIL SDLC Framework employs 6 specialized AI agents following the **OPERA (Business-Managed Agile Development)** methodology. Each agent brings unique expertise while working collaboratively to deliver exceptional software products.
 
 ---
 
@@ -796,4 +796,4 @@ Each agent has individual configuration in `.versatil/agents/[agent-name]/`:
 
 ---
 
-This completes the comprehensive Agent Reference Guide. Each agent is designed to excel in their specialty while maintaining seamless collaboration through the BMAD methodology and VERSATIL framework.
+This completes the comprehensive Agent Reference Guide. Each agent is designed to excel in their specialty while maintaining seamless collaboration through the OPERA methodology and VERSATIL framework.

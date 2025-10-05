@@ -44,7 +44,7 @@ class VersatilMigration {
 This tool will help you migrate to VERSATIL v1.2.0 with:
 - 🧠 RAG Memory System
 - 🤖 Opera Autonomous Orchestration
-- 🚀 Enhanced BMAD Agents
+- 🚀 Enhanced OPERA Agents
 
 `);
 
@@ -237,7 +237,7 @@ This tool will help you migrate to VERSATIL v1.2.0 with:
           maxConcurrentExecutions: 3,
           decisionConfidenceThreshold: 0.7
         },
-        enhancedBMAD: {
+        enhancedOPERA: {
           enabled: true,
           learningRate: 0.1,
           contextWindowSize: 5

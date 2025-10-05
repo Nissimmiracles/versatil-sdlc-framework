@@ -71,10 +71,10 @@ async function checkIsolation() {
 }
 
 /**
- * Check 2: BMAD Agents Health
+ * Check 2: OPERA Agents Health
  */
 async function checkAgents() {
-  console.log('Checking BMAD agents...');
+  console.log('Checking OPERA agents...');
 
   const agents = ['maria-qa', 'james-frontend', 'marcus-backend', 'sarah-pm', 'alex-ba', 'dr-ai-ml'];
   const missing = [];
@@ -92,7 +92,7 @@ async function checkAgents() {
     checks.agents.fixable = true;
   } else {
     checks.agents.status = 'pass';
-    checks.agents.message = 'All 6 BMAD agents healthy';
+    checks.agents.message = 'All 6 OPERA agents healthy';
   }
 }
 

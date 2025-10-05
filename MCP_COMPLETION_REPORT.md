@@ -56,7 +56,7 @@ Successfully migrated MCP implementation from **broken SDK v0.6.1 (non-existent)
 
 **Capabilities**:
 - 10 comprehensive framework tools
-- Full BMAD agent integration
+- Full OPERA agent integration
 - SDLC orchestration with quality gates
 - Architecture analysis (Dan)
 - Deployment management
@@ -64,7 +64,7 @@ Successfully migrated MCP implementation from **broken SDK v0.6.1 (non-existent)
 - Adaptive learning insights
 
 **Tools**:
-1. `versatil_activate_agent` - BMAD agent activation
+1. `versatil_activate_agent` - OPERA agent activation
 2. `versatil_orchestrate_phase` - SDLC transitions
 3. `versatil_run_quality_gates` - Quality enforcement
 4. `versatil_run_tests` - Enhanced Maria testing

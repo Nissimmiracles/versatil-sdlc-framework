@@ -3,7 +3,7 @@
 **VERSATIL SDLC Framework v2.0** - AI-Native Development with Proactive Agent Intelligence
 
 This document defines the core methodology for the VERSATIL SDLC Framework. For detailed configuration, see:
-- 📖 **Agent Details**: `.claude/AGENTS.md` (6 BMAD agents, triggers, collaboration patterns)
+- 📖 **Agent Details**: `.claude/AGENTS.md` (6 OPERA agents, triggers, collaboration patterns)
 - 📖 **Rules System**: `.claude/rules/README.md` (5-Rule system, automation, quality gates)
 
 ---
@@ -43,11 +43,11 @@ Allowed_In_Project:
 
 ---
 
-## 🎯 BMAD Methodology Overview
+## 🎯 OPERA Methodology Overview
 
-**BMAD** = **B**usiness Analyst + **M**arcus Backend + **A**lex Requirements + **D**evelopment Team
+**OPERA** = **B**usiness Analyst + **M**arcus Backend + **A**lex Requirements + **D**evelopment Team
 
-BMAD represents a revolutionary approach to AI-native software development, where specialized agents work in harmony through:
+OPERA represents a revolutionary approach to AI-native software development, where specialized agents work in harmony through:
 
 ### Core Principles
 1. **Proactive Intelligence** - Agents work automatically, not on command
@@ -121,7 +121,7 @@ Proactive_Activation_Examples:
 
 ---
 
-## 👥 6 BMAD Agents (Brief Overview)
+## 👥 6 OPERA Agents (Brief Overview)
 
 For complete details, see **`.claude/agents/README.md`**
 

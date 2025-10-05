@@ -34,7 +34,7 @@ installDeps.on('close', (code) => {
   console.log(chalk.bold('Choose what to run:\n'));
   console.log(chalk.cyan('1. Self-Referential Test') + ' - VERSATIL analyzes itself');
   console.log(chalk.cyan('2. Enhanced Onboarding') + ' - Interactive project setup');
-  console.log(chalk.cyan('3. Archon MCP Test') + ' - Test the orchestrator');
+  console.log(chalk.cyan('3. Opera MCP Test') + ' - Test the orchestrator');
   console.log(chalk.cyan('4. Context Awareness Demo') + ' - See full context scanning');
   
   const readline = require('readline');
@@ -55,7 +55,7 @@ installDeps.on('close', (code) => {
         script = 'enhanced-onboarding.cjs';
         break;
       case '3':
-        script = 'test-archon-mcp.js';
+        script = 'test-opera-mcp.js';
         break;
       case '4':
         script = 'context-awareness-demo.cjs';

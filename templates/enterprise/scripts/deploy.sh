@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # VERSATIL SDLC Framework - Enterprise Deployment Script
-# Automated deployment with Enhanced BMAD agents, monitoring, and security
+# Automated deployment with Enhanced OPERA agents, monitoring, and security
 
 set -euo pipefail
 
@@ -75,9 +75,9 @@ check_prerequisites() {
 pre_deployment_validation() {
     log "Running pre-deployment validation..."
 
-    # Run Enhanced BMAD self-analysis
+    # Run Enhanced OPERA self-analysis
     if [[ -f "scripts/self-improve.js" ]]; then
-        log "Running Enhanced BMAD self-analysis..."
+        log "Running Enhanced OPERA self-analysis..."
         if ! node scripts/self-improve.js; then
             warning "Self-analysis found issues but continuing deployment"
         fi
@@ -224,22 +224,22 @@ post_deployment_verification() {
             ;;
     esac
 
-    # Verify Enhanced BMAD agents
-    log "Verifying Enhanced BMAD agents..."
+    # Verify Enhanced OPERA agents
+    log "Verifying Enhanced OPERA agents..."
     case $DEPLOYMENT_TYPE in
         "docker-compose")
             if docker-compose -f templates/enterprise/docker-compose.yml exec -T versatil-app test -f /app/.versatil/analytics/metrics.json; then
-                success "Enhanced BMAD agents are active"
+                success "Enhanced OPERA agents are active"
             else
-                warning "Enhanced BMAD agents metrics not found"
+                warning "Enhanced OPERA agents metrics not found"
             fi
             ;;
         "kubernetes")
             POD=$(kubectl get pods -n versatil-sdlc -l app=versatil-app -o jsonpath='{.items[0].metadata.name}')
             if kubectl exec -n versatil-sdlc $POD -- test -f /app/.versatil/analytics/metrics.json; then
-                success "Enhanced BMAD agents are active"
+                success "Enhanced OPERA agents are active"
             else
-                warning "Enhanced BMAD agents metrics not found"
+                warning "Enhanced OPERA agents metrics not found"
             fi
             ;;
     esac
@@ -293,7 +293,7 @@ main() {
     post_deployment_verification
 
     success "🎉 VERSATIL SDLC Framework deployed successfully!"
-    log "🔍 Enhanced BMAD agents are active and monitoring your codebase"
+    log "🔍 Enhanced OPERA agents are active and monitoring your codebase"
     log "📊 Access monitoring at:"
 
     case $DEPLOYMENT_TYPE in

@@ -350,7 +350,7 @@ Isolation:
            ↓
 ┌─────────────────────────────┐
 │  VERSATIL Framework (Local)  │
-│  ├── 6 BMAD Agents           │
+│  ├── 6 OPERA Agents           │
 │  ├── RAG Memory (Supabase)   │
 │  └── State (~/.versatil/)    │
 └─────────────────────────────┘

@@ -2,7 +2,7 @@
 /**
  * VERSATIL SDLC Framework - Direct Agent RAG Capabilities Test
  *
- * Validates the transformation of Enhanced BMAD agents with direct RAG capabilities
+ * Validates the transformation of Enhanced OPERA agents with direct RAG capabilities
  * as proposed by the user's architecture where each agent has independent vector access
  */
 
@@ -60,7 +60,7 @@ class DirectAgentRAGTest {
   }
 
   async loadRAGEnabledAgents() {
-    console.log(colors.blue('⚙️  Loading RAG-Enabled BMAD Agents...'));
+    console.log(colors.blue('⚙️  Loading RAG-Enabled OPERA Agents...'));
 
     try {
       // Import compiled RAG-enabled agents

@@ -1,0 +1,185 @@
+{
+  "name": "staging",
+  "description": "Production-like staging environment for final validation and performance testing",
+  "version": "1.2.0",
+  "settings": {
+    "debug": false,
+    "hotReload": false,
+    "mockExternalServices": false,
+    "strictValidation": true,
+    "verboseLogging": false
+  },
+  "services": {
+    "mcp": {
+      "host": "0.0.0.0",
+      "port": 3000,
+      "ssl": true,
+      "autoRestart": true,
+      "watchFiles": false,
+      "healthCheck": true
+    },
+    "database": {
+      "type": "postgresql",
+      "url": "${DATABASE_URL}",
+      "pool": {
+        "min": 2,
+        "max": 10
+      },
+      "logging": false,
+      "ssl": true,
+      "migrations": true
+    },
+    "supabase": {
+      "url": "${SUPABASE_STAGING_URL}",
+      "anonKey": "${SUPABASE_STAGING_ANON_KEY}",
+      "serviceKey": "${SUPABASE_STAGING_SERVICE_KEY}",
+      "local": false,
+      "edgeFunctions": true
+    },
+    "opera": {
+      "enabled": true,
+      "autoUpdate": false,
+      "updateChannel": "stable",
+      "maxConcurrentGoals": 5,
+      "timeout": 300000,
+      "clustering": false
+    }
+  },
+  "agents": {
+    "maria-qa": {
+      "enabled": true,
+      "autoActivate": true,
+      "debugMode": false,
+      "testCoverageThreshold": 85,
+      "performanceThreshold": 95,
+      "strictMode": true,
+      "productionValidation": true
+    },
+    "james-frontend": {
+      "enabled": true,
+      "autoActivate": true,
+      "debugMode": false,
+      "optimizations": true,
+      "bundleAnalysis": true,
+      "performanceMonitoring": true
+    },
+    "marcus-backend": {
+      "enabled": true,
+      "autoActivate": true,
+      "debugMode": false,
+      "productionOptimizations": true,
+      "securityHardening": true,
+      "performanceMonitoring": true
+    },
+    "sarah-pm": {
+      "enabled": true,
+      "autoActivate": true,
+      "reportingInterval": 300000,
+      "businessMetrics": true,
+      "stakeholderReporting": true
+    },
+    "alex-ba": {
+      "enabled": true,
+      "autoActivate": true,
+      "businessValidation": true,
+      "userAcceptanceTesting": true
+    },
+    "dr-ai-ml": {
+      "enabled": true,
+      "autoActivate": false,
+      "productionModels": true,
+      "gpu": true,
+      "modelValidation": true
+    },
+    "devops-dan": {
+      "enabled": true,
+      "autoActivate": true,
+      "infrastructureMonitoring": true,
+      "deploymentAutomation": true,
+      "rollbackCapability": true
+    },
+    "security-sam": {
+      "enabled": true,
+      "autoActivate": true,
+      "vulnerabilityScanning": true,
+      "complianceValidation": true,
+      "securityMonitoring": true
+    }
+  },
+  "testing": {
+    "runTestsOnChange": false,
+    "parallelTesting": true,
+    "testTimeout": 60000,
+    "coverage": {
+      "threshold": 85,
+      "failOnLow": true
+    },
+    "e2e": {
+      "headless": true,
+      "slowMo": 0,
+      "devtools": false,
+      "retries": 3,
+      "parallel": true
+    },
+    "performance": {
+      "enabled": true,
+      "loadTesting": true,
+      "stressTesting": true,
+      "thresholds": {
+        "responseTime": 150,
+        "memoryUsage": 1024,
+        "cpuUsage": 70,
+        "throughput": 1000
+      }
+    },
+    "security": {
+      "enabled": true,
+      "penetrationTesting": true,
+      "vulnerabilityScanning": true,
+      "complianceTesting": true
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "apm": true,
+    "metricsCollection": true,
+    "performanceTracking": true,
+    "errorTracking": true,
+    "logLevel": "warn",
+    "alerting": true,
+    "businessMetrics": true
+  },
+  "security": {
+    "authRequired": true,
+    "encryptionEnabled": true,
+    "auditLogging": true,
+    "vulnerabilityScanning": true,
+    "complianceFramework": "SOC2",
+    "securityHeaders": true,
+    "rateLimiting": true
+  },
+  "features": {
+    "ragMemory": true,
+    "operaOrchestrator": true,
+    "realTimeUpdates": true,
+    "autoHealing": true,
+    "distributedMode": false,
+    "canaryDeployment": true,
+    "featureFlags": true
+  },
+  "deployment": {
+    "strategy": "blue-green",
+    "rollbackEnabled": true,
+    "healthChecks": true,
+    "gracefulShutdown": true,
+    "loadBalancing": true,
+    "autoScaling": false
+  },
+  "compliance": {
+    "framework": "SOC2",
+    "auditTrail": true,
+    "dataRetention": "90d",
+    "accessControl": true,
+    "dataProtection": true
+  }
+}

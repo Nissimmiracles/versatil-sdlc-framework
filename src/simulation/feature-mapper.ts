@@ -11,7 +11,7 @@ import { VERSATILLogger } from '../utils/logger.js';
 
 export interface FrameworkPromise {
   id: string;
-  category: 'agent-activation' | 'mcp-integration' | 'bmad-methodology' | 'context-preservation' | 'quality-gates' | 'testing-integration';
+  category: 'agent-activation' | 'mcp-integration' | 'opera-methodology' | 'context-preservation' | 'quality-gates' | 'testing-integration';
   featureName: string;
   description: string;
   source: string; // Which file/section contains the promise
@@ -82,7 +82,7 @@ export class FeatureMapper {
   }
 
   /**
-   * Parse CLAUDE.md for agent activation and BMAD methodology promises
+   * Parse CLAUDE.md for agent activation and OPERA methodology promises
    */
   private async parseClaudeConfiguration(): Promise<FrameworkPromise[]> {
     const promises: FrameworkPromise[] = [];
@@ -95,9 +95,9 @@ export class FeatureMapper {
       const agentPromises = this.extractAgentActivationPromises(content);
       promises.push(...agentPromises);
 
-      // Extract BMAD methodology claims
-      const bmadPromises = this.extractBMADPromises(content);
-      promises.push(...bmadPromises);
+      // Extract OPERA methodology claims
+      const operaPromises = this.extractOPERAPromises(content);
+      promises.push(...operaPromises);
 
       // Extract context preservation claims
       const contextPromises = this.extractContextPreservationPromises(content);
@@ -186,9 +186,9 @@ export class FeatureMapper {
   }
 
   /**
-   * Extract BMAD methodology promises
+   * Extract OPERA methodology promises
    */
-  private extractBMADPromises(content: string): FrameworkPromise[] {
+  private extractOPERAPromises(content: string): FrameworkPromise[] {
     const promises: FrameworkPromise[] = [];
 
     // Context Preservation Promise

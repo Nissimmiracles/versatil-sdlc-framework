@@ -311,11 +311,11 @@ export const environmentScanner = {
 export type RAGQuery = any;
 `);
 
-    // Archon
-    await fs.mkdir(path.join(__dirname, 'src/archon'), { recursive: true });
-    await fs.writeFile(path.join(__dirname, 'src/archon/archon-orchestrator.ts'), `import { EventEmitter } from 'events';
+    // Opera
+    await fs.mkdir(path.join(__dirname, 'src/opera'), { recursive: true });
+    await fs.writeFile(path.join(__dirname, 'src/opera/opera-orchestrator.ts'), `import { EventEmitter } from 'events';
 
-export interface ArchonGoal {
+export interface OperaGoal {
   id: string;
   type: string;
   description: string;
@@ -323,8 +323,8 @@ export interface ArchonGoal {
   priority: string;
 }
 
-export class ArchonOrchestrator extends EventEmitter {
-  async createGoal(goal: any): Promise<ArchonGoal> {
+export class OperaOrchestrator extends EventEmitter {
+  async createGoal(goal: any): Promise<OperaGoal> {
     return {
       id: Date.now().toString(),
       type: goal.type || 'feature',
@@ -338,20 +338,20 @@ export class ArchonOrchestrator extends EventEmitter {
 }
 `);
 
-    // Enhanced Archon
-    await fs.writeFile(path.join(__dirname, 'src/archon/enhanced-archon-orchestrator.ts'), `import { ArchonOrchestrator } from './archon-orchestrator';
+    // Enhanced Opera
+    await fs.writeFile(path.join(__dirname, 'src/opera/enhanced-opera-orchestrator.ts'), `import { OperaOrchestrator } from './opera-orchestrator';
 import { VERSATILLogger } from '../utils/logger';
 
-export class EnhancedArchonOrchestrator extends ArchonOrchestrator {
+export class EnhancedOperaOrchestrator extends OperaOrchestrator {
   private logger: VERSATILLogger;
   
   constructor(logger?: VERSATILLogger) {
     super();
-    this.logger = logger || new VERSATILLogger('Archon');
+    this.logger = logger || new VERSATILLogger('Opera');
   }
   
   async initialize(): Promise<void> {
-    this.logger.info('Enhanced Archon Orchestrator initialized');
+    this.logger.info('Enhanced Opera Orchestrator initialized');
   }
   
   async analyzeProject(depth: string): Promise<any> {
@@ -375,27 +375,27 @@ export class EnhancedArchonOrchestrator extends ArchonOrchestrator {
 `);
 
     // Mock MCP server
-    await fs.writeFile(path.join(__dirname, 'src/archon/archon-mcp-server.ts'), `import { EnhancedArchonOrchestrator } from './enhanced-archon-orchestrator';
+    await fs.writeFile(path.join(__dirname, 'src/opera/opera-mcp-server.ts'), `import { EnhancedOperaOrchestrator } from './enhanced-opera-orchestrator';
 
-export interface ArchonMCPConfig {
+export interface OperaMCPConfig {
   name?: string;
   version?: string;
   port?: number;
 }
 
-export class ArchonMCPServer {
-  constructor(private archon: EnhancedArchonOrchestrator, private config?: ArchonMCPConfig) {}
+export class OperaMCPServer {
+  constructor(private opera: EnhancedOperaOrchestrator, private config?: OperaMCPConfig) {}
   
   async start(port?: number): Promise<void> {
-    console.log(\`Archon MCP server started on port \${port || 3000}\`);
+    console.log(\`Opera MCP server started on port \${port || 3000}\`);
   }
   
   async stop(): Promise<void> {}
   async getMetrics(): Promise<any> { return {}; }
 }
 
-export function createArchonMCPServer(archon: EnhancedArchonOrchestrator, config?: ArchonMCPConfig): ArchonMCPServer {
-  return new ArchonMCPServer(archon, config);
+export function createOperaMCPServer(opera: EnhancedOperaOrchestrator, config?: OperaMCPConfig): OperaMCPServer {
+  return new OperaMCPServer(opera, config);
 }
 `);
 

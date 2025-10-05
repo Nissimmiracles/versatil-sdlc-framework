@@ -2,7 +2,7 @@
 
 /**
  * VERSATIL SDLC Framework - Agent Setup Script
- * Configures and initializes the 6 specialized BMAD agents
+ * Configures and initializes the 6 specialized OPERA agents
  */
 
 const fs = require('fs');
@@ -123,7 +123,7 @@ class VersatilAgentSetup {
     console.clear();
     console.log(`${colors.blue}╔══════════════════════════════════════════════════════════════╗`);
     console.log(`║                    VERSATIL AGENT SETUP                     ║`);
-    console.log(`║                BMAD Methodology Configuration               ║`);
+    console.log(`║                OPERA Methodology Configuration               ║`);
     console.log(`╚══════════════════════════════════════════════════════════════╝${colors.reset}`);
     console.log('');
     console.log('🤖 Configuring 6 specialized AI agents for optimal development workflow');
@@ -341,7 +341,7 @@ ${this.getAgentResponsibilities(agent.name)}
 - Always maintain quality-first approach
 - Collaborate effectively with other agents
 - Preserve context during handoffs
-- Follow BMAD methodology principles
+- Follow OPERA methodology principles
 
 ## Tools & Technologies
 ${agent.tools.map(t => `- ${t}`).join('\n')}

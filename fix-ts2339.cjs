@@ -61,11 +61,11 @@ async function fixTS2339() {
     // Fix 2: Add missing methods to base classes
     console.log('\n📝 Fix 2: Adding missing methods...');
     
-    // Add missing methods to ArchonOrchestrator
-    const archonPath = path.join(__dirname, 'src/archon/archon-orchestrator.ts');
-    let archonContent = await fs.readFile(archonPath, 'utf8');
+    // Add missing methods to OperaOrchestrator
+    const operaPath = path.join(__dirname, 'src/opera/opera-orchestrator.ts');
+    let operaContent = await fs.readFile(operaPath, 'utf8');
     
-    const missingArchonMethods = [
+    const missingOperaMethods = [
       'getActiveGoals',
       'getExecutionPlans', 
       'executePlan',
@@ -74,14 +74,14 @@ async function fixTS2339() {
       'updateEnvironmentContext'
     ];
     
-    for (const method of missingArchonMethods) {
-      if (!archonContent.includes(method)) {
+    for (const method of missingOperaMethods) {
+      if (!operaContent.includes(method)) {
         const methodImpl = `
   async ${method}(...args: any[]): Promise<any> {
     // Implementation stub
     return ${method.includes('get') ? '[]' : 'undefined'};
   }`;
-        archonContent = archonContent.replace(
+        operaContent = operaContent.replace(
           /}\s*$/,
           methodImpl + '\n}'
         );
@@ -89,8 +89,8 @@ async function fixTS2339() {
       }
     }
     
-    await fs.writeFile(archonPath, archonContent);
-    console.log('  ✓ Added missing methods to ArchonOrchestrator');
+    await fs.writeFile(operaPath, operaContent);
+    console.log('  ✓ Added missing methods to OperaOrchestrator');
     
     // Fix 3: Add missing properties to specific files
     console.log('\n📝 Fix 3: Fixing specific file issues...');
@@ -111,7 +111,7 @@ async function fixTS2339() {
     projectHealth: 100,
     agentPerformance: new Map(),
     memoryEfficiency: 100,
-    archonEffectiveness: 100,
+    operaEffectiveness: 100,
     predictedIssues: [],
     autonomousFixCount: 0,
     learnedPatterns: 0
@@ -142,8 +142,8 @@ async function fixTS2339() {
     
     // Fix files that are missing ExecutionStep, etc.
     const filesNeedingTypes = [
-      'src/archon/enhanced-archon-orchestrator.ts',
-      'src/bmad/enhanced-bmad-coordinator.ts'
+      'src/opera/enhanced-opera-orchestrator.ts',
+      'src/opera/enhanced-opera-coordinator.ts'
     ];
     
     for (const file of filesNeedingTypes) {
@@ -152,7 +152,7 @@ async function fixTS2339() {
         
         // Add missing imports if not present
         if (!content.includes('ExecutionStep') && content.includes('export interface')) {
-          content = `import { ExecutionStep, ArchonGoal, ArchonDecision } from '../agents/agent-types';\n` + content;
+          content = `import { ExecutionStep, OperaGoal, OperaDecision } from '../agents/agent-types';\n` + content;
           fixCount++;
         }
         

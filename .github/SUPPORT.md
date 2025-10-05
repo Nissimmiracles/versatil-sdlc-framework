@@ -1,6 +1,6 @@
 # 🤝 Getting Support for VERSATIL SDLC Framework
 
-Welcome to the VERSATIL community! We're here to help you succeed with AI-native development using the BMAD methodology.
+Welcome to the VERSATIL community! We're here to help you succeed with AI-native development using the OPERA methodology.
 
 ## 🚀 Quick Help
 
@@ -13,7 +13,7 @@ Welcome to the VERSATIL community! We're here to help you succeed with AI-native
 ### Common Questions
 - **"How do I activate agents?"** - Agents auto-activate based on file patterns in `.cursorrules`
 - **"MCP not working?"** - Check [MCP Troubleshooting](../docs/troubleshooting.md#mcp-issues)
-- **"Which agent for my task?"** - See [BMAD Agent Guide](../CLAUDE.md#bmad-agents)
+- **"Which agent for my task?"** - See [OPERA Agent Guide](../CLAUDE.md#opera-agents)
 
 ## 📋 Support Channels
 
@@ -70,7 +70,7 @@ Welcome to the VERSATIL community! We're here to help you succeed with AI-native
 📢 **Channels**:
 - `#general` - Community chat
 - `#help` - Get support from community
-- `#bmad-agents` - Discuss agent strategies
+- `#opera-agents` - Discuss agent strategies
 - `#mcp-integration` - Claude Desktop integration
 - `#showcase` - Share your projects
 
@@ -88,7 +88,7 @@ Welcome to the VERSATIL community! We're here to help you succeed with AI-native
 
 ### 📖 Core Documentation
 - [Framework Overview](../README.md) - Project introduction and setup
-- [BMAD Methodology](../CLAUDE.md) - Business-Managed Agile Development
+- [OPERA Methodology](../CLAUDE.md) - Business-Managed Agile Development
 - [Agent Guide](../docs/agents/) - Understanding and using agents
 - [MCP Integration](../docs/mcp-integration.md) - Claude Desktop setup
 

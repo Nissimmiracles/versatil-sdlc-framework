@@ -359,7 +359,7 @@
       "analysisTimestamp": "2025-09-28T19:34:11.669Z"
     },
     {
-      "filePath": "src/bmad/enhanced-bmad-coordinator.ts",
+      "filePath": "src/opera/enhanced-opera-coordinator.ts",
       "domain": "backend",
       "agent": "enhanced-marcus",
       "score": 100,
@@ -395,7 +395,7 @@
       "analysisTimestamp": "2025-09-28T19:34:11.671Z"
     },
     {
-      "filePath": "src/dashboard/bmad-mcp-integration.ts",
+      "filePath": "src/dashboard/opera-mcp-integration.ts",
       "domain": "backend",
       "agent": "enhanced-marcus",
       "score": 100,
@@ -407,7 +407,7 @@
       "analysisTimestamp": "2025-09-28T19:34:11.671Z"
     },
     {
-      "filePath": "src/dashboard/bmad-quality-dashboard.ts",
+      "filePath": "src/dashboard/opera-quality-dashboard.ts",
       "domain": "backend",
       "agent": "enhanced-marcus",
       "score": 100,
@@ -1268,7 +1268,7 @@
       "analysisTimestamp": "2025-09-28T19:34:11.706Z"
     },
     {
-      "filePath": "src/testing/bmad-testing-orchestrator.ts",
+      "filePath": "src/testing/opera-testing-orchestrator.ts",
       "domain": "backend",
       "agent": "enhanced-marcus",
       "score": 100,
@@ -4600,7 +4600,7 @@
       "analysisTimestamp": "2025-09-28T19:34:11.732Z"
     },
     {
-      "filePath": "tests/bmad/plan-to-prod-workflow.bmad.ts",
+      "filePath": "tests/opera/plan-to-prod-workflow.opera.ts",
       "domain": "backend",
       "agent": "enhanced-marcus",
       "score": 100,
@@ -4612,7 +4612,7 @@
       "analysisTimestamp": "2025-09-28T19:34:11.733Z"
     },
     {
-      "filePath": "tests/e2e/bmad-flywheel.test.ts",
+      "filePath": "tests/e2e/opera-flywheel.test.ts",
       "domain": "backend",
       "agent": "enhanced-marcus",
       "score": 100,

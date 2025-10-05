@@ -77,7 +77,7 @@ class DeploymentReadinessChecker {
 
     const functionsDir = 'supabase/functions';
     const expectedFunctions = [
-      'bmad-agent',
+      'opera-agent',
       'maria-rag',
       'james-rag',
       'marcus-rag',

@@ -11,7 +11,7 @@ import { AgentRegistry } from './agents/agent-registry.js';
 import { VERSATILLogger } from './utils/logger.js';
 import { PerformanceMonitor } from './analytics/performance-monitor.js';
 // import { VERSATILMCPServer } from './mcp/versatil-mcp-server.js';
-import { enhancedBMAD } from './bmad/enhanced-bmad-coordinator.js';
+import { enhancedOPERA } from './opera/enhanced-opera-coordinator.js';
 import { vectorMemoryStore } from './rag/vector-memory-store.js';
 import { OperaOrchestrator } from './opera/opera-orchestrator.js';
 import * as path from 'path';
@@ -90,12 +90,12 @@ export async function startEnhancedServer() {
     res.json(opera.getState());
   });
   
-  // BMAD endpoints
-  app.post('/api/bmad/execute', async (req, res) => {
+  // OPERA endpoints
+  app.post('/api/opera/execute', async (req, res) => {
     try {
       const { projectId, requirements } = req.body;
-      await enhancedBMAD.executeBMADWorkflow(projectId, requirements);
-      const context = await enhancedBMAD.getContext(projectId);
+      await enhancedOPERA.executeOPERAWorkflow(projectId, requirements);
+      const context = await enhancedOPERA.getContext(projectId);
       res.json({ success: true, context });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -116,7 +116,7 @@ export async function startEnhancedServer() {
   //   });
   //
   //   // Subscribe to learning events
-  //   enhancedBMAD.on('learning_milestone', (data) => {
+  //   enhancedOPERA.on('learning_milestone', (data) => {
   //     socket.emit('learning:milestone', data);
   //   });
   //
@@ -149,7 +149,7 @@ Ready for autonomous development with learning!
 
 export async function startAutonomousMode() {
   // Enable full autonomous mode
-  enhancedBMAD.setAutonomousMode(true);
+  enhancedOPERA.setAutonomousMode(true);
   const opera = OperaOrchestrator.getInstance();
   opera.startAutonomous();
   

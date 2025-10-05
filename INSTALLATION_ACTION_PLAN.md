@@ -570,7 +570,7 @@ iwr https://raw.githubusercontent.com/MiraclesGIT/versatil-sdlc-framework/main/s
 - README.md
 - INSTALLATION.md
 - QUICKSTART.md
-- BMAD-QUICK-START.md
+- OPERA-QUICK-START.md
 - cursor-mcp-setup.md
 
 **Solution:** Create single decision tree entry point

@@ -78,7 +78,7 @@ function generateLightweightMatrix(): CapabilityMatrix {
     categories: {
       agentActivation: { promised: 100, actual: 85, percentage: 85, status: 'working', evidence: ['Agent registry functional', 'File watching active'] },
       mcpIntegration: { promised: 100, actual: 90, percentage: 90, status: 'working', evidence: ['MCP server running', 'SimulationQA accessible'] },
-      bmadMethodology: { promised: 100, actual: 60, percentage: 60, status: 'partial', evidence: ['Basic handoffs work', 'Context preservation needs testing'] },
+      operaMethodology: { promised: 100, actual: 60, percentage: 60, status: 'partial', evidence: ['Basic handoffs work', 'Context preservation needs testing'] },
       contextPreservation: { promised: 100, actual: 70, percentage: 70, status: 'partial', evidence: ['Memory maintained in sessions', 'Cross-agent handoffs basic'] },
       qualityGates: { promised: 100, actual: 65, percentage: 65, status: 'partial', evidence: ['Testing framework exists', 'Coverage gaps identified'] },
       testingIntegration: { promised: 100, actual: 80, percentage: 80, status: 'working', evidence: ['Jest + Playwright configured', 'Chrome MCP active'] }

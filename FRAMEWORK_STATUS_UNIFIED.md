@@ -435,7 +435,7 @@ VERSATIL Framework v1.2.1
 │
 └── Core Framework (v1.2.1 - Stable)
     ├── 8 Orchestrators (active) ✅
-    ├── 6 BMAD Agents (enhanced) ✅
+    ├── 6 OPERA Agents (enhanced) ✅
     ├── RAG Memory System (operational) ✅
     ├── Opera MCP (operational) ✅
     ├── Rule 1-5 System (active) ✅
@@ -487,7 +487,7 @@ VERSATIL Framework v1.2.1
 **Tasks**:
 1. Add TypeScript compilation for language adapters
 2. Create unit tests for Python/Go adapters
-3. Update BMAD agents to leverage language detection
+3. Update OPERA agents to leverage language detection
 4. Document multi-language usage patterns
 5. Create migration guide for multi-language projects
 

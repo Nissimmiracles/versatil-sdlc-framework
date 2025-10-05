@@ -219,7 +219,7 @@ export * from './agents/agent-types';
 export * from './agents/validators/config-validators';
 export * from './utils/logger';
 export * from './rag/vector-memory-store';
-export * from './archon/archon-orchestrator';
+export * from './opera/opera-orchestrator';
 export * from './environment/environment-scanner';
 `;
   

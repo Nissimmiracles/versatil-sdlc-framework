@@ -256,7 +256,7 @@ node scripts/migrate-rag-v3.cjs
 | Docker Deployment | ❌ | ❌ | ✅ | NEW in v3.0 |
 | Kubernetes | ❌ | ❌ | ✅ | NEW in v3.0 |
 | Rule 1-5 | ✅ | ✅ | ✅ | Enhanced |
-| BMAD Agents | ✅ | ✅ | ✅ | Multi-language |
+| OPERA Agents | ✅ | ✅ | ✅ | Multi-language |
 | Dashboard | ✅ | ✅ | ✅ | Enhanced v3 |
 
 ---

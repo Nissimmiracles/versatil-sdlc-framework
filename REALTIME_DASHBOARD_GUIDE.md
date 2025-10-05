@@ -153,7 +153,7 @@ Scrolling log of framework events:
 - Initialization events
 
 ### 4. Agent Activity
-Current status of all 6 BMAD agents:
+Current status of all 6 OPERA agents:
 - ● Maria-QA
 - ● James-Frontend
 - ● Marcus-Backend

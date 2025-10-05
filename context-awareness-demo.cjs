@@ -2,7 +2,7 @@
 
 /**
  * VERSATIL v1.2.0 - Full Context Awareness Demo
- * Shows how Archon, RAG, and Introspective Agent work with complete environment context
+ * Shows how Opera, RAG, and Introspective Agent work with complete environment context
  */
 
 console.log(`
@@ -12,8 +12,8 @@ console.log(`
 
 This demo shows:
 1. Environment Scanner collecting full project context
-2. Archon using context for intelligent decisions  
-3. Introspective Agent with Archon + RAG access
+2. Opera using context for intelligent decisions  
+3. Introspective Agent with Opera + RAG access
 4. Autonomous problem detection and fixing
 `);
 
@@ -128,12 +128,12 @@ const mockRAG = {
   }
 };
 
-const mockArchon = {
+const mockOpera = {
   goals: [],
   
   async addGoal(goal) {
     this.goals.push(goal);
-    console.log(`\n🎯 Archon Goal Added: ${goal.description}`);
+    console.log(`\n🎯 Opera Goal Added: ${goal.description}`);
     console.log(`   Priority: ${goal.priority}`);
     console.log(`   Type: ${goal.type}`);
     console.log(`   Constraints: ${goal.constraints.join(', ')}`);
@@ -145,7 +145,7 @@ const mockArchon = {
   },
   
   async executeGoal(goal) {
-    console.log(`\n\n🤖 Archon executing: ${goal.description}\n`);
+    console.log(`\n\n🤖 Opera executing: ${goal.description}\n`);
     
     // Use context to make decisions
     console.log('   📋 Analyzing with project context:');
@@ -194,7 +194,7 @@ const mockIntrospectiveAgent = {
     // Check framework health
     console.log('   🔧 Framework Health: 95%');
     console.log('      ✅ All components operational');
-    console.log('      ✅ Archon responding');
+    console.log('      ✅ Opera responding');
     console.log('      ✅ RAG memory functional');
     
     await sleep(500);
@@ -239,7 +239,7 @@ const mockIntrospectiveAgent = {
     
     await sleep(1000);
     
-    // Create goal for Archon
+    // Create goal for Opera
     const goal = {
       id: `auto-fix-${Date.now()}`,
       type: 'optimization',
@@ -258,8 +258,8 @@ const mockIntrospectiveAgent = {
       ]
     };
     
-    console.log('\n   🎯 Creating Archon goal for autonomous execution...');
-    await mockArchon.addGoal(goal);
+    console.log('\n   🎯 Creating Opera goal for autonomous execution...');
+    await mockOpera.addGoal(goal);
     
     // Store this action in memory
     await mockRAG.storeMemory({
@@ -298,7 +298,7 @@ const mockIntrospectiveAgent = {
       successCriteria: ['Types valid', 'Tests pass', 'No regressions']
     };
     
-    await mockArchon.addGoal(verifyGoal);
+    await mockOpera.addGoal(verifyGoal);
   }
 };
 
@@ -332,7 +332,7 @@ async function runDemo() {
   console.log('\n\n✨ Demo Complete!\n');
   console.log('Key Takeaways:');
   console.log('1. Environment Scanner provides FULL project context');
-  console.log('2. Archon uses context for intelligent, adaptive planning');
+  console.log('2. Opera uses context for intelligent, adaptive planning');
   console.log('3. Introspective Agent autonomously detects and fixes issues');
   console.log('4. All components share knowledge through RAG');
   console.log('5. Continuous monitoring ensures ongoing optimization\n');

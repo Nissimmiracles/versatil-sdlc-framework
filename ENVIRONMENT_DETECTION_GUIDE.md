@@ -50,7 +50,7 @@ node detect-and-integrate.cjs
 ### 4. **Existing Agents**
 - **agents.md format**: Markdown file with agent definitions
 - **/agents folder**: Individual agent files
-- **BMAD format**: Agents defined in .cursorrules
+- **OPERA format**: Agents defined in .cursorrules
 
 ### 5. **SDLC Structure**
 - requirements/
@@ -71,7 +71,7 @@ node detect-and-integrate.cjs
 
 ### 2. **Enhances .cursorrules**
 Adds these commands to your existing rules:
-- `@archon <goal>` - Autonomous goal execution
+- `@opera <goal>` - Autonomous goal execution
 - `@memory <query>` - Query learned patterns
 - `@<agent> memory` - Show agent's memories
 - `@introspect` - Run self-diagnostics
@@ -111,7 +111,7 @@ my-project/
 - Enhanced agent commands
 - Introspective testing
 
-### Scenario 2: BMAD in Cursor
+### Scenario 2: OPERA in Cursor
 
 **What you have:**
 ```
@@ -123,7 +123,7 @@ my-project/
 ```
 
 **What VERSATIL adds:**
-- Memory for each BMAD agent
+- Memory for each OPERA agent
 - Goal-based orchestration
 - Learning from patterns
 - Autonomous execution
@@ -176,7 +176,7 @@ Instead of:
 
 Now just:
 ```
-@archon Build complete user management API with tests
+@opera Build complete user management API with tests
 ```
 
 ### 2. **Query Learned Patterns**
@@ -217,7 +217,7 @@ Edit `.versatil/integration-config.json` to:
       "memoryDepth": 100,
       "learningRate": 0.1
     },
-    "archon": {
+    "opera": {
       "enabled": true,
       "autonomousMode": false,
       "requireApproval": true
@@ -313,7 +313,7 @@ $ node detect-and-integrate.cjs
 
 1. **Test the integration**: `node .versatil/test-integration.js`
 2. **Read the report**: `cat .versatil/INTEGRATION_REPORT.md`
-3. **Try in Cursor**: Use new @archon and @memory commands
+3. **Try in Cursor**: Use new @opera and @memory commands
 4. **Run migrations**: If Supabase needs vector setup
 5. **Start building**: Set goals and watch the magic!
 

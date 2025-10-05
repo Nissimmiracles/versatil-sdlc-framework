@@ -4,7 +4,7 @@
  * Enables VERSATIL to work with Python projects, supporting pytest, poetry, pip,
  * pylint, black, mypy, and other Python ecosystem tools.
  *
- * BMAD agents can now orchestrate Python development workflows.
+ * OPERA agents can now orchestrate Python development workflows.
  */
 
 import { exec } from 'child_process';
@@ -364,7 +364,7 @@ export class PythonAdapter extends BaseLanguageAdapter {
   }
 
   /**
-   * Get recommended BMAD agents for Python projects
+   * Get recommended OPERA agents for Python projects
    */
   getRecommendedAgents(): string[] {
     return [

@@ -70,7 +70,7 @@ console.log(`   🎯 Feedback Loops Active: ${feedbackLoops.length}/8`);
 // Test 4: Self-Referential Validation
 console.log('\n🪞 Test 4: Self-Referential Architecture Validation');
 const selfReferentialFeatures = {
-  'Framework uses own BMAD methodology': true,
+  'Framework uses own OPERA methodology': true,
   'Agents manage framework development': true,
   'Quality gates applied to framework': true,
   'Self-testing functionality': true,
@@ -153,7 +153,7 @@ if (overallScore >= 95) {
 
 console.log('\n🎯 Key Achievements:');
 console.log('   • Complete 8-phase SDLC coverage');
-console.log('   • 8 specialized BMAD agents active');
+console.log('   • 8 specialized OPERA agents active');
 console.log('   • 8 adaptive feedback loops implemented');
 console.log('   • Self-referential framework architecture');
 console.log('   • Chrome MCP integration ready');

@@ -117,13 +117,13 @@ async function detectAndIntegrate() {
     console.log(`   ✅ Found /agents folder with ${detected.agents.existing.length} agents`);
   } catch {}
   
-  // Check for BMAD in cursor rules
+  // Check for OPERA in cursor rules
   if (detected.cursor) {
     try {
       const rules = await fs.readFile('.cursorrules', 'utf8');
-      if (rules.includes('BMAD') || rules.includes('BA-') || rules.includes('PM-')) {
-        detected.agents.format = 'bmad';
-        console.log('   ✅ BMAD methodology detected!');
+      if (rules.includes('OPERA') || rules.includes('BA-') || rules.includes('PM-')) {
+        detected.agents.format = 'opera';
+        console.log('   ✅ OPERA methodology detected!');
       }
     } catch {}
   }
@@ -160,7 +160,7 @@ async function createIntegration(detected) {
         useExisting: detected.supabase,
         needsVectorSetup: detected.supabase && !detected.rag.hasVectorStore
       },
-      archon: {
+      opera: {
         enabled: true,
         integrateWithExisting: Object.keys(detected.sdlc).length > 0
       },
@@ -200,11 +200,11 @@ All agents now have memory! They learn from every interaction.
 - View agent memories: @<agent> memory
 - Patterns are learned and applied automatically
 
-## 🤖 Archon Orchestrator
-Set goals, not tasks! Archon handles the rest autonomously.
-- Set goal: @archon <goal description>
-- Example: @archon Build user authentication with JWT and 2FA
-- Archon will plan, coordinate agents, and execute
+## 🤖 Opera Orchestrator
+Set goals, not tasks! Opera handles the rest autonomously.
+- Set goal: @opera <goal description>
+- Example: @opera Build user authentication with JWT and 2FA
+- Opera will plan, coordinate agents, and execute
 
 ## ⚡ Enhanced Agent Commands
 Your existing agents now have superpowers:
@@ -222,14 +222,14 @@ On file save:
 
 ## 🎯 Goal-Based Development
 Try these:
-- @archon Create REST API for user management
-- @archon Fix all security vulnerabilities
-- @archon Add comprehensive test coverage
-- @archon Optimize database performance
+- @opera Create REST API for user management
+- @opera Fix all security vulnerabilities
+- @opera Add comprehensive test coverage
+- @opera Optimize database performance
 
 ## 💡 Tips
 - Let agents learn - every interaction improves them
-- Trust Archon's autonomy - it gets smarter
+- Trust Opera's autonomy - it gets smarter
 - Check memories before implementing: @memory <topic>
 - Use @introspect if something seems wrong
 `;
@@ -346,7 +346,7 @@ async function test() {
   console.log('\\n✅ VERSATIL integration working!');
   console.log('\\nNext steps:');
   console.log('1. Run Supabase migration (if using Supabase)');
-  console.log('2. Try @archon commands in Cursor');
+  console.log('2. Try @opera commands in Cursor');
   console.log('3. Watch agents learn and improve!\\n');
 }
 
@@ -377,8 +377,8 @@ Generated: ${new Date().toISOString()}
    - Query with @memory <topic>
    ${detected.supabase && !detected.rag.hasVectorStore ? '- Run migration: .versatil/migrations/add-rag-memory.sql' : ''}
 
-2. **Archon Orchestrator**
-   - Set goals with @archon <goal>
+2. **Opera Orchestrator**
+   - Set goals with @opera <goal>
    - Autonomous execution
    - Self-healing capabilities
 
@@ -399,7 +399,7 @@ node .versatil/test-integration.js
 
 ## 📝 Try in Cursor
 
-1. **Set a goal**: @archon Build a user registration API
+1. **Set a goal**: @opera Build a user registration API
 2. **Query memory**: @memory authentication patterns  
 3. **Get suggestions**: @<your-agent> suggest improvements
 4. **Run diagnostics**: @introspect

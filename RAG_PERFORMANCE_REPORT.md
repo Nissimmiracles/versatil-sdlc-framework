@@ -92,7 +92,7 @@
 - ✅ Success pattern reinforcement
 
 **Integration**:
-- All 6 BMAD agents extend RAGEnabledAgent
+- All 6 OPERA agents extend RAGEnabledAgent
 - Auto-retrieves relevant context on activation
 - Stores successful patterns for future use
 

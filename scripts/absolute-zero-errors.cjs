@@ -24,10 +24,10 @@ if (fs.existsSync(enhancedIntrospectivePath)) {
     'JSON.stringify({ id: agent.id,'
   );
 
-  // Fix line 567 - ArchonOrchestrator.getInstance() takes no arguments
+  // Fix line 567 - OperaOrchestrator.getInstance() takes no arguments
   content = content.replace(
-    /ArchonOrchestrator\.getInstance\([^)]+\)/g,
-    'ArchonOrchestrator.getInstance()'
+    /OperaOrchestrator\.getInstance\([^)]+\)/g,
+    'OperaOrchestrator.getInstance()'
   );
 
   fs.writeFileSync(enhancedIntrospectivePath, content, 'utf8');
@@ -58,16 +58,16 @@ const metaAgentPath = path.join(__dirname, '..', 'src/agents/meta/introspective-
 if (fs.existsSync(metaAgentPath)) {
   let content = fs.readFileSync(metaAgentPath, 'utf8');
   content = content.replace(
-    /ArchonOrchestrator\.getInstance\([^)]+\)/g,
-    'ArchonOrchestrator.getInstance()'
+    /OperaOrchestrator\.getInstance\([^)]+\)/g,
+    'OperaOrchestrator.getInstance()'
   );
   fs.writeFileSync(metaAgentPath, content, 'utf8');
   console.log('✅ Fixed meta-agent.ts');
   fixCount++;
 }
 
-// Fix 4: Multimodal archon - add estimateComplexity method and remove relatedGoal
-const multimodalPath = path.join(__dirname, '..', 'src/archon/multimodal-archon-orchestrator.ts');
+// Fix 4: Multimodal opera - add estimateComplexity method and remove relatedGoal
+const multimodalPath = path.join(__dirname, '..', 'src/opera/multimodal-opera-orchestrator.ts');
 if (fs.existsSync(multimodalPath)) {
   let content = fs.readFileSync(multimodalPath, 'utf8');
 
@@ -84,14 +84,14 @@ if (fs.existsSync(multimodalPath)) {
   content = content.replace(/relatedGoal: [^,]+,\s*/g, '');
 
   fs.writeFileSync(multimodalPath, content, 'utf8');
-  console.log('✅ Fixed multimodal-archon-orchestrator.ts');
+  console.log('✅ Fixed multimodal-opera-orchestrator.ts');
   fixCount++;
 }
 
-// Fix 5: Enhanced BMAD coordinator - fix SDLCOrchestrator constructor and duplicate property
-const bmadPath = path.join(__dirname, '..', 'src/bmad/enhanced-bmad-coordinator.ts');
-if (fs.existsSync(bmadPath)) {
-  let content = fs.readFileSync(bmadPath, 'utf8');
+// Fix 5: Enhanced OPERA coordinator - fix SDLCOrchestrator constructor and duplicate property
+const operaPath = path.join(__dirname, '..', 'src/opera/enhanced-opera-coordinator.ts');
+if (fs.existsSync(operaPath)) {
+  let content = fs.readFileSync(operaPath, 'utf8');
 
   // Already fixed by previous script, but ensure no second argument
   content = content.replace(
@@ -108,7 +108,7 @@ if (fs.existsSync(bmadPath)) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    if (line.includes('const goal: ArchonGoal = {') || line.includes(': ArchonGoal = {')) {
+    if (line.includes('const goal: OperaGoal = {') || line.includes(': OperaGoal = {')) {
       inGoalObject = true;
       hasStatus = false;
     }
@@ -129,8 +129,8 @@ if (fs.existsSync(bmadPath)) {
   }
 
   content = fixedLines.join('\n');
-  fs.writeFileSync(bmadPath, content, 'utf8');
-  console.log('✅ Fixed bmad-coordinator.ts');
+  fs.writeFileSync(operaPath, content, 'utf8');
+  console.log('✅ Fixed opera-coordinator.ts');
   fixCount++;
 }
 

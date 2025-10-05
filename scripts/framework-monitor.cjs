@@ -78,8 +78,8 @@ async function main() {
 async function runHealthCheck() {
   const startTime = Date.now();
 
-  // 1. Check all BMAD agents
-  console.log('👥 Checking BMAD agents...');
+  // 1. Check all OPERA agents
+  console.log('👥 Checking OPERA agents...');
   const agentHealth = await checkAllAgents();
   displayAgentHealth(agentHealth);
 
@@ -152,7 +152,7 @@ async function runHealthCheck() {
 }
 
 /**
- * Check all BMAD agents
+ * Check all OPERA agents
  */
 async function checkAllAgents() {
   const agents = ['maria-qa', 'james-frontend', 'marcus-backend', 'sarah-pm', 'alex-ba', 'dr-ai-ml'];

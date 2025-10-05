@@ -1,5 +1,5 @@
 # VERSATIL SDLC Framework - Enterprise Docker Compose
-# Production-ready deployment with Enhanced BMAD agents, monitoring, and security
+# Production-ready deployment with Enhanced OPERA agents, monitoring, and security
 
 version: '3.8'
 

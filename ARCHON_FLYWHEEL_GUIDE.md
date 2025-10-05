@@ -25,7 +25,7 @@ Opera is the **autonomous orchestrator** that sits at the center of the VERSATIL
 ### 1. **Requirements Phase**
 ```javascript
 // User sets a high-level goal
-archon.addGoal({
+opera.addGoal({
   type: 'feature',
   description: 'Add user authentication with 2FA',
   priority: 'high',
@@ -97,10 +97,10 @@ if (monitoring.detectsIssue('high CPU usage')) {
   };
   
   // 3. Plan execution
-  const plan = archon.createPlan(goal, memories);
+  const plan = opera.createPlan(goal, memories);
   
   // 4. Execute autonomously
-  await archon.executeПлан(plan);
+  await opera.executeПлан(plan);
   
   // 5. Validate fix
   if (monitoring.issueResolved()) {
@@ -132,7 +132,7 @@ if (monitoring.detectsIssue('high CPU usage')) {
 ## Configuration
 
 ```javascript
-// .versatil/archon/config.json
+// .versatil/opera/config.json
 {
   "version": "1.2.0",
   "autonomousMode": true,
@@ -157,7 +157,7 @@ if (monitoring.detectsIssue('high CPU usage')) {
 ### Autonomous Feature Development
 ```javascript
 // One command builds entire feature
-await archon.addGoal({
+await opera.addGoal({
   type: 'feature',
   description: 'Build shopping cart with checkout',
   priority: 'high'
@@ -177,7 +177,7 @@ await archon.addGoal({
 // Opera detects issue
 monitoring.on('alert', async (issue) => {
   if (issue.severity === 'critical') {
-    await archon.addGoal({
+    await opera.addGoal({
       type: 'bug_fix',
       description: issue.description,
       priority: 'critical',

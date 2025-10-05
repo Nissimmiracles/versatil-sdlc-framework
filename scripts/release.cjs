@@ -264,7 +264,7 @@ versatil --version
 ## 📚 Documentation
 
 - [Framework Guide](https://github.com/MiraclesGIT/versatil-sdlc-framework#readme)
-- [BMAD Methodology](https://github.com/MiraclesGIT/versatil-sdlc-framework/blob/main/CLAUDE.md)
+- [OPERA Methodology](https://github.com/MiraclesGIT/versatil-sdlc-framework/blob/main/CLAUDE.md)
 - [MCP Integration](https://github.com/MiraclesGIT/versatil-sdlc-framework/blob/main/docs/mcp-integration.md)
 
 ## 🤝 Community

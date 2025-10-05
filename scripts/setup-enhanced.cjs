@@ -16,7 +16,7 @@ console.log(`
 This script will help you set up the new enhanced features:
 - 🧠 RAG Memory System
 - 🤖 Opera Autonomous Orchestrator
-- 🚀 Enhanced BMAD Integration
+- 🚀 Enhanced OPERA Integration
 
 `);
 
@@ -92,7 +92,7 @@ async function setup() {
           maxConcurrentExecutions: 3,
           decisionConfidenceThreshold: 0.7
         },
-        enhancedBMAD: {
+        enhancedOPERA: {
           enabled: true,
           learningRate: 0.1,
           contextWindowSize: 5
@@ -127,7 +127,7 @@ async function setup() {
  */
 
 import { 
-  enhancedBMAD, 
+  enhancedOPERA, 
   vectorMemoryStore 
 } from 'versatil-sdlc-framework';
 
@@ -136,7 +136,7 @@ async function main() {
   
   // Create project context
   const projectId = 'enhanced-demo-' + Date.now();
-  const context = await enhancedBMAD.createContext(projectId);
+  const context = await enhancedOPERA.createContext(projectId);
   console.log(\`✅ Created project: \${projectId}\\n\`);
   
   // Store some knowledge in RAG memory
@@ -156,7 +156,7 @@ async function main() {
   
   // Execute an enhanced workflow
   console.log('🤖 Starting enhanced workflow...');
-  await enhancedBMAD.executeBMADWorkflow(
+  await enhancedOPERA.executeOPERAWorkflow(
     projectId,
     'Create a TypeScript utility function for data validation'
   );
@@ -166,7 +166,7 @@ async function main() {
   console.log('   Check logs for detailed progress\\n');
   
   // Get performance metrics
-  const metrics = await enhancedBMAD.getPerformanceMetrics();
+  const metrics = await enhancedOPERA.getPerformanceMetrics();
   console.log('📊 Current metrics:');
   console.log(\`   Enhanced Agents: \${metrics.enhancedAgents}\`);
   console.log(\`   RAG Enabled: \${metrics.ragEnabled}\`);
@@ -250,7 +250,7 @@ main().catch(console.error);
 Your project is now configured with:
 - 🧠 RAG Memory System
 - 🤖 Opera Orchestrator${config.features.opera.autonomousMode ? ' (Autonomous Mode)' : ''}
-- 🚀 Enhanced BMAD Agents
+- 🚀 Enhanced OPERA Agents
 
 Quick Start Commands:
 --------------------

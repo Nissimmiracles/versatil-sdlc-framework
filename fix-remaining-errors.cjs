@@ -19,10 +19,10 @@ async function fixRemainingErrors() {
     console.log('⏰ Fix 1: Fixing Timer/Timeout type mismatches...');
     
     const filesToFixTimers = [
-      'src/archon/archon-mcp-server.ts',
-      'src/archon/enhanced-archon-orchestrator.ts',
+      'src/opera/opera-mcp-server.ts',
+      'src/opera/enhanced-opera-orchestrator.ts',
       'src/agents/introspective/enhanced-introspective-agent.ts',
-      'src/bmad/enhanced-bmad-coordinator.ts',
+      'src/opera/enhanced-opera-coordinator.ts',
       'src/monitoring/performance-tracker.ts'
     ];
     
@@ -126,14 +126,14 @@ async function fixRemainingErrors() {
     // Fix 5: Add missing method overloads
     console.log('\n📝 Fix 5: Adding method overloads...');
     
-    // Fix EventEmitter.on() in enhanced-archon-orchestrator.ts
-    const archonPath = path.join(__dirname, 'src/archon/enhanced-archon-orchestrator.ts');
+    // Fix EventEmitter.on() in enhanced-opera-orchestrator.ts
+    const operaPath = path.join(__dirname, 'src/opera/enhanced-opera-orchestrator.ts');
     try {
-      let archonContent = await fs.readFile(archonPath, 'utf8');
+      let operaContent = await fs.readFile(operaPath, 'utf8');
       
       // Add proper typing for emit method
-      if (!archonContent.includes('emit(event: string, data?: any): boolean')) {
-        archonContent = archonContent.replace(
+      if (!operaContent.includes('emit(event: string, data?: any): boolean')) {
+        operaContent = operaContent.replace(
           /emit\(event: string, data\?: any\): boolean {[\s\S]*?}/,
           `emit(event: string, data?: any): boolean {
     return super.emit(event, data);
@@ -143,10 +143,10 @@ async function fixRemainingErrors() {
       }
       
       // Fix on method
-      if (!archonContent.includes('on(event: string, listener: Function): this')) {
-        archonContent = archonContent.replace(
-          'export class EnhancedArchonOrchestrator extends EventEmitter {',
-          `export class EnhancedArchonOrchestrator extends EventEmitter {
+      if (!operaContent.includes('on(event: string, listener: Function): this')) {
+        operaContent = operaContent.replace(
+          'export class EnhancedOperaOrchestrator extends EventEmitter {',
+          `export class EnhancedOperaOrchestrator extends EventEmitter {
   on(event: string, listener: Function): this {
     return super.on(event, listener as any);
   }
@@ -155,10 +155,10 @@ async function fixRemainingErrors() {
         fixCount++;
       }
       
-      await fs.writeFile(archonPath, archonContent);
+      await fs.writeFile(operaPath, operaContent);
       console.log('  ✓ Fixed EventEmitter methods');
     } catch (e) {
-      console.log('  ⚠️  Could not fix archon orchestrator');
+      console.log('  ⚠️  Could not fix opera orchestrator');
     }
     
     console.log(`\n✅ Fixed ${fixCount} remaining issues`);

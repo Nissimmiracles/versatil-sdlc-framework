@@ -248,7 +248,7 @@ const message = criticalCount > 0
 ## 🚀 Framework Status
 
 ### ✅ Production Ready Features
-- [x] 6 BMAD Agents (Maria, Marcus, James, Alex, Sarah, Dr.AI-ML)
+- [x] 6 OPERA Agents (Maria, Marcus, James, Alex, Sarah, Dr.AI-ML)
 - [x] Pattern Analysis (Security, Performance, Quality)
 - [x] RAG Integration (Vector memory, context retrieval)
 - [x] Quality Gates (85% coverage, 80+ score)

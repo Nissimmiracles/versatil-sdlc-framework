@@ -27,5 +27,5 @@
   },
   "maxConcurrentTasks": 2,
   "priority": "medium",
-  "tags": ["machine-learning", "ai", "bmad", "data-science", "python"]
+  "tags": ["machine-learning", "ai", "opera", "data-science", "python"]
 }

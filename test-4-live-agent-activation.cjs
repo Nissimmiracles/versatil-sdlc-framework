@@ -24,7 +24,7 @@ const currentProjectContext = {
   ],
   recentChanges: [
     'MCP server implementation',
-    'BMAD agent synchronization',
+    'OPERA agent synchronization',
     'Adaptive flywheel completion',
     'Quality testing framework'
   ]
@@ -184,7 +184,7 @@ function activateArchitectureDan(context) {
     status: 'ACTIVATED',
     contextAdaptation: {
       systemDesignReview: [
-        'BMAD methodology implementation patterns',
+        'OPERA methodology implementation patterns',
         'MCP protocol integration architecture',
         'Agent communication design',
         'Flywheel orchestration structure'

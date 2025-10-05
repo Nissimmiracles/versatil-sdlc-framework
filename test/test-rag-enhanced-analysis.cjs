@@ -34,7 +34,7 @@ class RAGEnhancedAnalysisDemo {
   async runDemo() {
     console.log(colors.cyan('🚀 VERSATIL Phase 4: RAG-Enhanced Analysis Demonstration'));
     console.log(colors.gray('━'.repeat(80)));
-    console.log(colors.yellow('Transforming BMAD agents from pattern detectors to intelligent companions'));
+    console.log(colors.yellow('Transforming OPERA agents from pattern detectors to intelligent companions'));
     console.log('');
 
     // Step 1: Test file selection
@@ -98,7 +98,7 @@ class RAGEnhancedAnalysisDemo {
   }
 
   async loadAgentSystem() {
-    console.log(colors.blue('⚙️  Loading Enhanced BMAD Agent System...'));
+    console.log(colors.blue('⚙️  Loading Enhanced OPERA Agent System...'));
 
     try {
       // Import the compiled orchestrator
@@ -385,7 +385,7 @@ class RAGEnhancedAnalysisDemo {
     console.log(colors.gray('━'.repeat(80)));
 
     console.log(colors.white('🎯 What We Achieved:'));
-    console.log(colors.green('  ✅ Transformed BMAD agents from pattern detectors to intelligent companions'));
+    console.log(colors.green('  ✅ Transformed OPERA agents from pattern detectors to intelligent companions'));
     console.log(colors.green('  ✅ Integrated RAG with existing AgentOrchestrator system'));
     console.log(colors.green('  ✅ Enhanced PatternAnalyzer with historical context'));
     console.log(colors.green('  ✅ Upgraded PromptGenerator with proven examples'));

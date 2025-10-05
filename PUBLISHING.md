@@ -83,7 +83,7 @@ versatil init
 - [x] MCP integration guide included
 
 ### ✅ Framework Features
-- [x] 6 BMAD agents implemented
+- [x] 6 OPERA agents implemented
 - [x] Auto-agent dispatcher functional
 - [x] Quality gates operational
 - [x] Emergency response system active
@@ -153,4 +153,4 @@ npm audit fix
 
 **The VERSATIL SDLC Framework is ready for global distribution via NPM!** 🚀
 
-Once published, developers worldwide will have access to the revolutionary AI-native development platform with BMAD methodology, zero context loss, and comprehensive Claude Desktop integration.
+Once published, developers worldwide will have access to the revolutionary AI-native development platform with OPERA methodology, zero context loss, and comprehensive Claude Desktop integration.

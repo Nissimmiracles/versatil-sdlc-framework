@@ -4,7 +4,7 @@
  * VERSATIL SDLC Framework - Edge Function Deployment Orchestrator
  *
  * Automated deployment, validation, and management of Supabase Edge Functions
- * for Enhanced BMAD agents with production-ready monitoring and rollback.
+ * for Enhanced OPERA agents with production-ready monitoring and rollback.
  */
 
 const { Command } = require('commander');
@@ -30,8 +30,8 @@ class EdgeFunctionDeployment {
 
     this.edgeFunctions = [
       {
-        name: 'bmad-agent',
-        description: 'Unified BMAD Agent Router',
+        name: 'opera-agent',
+        description: 'Unified OPERA Agent Router',
         priority: 1,
         healthEndpoint: '/health',
         expectedResponse: { status: 'healthy' }
@@ -40,19 +40,19 @@ class EdgeFunctionDeployment {
         name: 'maria-rag',
         description: 'Enhanced Maria QA RAG',
         priority: 2,
-        dependencies: ['bmad-agent']
+        dependencies: ['opera-agent']
       },
       {
         name: 'james-rag',
         description: 'Enhanced James Frontend RAG',
         priority: 2,
-        dependencies: ['bmad-agent']
+        dependencies: ['opera-agent']
       },
       {
         name: 'marcus-rag',
         description: 'Enhanced Marcus Backend RAG',
         priority: 2,
-        dependencies: ['bmad-agent']
+        dependencies: ['opera-agent']
       },
       {
         name: 'store-memory',

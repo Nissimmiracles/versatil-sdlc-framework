@@ -82,7 +82,7 @@ After multiple "sure?" reality checks and discovering fundamental issues, the VE
 ```
 
 **Tools**:
-1. `versatil_activate_agent` - BMAD agent activation
+1. `versatil_activate_agent` - OPERA agent activation
 2. `versatil_orchestrate_phase` - SDLC transitions
 3. `versatil_run_quality_gates` - Quality enforcement
 4. `versatil_run_tests` - Enhanced Maria testing
@@ -113,7 +113,7 @@ After multiple "sure?" reality checks and discovering fundamental issues, the VE
 - ✅ Agent orchestration
 - ✅ MCP tool integration
 - ✅ Autonomous development (Opera)
-- ✅ BMAD methodology
+- ✅ OPERA methodology
 - ✅ Quality gates
 - ✅ SDLC orchestration
 - ✅ Emergency protocols
@@ -302,7 +302,7 @@ import { VERSATILMCPServerV2 } from '@versatil/framework/mcp';
 ## 🎯 Framework Status: PRODUCTION READY*
 
 **\* Core Features Ready**:
-- ✅ 12-agent BMAD system
+- ✅ 12-agent OPERA system
 - ✅ 2 MCP servers (16 tools)
 - ✅ Agent activation
 - ✅ Opera autonomous orchestration
@@ -366,7 +366,7 @@ Success Rate: 100.0%
 - 🎯 12 agents working
 - 🎯 2 MCP servers operational
 - 🎯 16 MCP tools functional
-- 🎯 BMAD methodology ready
+- 🎯 OPERA methodology ready
 - 🎯 100% test pass rate
 - 🎯 Runtime verified
 - 🎯 Production ready

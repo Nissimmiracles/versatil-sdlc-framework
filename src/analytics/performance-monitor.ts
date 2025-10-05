@@ -1,7 +1,7 @@
 /**
  * VERSATIL SDLC Framework - Performance Monitoring & Analytics System
  *
- * Real-time performance monitoring for Enhanced BMAD agents with
+ * Real-time performance monitoring for Enhanced OPERA agents with
  * comprehensive analytics, metrics collection, and alerting capabilities.
  */
 

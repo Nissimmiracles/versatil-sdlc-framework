@@ -1,7 +1,7 @@
 /**
  * VERSATIL SDLC Framework - Comprehensive Agent Testing Framework
  *
- * Tests all enhanced BMAD agents against the configuration validation scenarios
+ * Tests all enhanced OPERA agents against the configuration validation scenarios
  * identified in the Enhanced Maria analysis, including the VERSSAI Brain Route Bug
  * and other cross-file consistency issues.
  */
@@ -471,7 +471,7 @@ const processUserInput = (input) => {
    * Generate comprehensive test report
    */
   private generateTestReport(): void {
-    console.log('\n📊 Enhanced BMAD Agent Testing Report');
+    console.log('\n📊 Enhanced OPERA Agent Testing Report');
     console.log('='.repeat(80));
 
     // Overall statistics
@@ -542,7 +542,7 @@ const processUserInput = (input) => {
         console.log('   🚨 Address critical scenario failures immediately');
       }
     } else {
-      console.log('\n✅ All tests passed! Enhanced BMAD agents are working correctly.');
+      console.log('\n✅ All tests passed! Enhanced OPERA agents are working correctly.');
     }
   }
 

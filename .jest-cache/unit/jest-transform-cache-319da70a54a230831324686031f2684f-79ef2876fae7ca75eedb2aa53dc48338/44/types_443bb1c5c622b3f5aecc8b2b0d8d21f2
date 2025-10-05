@@ -1,0 +1,63 @@
+126dc8b4c729b714ad975e637849048f
+"use strict";
+
+/**
+ * VERSATIL Type Definitions
+ */
+/* istanbul ignore next */
+function cov_2dfs7022ss() {
+  var path = "/Users/nissimmenashe/VERSATIL SDLC FW/src/types.ts";
+  var hash = "eb923e9a22fea64e9dd6094f36d831cbfd59b01a";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/Users/nissimmenashe/VERSATIL SDLC FW/src/types.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 5,
+          column: 0
+        },
+        end: {
+          line: 5,
+          column: 62
+        }
+      }
+    },
+    fnMap: {},
+    branchMap: {},
+    s: {
+      "0": 0
+    },
+    f: {},
+    b: {},
+    inputSourceMap: {
+      file: "/Users/nissimmenashe/VERSATIL SDLC FW/src/types.ts",
+      mappings: ";AAAA;;GAEG",
+      names: [],
+      sources: ["/Users/nissimmenashe/VERSATIL SDLC FW/src/types.ts"],
+      sourcesContent: ["/**\n * VERSATIL Type Definitions\n */\n\nexport interface AgentResponse {\n  agentId: string;\n  message: string;\n  suggestions: any[];\n  priority: string;\n  handoffTo: string[];\n  context: any;\n  data?: any;\n  analysis?: any;\n}\n\nexport interface AgentActivationContext {\n  trigger?: any;\n  filePath?: string;\n  content?: string;\n  [key: string]: any;\n}\n\nexport interface ValidationResults {\n  score: number;\n  issues: any[];\n  warnings: string[];\n  recommendations: any[];\n  crossFileAnalysis?: {\n    inconsistencies: any[];\n    suggestions: string[];\n  };\n  performanceMetrics?: {\n    analysisTime: number;\n    filesAnalyzed: number;\n  };\n  securityConcerns?: any[];\n}\n\nexport interface Issue {\n  type: string;\n  severity: string;\n  message: string;\n  file: string;\n}\n\nexport interface Recommendation {\n  type: string;\n  priority: string;\n  message: string;\n  actions?: string[];\n  estimatedEffort?: string;\n  autoFixable?: boolean;\n}\n"],
+      version: 3
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "eb923e9a22fea64e9dd6094f36d831cbfd59b01a"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_2dfs7022ss = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_2dfs7022ss();
+cov_2dfs7022ss().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMmRmczcwMjJzcyIsInBhdGgiLCJoYXNoIiwiZ2xvYmFsIiwiRnVuY3Rpb24iLCJnY3YiLCJjb3ZlcmFnZURhdGEiLCJzdGF0ZW1lbnRNYXAiLCJzdGFydCIsImxpbmUiLCJjb2x1bW4iLCJlbmQiLCJmbk1hcCIsImJyYW5jaE1hcCIsInMiLCJmIiwiYiIsImlucHV0U291cmNlTWFwIiwiZmlsZSIsIm1hcHBpbmdzIiwibmFtZXMiLCJzb3VyY2VzIiwic291cmNlc0NvbnRlbnQiLCJ2ZXJzaW9uIiwiX2NvdmVyYWdlU2NoZW1hIiwiY292ZXJhZ2UiLCJhY3R1YWxDb3ZlcmFnZSJdLCJzb3VyY2VzIjpbIi9Vc2Vycy9uaXNzaW1tZW5hc2hlL1ZFUlNBVElMIFNETEMgRlcvc3JjL3R5cGVzLnRzIl0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogVkVSU0FUSUwgVHlwZSBEZWZpbml0aW9uc1xuICovXG5cbmV4cG9ydCBpbnRlcmZhY2UgQWdlbnRSZXNwb25zZSB7XG4gIGFnZW50SWQ6IHN0cmluZztcbiAgbWVzc2FnZTogc3RyaW5nO1xuICBzdWdnZXN0aW9uczogYW55W107XG4gIHByaW9yaXR5OiBzdHJpbmc7XG4gIGhhbmRvZmZUbzogc3RyaW5nW107XG4gIGNvbnRleHQ6IGFueTtcbiAgZGF0YT86IGFueTtcbiAgYW5hbHlzaXM/OiBhbnk7XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgQWdlbnRBY3RpdmF0aW9uQ29udGV4dCB7XG4gIHRyaWdnZXI/OiBhbnk7XG4gIGZpbGVQYXRoPzogc3RyaW5nO1xuICBjb250ZW50Pzogc3RyaW5nO1xuICBba2V5OiBzdHJpbmddOiBhbnk7XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgVmFsaWRhdGlvblJlc3VsdHMge1xuICBzY29yZTogbnVtYmVyO1xuICBpc3N1ZXM6IGFueVtdO1xuICB3YXJuaW5nczogc3RyaW5nW107XG4gIHJlY29tbWVuZGF0aW9uczogYW55W107XG4gIGNyb3NzRmlsZUFuYWx5c2lzPzoge1xuICAgIGluY29uc2lzdGVuY2llczogYW55W107XG4gICAgc3VnZ2VzdGlvbnM6IHN0cmluZ1tdO1xuICB9O1xuICBwZXJmb3JtYW5jZU1ldHJpY3M/OiB7XG4gICAgYW5hbHlzaXNUaW1lOiBudW1iZXI7XG4gICAgZmlsZXNBbmFseXplZDogbnVtYmVyO1xuICB9O1xuICBzZWN1cml0eUNvbmNlcm5zPzogYW55W107XG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgSXNzdWUge1xuICB0eXBlOiBzdHJpbmc7XG4gIHNldmVyaXR5OiBzdHJpbmc7XG4gIG1lc3NhZ2U6IHN0cmluZztcbiAgZmlsZTogc3RyaW5nO1xufVxuXG5leHBvcnQgaW50ZXJmYWNlIFJlY29tbWVuZGF0aW9uIHtcbiAgdHlwZTogc3RyaW5nO1xuICBwcmlvcml0eTogc3RyaW5nO1xuICBtZXNzYWdlOiBzdHJpbmc7XG4gIGFjdGlvbnM/OiBzdHJpbmdbXTtcbiAgZXN0aW1hdGVkRWZmb3J0Pzogc3RyaW5nO1xuICBhdXRvRml4YWJsZT86IGJvb2xlYW47XG59XG4iXSwibWFwcGluZ3MiOiI7O0FBQUE7OztBQUFBO0FBQUEsU0FBQUEsZUFBQTtFQUFBLElBQUFDLElBQUE7RUFBQSxJQUFBQyxJQUFBO0VBQUEsSUFBQUMsTUFBQSxPQUFBQyxRQUFBO0VBQUEsSUFBQUMsR0FBQTtFQUFBLElBQUFDLFlBQUE7SUFBQUwsSUFBQTtJQUFBTSxZQUFBO01BQUE7UUFBQUMsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7SUFBQTtJQUFBRSxLQUFBO0lBQUFDLFNBQUE7SUFBQUMsQ0FBQTtNQUFBO0lBQUE7SUFBQUMsQ0FBQTtJQUFBQyxDQUFBO0lBQUFDLGNBQUE7TUFBQUMsSUFBQTtNQUFBQyxRQUFBO01BQUFDLEtBQUE7TUFBQUMsT0FBQTtNQUFBQyxjQUFBO01BQUFDLE9BQUE7SUFBQTtJQUFBQyxlQUFBO0lBQUF0QixJQUFBO0VBQUE7RUFBQSxJQUFBdUIsUUFBQSxHQUFBdEIsTUFBQSxDQUFBRSxHQUFBLE1BQUFGLE1BQUEsQ0FBQUUsR0FBQTtFQUFBLEtBQUFvQixRQUFBLENBQUF4QixJQUFBLEtBQUF3QixRQUFBLENBQUF4QixJQUFBLEVBQUFDLElBQUEsS0FBQUEsSUFBQTtJQUFBdUIsUUFBQSxDQUFBeEIsSUFBQSxJQUFBSyxZQUFBO0VBQUE7RUFBQSxJQUFBb0IsY0FBQSxHQUFBRCxRQUFBLENBQUF4QixJQUFBO0VBQUEiLCJpZ25vcmVMaXN0IjpbXX0=

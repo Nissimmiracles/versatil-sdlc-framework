@@ -457,7 +457,7 @@ class ProductionDeploymentTester {
     // Production readiness assessment
     if (overallScore >= 90) {
       console.log('🚀 PRODUCTION READY: All systems operational!');
-      console.log('🌐 Your Enhanced BMAD agents are ready for global deployment');
+      console.log('🌐 Your Enhanced OPERA agents are ready for global deployment');
     } else if (overallScore >= 75) {
       console.log('⚠️  MOSTLY READY: Minor issues detected');
       console.log('🔧 Address failed tests before full production deployment');

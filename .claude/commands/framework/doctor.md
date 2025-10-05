@@ -6,7 +6,7 @@ Run the **VERSATIL Framework Doctor** to diagnose and fix issues automatically.
 
 ## What Gets Checked:
 🏥 **Isolation**: Framework-project separation validation
-🤖 **Agents**: All 6 BMAD agents operational
+🤖 **Agents**: All 6 OPERA agents operational
 🔌 **MCP Servers**: Connection and tool availability
 📊 **Rules**: Rules 1-5 configuration and enablement
 ✅ **Test Coverage**: 85%+ threshold validation
@@ -28,8 +28,8 @@ Run the **VERSATIL Framework Doctor** to diagnose and fix issues automatically.
 🏥 VERSATIL Framework Doctor
 
 ✅ Isolation: Framework properly isolated in ~/.versatil/
-✅ Agents: All 6 BMAD agents healthy
-⚠️  MCP Servers: 1 server disconnected (archon-mcp)
+✅ Agents: All 6 OPERA agents healthy
+⚠️  MCP Servers: 1 server disconnected (opera-mcp)
 ✅ Rules: 3/3 enabled (Parallel, Stress Test, Audit)
 ✅ Tests: 87% coverage (target: 85%+)
 ✅ Security: 0 vulnerabilities

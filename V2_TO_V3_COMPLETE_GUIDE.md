@@ -427,7 +427,7 @@ Outcome: All v3.0 core features functional
 ```yaml
 Week 8-9: Enhanced Agent Intelligence
   - Integrate GPT-4 Vision API
-    • Wrap all 6 BMAD agents
+    • Wrap all 6 OPERA agents
     • Add visual analysis
     • Implement pixel validation
 

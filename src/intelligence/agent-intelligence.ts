@@ -1,7 +1,7 @@
 /**
  * VERSATIL SDLC Framework - Agent Intelligence Integration
  *
- * Integrates adaptive learning and usage analytics with Enhanced BMAD agents
+ * Integrates adaptive learning and usage analytics with Enhanced OPERA agents
  * to enable continuous improvement based on real user interactions.
  */
 
@@ -205,7 +205,7 @@ export class AgentIntelligenceManager {
         activationId,
         suggestionId: `${activationId}_${index}`,
         feedbackEnabled: true,
-        learningSource: 'enhanced_bmad'
+        learningSource: 'enhanced_opera'
       }
     }));
 

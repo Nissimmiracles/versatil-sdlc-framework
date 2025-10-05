@@ -506,7 +506,7 @@ npm run test:e2e:all
 - ✅ **Orchestrator Status**: Live tracking of all 8 orchestrators
 - ✅ **Sync Score**: Real-time sync score with trending
 - ✅ **Event Stream**: Live event log with timestamps
-- ✅ **Agent Activity**: Current status of 6 BMAD agents
+- ✅ **Agent Activity**: Current status of 6 OPERA agents
 - ✅ **System Metrics**: Memory, CPU, uptime monitoring
 
 ---

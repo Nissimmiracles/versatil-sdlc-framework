@@ -3,7 +3,7 @@
 /**
  * VERSATIL SDLC Framework - Self-Improvement Script
  *
- * Applies Enhanced BMAD methodology to our own codebase
+ * Applies Enhanced OPERA methodology to our own codebase
  * Demonstrates "eating our own dog food" by using Enhanced Maria
  * to validate and improve the VERSATIL framework itself
  */
@@ -22,7 +22,7 @@ class VERSATILSelfImprovement {
   async runSelfAnalysis() {
     console.log('🔍 VERSATIL Self-Improvement Analysis');
     console.log('=====================================');
-    console.log('Applying Enhanced BMAD methodology to our own codebase...\n');
+    console.log('Applying Enhanced OPERA methodology to our own codebase...\n');
 
     // Run Enhanced Maria analysis on our own code
     await this.runEnhancedMariaAnalysis();
@@ -438,7 +438,7 @@ class VERSATILSelfImprovement {
 
       console.log('\n🔄 Next Steps:');
       console.log('1. Fix critical and high-priority issues first');
-      console.log('2. Run Enhanced BMAD agents on codebase changes');
+      console.log('2. Run Enhanced OPERA agents on codebase changes');
       console.log('3. Implement automated quality gates');
       console.log('4. Schedule regular self-improvement analysis');
     }

@@ -14,7 +14,7 @@
   },
   "tools": {
     "versatil_activate_agent": {
-      "description": "Activate a specific BMAD agent with context",
+      "description": "Activate a specific OPERA agent with context",
       "server": "versatil-framework"
     },
     "versatil_orchestrate_sdlc": {

@@ -214,7 +214,7 @@ A fully working VERSATIL framework must have:
 ### ✅ Core Requirements (ALL MUST PASS)
 1. **133/133 Tests Passing** (100% pass rate)
 2. **Zero Isolation Violations** (only .versatil-project.json in project)
-3. **All 6 BMAD Agents Operational** (activate on triggers)
+3. **All 6 OPERA Agents Operational** (activate on triggers)
 4. **5 Rules Functioning** (parallel, stress-test, audit, onboarding, release)
 5. **Doctor Command Working** (health check + auto-fix)
 6. **Clean Build** (zero TypeScript errors)

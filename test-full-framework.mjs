@@ -192,7 +192,7 @@ if (passedTests === totalTests) {
   console.log('   - VERSATIL MCP V2 operational (10 tools)');
   console.log('   - Total: 16 MCP tools functional');
   console.log('   - Agent activation confirmed');
-  console.log('   - BMAD methodology ready\n');
+  console.log('   - OPERA methodology ready\n');
   process.exit(0);
 } else {
   console.log('❌ SOME TESTS FAILED');

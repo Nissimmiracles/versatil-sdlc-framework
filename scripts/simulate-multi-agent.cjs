@@ -8,7 +8,7 @@ console.log(`
 ║        VERSATIL Multi-Agent Coordination Demo               ║
 ╚══════════════════════════════════════════════════════════════╝
 
-Simulating a complete BMAD workflow with agent handoffs...
+Simulating a complete OPERA workflow with agent handoffs...
 `);
 
 async function simulateWorkflow() {

@@ -152,9 +152,9 @@ const mockMCPDiscoveryAgent = {
   }
 };
 
-const mockArchon = {
+const mockOpera = {
   async processWithSeparation(context, mcps) {
-    console.log('\n🏗️  Archon: Processing with clean architecture separation...');
+    console.log('\n🏗️  Opera: Processing with clean architecture separation...');
     
     // SDLC Layer - No direct environment knowledge
     console.log('\n   📋 SDLC Layer:');
@@ -321,10 +321,10 @@ async function runDemo() {
   
   await sleep(500);
   
-  // 5. Archon processing with separation
+  // 5. Opera processing with separation
   const plan = await performanceMonitor.measure(
-    'Archon Planning',
-    () => mockArchon.processWithSeparation(context, [...discovered, ...additional])
+    'Opera Planning',
+    () => mockOpera.processWithSeparation(context, [...discovered, ...additional])
   );
   
   console.log('\n📋 Installation Plan:');

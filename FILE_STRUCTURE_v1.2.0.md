@@ -16,13 +16,13 @@ src/rag/
 
 ### 🤖 Opera Orchestrator
 ```
-src/archon/
-├── archon-orchestrator.ts     # Autonomous orchestration
+src/opera/
+├── opera-orchestrator.ts     # Autonomous orchestration
 ├── goal-planner.ts           # Goal decomposition
 ├── decision-engine.ts        # Decision making
 └── execution-monitor.ts      # Progress tracking
 
-.versatil/archon/
+.versatil/opera/
 ├── goals/                    # Active goals
 ├── decisions/                # Decision history
 └── config.json              # Opera configuration
@@ -30,8 +30,8 @@ src/archon/
 
 ### 🚀 Enhanced Components
 ```
-src/bmad/
-├── enhanced-bmad-coordinator.ts    # Enhanced BMAD
+src/opera/
+├── enhanced-opera-coordinator.ts    # Enhanced OPERA
 └── enhanced-agents/               # Agent implementations
     ├── enhanced-maria.ts
     ├── enhanced-marcus.ts
@@ -54,7 +54,7 @@ tests/
 ├── learning-demos.js           # Learning progression
 └── run-all-tests.js           # Interactive runner
 
-test-enhanced-bmad.js           # Original enhanced test
+test-enhanced-opera.js           # Original enhanced test
 ```
 
 ### 📚 Documentation
@@ -101,7 +101,7 @@ package.json                   # New scripts & version
 
 1. **Enhanced Agents** inherit from base agents
 2. **RAG Memory** integrates with all agent decisions
-3. **Opera** orchestrates enhanced BMAD workflow
+3. **Opera** orchestrates enhanced OPERA workflow
 4. **MCP Tools** expose all v1.2.0 features
 5. **Test Suite** demonstrates real value
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * VERSATIL SDLC Framework - Multi-Agent Collaboration Dashboard
- * Shows real results from all BMAD agents working together
+ * Shows real results from all OPERA agents working together
  */
 
 const fs = require('fs');
@@ -307,7 +307,7 @@ class MultiAgentDashboard {
     <!-- Header -->
     <div class="header">
       <h1>🤖 VERSATIL Multi-Agent Collaboration Dashboard</h1>
-      <div class="subtitle">Real-time BMAD Agent System Analysis & Coordination</div>
+      <div class="subtitle">Real-time OPERA Agent System Analysis & Coordination</div>
       <div style="font-size: 0.9rem; color: #888; margin-top: 10px;">
         Generated: ${new Date().toLocaleString()}
       </div>
@@ -353,7 +353,7 @@ class MultiAgentDashboard {
   </div>
 
   <div class="footer">
-    <p>🎭 VERSATIL Multi-Agent System • Real BMAD Agent Collaboration</p>
+    <p>🎭 VERSATIL Multi-Agent System • Real OPERA Agent Collaboration</p>
     <p>Enhanced Maria • Enhanced James • Enhanced Marcus • Security Sam</p>
   </div>
 

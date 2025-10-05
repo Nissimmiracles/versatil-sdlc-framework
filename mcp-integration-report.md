@@ -23,7 +23,7 @@ The VERSATIL SDLC Framework MCP server integration has been successfully configu
 - **Tools Count**: 4 tools available
 - **Tool List**:
   1. `versatil_framework_status` - Get current framework status
-  2. `versatil_activate_agent` - Activate specific BMAD agents
+  2. `versatil_activate_agent` - Activate specific OPERA agents
   3. `versatil_quality_gate` - Execute quality checks
   4. `versatil_orchestrate_sdlc` - Manage SDLC phases
 
@@ -74,7 +74,7 @@ The VERSATIL SDLC Framework MCP server integration has been successfully configu
 ```
 
 ### Available Agents
-The following BMAD agents are available for activation:
+The following OPERA agents are available for activation:
 - `enhanced-maria` - Quality Assurance & Testing
 - `enhanced-james` - Frontend Development & UX
 - `enhanced-marcus` - Backend Development & APIs

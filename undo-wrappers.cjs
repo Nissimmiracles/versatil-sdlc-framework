@@ -2,9 +2,9 @@ const fs = require('fs');
 
 const files = [
   'src/agents/introspective/enhanced-introspective-agent.ts',
-  'src/bmad/enhanced-bmad-coordinator.ts',
+  'src/opera/enhanced-opera-coordinator.ts',
   'src/enhanced-server.ts',
-  'src/mcp/archon-mcp.ts',
+  'src/mcp/opera-mcp.ts',
   'src/mcp/enhanced-mcp-tools.ts'
 ];
 

@@ -137,7 +137,7 @@ class IsolationValidator {
           const hasVersatilFiles = files.some(f =>
             f.includes('versatil') ||
             f.includes('opera') ||
-            f.includes('bmad')
+            f.includes('opera')
           );
 
           if (hasVersatilFiles) {

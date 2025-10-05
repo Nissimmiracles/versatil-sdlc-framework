@@ -26,7 +26,7 @@ if [[ -f ".versatil-project.json" ]]; then
 
   cat <<EOF
 {
-  "systemMessage": "🚀 VERSATIL Framework Initialized\n\nProject: $PROJECT_NAME\nFramework: v$(versatil-sdlc --version 2>/dev/null || echo '1.2.1')\nAgents: 6 BMAD agents ready\nRules: 1-5 enabled\n\n✨ Ready for AI-native development!"
+  "systemMessage": "🚀 VERSATIL Framework Initialized\n\nProject: $PROJECT_NAME\nFramework: v$(versatil-sdlc --version 2>/dev/null || echo '1.2.1')\nAgents: 6 OPERA agents ready\nRules: 1-5 enabled\n\n✨ Ready for AI-native development!"
 }
 EOF
 else

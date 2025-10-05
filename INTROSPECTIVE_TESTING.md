@@ -79,7 +79,7 @@ agent.activate({
   frameworkHealth: 95,      // Overall health percentage
   agentHealth: Map,         // Individual agent health
   memorySystemHealth: 100,  // RAG memory status
-  archonHealth: 90,         // Orchestrator status
+  operaHealth: 90,         // Orchestrator status
   lastCheck: timestamp      // Last health check
 }
 ```
@@ -150,7 +150,7 @@ versatil_introspection:
   description: Run framework self-test
   parameters:
     - type: [health-check, self-test, diagnose]
-    - component: [agents, memory, archon, all]
+    - component: [agents, memory, opera, all]
 ```
 
 ### Continuous Validation

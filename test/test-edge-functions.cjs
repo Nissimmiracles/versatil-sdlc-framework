@@ -4,7 +4,7 @@
  * VERSATIL SDLC Framework - Edge Function Integration Tests
  *
  * Comprehensive testing suite for Supabase Edge Functions including
- * BMAD agents, performance validation, and production readiness checks.
+ * OPERA agents, performance validation, and production readiness checks.
  */
 
 // Simple color functions (compatible with all Node versions)
@@ -39,7 +39,7 @@ class EdgeFunctionTester {
 
     const testSuites = [
       { name: 'Health Checks', method: 'testHealthChecks' },
-      { name: 'BMAD Agent Functionality', method: 'testBMADAgents' },
+      { name: 'OPERA Agent Functionality', method: 'testOPERAAgents' },
       { name: 'Rate Limiting', method: 'testRateLimiting' },
       { name: 'Caching Behavior', method: 'testCaching' },
       { name: 'Performance Benchmarks', method: 'testPerformance' },
@@ -87,7 +87,7 @@ class EdgeFunctionTester {
    */
   async testHealthChecks() {
     const functions = [
-      'bmad-agent',
+      'opera-agent',
       'maria-rag',
       'james-rag',
       'marcus-rag',
@@ -106,8 +106,8 @@ class EdgeFunctionTester {
           if (response.status !== 200) {
             throw new Error(`Health check failed with status ${response.status}`);
           }
-          if (funcName === 'bmad-agent' && data.status !== 'healthy') {
-            throw new Error('BMAD agent reported unhealthy status');
+          if (funcName === 'opera-agent' && data.status !== 'healthy') {
+            throw new Error('OPERA agent reported unhealthy status');
           }
         }
       );
@@ -115,9 +115,9 @@ class EdgeFunctionTester {
   }
 
   /**
-   * Test BMAD agent functionality
+   * Test OPERA agent functionality
    */
-  async testBMADAgents() {
+  async testOPERAAgents() {
     const agents = [
       {
         agent: 'enhanced-maria',
@@ -152,9 +152,9 @@ class EdgeFunctionTester {
 
     for (const testCase of agents) {
       await this.testFunction(
-        `BMAD Agent: ${testCase.agent}`,
+        `OPERA Agent: ${testCase.agent}`,
         'POST',
-        `${this.supabaseUrl}/functions/v1/bmad-agent`,
+        `${this.supabaseUrl}/functions/v1/opera-agent`,
         testCase,
         (response, data) => {
           if (response.status !== 200) {
@@ -194,7 +194,7 @@ class EdgeFunctionTester {
     const promises = [];
     for (let i = 0; i < 50; i++) {
       promises.push(
-        fetch(`${this.supabaseUrl}/functions/v1/bmad-agent`, {
+        fetch(`${this.supabaseUrl}/functions/v1/opera-agent`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -227,7 +227,7 @@ class EdgeFunctionTester {
    * Test caching behavior
    */
   async testCaching() {
-    const testUrl = `${this.supabaseUrl}/functions/v1/bmad-agent/health`;
+    const testUrl = `${this.supabaseUrl}/functions/v1/opera-agent/health`;
 
     // First request
     const start1 = Date.now();
@@ -273,7 +273,7 @@ class EdgeFunctionTester {
 
     for (let i = 0; i < iterations; i++) {
       const start = Date.now();
-      const response = await fetch(`${this.supabaseUrl}/functions/v1/bmad-agent`, {
+      const response = await fetch(`${this.supabaseUrl}/functions/v1/opera-agent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -332,7 +332,7 @@ class EdgeFunctionTester {
       await this.testFunction(
         `Error handling: ${test.name}`,
         'POST',
-        `${this.supabaseUrl}/functions/v1/bmad-agent`,
+        `${this.supabaseUrl}/functions/v1/opera-agent`,
         test.payload,
         (response, data) => {
           if (response.status !== test.expectedStatus) {
@@ -350,7 +350,7 @@ class EdgeFunctionTester {
    * Test security headers
    */
   async testSecurityHeaders() {
-    const response = await fetch(`${this.supabaseUrl}/functions/v1/bmad-agent/health`, {
+    const response = await fetch(`${this.supabaseUrl}/functions/v1/opera-agent/health`, {
       headers: { 'Authorization': `Bearer ${this.supabaseKey}` }
     });
 
@@ -384,7 +384,7 @@ class EdgeFunctionTester {
     await this.testFunction(
       'Metrics endpoint',
       'GET',
-      `${this.supabaseUrl}/functions/v1/bmad-agent/metrics`,
+      `${this.supabaseUrl}/functions/v1/opera-agent/metrics`,
       null,
       (response, data) => {
         if (response.status !== 200) {

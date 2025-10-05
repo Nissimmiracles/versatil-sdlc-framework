@@ -2,7 +2,7 @@
 
 /**
  * VERSATIL SDLC Framework - Agent Status Display
- * Shows all configured BMAD agents and their current status
+ * Shows all configured OPERA agents and their current status
  */
 
 const fs = require('fs');
@@ -12,7 +12,7 @@ const AGENTS_DIR = path.join(__dirname, '..', '.versatil', 'agents');
 
 function displayAgents() {
   console.log('\n╔══════════════════════════════════════════════════════════════╗');
-  console.log('║                    VERSATIL BMAD AGENTS                     ║');
+  console.log('║                    VERSATIL OPERA AGENTS                     ║');
   console.log('║                     Currently Active                        ║');
   console.log('╚══════════════════════════════════════════════════════════════╝\n');
 
@@ -30,7 +30,7 @@ function displayAgents() {
     return;
   }
 
-  console.log('🤖 Active BMAD Agents:\n');
+  console.log('🤖 Active OPERA Agents:\n');
 
   agentDirs.forEach(agentDir => {
     const configPath = path.join(AGENTS_DIR, agentDir, 'config.json');
@@ -93,7 +93,7 @@ function showRecentActivity() {
   });
 
   console.log('');
-  console.log('🎯 Framework Status: SELF-MANAGING via BMAD Agents');
+  console.log('🎯 Framework Status: SELF-MANAGING via OPERA Agents');
   console.log('');
 }
 
@@ -109,7 +109,7 @@ function showSelfReferentialStatus() {
     'Quality gates active': '✅ YES',
     'Self-testing working': '✅ YES (7/7 tests pass)',
     'Context preservation': '✅ YES',
-    'BMAD methodology applied': '✅ YES'
+    'OPERA methodology applied': '✅ YES'
   };
 
   Object.entries(selfStatus).forEach(([key, value]) => {

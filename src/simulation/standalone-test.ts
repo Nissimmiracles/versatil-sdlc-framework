@@ -95,7 +95,7 @@ function assessFrameworkCapabilities(): StandaloneCapability[] {
       ]
     },
     {
-      name: 'BMAD Methodology',
+      name: 'OPERA Methodology',
       promised: 100,
       actual: 60,
       status: 'partial',

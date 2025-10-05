@@ -1,7 +1,7 @@
 /**
  * VERSATIL SDLC Framework - Usage Analytics & User Behavior Tracking
  *
- * Collects real-time usage data from Enhanced BMAD agents to enable
+ * Collects real-time usage data from Enhanced OPERA agents to enable
  * continuous learning and improvement based on actual user interactions.
  */
 

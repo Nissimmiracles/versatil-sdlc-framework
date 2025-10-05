@@ -136,10 +136,10 @@ SUPABASE_ANON_KEY=your-supabase-key
 # OpenAI (Optional - for embeddings)
 OPENAI_API_KEY=your-openai-key
 
-# Archon MCP
-ARCHON_MCP_PORT=3000
-ARCHON_AUTO_UPDATE=true
-ARCHON_UPDATE_CHANNEL=stable
+# Opera MCP
+OPERA_MCP_PORT=3000
+OPERA_AUTO_UPDATE=true
+OPERA_UPDATE_CHANNEL=stable
 
 # Logging
 LOG_LEVEL=info

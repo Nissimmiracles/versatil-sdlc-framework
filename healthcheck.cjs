@@ -2,7 +2,7 @@
 
 /**
  * VERSATIL SDLC Framework - Health Check Script
- * Enterprise deployment health monitoring for Enhanced BMAD agents
+ * Enterprise deployment health monitoring for Enhanced OPERA agents
  */
 
 const http = require('http');
@@ -116,8 +116,8 @@ healthChecker.addCheck('memory', async () => {
   };
 });
 
-// Enhanced BMAD Agents Health Check
-healthChecker.addCheck('bmad-agents', async () => {
+// Enhanced OPERA Agents Health Check
+healthChecker.addCheck('opera-agents', async () => {
   const agentDataPath = path.join('/app/.versatil', 'analytics', 'metrics.json');
 
   if (!fs.existsSync(agentDataPath)) {

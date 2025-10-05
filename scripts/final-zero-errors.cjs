@@ -31,11 +31,11 @@ if (!simQaContent.includes('expectedBehavior?:')) {
   console.log('✅ Added expectedBehavior to SimulationScenario');
 }
 
-// Fix 3: Update all incomplete ArchonGoal creations to include status
+// Fix 3: Update all incomplete OperaGoal creations to include status
 const goalFiles = [
-  'src/bmad/enhanced-bmad-coordinator.ts',
+  'src/opera/enhanced-opera-coordinator.ts',
   'src/agents/introspective/enhanced-introspective-agent.ts',
-  'src/archon/multimodal-archon-orchestrator.ts'
+  'src/opera/multimodal-opera-orchestrator.ts'
 ];
 
 goalFiles.forEach(file => {
@@ -45,7 +45,7 @@ goalFiles.forEach(file => {
   let content = fs.readFileSync(filePath, 'utf8');
   const original = content;
 
-  // Find ArchonGoal objects missing status
+  // Find OperaGoal objects missing status
   const lines = content.split('\n');
   let inGoalObject = false;
   let goalStartLine = -1;
@@ -55,7 +55,7 @@ goalFiles.forEach(file => {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    if (line.includes('const goal: ArchonGoal') || line.includes(': ArchonGoal = {')) {
+    if (line.includes('const goal: OperaGoal') || line.includes(': OperaGoal = {')) {
       inGoalObject = true;
       goalStartLine = i;
       hasStatus = false;
@@ -99,18 +99,18 @@ goalFiles.forEach(file => {
 
   if (content !== original) {
     fs.writeFileSync(filePath, content, 'utf8');
-    console.log(`✅ Fixed ArchonGoal status in ${file}`);
+    console.log(`✅ Fixed OperaGoal status in ${file}`);
   }
 });
 
 // Fix 4: Add missing constructor parameters and method overloads
-const archonPath = path.join(__dirname, '..', 'src/archon/enhanced-archon-orchestrator.ts');
-if (fs.existsSync(archonPath)) {
-  let archonContent = fs.readFileSync(archonPath, 'utf8');
+const operaPath = path.join(__dirname, '..', 'src/opera/enhanced-opera-orchestrator.ts');
+if (fs.existsSync(operaPath)) {
+  let operaContent = fs.readFileSync(operaPath, 'utf8');
 
   // Add missing methods if not present
-  if (!archonContent.includes('getGoalStatus(')) {
-    const insertPos = archonContent.lastIndexOf('}');
+  if (!operaContent.includes('getGoalStatus(')) {
+    const insertPos = operaContent.lastIndexOf('}');
     const methods = `
   async getGoalStatus(goalId: string): Promise<any> {
     return { status: 'unknown' };
@@ -130,9 +130,9 @@ if (fs.existsSync(archonPath)) {
 
   async overrideGoal(goalId: string, override: any): Promise<void> {}
 `;
-    archonContent = archonContent.slice(0, insertPos) + methods + archonContent.slice(insertPos);
-    fs.writeFileSync(archonPath, archonContent, 'utf8');
-    console.log('✅ Added missing methods to EnhancedArchonOrchestrator');
+    operaContent = operaContent.slice(0, insertPos) + methods + operaContent.slice(insertPos);
+    fs.writeFileSync(operaPath, operaContent, 'utf8');
+    console.log('✅ Added missing methods to EnhancedOperaOrchestrator');
   }
 }
 

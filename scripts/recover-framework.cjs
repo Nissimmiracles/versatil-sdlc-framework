@@ -235,7 +235,7 @@ class FrameworkRecoverySystem {
     if (!(await this.pathExists(agentDir))) {
       this.warnings.push({
         message: '.claude/agents/ directory not found',
-        suggestion: 'Create agent configurations for BMAD agents'
+        suggestion: 'Create agent configurations for OPERA agents'
       });
       this.log('   ⚠️  .claude/agents/ not found', 'yellow');
       return;

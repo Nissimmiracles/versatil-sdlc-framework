@@ -54,14 +54,14 @@ await runTest('Environment Scanner - Full Context Collection', async () => {
   if (!context.patterns) throw new Error('Missing patterns context');
 });
 
-// Test 2: Archon uses environment context
-await runTest('Archon - Environment Context Usage', async () => {
-  const mockArchon = {
+// Test 2: Opera uses environment context
+await runTest('Opera - Environment Context Usage', async () => {
+  const mockOpera = {
     projectContext: null,
     
     async planWithContext(goal) {
       if (!this.projectContext) {
-        throw new Error('Archon missing project context');
+        throw new Error('Opera missing project context');
       }
       
       // Verify context influences decisions
@@ -84,26 +84,26 @@ await runTest('Archon - Environment Context Usage', async () => {
   };
   
   // Set context
-  mockArchon.projectContext = {
+  mockOpera.projectContext = {
     technology: { typescript: true },
     quality: { testCoverage: 45 }
   };
   
-  const plan = await mockArchon.planWithContext({ type: 'feature' });
+  const plan = await mockOpera.planWithContext({ type: 'feature' });
   
   if (!plan.considerations.includes('Type safety required')) {
-    throw new Error('Archon not using TypeScript context');
+    throw new Error('Opera not using TypeScript context');
   }
   if (!plan.agents.includes('enhanced-maria')) {
-    throw new Error('Archon not considering test coverage');
+    throw new Error('Opera not considering test coverage');
   }
 });
 
-// Test 3: Introspective Agent has Archon access
-await runTest('Introspective Agent - Archon Access', async () => {
+// Test 3: Introspective Agent has Opera access
+await runTest('Introspective Agent - Opera Access', async () => {
   let goalCreated = false;
   
-  const mockArchon = {
+  const mockOpera = {
     addGoal: async (goal) => {
       goalCreated = true;
       return { id: 'test-goal' };
@@ -111,14 +111,14 @@ await runTest('Introspective Agent - Archon Access', async () => {
   };
   
   const mockIntrospective = {
-    archon: mockArchon,
+    opera: mockOpera,
     
     async createAutonomousFix(issue) {
-      if (!this.archon) {
-        throw new Error('Introspective agent missing Archon access');
+      if (!this.opera) {
+        throw new Error('Introspective agent missing Opera access');
       }
       
-      await this.archon.addGoal({
+      await this.opera.addGoal({
         type: 'bug_fix',
         description: issue
       });
@@ -128,7 +128,7 @@ await runTest('Introspective Agent - Archon Access', async () => {
   await mockIntrospective.createAutonomousFix('Test issue');
   
   if (!goalCreated) {
-    throw new Error('Introspective agent could not create Archon goal');
+    throw new Error('Introspective agent could not create Opera goal');
   }
 });
 

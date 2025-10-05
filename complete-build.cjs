@@ -30,7 +30,7 @@ async function completeBuild() {
     // Fix any remaining MCP imports in other files
     const filesToCheck = [
       'src/agents/mcp/mcp-auto-discovery-agent.ts',
-      'src/archon/multimodal-archon-orchestrator.ts'
+      'src/opera/multimodal-opera-orchestrator.ts'
     ];
     
     for (const file of filesToCheck) {

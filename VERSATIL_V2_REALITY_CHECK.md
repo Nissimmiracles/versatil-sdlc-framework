@@ -28,7 +28,7 @@ $ ls -la .claude/commands/
 -rw-r--r-- marcus-backend.md
 -rw-r--r-- maria-qa.md
 -rw-r--r-- sarah-pm.md
-drwxr-xr-x bmad/
+drwxr-xr-x opera/
 drwxr-xr-x framework/
 ```
 
@@ -140,7 +140,7 @@ $ node scripts/doctor-integration.cjs --quick
 🏥 VERSATIL Framework Doctor
 
 ✅ Isolation: Framework properly isolated in ~/.versatil/
-✅ Agents: All 6 BMAD agents healthy
+✅ Agents: All 6 OPERA agents healthy
 ⚠️  MCP Servers: No MCP configuration found
 ⚠️  Rules: 0/3 rules enabled
 ✅ Tests: Skipped in quick mode
@@ -153,7 +153,7 @@ Auto-fixable: 0
 
 **Proof**: Script executes successfully and performs 7 validation checks:
 1. Isolation validation ✅
-2. BMAD agents health ✅
+2. OPERA agents health ✅
 3. MCP servers status ⚠️
 4. Rules enablement ⚠️
 5. Test coverage (quick mode: skipped)
@@ -263,7 +263,7 @@ $ find . -name "*.bak" | wc -l
 
 **Examples**:
 - `src/agents/enhanced-maria.ts.bak`
-- `src/bmad/enhanced-bmad-coordinator.ts.bak`
+- `src/opera/enhanced-opera-coordinator.ts.bak`
 - 179 more...
 
 **Impact**: 🟡 **Medium**
@@ -441,7 +441,7 @@ $ npm run build
 # 2. Doctor shows all green
 $ node scripts/doctor-integration.cjs
 ✅ Isolation: Framework properly isolated
-✅ Agents: All 6 BMAD agents healthy
+✅ Agents: All 6 OPERA agents healthy
 ✅ MCP Servers: 3 servers connected
 ✅ Rules: 3/3 rules enabled
 ✅ Tests: 87% coverage

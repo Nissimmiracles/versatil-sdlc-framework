@@ -1,6 +1,6 @@
 /**
  * VERSATIL SDLC Framework v1.3.0 - Stack-Aware Orchestrator
- * Focused on: Cursor/Claude/Supabase/n8n/Vercel/BMAD stack
+ * Focused on: Cursor/Claude/Supabase/n8n/Vercel/OPERA stack
  * With clear framework/project isolation
  */
 

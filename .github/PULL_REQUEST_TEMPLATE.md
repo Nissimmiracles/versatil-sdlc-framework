@@ -12,10 +12,10 @@ Brief description of the changes in this PR.
 - [ ] 📚 Documentation update
 - [ ] 🔧 Refactoring (no functional changes)
 - [ ] 🧪 Tests (adding or updating tests)
-- [ ] 🤖 Agent enhancement (improving BMAD agent capabilities)
+- [ ] 🤖 Agent enhancement (improving OPERA agent capabilities)
 - [ ] 🔗 MCP integration (Model Context Protocol related)
 
-## 🤖 Affected BMAD Agents
+## 🤖 Affected OPERA Agents
 
 - [ ] Maria (QA Lead)
 - [ ] James (Frontend)
@@ -44,7 +44,7 @@ Brief description of the changes in this PR.
 - [ ] TypeScript types are properly defined
 
 ### VERSATIL Framework Standards
-- [ ] Changes align with BMAD methodology
+- [ ] Changes align with OPERA methodology
 - [ ] Agent interactions are well-defined
 - [ ] Error handling is comprehensive
 - [ ] Context validation is implemented where needed
@@ -52,7 +52,7 @@ Brief description of the changes in this PR.
 
 ### Documentation
 - [ ] Documentation updated (if needed)
-- [ ] CLAUDE.md updated (if BMAD methodology affected)
+- [ ] CLAUDE.md updated (if OPERA methodology affected)
 - [ ] API documentation updated (if applicable)
 - [ ] MCP integration docs updated (if applicable)
 
@@ -78,7 +78,7 @@ Any additional information for reviewers.
 
 **For Reviewers:**
 - [ ] Code quality and style
-- [ ] BMAD methodology compliance
+- [ ] OPERA methodology compliance
 - [ ] Agent interaction patterns
 - [ ] Documentation completeness
 

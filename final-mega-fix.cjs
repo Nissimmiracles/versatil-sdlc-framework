@@ -2,16 +2,16 @@ const fs = require('fs');
 
 console.log('🔧 Final Mega-Fix for Remaining Errors\n');
 
-// Fix 1: Add status property to all ArchonGoal creations
+// Fix 1: Add status property to all OperaGoal creations
 const files = [
   'src/agents/introspective/enhanced-introspective-agent.ts',
-  'src/bmad/enhanced-bmad-coordinator.ts'
+  'src/opera/enhanced-opera-coordinator.ts'
 ];
 
 files.forEach(file => {
   if (fs.existsSync(file)) {
     let content = fs.readFileSync(file, 'utf8');
-    // Add status: 'pending' to ArchonGoal objects
+    // Add status: 'pending' to OperaGoal objects
     content = content.replace(
       /({\s*id:[^}]+type:[^}]+description:[^}]+priority:[^}]+constraints:[^}]+successCriteria:[^}]+)(})/g,
       '$1,\n      status: \'pending\'$2'
@@ -19,7 +19,7 @@ files.forEach(file => {
     fs.writeFileSync(file, content);
   }
 });
-console.log('✓ Added status to ArchonGoal objects');
+console.log('✓ Added status to OperaGoal objects');
 
 // Fix 2: Add missing context property to full-context agent response
 const fullContextFile = 'src/agents/introspective/full-context-introspective-agent.ts';
@@ -37,10 +37,10 @@ if (fs.existsSync(fullContextFile)) {
 const enhIntrFile = 'src/agents/introspective/enhanced-introspective-agent.ts';
 if (fs.existsSync(enhIntrFile)) {
   let content = fs.readFileSync(enhIntrFile, 'utf8');
-  // Fix: archonState.performance -> (await archonState).performance
+  // Fix: operaState.performance -> (await operaState).performance
   content = content.replace(
-    /const archonState = await this\.archon\.getState\(\);\s*const score = archonState\.performance/g,
-    'const archonState = await this.archon.getState(); const score = (archonState as any).performance'
+    /const operaState = await this\.opera\.getState\(\);\s*const score = operaState\.performance/g,
+    'const operaState = await this.opera.getState(); const score = (operaState as any).performance'
   );
   fs.writeFileSync(enhIntrFile, content);
   console.log('✓ Fixed Promise property access');
@@ -89,25 +89,25 @@ export class VersatilMigration {
 `);
 console.log('✓ Added VersatilMigration export');
 
-// Fix 6: Add getInstance to ArchonOrchestrator
-const archonFile = 'src/archon/archon-orchestrator.ts';
-if (fs.existsSync(archonFile)) {
-  let content = fs.readFileSync(archonFile, 'utf8');
+// Fix 6: Add getInstance to OperaOrchestrator
+const operaFile = 'src/opera/opera-orchestrator.ts';
+if (fs.existsSync(operaFile)) {
+  let content = fs.readFileSync(operaFile, 'utf8');
   if (!content.includes('static getInstance')) {
     content = content.replace(
-      'export class ArchonOrchestrator extends EventEmitter {',
-      `export class ArchonOrchestrator extends EventEmitter {
-  private static instance: ArchonOrchestrator;
-  static getInstance(): ArchonOrchestrator {
-    if (!ArchonOrchestrator.instance) {
-      ArchonOrchestrator.instance = new ArchonOrchestrator();
+      'export class OperaOrchestrator extends EventEmitter {',
+      `export class OperaOrchestrator extends EventEmitter {
+  private static instance: OperaOrchestrator;
+  static getInstance(): OperaOrchestrator {
+    if (!OperaOrchestrator.instance) {
+      OperaOrchestrator.instance = new OperaOrchestrator();
     }
-    return ArchonOrchestrator.instance;
+    return OperaOrchestrator.instance;
   }
 `
     );
-    fs.writeFileSync(archonFile, content);
-    console.log('✓ Added getInstance to ArchonOrchestrator');
+    fs.writeFileSync(operaFile, content);
+    console.log('✓ Added getInstance to OperaOrchestrator');
   }
 }
 
@@ -121,47 +121,47 @@ export declare class Socket {}
 `);
 console.log('✓ Fixed socket.io Server');
 
-// Fix 8: Fix EventEmitter constructor in bmad
-const bmadFile = 'src/bmad/enhanced-bmad-coordinator.ts';
-if (fs.existsSync(bmadFile)) {
-  let content = fs.readFileSync(bmadFile, 'utf8');
+// Fix 8: Fix EventEmitter constructor in opera
+const operaFile = 'src/opera/enhanced-opera-coordinator.ts';
+if (fs.existsSync(operaFile)) {
+  let content = fs.readFileSync(operaFile, 'utf8');
   // Fix EventEmitter call with AgentRegistry
   content = content.replace(
     /super\(agentRegistry\);/g,
     'super();'
   );
-  fs.writeFileSync(bmadFile, content);
+  fs.writeFileSync(operaFile, content);
   console.log('✓ Fixed EventEmitter constructor');
 }
 
-// Fix 9: Fix archon state await wrapper
-const bmadFile2 = 'src/bmad/enhanced-bmad-coordinator.ts';
-if (fs.existsSync(bmadFile2)) {
-  let content = fs.readFileSync(bmadFile2, 'utf8');
+// Fix 9: Fix opera state await wrapper
+const operaFile2 = 'src/opera/enhanced-opera-coordinator.ts';
+if (fs.existsSync(operaFile2)) {
+  let content = fs.readFileSync(operaFile2, 'utf8');
   content = content.replace(
-    /const archonState = await \(async \(\) => {[^}]+}\)\(\);/g,
-    `const archonStateRaw = await this.archon.getState();
-    const archonState = { 
-      ...archonStateRaw, 
-      currentGoals: (archonStateRaw as any).activeGoals || [], 
+    /const operaState = await \(async \(\) => {[^}]+}\)\(\);/g,
+    `const operaStateRaw = await this.opera.getState();
+    const operaState = { 
+      ...operaStateRaw, 
+      currentGoals: (operaStateRaw as any).activeGoals || [], 
       activeDecisions: [], 
       executionQueue: [], 
-      performance: (archonStateRaw as any).performance || {} 
+      performance: (operaStateRaw as any).performance || {} 
     };`
   );
-  fs.writeFileSync(bmadFile2, content);
-  console.log('✓ Fixed archon state wrapper');
+  fs.writeFileSync(operaFile2, content);
+  console.log('✓ Fixed opera state wrapper');
 }
 
 // Fix 10: Fix BaseAgent array access
-const bmadFile3 = 'src/bmad/enhanced-bmad-coordinator.ts';
-if (fs.existsSync(bmadFile3)) {
-  let content = fs.readFileSync(bmadFile3, 'utf8');
+const operaFile3 = 'src/opera/enhanced-opera-coordinator.ts';
+if (fs.existsSync(operaFile3)) {
+  let content = fs.readFileSync(operaFile3, 'utf8');
   content = content.replace(
     /for \(const agent of Array\.isArray\(agents\) \? agents : Array\.from\(agents\)\)/g,
     'for (const agent of (Array.isArray(agents) ? agents : [agents]))'
   );
-  fs.writeFileSync(bmadFile3, content);
+  fs.writeFileSync(operaFile3, content);
 }
 
 const versatilMcpFile = 'src/mcp/versatil-mcp-server.ts';

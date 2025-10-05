@@ -1,14 +1,14 @@
 name: 🤖 New Agent Request
-description: Request a new specialized agent for the BMAD methodology
+description: Request a new specialized agent for the OPERA methodology
 title: "[Agent] "
 labels: ["agent-request", "enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        🎯 **BMAD Agent Creation Request**
+        🎯 **OPERA Agent Creation Request**
 
-        The VERSATIL framework currently includes 6 core BMAD agents:
+        The VERSATIL framework currently includes 6 core OPERA agents:
         - **Maria** (QA Lead) - Testing, quality assurance, bug detection
         - **James** (Frontend) - UI/UX, React/Vue, responsive design
         - **Marcus** (Backend) - APIs, databases, server-side logic
@@ -16,7 +16,7 @@ body:
         - **Alex** (BA) - Business analysis, requirements, user stories
         - **Dr.AI** (ML) - Machine learning, AI features, data science
 
-        Request a new specialized agent to expand BMAD capabilities!
+        Request a new specialized agent to expand OPERA capabilities!
 
   - type: input
     id: agent-name

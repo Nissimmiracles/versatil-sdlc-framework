@@ -1,8 +1,8 @@
 {
   "name": "@versatil/sdlc-framework",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "type": "module",
-  "description": "🚀 AI-Native SDLC framework with RAG memory, Opera autonomous orchestration, and Enhanced BMAD agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
+  "description": "🚀 AI-Native SDLC framework with RAG memory, OPERA autonomous orchestration, and 6 specialized agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
   "main": "dist/index.js",
   "bin": {
     "versatil": "./bin/versatil.js",
@@ -43,7 +43,7 @@
     "test:performance": "node test/run-all-tests.cjs --skip-optional",
     "test:accessibility": "playwright test --project=accessibility",
     "test:security": "playwright test --project=security",
-    "test:bmad": "playwright test --project=bmad-integration",
+    "test:opera": "playwright test --project=opera-integration",
     "test:opera-mcp": "node test-opera-mcp.cjs",
     "test:self-referential": "node test-self-referential.cjs",
     "simulation:stress-test": "node dist/simulation/standalone-test.js",
@@ -166,8 +166,8 @@
     "sdlc",
     "development-framework",
     "agents",
-    "bmad",
-    "enhanced-bmad",
+    "opera",
+    "enhanced-opera",
     "zero-context-loss",
     "cursor-ai",
     "claude-ai",
@@ -278,6 +278,6 @@
     "jest.config.js",
     "init-opera-mcp.js",
     "test-opera-mcp.js",
-    "ARCHON_MCP_DOCUMENTATION.md"
+    "OPERA_MCP_DOCUMENTATION.md"
   ]
 }

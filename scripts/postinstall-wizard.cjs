@@ -199,7 +199,7 @@ function showGettingStarted() {
   console.log('  4. Initialize in your project:');
   console.log('     $ cd your-project');
   console.log('     $ versatil init\n');
-  console.log('🤖 BMAD Agents:\n');
+  console.log('🤖 OPERA Agents:\n');
   console.log('  The framework includes 6 specialized agents:');
   console.log('  • Maria-QA - Quality assurance and testing');
   console.log('  • James-Frontend - UI/UX development');

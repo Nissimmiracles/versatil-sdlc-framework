@@ -5,8 +5,8 @@
 ### Table of Contents
 1. [Overview](#overview)
 2. [RAG Memory System](#rag-memory-system)
-3. [Opera Autonomous Orchestrator](#archon-autonomous-orchestrator)
-4. [Enhanced BMAD Integration](#enhanced-bmad-integration)
+3. [Opera Autonomous Orchestrator](#opera-autonomous-orchestrator)
+4. [Enhanced OPERA Integration](#enhanced-opera-integration)
 5. [Getting Started](#getting-started)
 6. [API Reference](#api-reference)
 7. [Examples](#examples)
@@ -20,7 +20,7 @@ The enhanced VERSATIL SDLC Framework introduces three revolutionary features:
 
 - **🧠 RAG Memory System**: Vector-based memory storage for agents to learn from past interactions
 - **🤖 Opera Orchestrator**: Autonomous goal planning and execution with hierarchical agent coordination
-- **🚀 Enhanced BMAD**: Integration of RAG and Opera with existing BMAD agents for zero context loss
+- **🚀 Enhanced OPERA**: Integration of RAG and Opera with existing OPERA agents for zero context loss
 
 ### Key Benefits
 
@@ -150,29 +150,29 @@ const goal: OperaGoal = {
 };
 
 // Add goal for autonomous execution
-await archonOrchestrator.addGoal(goal);
+await operaOrchestrator.addGoal(goal);
 ```
 
 #### Monitor Execution
 
 ```typescript
 // Listen to Opera events
-archonOrchestrator.on('decision_made', (decision) => {
+operaOrchestrator.on('decision_made', (decision) => {
   console.log(`Decision: ${decision.decision}`);
   console.log(`Confidence: ${decision.confidence}`);
   console.log(`Selected agents: ${decision.selectedAgents.join(', ')}`);
 });
 
-archonOrchestrator.on('step_completed', ({ step, result }) => {
+operaOrchestrator.on('step_completed', ({ step, result }) => {
   console.log(`Step completed: ${step.action}`);
   console.log(`Execution time: ${result.executionTime}ms`);
 });
 
-archonOrchestrator.on('goal_completed', ({ goal, decision }) => {
+operaOrchestrator.on('goal_completed', ({ goal, decision }) => {
   console.log(`Goal completed: ${goal.description}`);
 });
 
-archonOrchestrator.on('human_intervention_required', ({ step, error }) => {
+operaOrchestrator.on('human_intervention_required', ({ step, error }) => {
   console.log(`Human help needed: ${error}`);
 });
 ```
@@ -180,7 +180,7 @@ archonOrchestrator.on('human_intervention_required', ({ step, error }) => {
 #### Get Opera State
 
 ```typescript
-const state = archonOrchestrator.getState();
+const state = operaOrchestrator.getState();
 
 console.log(`Active goals: ${state.currentGoals.length}`);
 console.log(`Queued steps: ${state.executionQueue.length}`);
@@ -189,11 +189,11 @@ console.log(`Success rate: ${state.performance.successRate}`);
 
 ---
 
-## Enhanced BMAD Integration
+## Enhanced OPERA Integration
 
 ### What's Enhanced?
 
-Every BMAD agent now has:
+Every OPERA agent now has:
 
 1. **Memory Context**: Access to relevant past experiences
 2. **Learning Capability**: Improves based on interactions
@@ -205,10 +205,10 @@ Every BMAD agent now has:
 #### Basic Usage
 
 ```typescript
-import { enhancedBMAD } from 'versatil-sdlc-framework';
+import { enhancedOPERA } from 'versatil-sdlc-framework';
 
 // Get enhanced agent
-const mariaQA = enhancedBMAD.getEnhancedAgent('enhanced-maria');
+const mariaQA = enhancedOPERA.getEnhancedAgent('enhanced-maria');
 
 // Activate with context
 const response = await mariaQA.activate({
@@ -223,15 +223,15 @@ console.log(`Learnings: ${response.learnings}`);
 console.log(`Autonomous actions: ${response.autonomousActions}`);
 ```
 
-#### Execute BMAD Workflow
+#### Execute OPERA Workflow
 
 ```typescript
 // Create project context
 const projectId = 'my-project';
-await enhancedBMAD.createContext(projectId);
+await enhancedOPERA.createContext(projectId);
 
 // Execute complete workflow
-await enhancedBMAD.executeBMADWorkflow(
+await enhancedOPERA.executeOPERAWorkflow(
   projectId,
   'Build a REST API for user management with authentication'
 );
@@ -243,11 +243,11 @@ await enhancedBMAD.executeBMADWorkflow(
 
 ```typescript
 // Enable/disable features
-enhancedBMAD.setRAGEnabled(true);      // Enable memory
-enhancedBMAD.setAutonomousMode(true);  // Enable autonomous execution
+enhancedOPERA.setRAGEnabled(true);      // Enable memory
+enhancedOPERA.setAutonomousMode(true);  // Enable autonomous execution
 
 // Get performance metrics
-const metrics = await enhancedBMAD.getPerformanceMetrics();
+const metrics = await enhancedOPERA.getPerformanceMetrics();
 console.log(JSON.stringify(metrics, null, 2));
 ```
 
@@ -294,7 +294,7 @@ await startAutonomousMode();
 
 ```typescript
 import { 
-  enhancedBMAD, 
+  enhancedOPERA, 
   vectorMemoryStore, 
   OperaGoal 
 } from 'versatil-sdlc-framework';
@@ -302,7 +302,7 @@ import {
 async function buildFeature() {
   // 1. Create project context
   const projectId = 'auth-feature';
-  await enhancedBMAD.createContext(projectId);
+  await enhancedOPERA.createContext(projectId);
   
   // 2. Store relevant context in memory
   await vectorMemoryStore.storeMemory({
@@ -318,7 +318,7 @@ async function buildFeature() {
   });
   
   // 3. Execute workflow - Opera will handle the rest
-  await enhancedBMAD.executeBMADWorkflow(
+  await enhancedOPERA.executeOPERAWorkflow(
     projectId,
     'Implement secure user registration with email verification'
   );
@@ -379,16 +379,16 @@ class OperaOrchestrator {
 }
 ```
 
-### EnhancedBMADCoordinator
+### EnhancedOPERACoordinator
 
 ```typescript
-class EnhancedBMADCoordinator {
+class EnhancedOPERACoordinator {
   // Project management
-  async createContext(projectId: string): Promise<BMADContext>
-  async getContext(projectId: string): Promise<BMADContext>
+  async createContext(projectId: string): Promise<OPERAContext>
+  async getContext(projectId: string): Promise<OPERAContext>
   
   // Workflow execution
-  async executeBMADWorkflow(
+  async executeOPERAWorkflow(
     projectId: string, 
     requirements: string
   ): Promise<void>
@@ -427,7 +427,7 @@ const bugGoal: OperaGoal = {
   ]
 };
 
-await archonOrchestrator.addGoal(bugGoal);
+await operaOrchestrator.addGoal(bugGoal);
 ```
 
 ### Example 2: Learning from Patterns
@@ -454,7 +454,7 @@ await vectorMemoryStore.storeMemory({
 
 ```typescript
 // Complex feature requiring multiple agents
-await enhancedBMAD.executeBMADWorkflow(
+await enhancedOPERA.executeOPERAWorkflow(
   'ecommerce-project',
   `Build a complete shopping cart feature with:
    - Product catalog with search
@@ -486,17 +486,17 @@ npm update versatil-sdlc-framework
 #### Step 2: Enable RAG Memory (Optional)
 
 ```typescript
-import { enhancedBMAD } from 'versatil-sdlc-framework';
+import { enhancedOPERA } from 'versatil-sdlc-framework';
 
 // Enable RAG for memory-based learning
-enhancedBMAD.setRAGEnabled(true);
+enhancedOPERA.setRAGEnabled(true);
 ```
 
 #### Step 3: Enable Autonomous Mode (Optional)
 
 ```typescript
 // Enable autonomous execution
-enhancedBMAD.setAutonomousMode(true);
+enhancedOPERA.setAutonomousMode(true);
 ```
 
 #### Step 4: Use Enhanced Agents
@@ -506,7 +506,7 @@ enhancedBMAD.setAutonomousMode(true);
 const maria = agentRegistry.getAgent('enhanced-maria');
 
 // New way with enhanced features
-const enhancedMaria = enhancedBMAD.getEnhancedAgent('enhanced-maria');
+const enhancedMaria = enhancedOPERA.getEnhancedAgent('enhanced-maria');
 ```
 
 ### Best Practices
@@ -523,12 +523,12 @@ const enhancedMaria = enhancedBMAD.getEnhancedAgent('enhanced-maria');
 ### Common Issues
 
 #### Memory Not Being Retrieved
-- Check if RAG is enabled: `enhancedBMAD.setRAGEnabled(true)`
+- Check if RAG is enabled: `enhancedOPERA.setRAGEnabled(true)`
 - Verify memories exist: Check `.versatil/rag/vector-index/`
 - Review query terms: Use specific keywords
 
 #### Autonomous Execution Not Starting
-- Verify autonomous mode: `enhancedBMAD.setAutonomousMode(true)`
+- Verify autonomous mode: `enhancedOPERA.setAutonomousMode(true)`
 - Check goal format: Ensure all required fields are provided
 - Review constraints: Conflicting constraints may prevent execution
 
@@ -544,11 +544,11 @@ const enhancedMaria = enhancedBMAD.getEnhancedAgent('enhanced-maria');
 process.env.VERSATIL_DEBUG = 'true';
 
 // Monitor all events
-enhancedBMAD.on('enhanced_activation', (data) => {
+enhancedOPERA.on('enhanced_activation', (data) => {
   console.log('Enhanced activation:', data);
 });
 
-archonOrchestrator.on('decision_made', (decision) => {
+operaOrchestrator.on('decision_made', (decision) => {
   console.log('Opera decision:', decision);
 });
 ```

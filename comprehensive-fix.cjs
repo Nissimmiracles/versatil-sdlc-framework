@@ -35,9 +35,9 @@ if (fs.existsSync(enhancedIntrFile)) {
 // Fix 2: Add .documents property wrapper
 const filesToFixDocuments = [
   'src/agents/introspective/enhanced-introspective-agent.ts',
-  'src/bmad/enhanced-bmad-coordinator.ts',
+  'src/opera/enhanced-opera-coordinator.ts',
   'src/enhanced-server.ts',
-  'src/mcp/archon-mcp.ts',
+  'src/mcp/opera-mcp.ts',
   'src/mcp/enhanced-mcp-tools.ts'
 ];
 
@@ -56,7 +56,7 @@ fixes.push('✓ Added .documents property wrapper');
 
 // Fix 3: Fix BaseAgent iteration issues
 const filesWithIteration = [
-  'src/bmad/enhanced-bmad-coordinator.ts',
+  'src/opera/enhanced-opera-coordinator.ts',
   'src/mcp/versatil-mcp-server.ts'
 ];
 
@@ -108,17 +108,17 @@ if (fs.existsSync(agentTestFile)) {
   fixes.push('✓ Fixed agentRegistry export casing');
 }
 
-// Fix 7: Add missing archon state properties
-const bmadCoordFile = 'src/bmad/enhanced-bmad-coordinator.ts';
-if (fs.existsSync(bmadCoordFile)) {
-  let content = fs.readFileSync(bmadCoordFile, 'utf8');
+// Fix 7: Add missing opera state properties
+const operaCoordFile = 'src/opera/enhanced-opera-coordinator.ts';
+if (fs.existsSync(operaCoordFile)) {
+  let content = fs.readFileSync(operaCoordFile, 'utf8');
   // Wrap getState calls
   content = content.replace(
-    /const\s+archonState\s*=\s*await\s+this\.archon\.getState\(\);/g,
-    'const archonState = await (async () => { const state = await this.archon.getState(); return { ...state, currentGoals: state.activeGoals || [], activeDecisions: [], executionQueue: [], performance: state.performance || {} }; })();'
+    /const\s+operaState\s*=\s*await\s+this\.opera\.getState\(\);/g,
+    'const operaState = await (async () => { const state = await this.opera.getState(); return { ...state, currentGoals: state.activeGoals || [], activeDecisions: [], executionQueue: [], performance: state.performance || {} }; })();'
   );
-  fs.writeFileSync(bmadCoordFile, content);
-  fixes.push('✓ Fixed archon state properties');
+  fs.writeFileSync(operaCoordFile, content);
+  fixes.push('✓ Fixed opera state properties');
 }
 
 // Fix 8: Fix string/number type mismatches in realtime-sdlc-tracker
@@ -147,16 +147,16 @@ if (fs.existsSync(stackOrchFile)) {
 }
 
 // Fix 10: Fix enhanced constructor calls with wrong arguments
-const mcpArchonFile = 'src/mcp/archon-mcp.ts';
-if (fs.existsSync(mcpArchonFile)) {
-  let content = fs.readFileSync(mcpArchonFile, 'utf8');
+const mcpOperaFile = 'src/mcp/opera-mcp.ts';
+if (fs.existsSync(mcpOperaFile)) {
+  let content = fs.readFileSync(mcpOperaFile, 'utf8');
   // Fix method signatures that don't accept arguments
   content = content.replace(/getDecisionHistory\(\w+\)/g, 'getDecisionHistory()');
   content = content.replace(/getLearningInsights\(\w+\)/g, 'getLearningInsights()');
   content = content.replace(/overrideGoal\((\w+)\)/g, 'overrideGoal($1, {})');
   content = content.replace(/getCurrentContext\(\w+\)/g, 'getCurrentContext()');
   content = content.replace(/getPerformanceMetrics\(\w+\)/g, 'getPerformanceMetrics()');
-  fs.writeFileSync(mcpArchonFile, content);
+  fs.writeFileSync(mcpOperaFile, content);
   fixes.push('✓ Fixed enhanced method calls');
 }
 

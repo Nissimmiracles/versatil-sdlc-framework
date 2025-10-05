@@ -208,7 +208,7 @@ class VersatilValidator {
 
       // Check for essential sections
       const requiredSections = [
-        'BMAD METHODOLOGY',
+        'OPERA METHODOLOGY',
         'Maria-QA',
         'James-Frontend',
         'Marcus-Backend',
@@ -238,9 +238,9 @@ class VersatilValidator {
 
       const content = fs.readFileSync(claudePath, 'utf8');
 
-      // Check for BMAD methodology sections
+      // Check for OPERA methodology sections
       const requiredSections = [
-        'BMAD Methodology',
+        'OPERA Methodology',
         'Quality Gates',
         'Chrome MCP Testing',
         'Context Preservation Protocol',
@@ -252,7 +252,7 @@ class VersatilValidator {
       );
 
       if (missingSections.length === 0) {
-        return { success: true, message: 'BMAD methodology fully documented' };
+        return { success: true, message: 'OPERA methodology fully documented' };
       } else {
         return { success: false, message: `Missing sections: ${missingSections.join(', ')}` };
       }

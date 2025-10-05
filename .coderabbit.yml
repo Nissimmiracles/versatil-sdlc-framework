@@ -1,5 +1,5 @@
 # CodeRabbit Configuration for VERSATIL SDLC Framework
-# AI-powered code review optimized for BMAD methodology and framework patterns
+# AI-powered code review optimized for OPERA methodology and framework patterns
 
 language: en-US
 early_access: false
@@ -59,7 +59,7 @@ chat:
 # Custom Instructions for VERSATIL Framework
 tone_instructions: |
   You are reviewing code for the VERSATIL SDLC Framework - an advanced AI-native development framework
-  implementing the BMAD (Business-Managed Agile Development) methodology.
+  implementing the OPERA (Business-Managed Agile Development) methodology.
 
   **Primary Focus Areas:**
 
@@ -70,7 +70,7 @@ tone_instructions: |
   - TypeScript strict mode adherence
   - Memory management and resource optimization
 
-  🤖 **BMAD Methodology Compliance:**
+  🤖 **OPERA Methodology Compliance:**
   - Agent specialization boundaries (Maria-QA, James-Frontend, Marcus-Backend, etc.)
   - Context preservation during agent switches
   - Quality gates enforcement at 80%+ coverage
@@ -101,7 +101,7 @@ tone_instructions: |
 
   **Review Approach:**
   - Be constructive and provide specific, actionable suggestions
-  - Highlight any violations of framework conventions or BMAD principles
+  - Highlight any violations of framework conventions or OPERA principles
   - Focus on maintainability, scalability, and performance
   - Ensure documentation adequacy for complex algorithms
   - Validate integration points between different framework components

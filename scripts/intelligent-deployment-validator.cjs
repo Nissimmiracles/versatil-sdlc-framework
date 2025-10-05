@@ -318,7 +318,7 @@ class IntelligentDeploymentValidator {
       console.log(chalk.yellow('🔄 Run agent analysis for comprehensive validation'));
     }
 
-    console.log(chalk.gray('\n🎯 Powered by VERSATIL Enhanced BMAD Agents'));
+    console.log(chalk.gray('\n🎯 Powered by VERSATIL Enhanced OPERA Agents'));
   }
 }
 
@@ -328,7 +328,7 @@ const program = new Command();
 
 program
   .name('intelligent-deployment-validator')
-  .description('Intelligent deployment validation using BMAD agent intelligence')
+  .description('Intelligent deployment validation using OPERA agent intelligence')
   .version('1.2.1')
   .action(async () => {
     try {

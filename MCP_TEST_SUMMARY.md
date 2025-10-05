@@ -50,13 +50,13 @@ Following the comprehensive MCP audit, this document tracks testing progress and
 2. ✅ `versatil_memory_query` - Query RAG
 3. ✅ `versatil_opera_goal` - Set autonomous goals
 4. ✅ `versatil_opera_status` - Get Opera status
-5. ✅ `versatil_bmad_autonomous` - Execute BMAD workflow
+5. ✅ `versatil_opera_autonomous` - Execute OPERA workflow
 6. ✅ `versatil_learning_insights` - Get learning metrics
 
 **Dependencies**:
 - Vector Memory Store (RAG)
 - Opera Orchestrator
-- Enhanced BMAD Coordinator
+- Enhanced OPERA Coordinator
 
 **Test Commands**:
 ```bash
@@ -66,8 +66,8 @@ Following the comprehensive MCP audit, this document tracks testing progress and
 # Test Opera
 # Example: "set a goal to optimize API performance"
 
-# Test BMAD
-# Example: "execute BMAD workflow for 'user authentication feature'"
+# Test OPERA
+# Example: "execute OPERA workflow for 'user authentication feature'"
 ```
 
 ---
@@ -282,7 +282,7 @@ npm run opera:status              # Get status
 
 ### RAG & Memory Testing
 ```bash
-npm run test:enhanced             # Enhanced BMAD tests
+npm run test:enhanced             # Enhanced OPERA tests
 npm run test:scenarios            # Real-world scenarios
 npm run test:learning             # Learning demos
 ```
@@ -336,7 +336,7 @@ npm run validate                  # Lint + Test + Build
 - [x] All 6 v1.2.0 tools available
 - [x] RAG integration working
 - [x] Opera integration present
-- [x] BMAD integration working
+- [x] OPERA integration working
 - [ ] Tested end-to-end
 
 ### Opera MCP Server ✅ COMPLETE (Updated: 2025-09-28)

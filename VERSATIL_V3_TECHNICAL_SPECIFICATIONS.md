@@ -41,7 +41,7 @@ graph TB
         G[Proactive Transparency System]
     end
 
-    subgraph "BMAD Agent System"
+    subgraph "OPERA Agent System"
         H[Alex-BA v3]
         I[James-Frontend v3]
         J[Marcus-Backend v3]
@@ -3514,7 +3514,7 @@ This technical specification provides a complete implementation guide for VERSAT
 ✅ **Production-First Code Generation**: Zero-mock validation, completeness checking
 ✅ **Question-Driven Development**: Uncertainty detection, question generation
 ✅ **Proactive Transparency**: Visual previews, real-time progress, documentation
-✅ **Enhanced Agent Implementations**: All 6 BMAD agents with v3.0 capabilities
+✅ **Enhanced Agent Implementations**: All 6 OPERA agents with v3.0 capabilities
 ✅ **Integration Architecture**: MCP server, agent coordination, RAG memory v3
 ✅ **Testing Strategy**: Unit, integration, E2E, visual regression
 ✅ **Deployment & Scaling**: Infrastructure, CI/CD pipeline

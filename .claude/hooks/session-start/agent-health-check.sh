@@ -1,6 +1,6 @@
 #!/bin/bash
 # VERSATIL Agent Health Check Hook
-# Validates all BMAD agents are operational
+# Validates all OPERA agents are operational
 
 set -euo pipefail
 
@@ -21,5 +21,5 @@ if [[ ${#UNHEALTHY_AGENTS[@]} -gt 0 ]]; then
 }
 EOF
 else
-  echo '{"systemMessage": "✅ All 6 BMAD agents healthy"}'
+  echo '{"systemMessage": "✅ All 6 OPERA agents healthy"}'
 fi

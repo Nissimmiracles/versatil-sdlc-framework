@@ -106,7 +106,7 @@ your-project/
 │       ├── shadcn-mcp.json      # Shadcn MCP settings
 │       └── github-mcp.json      # GitHub MCP settings
 ├── .cursorrules                 # Cursor IDE integration
-├── CLAUDE.md                    # BMAD methodology guide
+├── CLAUDE.md                    # OPERA methodology guide
 └── versatil.log                 # Framework activity log
 ```
 

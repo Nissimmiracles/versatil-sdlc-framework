@@ -21,8 +21,8 @@ async function testPerformanceMetrics() {
   
   try {
     // Import the multimodal orchestrator
-    const { MultimodalArchonOrchestrator } = require('./dist/archon/multimodal-archon-orchestrator.js');
-    const orchestrator = new MultimodalArchonOrchestrator();
+    const { MultimodalOperaOrchestrator } = require('./dist/opera/multimodal-opera-orchestrator.js');
+    const orchestrator = new MultimodalOperaOrchestrator();
     
     // Simulate multiple model selections
     const testCases = [
@@ -889,8 +889,8 @@ export class LearningRepository {
   }
 }
 
-// Integration with Archon
-export class LearningArchon {
+// Integration with Opera
+export class LearningOpera {
   private repository = new LearningRepository();
   
   async learnFromSuccess(context: any, solution: any) {
@@ -922,7 +922,7 @@ export class LearningArchon {
 }
 
 export const learningRepository = new LearningRepository();
-export const learningArchon = new LearningArchon();
+export const learningOpera = new LearningOpera();
 `;
     
     await fs.mkdir(path.join(__dirname, 'src/learning'), { recursive: true });
@@ -1059,7 +1059,7 @@ test();
 
   // Learning Repository Test
   await fs.writeFile('test-learning-repository.cjs', `#!/usr/bin/env node
-const { learningRepository, learningArchon } = require('./dist/learning/learning-repository.js');
+const { learningRepository, learningOpera } = require('./dist/learning/learning-repository.js');
 
 async function test() {
   console.log('Testing learning repository...\\n');
@@ -1102,7 +1102,7 @@ async function test() {
   });
   
   // Learn from success
-  await learningArchon.learnFromSuccess(
+  await learningOpera.learnFromSuccess(
     { error: 'TypeScript TS2339', file: 'test.ts' },
     { fix: 'Added interface definition' }
   );

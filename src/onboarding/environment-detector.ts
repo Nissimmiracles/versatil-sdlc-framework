@@ -15,7 +15,7 @@ export class VERSATILEnvironmentDetector {
     supabase: false,
     claude: false,
     agents: {
-      format: null as 'bmad' | 'agents.md' | 'agents-folder' | null,
+      format: null as 'opera' | 'agents.md' | 'agents-folder' | null,
       location: null as string | null,
       existing: [] as string[]
     },
@@ -248,17 +248,17 @@ export class VERSATILEnvironmentDetector {
       // No agents directory
     }
     
-    // Check for BMAD structure
+    // Check for OPERA structure
     try {
       await fs.access('.cursorrules');
       const content = await fs.readFile('.cursorrules', 'utf8');
       
-      if (content.includes('BMAD') || content.includes('BA-')) {
-        this.detectedEnvironment.agents.format = 'bmad';
-        console.log('   ✅ BMAD methodology detected in cursor rules');
+      if (content.includes('OPERA') || content.includes('BA-')) {
+        this.detectedEnvironment.agents.format = 'opera';
+        console.log('   ✅ OPERA methodology detected in cursor rules');
         
-        // Extract BMAD agents
-        const bmadAgents = [
+        // Extract OPERA agents
+        const operaAgents = [
           'BA-',  // Business Analyst
           'PM-',  // Product Manager
           'ARCH-', // Architect
@@ -268,14 +268,14 @@ export class VERSATILEnvironmentDetector {
         ];
         
         const foundAgents = [];
-        for (const prefix of bmadAgents) {
+        for (const prefix of operaAgents) {
           if (content.includes(prefix)) {
             foundAgents.push(prefix);
           }
         }
         
         this.detectedEnvironment.agents.existing = foundAgents;
-        console.log(`   📋 Found ${foundAgents.length} BMAD agents`);
+        console.log(`   📋 Found ${foundAgents.length} OPERA agents`);
       }
     } catch {
       // Continue
@@ -617,7 +617,7 @@ async function enhanceAgents() {
   const enhancement = \`
 // VERSATIL v1.2.0 Enhancement
 import { vectorMemoryStore } from '@versatil/rag';
-import { enhancedBMAD } from '@versatil/bmad';
+import { enhancedOPERA } from '@versatil/opera';
 
 // Add to agent class
 private async queryMemory(query: string) {

@@ -29,7 +29,7 @@ Transform VERSATIL into the **world's first fully Claude Code 2.0 native AI-nati
 
 #### Phase 2: Enhanced Features (Weeks 3-4)
 - ⏳ Enhanced memory integration (# quick add)
-- ⏳ Output styles (BMAD-specific)
+- ⏳ Output styles (OPERA-specific)
 - ⏳ Status line customization
 - ⏳ Agent @-mention with typeahead
 - ⏳ MCP resource @-mention
@@ -57,7 +57,7 @@ Transform VERSATIL into the **world's first fully Claude Code 2.0 native AI-nati
 | Background Commands | 📋 Planned | P0 | Week 2 |
 | /doctor Integration | 📋 Planned | P0 | Week 2 |
 
-### **Epic 2: BMAD Agent Enhancement** (Priority: P1)
+### **Epic 2: OPERA Agent Enhancement** (Priority: P1)
 **Owner**: Agent Team
 **Status**: 📋 Planned
 
@@ -92,12 +92,12 @@ Transform VERSATIL into the **world's first fully Claude Code 2.0 native AI-nati
 
 **Deliverables**:
 - [ ] `.claude/commands/` directory structure
-- [ ] 10 BMAD agent slash commands
+- [ ] 10 OPERA agent slash commands
 - [ ] Framework management commands
 - [ ] Documentation and examples
 
 **Success Criteria**:
-- All 6 BMAD agents accessible via /command
+- All 6 OPERA agents accessible via /command
 - Rule 1-5 management via slash commands
 - Framework validation commands work
 - < 100ms command activation time
@@ -135,13 +135,13 @@ Transform VERSATIL into the **world's first fully Claude Code 2.0 native AI-nati
 
 **Deliverables**:
 - [ ] `.claude/agents/` directory structure
-- [ ] 6 BMAD agent configurations
+- [ ] 6 OPERA agent configurations
 - [ ] Agent system prompts integration
 - [ ] Model selection per agent
 - [ ] Tool access configuration
 
 **Success Criteria**:
-- All BMAD agents @-mentionable
+- All OPERA agents @-mentionable
 - Correct model routing (Sonnet/Opus)
 - Agent-specific tools accessible
 - Context preservation across agents
@@ -220,14 +220,14 @@ Transform VERSATIL into the **world's first fully Claude Code 2.0 native AI-nati
 
 **Deliverables**:
 - [ ] `.claude/output-styles/` directory
-- [ ] 5 BMAD agent-specific styles
+- [ ] 5 OPERA agent-specific styles
 - [ ] Beginner-friendly style
 - [ ] Expert mode style
 
 **Success Criteria**:
 - Each agent has unique output tone
 - Styles switchable via `/output-style`
-- Educational mode explains BMAD methodology
+- Educational mode explains OPERA methodology
 - Context-appropriate verbosity
 
 ---
@@ -320,7 +320,7 @@ Transform VERSATIL into the **world's first fully Claude Code 2.0 native AI-nati
 ### Release 2.0.0 KPIs:
 - **Developer Productivity**: +50% increase in velocity
 - **Context Retention**: 99%+ accuracy
-- **BMAD Adoption**: 100% of features Claude Code native
+- **OPERA Adoption**: 100% of features Claude Code native
 - **User Satisfaction**: 4.8+ / 5.0 rating
 - **Bug Resolution**: < 2 hour P0 response time
 - **Framework Performance**: < 200ms command latency

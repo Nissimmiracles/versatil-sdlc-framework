@@ -322,12 +322,12 @@ export const vectorMemoryStore = new VectorMemoryStore();
 export type RAGQuery = any;
 `);
 
-    // Archon Orchestrator
-    await fs.mkdir(path.join(__dirname, 'src/archon'), { recursive: true });
-    await fs.writeFile(path.join(__dirname, 'src/archon/archon-orchestrator.ts'), `
+    // Opera Orchestrator
+    await fs.mkdir(path.join(__dirname, 'src/opera'), { recursive: true });
+    await fs.writeFile(path.join(__dirname, 'src/opera/opera-orchestrator.ts'), `
 import { EventEmitter } from 'events';
 
-export interface ArchonGoal {
+export interface OperaGoal {
   id: string;
   type: string;
   description: string;
@@ -335,8 +335,8 @@ export interface ArchonGoal {
   priority: string;
 }
 
-export class ArchonOrchestrator extends EventEmitter {
-  async createGoal(goal: any): Promise<ArchonGoal> {
+export class OperaOrchestrator extends EventEmitter {
+  async createGoal(goal: any): Promise<OperaGoal> {
     return { id: '1', type: 'feature', description: '', status: 'pending', priority: 'medium' };
   }
 }

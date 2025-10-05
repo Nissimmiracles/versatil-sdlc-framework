@@ -7,7 +7,7 @@
 1. **Test Suites & Demos**
    - `working-demo.cjs` - Fully functional demonstrations
    - `introspective-test.cjs` - Self-testing framework
-   - `test-enhanced-bmad-working.cjs` - Feature validation
+   - `test-enhanced-opera-working.cjs` - Feature validation
    - Multiple demo files showing all concepts
 
 2. **Documentation**
@@ -79,7 +79,7 @@
    - Deploy edge functions
 
 3. **Build Opera Engine**
-   - Use the architecture in archon-orchestrator.ts
+   - Use the architecture in opera-orchestrator.ts
    - Implement goal planning
    - Add execution monitoring
 

@@ -1,6 +1,6 @@
 /**
  * VERSATIL SDLC Framework - Stack-Aware Orchestrator
- * Optimized for: Cursor / Claude / Supabase / n8n / Vercel / BMAD
+ * Optimized for: Cursor / Claude / Supabase / n8n / Vercel / OPERA
  */
 
 import { EventEmitter } from 'events';

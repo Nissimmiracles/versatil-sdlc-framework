@@ -61,7 +61,7 @@ The VERSATIL SDLC Framework contains a comprehensive MCP (Model Context Protocol
 #### Features:
 - ✅ RAG Memory integration
 - ✅ Opera orchestration interface
-- ✅ Enhanced BMAD autonomous workflows
+- ✅ Enhanced OPERA autonomous workflows
 - ✅ Learning insights and metrics
 
 #### Additional Tools:
@@ -69,10 +69,10 @@ The VERSATIL SDLC Framework contains a comprehensive MCP (Model Context Protocol
 2. `versatil_memory_query` - Query RAG memory
 3. `versatil_opera_goal` - Set autonomous goals
 4. `versatil_opera_status` - Get Opera status
-5. `versatil_bmad_autonomous` - Execute BMAD autonomously
+5. `versatil_opera_autonomous` - Execute OPERA autonomously
 6. `versatil_learning_insights` - Get learning metrics
 
-**Dependencies**: Vector memory store, Opera orchestrator, Enhanced BMAD
+**Dependencies**: Vector memory store, Opera orchestrator, Enhanced OPERA
 
 ---
 
@@ -258,7 +258,7 @@ Features:
 - **AgentRegistry**: Full integration for agent activation
 - **SDLCOrchestrator**: Phase transitions and orchestration
 - **PerformanceMonitor**: Metrics and reporting
-- **EnhancedBMAD**: Autonomous workflows
+- **EnhancedOPERA**: Autonomous workflows
 - **VectorMemoryStore**: RAG integration
 - **EnvironmentScanner**: Context awareness
 
@@ -374,7 +374,7 @@ npm run test:opera-mcp
 - [ ] Test VERSATIL MCP server with Claude
 - [ ] Test Opera MCP initialization
 - [ ] Test RAG memory tools
-- [ ] Test BMAD autonomous workflows
+- [ ] Test OPERA autonomous workflows
 - [ ] Test all 16 MCP tools
 - [ ] Verify isolation compliance
 - [ ] Test Cursor integration

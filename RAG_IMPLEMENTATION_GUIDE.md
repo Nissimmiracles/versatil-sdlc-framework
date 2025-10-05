@@ -227,7 +227,7 @@ Until you set up Supabase:
 node working-demo.cjs
 
 # Test memory operations
-node test-enhanced-bmad-working.cjs
+node test-enhanced-opera-working.cjs
 ```
 
 The mock gives you the same API, so switching to Supabase later is seamless.

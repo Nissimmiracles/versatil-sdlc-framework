@@ -1,6 +1,6 @@
 #!/bin/bash
 # VERSATIL Proactive Agent Coordinator Hook
-# Automatically activates appropriate BMAD agent based on context
+# Automatically activates appropriate OPERA agent based on context
 
 set -euo pipefail
 

@@ -328,7 +328,7 @@ Apply same testing methodology to other enhanced agents:
 
 ### 3. Advanced Features Testing
 - RAG memory integration tests
-- Archon decision-making validation
+- Opera decision-making validation
 - Advanced Chrome MCP testing
 
 ### 4. Performance Optimization

@@ -195,7 +195,7 @@ export function createFromEnv(): AIIntegration {
   const config: AIConfig = {
     apiKey: process.env.ANTHROPIC_API_KEY,
     model: (process.env.CLAUDE_MODEL as any) || 'claude-3-5-sonnet-20241022',
-    enabled: process.env.BMAD_MODE !== 'orchestrator-only'
+    enabled: process.env.OPERA_MODE !== 'orchestrator-only'
   };
 
   return new AIIntegration(config);

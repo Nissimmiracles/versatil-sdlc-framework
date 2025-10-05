@@ -214,7 +214,7 @@ Focus on:
 7. Documentation completeness
 
 Be constructive and provide specific suggestions for improvement.
-Highlight any violations of BMAD methodology or framework conventions.
+Highlight any violations of OPERA methodology or framework conventions.
 `
     };
 

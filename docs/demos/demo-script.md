@@ -12,7 +12,7 @@ This document provides a complete demo script for showcasing the VERSATIL SDLC F
 
 ### 1. Introduction (2 minutes)
 
-"Today I'll demonstrate the VERSATIL SDLC Framework - an AI-native development platform that revolutionizes how teams build software. VERSATIL stands for Versatile Extensible Rapid Secure Agile Technical Infrastructure Layer, and it implements the BMAD methodology - Business-Managed Agile Development."
+"Today I'll demonstrate the VERSATIL SDLC Framework - an AI-native development platform that revolutionizes how teams build software. VERSATIL stands for Versatile Extensible Rapid Secure Agile Technical Infrastructure Layer, and it implements the OPERA methodology - Business-Managed Agile Development."
 
 **Key Points to Highlight:**
 - Zero context loss between development sessions
@@ -38,7 +38,7 @@ versatil init
 - Interactive onboarding wizard
 - Automatic project analysis
 - Agent recommendation system
-- BMAD methodology configuration
+- OPERA methodology configuration
 
 ### 3. Agent System in Action (5 minutes)
 
@@ -177,7 +177,7 @@ echo "console.log('Demo app');" > src/index.js
 
 ### Documentation Links
 - [Complete Setup Guide](../setup/README.md)
-- [BMAD Methodology](../methodology/bmad.md)
+- [OPERA Methodology](../methodology/opera.md)
 - [Agent Configuration](../agents/README.md)
 - [API Reference](../api/README.md)
 

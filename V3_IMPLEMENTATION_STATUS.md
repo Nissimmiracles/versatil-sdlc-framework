@@ -86,7 +86,7 @@ VERSATIL Framework v3.0.0 introduces **multi-language support**, **cloud-native 
 VERSATIL Framework v3.0.0
 ├── Core Framework (v1.2.1 → v3.0.0)
 │   ├── 8 Orchestrators (unchanged)
-│   ├── 6+ BMAD Agents (enhanced)
+│   ├── 6+ OPERA Agents (enhanced)
 │   ├── RAG Memory System (unchanged)
 │   └── Opera MCP (unchanged)
 │

@@ -5,11 +5,14 @@
  * This configuration enables:
  * - Unit testing with Jest
  * - Integration testing coordination with Playwright
- * - BMAD methodology compliance
+ * - OPERA methodology compliance
  * - Chrome MCP integration support
  */
 
 module.exports = {
+  // Root directory resolution
+  rootDir: __dirname,
+
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src', '<rootDir>/tests'],
@@ -66,6 +69,8 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
 
   moduleNameMapper: {
+    // Handle .js extensions in TypeScript imports (ESM compatibility)
+    '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/types/(.*)$': '<rootDir>/src/types/$1',
     '^@/agents/(.*)$': '<rootDir>/src/agents/$1',
@@ -74,7 +79,7 @@ module.exports = {
     '^@/tests/(.*)$': '<rootDir>/tests/$1'
   },
 
-  testTimeout: 15000, // Increased for BMAD methodology
+  testTimeout: 15000, // Increased for OPERA methodology
   verbose: process.env.CI ? false : true,
   collectCoverage: process.env.JEST_COVERAGE === 'true',
 
@@ -84,7 +89,7 @@ module.exports = {
   detectOpenHandles: true,
   forceExit: true,
 
-  // Enhanced coverage thresholds for BMAD compliance
+  // Enhanced coverage thresholds for OPERA compliance
   coverageThreshold: {
     global: {
       branches: 80,  // Increased from 50 to 80 for Enhanced Maria-QA standards
@@ -92,7 +97,7 @@ module.exports = {
       lines: 80,     // Increased from 50 to 80
       statements: 80 // Increased from 50 to 80
     },
-    // Per-module thresholds for critical BMAD components
+    // Per-module thresholds for critical OPERA components
     'src/agents/': {
       branches: 85,
       functions: 85,
@@ -111,7 +116,11 @@ module.exports = {
   projects: [
     './jest-unit.config.cjs',
     {
-      displayName: 'integration',
+      displayName: {
+        name: 'INTEGRATION',
+        color: 'magenta'
+      },
+      rootDir: __dirname,
       preset: 'ts-jest',
       testEnvironment: 'node',
       transform: {
@@ -121,22 +130,46 @@ module.exports = {
           useESM: false,
           babelConfig: false,
           diagnostics: false
+        }],
+        '^.+\\.(js|jsx)$': ['ts-jest', {
+          tsconfig: 'tsconfig.test.json',
+          isolatedModules: true,
+          useESM: false,
+          babelConfig: false
         }]
       },
+      moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+      transformIgnorePatterns: [
+        'node_modules/(?!(@modelcontextprotocol)/)'
+      ],
+      moduleNameMapper: {
+        // Handle .js extensions in TypeScript imports (ESM compatibility)
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+        '^@/(.*)$': '<rootDir>/src/$1',
+        '^@/types/(.*)$': '<rootDir>/src/types/$1',
+        '^@/agents/(.*)$': '<rootDir>/src/agents/$1',
+        '^@/services/(.*)$': '<rootDir>/src/services/$1',
+        '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
+        '^@/tests/(.*)$': '<rootDir>/tests/$1'
+      },
+      setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
       testMatch: [
         '<rootDir>/tests/integration/**/*.{ts,tsx}',
         '<rootDir>/tests/agents/**/*.{ts,tsx}',
+        '<rootDir>/tests/update/**/*.{ts,tsx}',
         // Exclude Playwright integration tests
         '!<rootDir>/tests/integration/**/*.e2e.{ts,tsx}',
         '!<rootDir>/tests/integration/**/*.playwright.{ts,tsx}'
-      ]
+      ],
+      coverageDirectory: '<rootDir>/coverage/integration',
+      maxWorkers: process.env.CI ? 1 : '50%'
     }
   ],
 
-  // Enhanced error handling for BMAD methodology
+  // Enhanced error handling for OPERA methodology
   errorOnDeprecated: true,
 
-  // Global setup for BMAD integration
+  // Global setup for OPERA integration
   globalSetup: '<rootDir>/tests/setup/jest-global-setup.js',
   globalTeardown: '<rootDir>/tests/setup/jest-global-teardown.ts',
 
@@ -154,9 +187,9 @@ module.exports = {
     }]
   ],
 
-  // BMAD methodology metadata
+  // OPERA methodology metadata
   testEnvironmentOptions: {
-    bmad: {
+    opera: {
       agent: 'Enhanced Maria-QA',
       framework: 'VERSATIL SDLC',
       version: '1.0.0',

@@ -492,7 +492,7 @@ export class TestGenerator {
     const priorityMap: Record<string, 'critical' | 'high' | 'medium' | 'low'> = {
       'agent-activation': 'critical',
       'mcp-integration': 'critical',
-      'bmad-methodology': 'high',
+      'opera-methodology': 'high',
       'context-preservation': 'high',
       'quality-gates': 'high',
       'testing-integration': 'medium'
@@ -508,7 +508,7 @@ export class TestGenerator {
     const prerequisiteMap: Record<string, string[]> = {
       'agent-activation': ['Framework installed', 'Agent registry initialized'],
       'mcp-integration': ['MCP server running', 'Agent system operational'],
-      'bmad-methodology': ['All agents functional', 'Context system operational'],
+      'opera-methodology': ['All agents functional', 'Context system operational'],
       'context-preservation': ['Agent activation working', 'Memory system functional'],
       'quality-gates': ['Maria-QA agent operational', 'Testing infrastructure ready'],
       'testing-integration': ['Jest configured', 'Playwright available']

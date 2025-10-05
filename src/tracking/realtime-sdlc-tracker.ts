@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events';
 import { VERSATILLogger } from '../utils/logger.js';
 import { SDLCOrchestrator, FlywheelState } from '../flywheel/sdlc-orchestrator.js';
-import { EnhancedBMADCoordinator } from '../bmad/enhanced-bmad-coordinator.js';
+import { EnhancedOPERACoordinator } from '../opera/enhanced-opera-coordinator.js';
 import { AgentRegistry } from '../agents/agent-registry.js';
 import { WebSocket, WebSocketServer } from 'ws';
 
@@ -75,7 +75,7 @@ export interface RealTimeConfig {
 export class RealTimeSDLCTracker extends EventEmitter {
   private logger: VERSATILLogger;
   private sdlcOrchestrator: SDLCOrchestrator;
-  private bmadCoordinator: EnhancedBMADCoordinator;
+  private operaCoordinator: EnhancedOPERACoordinator;
   private agentRegistry: AgentRegistry;
   private config: RealTimeConfig;
   
@@ -92,14 +92,14 @@ export class RealTimeSDLCTracker extends EventEmitter {
   
   constructor(
     sdlcOrchestrator: SDLCOrchestrator,
-    bmadCoordinator: EnhancedBMADCoordinator,
+    operaCoordinator: EnhancedOPERACoordinator,
     agentRegistry: AgentRegistry,
     config?: Partial<RealTimeConfig>
   ) {
     super();
     this.logger = new VERSATILLogger();
     this.sdlcOrchestrator = sdlcOrchestrator;
-    this.bmadCoordinator = bmadCoordinator;
+    this.operaCoordinator = operaCoordinator;
     this.agentRegistry = agentRegistry;
     
     this.config = {
@@ -128,8 +128,8 @@ export class RealTimeSDLCTracker extends EventEmitter {
     // Set up SDLC orchestrator listeners
     this.setupSDLCListeners();
     
-    // Set up BMAD coordinator listeners
-    this.setupBMADListeners();
+    // Set up OPERA coordinator listeners
+    this.setupOPERAListeners();
     
     // Start WebSocket server if enabled
     if (this.config.enableWebSocket) {
@@ -257,23 +257,23 @@ export class RealTimeSDLCTracker extends EventEmitter {
   }
   
   /**
-   * Setup BMAD coordinator listeners
+   * Setup OPERA coordinator listeners
    */
-  private setupBMADListeners(): void {
+  private setupOPERAListeners(): void {
     // Listen for enhanced activations
-    this.bmadCoordinator.on('enhanced_activation', (data) => {
+    this.operaCoordinator.on('enhanced_activation', (data) => {
       this.emit('agent:enhanced', data);
       this.broadcastUpdate('agent:enhanced', data);
     });
     
     // Listen for autonomous goals
-    this.bmadCoordinator.on('autonomous_goal_completed', (data) => {
+    this.operaCoordinator.on('autonomous_goal_completed', (data) => {
       this.emit('autonomous:completed', data);
       this.broadcastUpdate('autonomous:completed', data);
     });
     
     // Listen for human intervention
-    this.bmadCoordinator.on('human_intervention_required', (data) => {
+    this.operaCoordinator.on('human_intervention_required', (data) => {
       this.emit('intervention:required', data);
       this.broadcastUpdate('intervention:required', data);
       this.createBlocker(data.reason);

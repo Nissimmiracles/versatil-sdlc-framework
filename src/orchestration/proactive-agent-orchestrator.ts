@@ -1,7 +1,7 @@
 /**
  * Proactive Agent Orchestrator
  *
- * Automatically activates and coordinates BMAD agents based on file patterns,
+ * Automatically activates and coordinates OPERA agents based on file patterns,
  * code context, and real-time development activity.
  *
  * @module ProactiveAgentOrchestrator
@@ -73,7 +73,7 @@ export class ProactiveAgentOrchestrator extends EventEmitter {
   }
 
   /**
-   * Initialize BMAD agent instances
+   * Initialize OPERA agent instances
    */
   private initializeAgents(): void {
     this.agents.set('maria-qa', new EnhancedMaria());

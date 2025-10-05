@@ -153,7 +153,7 @@ async function fixAllTypeScriptErrors() {
     console.log('\n⏱️  Step 4: Fixing timer types...');
     
     const filesWithTimers = [
-      'src/archon/archon-mcp-server.ts',
+      'src/opera/opera-mcp-server.ts',
       'src/agents/introspective/enhanced-introspective-agent.ts'
     ];
 
@@ -226,18 +226,18 @@ async function fixAllTypeScriptErrors() {
       }
     ]);
 
-    // Step 7: Create missing archon types
+    // Step 7: Create missing opera types
     console.log('\n🏗️  Step 7: Creating missing orchestrator types...');
     
-    const archonOrchestratorPath = path.join(__dirname, 'src/archon/archon-orchestrator.ts');
-    if (!await fileExists(archonOrchestratorPath)) {
-      await fs.writeFile(archonOrchestratorPath, `/**
- * VERSATIL Archon Orchestrator Base
+    const operaOrchestratorPath = path.join(__dirname, 'src/opera/opera-orchestrator.ts');
+    if (!await fileExists(operaOrchestratorPath)) {
+      await fs.writeFile(operaOrchestratorPath, `/**
+ * VERSATIL Opera Orchestrator Base
  */
 
 import { EventEmitter } from 'node:events';
 
-export interface ArchonGoal {
+export interface OperaGoal {
   id: string;
   type: string;
   description: string;
@@ -246,8 +246,8 @@ export interface ArchonGoal {
   acceptanceCriteria?: string[];
 }
 
-export class ArchonOrchestrator extends EventEmitter {
-  async createGoal(goal: Partial<ArchonGoal>): Promise<ArchonGoal> {
+export class OperaOrchestrator extends EventEmitter {
+  async createGoal(goal: Partial<OperaGoal>): Promise<OperaGoal> {
     return {
       id: 'goal-' + Date.now(),
       type: goal.type || 'feature',
@@ -264,11 +264,11 @@ export class ArchonOrchestrator extends EventEmitter {
 }`);
     }
 
-    // Step 8: Fix enhanced archon imports
-    console.log('\n🔗 Step 8: Fixing enhanced archon imports...');
+    // Step 8: Fix enhanced opera imports
+    console.log('\n🔗 Step 8: Fixing enhanced opera imports...');
     
-    const enhancedArchonPath = path.join(__dirname, 'src/archon/enhanced-archon-orchestrator.ts');
-    await updateFile(enhancedArchonPath, [
+    const enhancedOperaPath = path.join(__dirname, 'src/opera/enhanced-opera-orchestrator.ts');
+    await updateFile(enhancedOperaPath, [
       // Fix missing config property
       {
         condition: (content) => !content.includes('private config ='),
@@ -284,7 +284,7 @@ export class ArchonOrchestrator extends EventEmitter {
       // Add missing properties
       {
         condition: (content) => !content.includes('private agentRegistry:'),
-        search: /(export class EnhancedArchonOrchestrator extends EventEmitter {)/,
+        search: /(export class EnhancedOperaOrchestrator extends EventEmitter {)/,
         replace: `$1
   private agentRegistry: AgentRegistry;`
       },
