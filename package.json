@@ -1,6 +1,6 @@
 {
   "name": "@versatil/sdlc-framework",
-  "version": "3.1.4",
+  "version": "3.1.5",
   "type": "module",
   "description": "🚀 AI-Native SDLC framework with RAG memory, OPERA autonomous orchestration, and 6 specialized agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
   "main": "dist/index.js",
@@ -19,6 +19,7 @@
     "validate:isolation": "node scripts/validate-isolation.cjs",
     "validate:update": "node scripts/validate-update.cjs",
     "recover": "node scripts/recover-framework.cjs",
+    "typecheck": "tsc --noEmit",
     "build": "node scripts/show-framework-active.cjs --quick && tsc",
     "build:security": "node scripts/show-framework-active.cjs --quick && tsc && echo 'Security modules compiled'",
     "build:watch": "node scripts/show-framework-active.cjs --quick && tsc --watch",

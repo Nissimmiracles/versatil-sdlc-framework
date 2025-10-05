@@ -208,17 +208,29 @@ class VERSATILAgentDispatcher extends EventEmitter {
    * Auto-Activate Agents Based on File Changes
    */
   private setupFileWatching(): void {
+    // Skip file watching in CI environments or during initial setup
+    if (process.env.CI === 'true' || process.env.VERSATIL_SKIP_WATCH === 'true') {
+      console.log('📁 File watching disabled (CI/test environment)');
+      return;
+    }
+
     const watchPath = process.cwd();
 
-    const watcher = watch(watchPath, { recursive: true }, (eventType, filename) => {
-      if (!filename || this.shouldIgnoreFile(filename)) return;
+    try {
+      const watcher = watch(watchPath, { recursive: true }, (eventType, filename) => {
+        if (!filename || this.shouldIgnoreFile(filename)) return;
 
-      const fullPath = path.join(watchPath, filename);
-      this.handleFileChange(eventType, fullPath);
-    });
+        const fullPath = path.join(watchPath, filename);
+        this.handleFileChange(eventType, fullPath);
+      });
 
-    this.fileWatchers.set(watchPath, watcher);
-    console.log(`📁 File watching enabled for: ${watchPath}`);
+      this.fileWatchers.set(watchPath, watcher);
+      console.log(`📁 File watching enabled for: ${watchPath}`);
+    } catch (error) {
+      // Recursive watching not supported on this platform - gracefully degrade
+      console.log('📁 File watching not available on this platform (non-recursive mode)');
+      // Framework will still work, just without auto-activation on file changes
+    }
   }
 
   private shouldIgnoreFile(filename: string): boolean {
