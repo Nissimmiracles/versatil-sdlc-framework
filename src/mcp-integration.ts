@@ -70,14 +70,20 @@ export class MCPToolManager {
 
   /**
    * Execute Chrome MCP for browser testing and debugging
+   *
+   * ⚠️ STUB IMPLEMENTATION - NOT FUNCTIONAL
+   * This function uses a mock executor (mcp-executor.ts) that simulates browser testing.
+   * No real Chrome DevTools Protocol or browser automation is performed.
+   * See: docs/MCP_INTEGRATIONS_STATUS.md
    */
   private async executeChromeMCP(context: AgentActivationContext): Promise<any> {
     const sessionId = `chrome_${context.trigger.agent}_${Date.now()}`;
 
     try {
+      // TODO: Replace with real Chrome MCP integration
       const { mcpExecutor } = await import('./mcp-executor');
 
-      console.log(`🎯 ${context.trigger.agent}: Starting Chrome MCP automated testing session`);
+      console.log(`🎯 ${context.trigger.agent}: Starting Chrome MCP automated testing session (MOCK)`);
 
       // Execute the full testing workflow
       const navigationResult = await mcpExecutor.executeChromeMCP('navigate', {
@@ -127,8 +133,14 @@ export class MCPToolManager {
 
   /**
    * Execute Playwright MCP for cross-browser testing
+   *
+   * ⚠️ STUB IMPLEMENTATION - NOT FUNCTIONAL
+   * This is a placeholder that returns mock data only.
+   * Real Playwright MCP integration is not yet implemented.
+   * See: docs/MCP_INTEGRATIONS_STATUS.md
    */
   private async executePlaywrightMCP(context: AgentActivationContext): Promise<any> {
+    // TODO: Implement real Playwright MCP integration
     return {
       agent: context.trigger.agent,
       action: 'cross_browser_testing',
@@ -139,8 +151,14 @@ export class MCPToolManager {
 
   /**
    * Execute Shadcn MCP for component library integration
+   *
+   * ⚠️ STUB IMPLEMENTATION - NOT FUNCTIONAL
+   * This is a placeholder that returns mock data only.
+   * Real Shadcn MCP integration is not yet implemented.
+   * See: docs/MCP_INTEGRATIONS_STATUS.md
    */
   private async executeShadcnMCP(context: AgentActivationContext): Promise<any> {
+    // TODO: Implement real Shadcn MCP integration
     return {
       agent: context.trigger.agent,
       action: 'component_analysis',
@@ -151,8 +169,14 @@ export class MCPToolManager {
 
   /**
    * Execute GitHub MCP for repository operations
+   *
+   * ⚠️ STUB IMPLEMENTATION - NOT FUNCTIONAL
+   * This is a placeholder that returns mock data only.
+   * Real GitHub MCP integration is not yet implemented.
+   * See: docs/MCP_INTEGRATIONS_STATUS.md
    */
   private async executeGitHubMCP(context: AgentActivationContext): Promise<any> {
+    // TODO: Implement real GitHub MCP integration using GitHub API
     return {
       agent: context.trigger.agent,
       action: 'repository_analysis',

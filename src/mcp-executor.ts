@@ -1,6 +1,16 @@
 /**
- * MCP Executor - Bridges VERSATIL framework to actual MCP function calls
- * This module handles the real execution of MCP tools through Claude Code
+ * MCP Executor - Mock implementation for browser testing
+ *
+ * ⚠️ WARNING: STUB IMPLEMENTATION ONLY
+ * This module SIMULATES MCP function calls but does NOT perform real browser automation.
+ * All results are mocked/simulated data for demonstration purposes.
+ *
+ * Real implementation would require:
+ * - Chrome DevTools Protocol integration
+ * - Playwright or Puppeteer MCP server
+ * - Actual browser automation capabilities
+ *
+ * See: docs/MCP_INTEGRATIONS_STATUS.md for details
  */
 
 export interface MCPExecutionResult {
@@ -12,13 +22,15 @@ export interface MCPExecutionResult {
 
 export class MCPExecutor {
   /**
-   * Execute actual MCP function via Claude Code environment
+   * MOCK: Simulates Chrome MCP execution (NOT FUNCTIONAL)
+   *
+   * @deprecated This is a stub implementation that returns simulated results
    */
   async executeChromeMCP(action: string, params: any = {}): Promise<MCPExecutionResult> {
     const startTime = Date.now();
 
     try {
-      console.log(`🎯 MARIA (QA Agent): Initiating Chrome MCP for ${action}`);
+      console.log(`🎯 MARIA (QA Agent): Initiating Chrome MCP for ${action} (SIMULATED)`);
 
       switch (action) {
         case 'navigate':
