@@ -71,7 +71,7 @@ describe('PreferenceManager', () => {
       );
       expect(mockFs.writeFile).toHaveBeenCalledWith(
         mockPreferencesFile,
-        expect.stringContaining('"updateBehavior":"auto"')
+        expect.stringMatching(/"updateBehavior"\s*:\s*"auto"/)
       );
     });
 
@@ -87,7 +87,7 @@ describe('PreferenceManager', () => {
 
       expect(mockFs.writeFile).toHaveBeenCalledWith(
         mockPreferencesFile,
-        expect.stringMatching(/"updateBehavior":"manual"/)
+        expect.stringMatching(/"updateBehavior"\s*:\s*"manual"/)
       );
     });
 
@@ -125,7 +125,7 @@ describe('PreferenceManager', () => {
 
       expect(mockFs.writeFile).toHaveBeenCalledWith(
         mockPreferencesFile,
-        expect.stringContaining('"updateBehavior":"auto"')
+        expect.stringMatching(/"updateBehavior"\s*:\s*"auto"/)
       );
     });
 

@@ -293,7 +293,7 @@ jobs:
   reporting:
     name: 📊 Comprehensive Reporting
     runs-on: ubuntu-latest
-    needs: [test-matrix, opera-agent-tests, security-compliance, performance-tests, deployment-validation]
+    needs: [test-matrix, opera-agent-tests, security-compliance, deployment-validation]
     if: always()
     steps:
       - name: 📂 Checkout code

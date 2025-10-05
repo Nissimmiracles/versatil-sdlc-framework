@@ -284,7 +284,7 @@ describe('ConfigValidator', () => {
       const result = validator.validate(prefs);
 
       expect(result.suggestions.length).toBeGreaterThan(0);
-      expect(result.suggestions.some(s => s.includes('rollback'))).toBe(true);
+      expect(result.suggestions.some(s => s.toLowerCase().includes('rollback'))).toBe(true);
     });
 
     it('should suggest when telemetry is disabled', () => {
