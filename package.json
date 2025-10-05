@@ -238,6 +238,10 @@
     "typescript": "^5.0.0",
     "ws": "^8.16.0"
   },
+  "optionalDependencies": {
+    "@google-cloud/aiplatform": "^3.35.0",
+    "@google-cloud/vertexai": "^1.10.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@playwright/test": "^1.55.0",

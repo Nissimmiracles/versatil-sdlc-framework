@@ -38,6 +38,26 @@
       },
       "description": "Official Exa Labs MCP for AI-powered search and research (Alex-BA, Dr.AI-ML)"
     },
+    "vertex-ai": {
+      "command": "npx",
+      "args": ["-y", "vertex-ai-mcp-server"],
+      "env": {
+        "GOOGLE_CLOUD_PROJECT": "${GOOGLE_CLOUD_PROJECT}",
+        "GOOGLE_CLOUD_LOCATION": "${GOOGLE_CLOUD_LOCATION}",
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}"
+      },
+      "description": "Google Cloud Vertex AI MCP with Gemini models (Dr.AI-ML, Marcus-Backend)"
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "supabase-mcp"],
+      "env": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_ANON_KEY": "${SUPABASE_ANON_KEY}",
+        "SUPABASE_SERVICE_KEY": "${SUPABASE_SERVICE_KEY}"
+      },
+      "description": "Supabase MCP for database and vector operations (Marcus-Backend, Dr.AI-ML)"
+    },
     "claude-code-mcp": {
       "command": "npx",
       "args": ["-y", "@steipete/claude-code-mcp@latest"],
