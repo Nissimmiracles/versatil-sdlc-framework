@@ -58,6 +58,34 @@
       },
       "description": "Supabase MCP for database and vector operations (Marcus-Backend, Dr.AI-ML)"
     },
+    "n8n": {
+      "command": "npx",
+      "args": ["-y", "n8n-nodes-mcp"],
+      "env": {
+        "N8N_BASE_URL": "${N8N_BASE_URL}",
+        "N8N_API_KEY": "${N8N_API_KEY}"
+      },
+      "description": "n8n MCP for workflow automation (Sarah-PM, Marcus, Maria-QA)"
+    },
+    "semgrep": {
+      "command": "npx",
+      "args": ["-y", "semgrep-mcp"],
+      "env": {
+        "SEMGREP_API_KEY": "${SEMGREP_API_KEY}",
+        "SEMGREP_APP_URL": "${SEMGREP_APP_URL}"
+      },
+      "description": "Semgrep MCP for security scanning (Marcus-Backend, Maria-QA, Dr.AI-ML)"
+    },
+    "sentry": {
+      "command": "npx",
+      "args": ["-y", "sentry-mcp-stdio"],
+      "env": {
+        "SENTRY_DSN": "${SENTRY_DSN}",
+        "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}",
+        "SENTRY_ORG": "${SENTRY_ORG}"
+      },
+      "description": "Sentry MCP for error monitoring with AI-powered analysis (Maria-QA, Marcus, Sarah-PM)"
+    },
     "claude-code-mcp": {
       "command": "npx",
       "args": ["-y", "@steipete/claude-code-mcp@latest"],

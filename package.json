@@ -240,7 +240,10 @@
   },
   "optionalDependencies": {
     "@google-cloud/aiplatform": "^3.35.0",
-    "@google-cloud/vertexai": "^1.10.0"
+    "@google-cloud/vertexai": "^1.10.0",
+    "@sentry/node": "^8.0.0",
+    "n8n": "^1.0.0",
+    "semgrep": "^1.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",

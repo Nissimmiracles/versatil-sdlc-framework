@@ -72,6 +72,27 @@ export class MCPToolManager {
           result.success = true;
           break;
 
+        case 'n8n_mcp':
+        case 'n8n':
+        case 'workflow':
+          result.data = await this.executeN8nMCP(context);
+          result.success = true;
+          break;
+
+        case 'semgrep_mcp':
+        case 'semgrep':
+        case 'security_scan':
+          result.data = await this.executeSemgrepMCP(context);
+          result.success = true;
+          break;
+
+        case 'sentry_mcp':
+        case 'sentry':
+        case 'error_monitoring':
+          result.data = await this.executeSentryMCP(context);
+          result.success = true;
+          break;
+
         default:
           throw new Error(`Unknown MCP tool: ${tool}`);
       }
@@ -660,6 +681,204 @@ export class MCPToolManager {
         message: `Supabase MCP failed: ${error.message}`
       };
     }
+  }
+
+  /**
+   * Execute n8n MCP for workflow automation
+   * ✅ PRODUCTION IMPLEMENTATION - n8n Workflow Automation
+   *
+   * Primary Agent: Sarah-PM (project management automation)
+   */
+  private async executeN8nMCP(context: AgentActivationContext): Promise<any> {
+    try {
+      const { n8nMCPExecutor } = await import('./mcp/n8n-mcp-executor.js');
+
+      console.log(`🔄 ${context.trigger.agent}: Starting n8n MCP workflow session`);
+
+      let action = 'list_workflows';
+      let params: any = {};
+
+      // Sarah-PM: Workflow automation and task scheduling
+      if (context.trigger.agent === 'Sarah-PM') {
+        if (context.userRequest?.includes('create workflow')) {
+          action = 'create_workflow';
+          params = {
+            name: context.userRequest.match(/workflow[:\s]+([a-zA-Z0-9\s-]+)/)?.[1] || 'New Workflow'
+          };
+        } else if (context.userRequest?.includes('execute') || context.userRequest?.includes('run')) {
+          action = 'execute_workflow';
+          params = {
+            workflowName: context.userRequest.match(/workflow[:\s]+([a-zA-Z0-9-_]+)/)?.[1]
+          };
+        } else if (context.userRequest?.includes('schedule')) {
+          action = 'schedule_task';
+          params = {
+            workflowId: 'default',
+            schedule: '0 9 * * 1' // Default: Monday 9am
+          };
+        }
+      }
+
+      const workflowResult = await n8nMCPExecutor.executeN8nMCP(action, params);
+
+      return {
+        agent: context.trigger.agent,
+        action,
+        status: workflowResult.success ? 'completed' : 'failed',
+        data: workflowResult.data,
+        metadata: workflowResult.metadata,
+        message: workflowResult.success
+          ? `n8n ${action} completed successfully`
+          : workflowResult.error
+      };
+
+    } catch (error: any) {
+      console.error(`❌ n8n MCP execution failed:`, error.message);
+      return {
+        agent: context.trigger.agent,
+        action: 'n8n',
+        status: 'error',
+        message: `n8n MCP failed: ${error.message}`
+      };
+    }
+  }
+
+  /**
+   * Execute Semgrep MCP for security scanning
+   * ✅ PRODUCTION IMPLEMENTATION - Semgrep Security Scanning
+   *
+   * Primary Agent: Marcus-Backend (security-first development)
+   */
+  private async executeSemgrepMCP(context: AgentActivationContext): Promise<any> {
+    try {
+      const { semgrepMCPExecutor } = await import('./mcp/semgrep-mcp-executor.js');
+
+      console.log(`🔒 ${context.trigger.agent}: Starting Semgrep security scan`);
+
+      let action = 'security_check';
+      let params: any = {};
+
+      // Marcus-Backend: Security scanning
+      if (context.trigger.agent === 'Marcus-Backend') {
+        if (context.filePath) {
+          const code = await this.readFile(context.filePath);
+          const language = this.detectLanguage(context.filePath);
+
+          action = 'security_check';
+          params = { code, language, filePath: context.filePath };
+        } else if (context.userRequest?.includes('scan')) {
+          action = 'semgrep_scan';
+          params = {
+            files: ['.'],
+            config: 'auto'
+          };
+        }
+      }
+
+      const scanResult = await semgrepMCPExecutor.executeSemgrepMCP(action, params);
+
+      return {
+        agent: context.trigger.agent,
+        action,
+        status: scanResult.success ? 'completed' : 'failed',
+        data: scanResult.data,
+        metadata: scanResult.metadata,
+        message: scanResult.success
+          ? `Semgrep ${action} completed successfully`
+          : scanResult.error
+      };
+
+    } catch (error: any) {
+      console.error(`❌ Semgrep MCP execution failed:`, error.message);
+      return {
+        agent: context.trigger.agent,
+        action: 'semgrep',
+        status: 'error',
+        message: `Semgrep MCP failed: ${error.message}`
+      };
+    }
+  }
+
+  /**
+   * Execute Sentry MCP for error monitoring
+   * ✅ PRODUCTION IMPLEMENTATION - Sentry Error Monitoring
+   *
+   * Primary Agent: Maria-QA (quality assurance and bug tracking)
+   */
+  private async executeSentryMCP(context: AgentActivationContext): Promise<any> {
+    try {
+      const { sentryMCPExecutor } = await import('./mcp/sentry-mcp-executor.js');
+
+      console.log(`📊 ${context.trigger.agent}: Starting Sentry error monitoring`);
+
+      let action = 'get_recent_issues';
+      let params: any = {};
+
+      // Maria-QA: Error monitoring and issue tracking
+      if (context.trigger.agent === 'Maria-QA') {
+        if (context.userRequest?.includes('issue') && context.userRequest?.match(/\d+/)) {
+          action = 'fetch_issue';
+          params = {
+            issueId: context.userRequest.match(/\d+/)?.[0]
+          };
+        } else if (context.userRequest?.includes('analyze')) {
+          action = 'analyze_error';
+          params = {
+            issueId: context.userRequest.match(/\d+/)?.[0],
+            useAI: true
+          };
+        } else if (context.userRequest?.includes('trends')) {
+          action = 'get_issue_trends';
+          params = {
+            period: '7d'
+          };
+        }
+      }
+
+      const monitorResult = await sentryMCPExecutor.executeSentryMCP(action, params);
+
+      return {
+        agent: context.trigger.agent,
+        action,
+        status: monitorResult.success ? 'completed' : 'failed',
+        data: monitorResult.data,
+        metadata: monitorResult.metadata,
+        message: monitorResult.success
+          ? `Sentry ${action} completed successfully`
+          : monitorResult.error
+      };
+
+    } catch (error: any) {
+      console.error(`❌ Sentry MCP execution failed:`, error.message);
+      return {
+        agent: context.trigger.agent,
+        action: 'sentry',
+        status: 'error',
+        message: `Sentry MCP failed: ${error.message}`
+      };
+    }
+  }
+
+  /**
+   * Helper to detect programming language from file path
+   */
+  private detectLanguage(filePath: string): string {
+    const ext = filePath.split('.').pop()?.toLowerCase();
+    const langMap: Record<string, string> = {
+      'ts': 'typescript',
+      'tsx': 'typescript',
+      'js': 'javascript',
+      'jsx': 'javascript',
+      'py': 'python',
+      'go': 'go',
+      'java': 'java',
+      'rb': 'ruby',
+      'php': 'php',
+      'rs': 'rust',
+      'cpp': 'cpp',
+      'c': 'c'
+    };
+    return langMap[ext || ''] || 'unknown';
   }
 
   /**
