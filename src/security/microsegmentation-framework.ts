@@ -8,7 +8,7 @@ import { z } from 'zod';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { VERSATILLogger } from '../utils/logger';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export const SecuritySegmentSchema = z.object({
   segmentId: z.string(),

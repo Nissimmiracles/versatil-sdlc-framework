@@ -6,14 +6,14 @@
 import express from 'express';
 import { createServer } from 'http';
 // import { Server as SocketServer } from 'socket.io';
-import { SDLCOrchestrator } from './flywheel/sdlc-orchestrator';
-import { AgentRegistry } from './agents/agent-registry';
-import { VERSATILLogger } from './utils/logger';
-import { PerformanceMonitor } from './analytics/performance-monitor';
-// import { VERSATILMCPServer } from './mcp/versatil-mcp-server';
-import { enhancedBMAD } from './bmad/enhanced-bmad-coordinator';
-import { vectorMemoryStore } from './rag/vector-memory-store';
-import { OperaOrchestrator } from './opera/opera-orchestrator';
+import { SDLCOrchestrator } from './flywheel/sdlc-orchestrator.js';
+import { AgentRegistry } from './agents/agent-registry.js';
+import { VERSATILLogger } from './utils/logger.js';
+import { PerformanceMonitor } from './analytics/performance-monitor.js';
+// import { VERSATILMCPServer } from './mcp/versatil-mcp-server.js';
+import { enhancedBMAD } from './bmad/enhanced-bmad-coordinator.js';
+import { vectorMemoryStore } from './rag/vector-memory-store.js';
+import { OperaOrchestrator } from './opera/opera-orchestrator.js';
 import * as path from 'path';
 
 export async function startEnhancedServer() {

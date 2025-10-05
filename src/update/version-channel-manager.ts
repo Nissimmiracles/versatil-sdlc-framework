@@ -6,7 +6,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
-import { GitHubReleaseChecker, ReleaseInfo } from './github-release-checker';
+import { GitHubReleaseChecker, ReleaseInfo } from './github-release-checker.js';
 
 export type UpdateChannel = 'stable' | 'beta' | 'alpha' | 'nightly' | 'custom';
 

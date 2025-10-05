@@ -10,15 +10,15 @@
  * 5. Proactive quality (catches issues before they happen)
  */
 
-import { AgentRegistry } from '../agents/agent-registry';
-import { BaseAgent, AgentResponse, AgentActivationContext } from '../agents/base-agent';
-import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store';
-import { AgentRAGSynchronization, EnrichedContext } from './agent-rag-sync';
-import { PatternLearningSystem } from '../rag/pattern-learning-system';
-import { ContinuousWebLearning } from '../rag/continuous-web-learning';
-import { BidirectionalRAGSync } from '../rag/bidirectional-sync';
-import { CrossAgentLearning } from '../rag/cross-agent-learning';
-import { IncrementalIntelligence } from '../rag/incremental-intelligence';
+import { AgentRegistry } from '../agents/agent-registry.js';
+import { BaseAgent, AgentResponse, AgentActivationContext } from '../agents/base-agent.js';
+import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
+import { AgentRAGSynchronization, EnrichedContext } from './agent-rag-sync.js';
+import { PatternLearningSystem } from '../rag/pattern-learning-system.js';
+import { ContinuousWebLearning } from '../rag/continuous-web-learning.js';
+import { BidirectionalRAGSync } from '../rag/bidirectional-sync.js';
+import { CrossAgentLearning } from '../rag/cross-agent-learning.js';
+import { IncrementalIntelligence } from '../rag/incremental-intelligence.js';
 
 export interface AIEraDeveloperConfig {
   enableFullContextCoding: boolean; // See entire codebase, not just current file

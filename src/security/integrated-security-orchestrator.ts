@@ -8,11 +8,11 @@ import { z } from 'zod';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { VERSATILLogger } from '../utils/logger';
-import { MicrosegmentationFramework, ProjectSecurityContext } from './microsegmentation-framework';
-import { ZeroTrustProjectIsolation } from './zero-trust-project-isolation';
-import { BoundaryEnforcementEngine } from './boundary-enforcement-engine';
-import { PathTraversalPrevention } from './path-traversal-prevention';
+import { VERSATILLogger } from '../utils/logger.js';
+import { MicrosegmentationFramework, ProjectSecurityContext } from './microsegmentation-framework.js';
+import { ZeroTrustProjectIsolation } from './zero-trust-project-isolation.js';
+import { BoundaryEnforcementEngine } from './boundary-enforcement-engine.js';
+import { PathTraversalPrevention } from './path-traversal-prevention.js';
 
 export const SecurityIncidentSchema = z.object({
   id: z.string(),

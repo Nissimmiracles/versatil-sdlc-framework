@@ -14,7 +14,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { UltraThinkBreakthroughSystem } from '../intelligence/ultrathink-breakthrough-system';
+import { UltraThinkBreakthroughSystem } from '../intelligence/ultrathink-breakthrough-system.js';
 
 export interface FrontendResearchAnalysis {
   currentLandscape: FrontendLandscape;

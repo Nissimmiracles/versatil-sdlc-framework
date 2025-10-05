@@ -7,10 +7,10 @@
 import { EventEmitter } from 'events';
 import * as path from 'path';
 import * as os from 'os';
-import { VERSATILLogger } from '../utils/logger';
-import { EnhancedOperaOrchestrator } from '../opera/enhanced-opera-orchestrator';
-import { AgentRegistry } from '../agents/agent-registry';
-import { vectorMemoryStore } from '../rag/vector-memory-store';
+import { VERSATILLogger } from '../utils/logger.js';
+import { EnhancedOperaOrchestrator } from '../opera/enhanced-opera-orchestrator.js';
+import { AgentRegistry } from '../agents/agent-registry.js';
+import { vectorMemoryStore } from '../rag/vector-memory-store.js';
 
 export interface StackContext {
   cursor: {

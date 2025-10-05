@@ -3,9 +3,9 @@
  * Uses dependency injection for real testing
  */
 
-import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent';
-import { VERSATILLogger } from '../utils/logger';
-import { PerformanceMonitor } from '../analytics/performance-monitor';
+import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent.js';
+import { VERSATILLogger } from '../utils/logger.js';
+import { PerformanceMonitor } from '../analytics/performance-monitor.js';
 
 export interface IntrospectionResult {
   insights: Insight[];

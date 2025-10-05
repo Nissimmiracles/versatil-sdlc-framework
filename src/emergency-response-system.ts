@@ -10,10 +10,10 @@
  * - Performance issues that impact user experience
  */
 
-import { versatilDispatcher } from './agent-dispatcher';
-import { qualityGateEnforcer } from './quality-gate-enforcer';
-import { enhancedContextValidator } from './enhanced-context-validator';
-import { cursorClaudeBridge } from './cursor-claude-bridge';
+import { versatilDispatcher } from './agent-dispatcher.js';
+import { qualityGateEnforcer } from './quality-gate-enforcer.js';
+import { enhancedContextValidator } from './enhanced-context-validator.js';
+import { cursorClaudeBridge } from './cursor-claude-bridge.js';
 import { spawn, exec } from 'child_process';
 import { promises as fs } from 'fs';
 import path from 'path';

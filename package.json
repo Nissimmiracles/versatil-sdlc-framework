@@ -1,5 +1,5 @@
 {
-  "name": "versatil-sdlc-framework",
+  "name": "@versatil/sdlc-framework",
   "version": "3.0.0",
   "type": "module",
   "description": "🚀 AI-Native SDLC framework with RAG memory, Opera autonomous orchestration, and Enhanced BMAD agents achieving ZERO CONTEXT LOSS. Features intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
@@ -35,8 +35,8 @@
     "test": "VERSATIL_OPERATION='Running tests' node scripts/show-framework-active.cjs --quick && jest",
     "test:watch": "VERSATIL_OPERATION='Running tests (watch mode)' node scripts/show-framework-active.cjs --quick && jest --watch",
     "test:coverage": "VERSATIL_OPERATION='Running coverage tests' node scripts/show-framework-active.cjs && jest --coverage",
-    "test:unit": "jest --selectProjects unit",
-    "test:integration": "jest --selectProjects integration",
+    "test:unit": "jest --selectProjects UNIT",
+    "test:integration": "jest --selectProjects INTEGRATION",
     "test:e2e": "playwright test --project=chromium-desktop",
     "test:e2e:all": "playwright test",
     "test:visual": "node test/generate-visual-report.cjs",

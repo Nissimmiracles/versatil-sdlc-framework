@@ -4,10 +4,10 @@
  */
 
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { SDLCOrchestrator, FlywheelState } from '../flywheel/sdlc-orchestrator';
-import { EnhancedBMADCoordinator } from '../bmad/enhanced-bmad-coordinator';
-import { AgentRegistry } from '../agents/agent-registry';
+import { VERSATILLogger } from '../utils/logger.js';
+import { SDLCOrchestrator, FlywheelState } from '../flywheel/sdlc-orchestrator.js';
+import { EnhancedBMADCoordinator } from '../bmad/enhanced-bmad-coordinator.js';
+import { AgentRegistry } from '../agents/agent-registry.js';
 import { WebSocket, WebSocketServer } from 'ws';
 
 export interface TaskProgress {

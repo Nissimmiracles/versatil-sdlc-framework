@@ -5,8 +5,8 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { VERSATILLogger } from '../utils/logger';
-import { environmentManager } from '../environment/environment-manager';
+import { VERSATILLogger } from '../utils/logger.js';
+import { environmentManager } from '../environment/environment-manager.js';
 
 export interface SecurityScanResult {
   id: string;

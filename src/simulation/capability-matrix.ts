@@ -6,7 +6,7 @@
  * showing framework promises vs reality with brutal honesty.
  */
 
-import { SimulationQA } from '../agents/simulation-qa';
+import { SimulationQA } from '../agents/simulation-qa.js';
 
 async function showCapabilityMatrix() {
   console.log('📊 VERSATIL Framework Capability Matrix\n');

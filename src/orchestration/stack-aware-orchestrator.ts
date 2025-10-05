@@ -4,9 +4,9 @@
  */
 
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { IsolatedPaths } from './isolated-versatil-orchestrator';
-import { AgenticRAGOrchestrator } from './agentic-rag-orchestrator';
+import { VERSATILLogger } from '../utils/logger.js';
+import { IsolatedPaths } from './isolated-versatil-orchestrator.js';
+import { AgenticRAGOrchestrator } from './agentic-rag-orchestrator.js';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 

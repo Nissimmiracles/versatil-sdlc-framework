@@ -3,9 +3,9 @@
  * Provides client-side integration for MCP tools with VERSATIL agents
  */
 
-import { AgentRegistry } from '../agents/agent-registry';
-import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator';
-import { VERSATILLogger } from '../utils/logger';
+import { AgentRegistry } from '../agents/agent-registry.js';
+import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator.js';
+import { VERSATILLogger } from '../utils/logger.js';
 
 // Mock interfaces for compilation
 interface MockAgentActivationContext {

@@ -10,7 +10,7 @@
  * - Performance optimization strategies
  */
 
-import { EnhancedVectorMemoryStore } from './enhanced-vector-memory-store';
+import { EnhancedVectorMemoryStore } from './enhanced-vector-memory-store.js';
 
 export interface WebLearnedPattern {
   id: string;

@@ -9,8 +9,8 @@
  * - Managing development lifecycle
  */
 
-import { versatilDispatcher } from './agent-dispatcher';
-import { versatilIntegration } from './framework-integration';
+import { versatilDispatcher } from './agent-dispatcher.js';
+import { versatilIntegration } from './framework-integration.js';
 import { spawn, exec } from 'child_process';
 import { promises as fs } from 'fs';
 import path from 'path';

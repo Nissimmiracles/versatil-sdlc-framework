@@ -5,9 +5,9 @@
  * Completes the adaptive SDLC flywheel with intelligent phase transitions
  */
 
-import { VERSATILLogger } from '../utils/logger';
-import { AgentRegistry } from '../agents/agent-registry';
-import { BaseAgent, AgentActivationContext } from '../agents/base-agent';
+import { VERSATILLogger } from '../utils/logger.js';
+import { AgentRegistry } from '../agents/agent-registry.js';
+import { BaseAgent, AgentActivationContext } from '../agents/base-agent.js';
 
 export interface SDLCPhase {
   id: string;

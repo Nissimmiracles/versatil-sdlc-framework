@@ -11,13 +11,13 @@
  * - Cursor-Claude bridge functionality
  */
 
-import { versatilDispatcher } from './agent-dispatcher';
-import { versatilIntegration } from './framework-integration';
-import { versatilDevIntegration } from './development-integration';
-import { cursorClaudeBridge } from './cursor-claude-bridge';
-import { qualityGateEnforcer } from './quality-gate-enforcer';
-import { enhancedContextValidator } from './enhanced-context-validator';
-import { emergencyResponseSystem } from './emergency-response-system';
+import { versatilDispatcher } from './agent-dispatcher.js';
+import { versatilIntegration } from './framework-integration.js';
+import { versatilDevIntegration } from './development-integration.js';
+import { cursorClaudeBridge } from './cursor-claude-bridge.js';
+import { qualityGateEnforcer } from './quality-gate-enforcer.js';
+import { enhancedContextValidator } from './enhanced-context-validator.js';
+import { emergencyResponseSystem } from './emergency-response-system.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 

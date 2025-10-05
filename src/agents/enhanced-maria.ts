@@ -1,8 +1,8 @@
-import { RAGEnabledAgent, RAGConfig, AgentRAGContext } from './rag-enabled-agent';
-import { AgentResponse, AgentActivationContext } from './base-agent';
-import { PatternAnalyzer, AnalysisResult } from '../intelligence/pattern-analyzer';
-import { PromptGenerator } from '../intelligence/prompt-generator';
-import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store';
+import { RAGEnabledAgent, RAGConfig, AgentRAGContext } from './rag-enabled-agent.js';
+import { AgentResponse, AgentActivationContext } from './base-agent.js';
+import { PatternAnalyzer, AnalysisResult } from '../intelligence/pattern-analyzer.js';
+import { PromptGenerator } from '../intelligence/prompt-generator.js';
+import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
 
 export class EnhancedMaria extends RAGEnabledAgent {
   name = 'EnhancedMaria';

@@ -7,8 +7,8 @@
  * BEFORE they break the development environment
  */
 
-import { versatilDispatcher } from './agent-dispatcher';
-import { cursorClaudeBridge } from './cursor-claude-bridge';
+import { versatilDispatcher } from './agent-dispatcher.js';
+import { cursorClaudeBridge } from './cursor-claude-bridge.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { spawn, exec } from 'child_process';

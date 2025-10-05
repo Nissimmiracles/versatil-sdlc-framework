@@ -5,8 +5,8 @@
  * Main Entry Point with Enhanced Features
  */
 
-import { startEnhancedServer, startAutonomousMode } from './enhanced-server';
-import { VersatilMigration } from './scripts/migrate-to-1.2.0';
+import { startEnhancedServer, startAutonomousMode } from './enhanced-server.js';
+import { VersatilMigration } from './scripts/migrate-to-1.2.0.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

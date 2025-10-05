@@ -5,10 +5,10 @@
  * to enable continuous improvement based on real user interactions.
  */
 
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../agents/base-agent';
-import { usageAnalytics } from './usage-analytics';
-import { adaptiveLearning } from './adaptive-learning';
-import { VERSATILLogger } from '../utils/logger';
+import { BaseAgent, AgentActivationContext, AgentResponse } from '../agents/base-agent.js';
+import { usageAnalytics } from './usage-analytics.js';
+import { adaptiveLearning } from './adaptive-learning.js';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export interface IntelligentAgentWrapper {
   agent: BaseAgent;

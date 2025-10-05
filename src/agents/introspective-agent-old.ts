@@ -1,6 +1,6 @@
-import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent';
-import { VERSATILLogger } from '../utils/logger';
-import { PerformanceMonitor } from '../analytics/performance-monitor';
+import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent.js';
+import { VERSATILLogger } from '../utils/logger.js';
+import { PerformanceMonitor } from '../analytics/performance-monitor.js';
 import * as fs from 'fs-extra';
 import { exec } from 'child_process';
 import { promisify } from 'util';

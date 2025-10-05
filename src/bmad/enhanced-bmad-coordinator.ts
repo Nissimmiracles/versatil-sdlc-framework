@@ -4,13 +4,13 @@
  */
 
 import { EventEmitter } from 'events';
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../agents/base-agent';
-import { AgentRegistry } from '../agents/agent-registry';
-import { VERSATILLogger } from '../utils/logger';
-import { vectorMemoryStore, RAGQuery } from '../rag/vector-memory-store';
-import { OperaOrchestrator, OperaGoal } from '../opera/opera-orchestrator';
-import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator';
-import { AgentIntelligenceManager } from '../intelligence/agent-intelligence';
+import { BaseAgent, AgentActivationContext, AgentResponse } from '../agents/base-agent.js';
+import { AgentRegistry } from '../agents/agent-registry.js';
+import { VERSATILLogger } from '../utils/logger.js';
+import { vectorMemoryStore, RAGQuery } from '../rag/vector-memory-store.js';
+import { OperaOrchestrator, OperaGoal } from '../opera/opera-orchestrator.js';
+import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator.js';
+import { AgentIntelligenceManager } from '../intelligence/agent-intelligence.js';
 
 export interface EnhancedBMADConfig {
   ragEnabled: boolean;

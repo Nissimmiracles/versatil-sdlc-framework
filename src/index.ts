@@ -21,30 +21,30 @@ export class VERSATIL {
 export default VERSATIL;
 
 // Export all types
-export * from './types';
+export * from './types/agent-types.js';
 
 // Export all agents
-export { BaseAgent } from './agents/base-agent';
-export { RAGEnabledAgent } from './agents/rag-enabled-agent';
-export { EnhancedMaria } from './agents/enhanced-maria';
-export { EnhancedJames } from './agents/enhanced-james';
-export { EnhancedMarcus } from './agents/enhanced-marcus';
-export { AlexBa } from './agents/alex-ba';
-export { SarahPm } from './agents/sarah-pm';
-export { DrAiMl } from './agents/dr-ai-ml';
-export { IntrospectiveAgent } from './agents/introspective-agent';
-export { AgentRegistry } from './agents/agent-registry';
+export { BaseAgent } from './agents/base-agent.js';
+export { RAGEnabledAgent } from './agents/rag-enabled-agent.js';
+export { EnhancedMaria } from './agents/enhanced-maria.js';
+export { EnhancedJames } from './agents/enhanced-james.js';
+export { EnhancedMarcus } from './agents/enhanced-marcus.js';
+export { AlexBa } from './agents/alex-ba.js';
+export { SarahPm } from './agents/sarah-pm.js';
+export { DrAiMl } from './agents/dr-ai-ml.js';
+export { IntrospectiveAgent } from './agents/introspective-agent.js';
+export { AgentRegistry } from './agents/agent-registry.js';
 
 // Export orchestration
-export { ProactiveAgentOrchestrator } from './orchestration/proactive-agent-orchestrator';
-export { ParallelTaskManager } from './orchestration/parallel-task-manager';
+export { ProactiveAgentOrchestrator } from './orchestration/proactive-agent-orchestrator.js';
+export { ParallelTaskManager } from './orchestration/parallel-task-manager.js';
 
 // Export RAG system
-export { EnhancedVectorMemoryStore } from './rag/enhanced-vector-memory-store';
+export { EnhancedVectorMemoryStore } from './rag/enhanced-vector-memory-store.js';
 
 // Export intelligence
-export { PatternAnalyzer } from './intelligence/pattern-analyzer';
-export { PromptGenerator } from './intelligence/prompt-generator';
+export { PatternAnalyzer } from './intelligence/pattern-analyzer.js';
+export { PromptGenerator} from './intelligence/prompt-generator.js';
 
 // Export utilities
-export { VERSATILLogger } from './utils/logger';
+export { VERSATILLogger } from './utils/logger.js';

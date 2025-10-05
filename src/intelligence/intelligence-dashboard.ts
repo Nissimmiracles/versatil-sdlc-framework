@@ -5,10 +5,10 @@
  * agent intelligence metrics, and user interaction patterns.
  */
 
-import { agentIntelligence } from './agent-intelligence';
-import { usageAnalytics } from './usage-analytics';
-import { adaptiveLearning } from './adaptive-learning';
-import { VERSATILLogger } from '../utils/logger';
+import { agentIntelligence } from './agent-intelligence.js';
+import { usageAnalytics } from './usage-analytics.js';
+import { adaptiveLearning } from './adaptive-learning.js';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export interface IntelligenceDashboardData {
   systemOverview: {

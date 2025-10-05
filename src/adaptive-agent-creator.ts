@@ -3,7 +3,7 @@
  * Automatically creates new specialized agents when specific patterns/needs are detected
  */
 
-import { VERSATILAgentDispatcher, AgentTrigger } from './agent-dispatcher';
+import { VERSATILAgentDispatcher, AgentTrigger } from './agent-dispatcher.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

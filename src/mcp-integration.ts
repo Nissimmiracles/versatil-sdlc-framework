@@ -3,7 +3,7 @@
  * Connects VERSATIL framework agents to actual MCP tool execution
  */
 
-import { AgentActivationContext } from './agent-dispatcher';
+import { AgentActivationContext } from './agent-dispatcher.js';
 
 export interface MCPToolResult {
   success: boolean;

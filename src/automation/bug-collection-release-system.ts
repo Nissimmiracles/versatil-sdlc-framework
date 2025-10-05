@@ -4,9 +4,9 @@
  */
 
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { AgenticRAGOrchestrator } from '../orchestration/agentic-rag-orchestrator';
-import { DailyAuditSystem } from '../audit/daily-audit-system';
+import { VERSATILLogger } from '../utils/logger.js';
+import { AgenticRAGOrchestrator } from '../orchestration/agentic-rag-orchestrator.js';
+import { DailyAuditSystem } from '../audit/daily-audit-system.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { exec } from 'child_process';

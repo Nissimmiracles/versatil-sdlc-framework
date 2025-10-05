@@ -3,7 +3,7 @@
  * Enables agents to learn from each other's successes and failures
  */
 
-import { EnhancedVectorMemoryStore } from './enhanced-vector-memory-store';
+import { EnhancedVectorMemoryStore } from './enhanced-vector-memory-store.js';
 
 export interface AgentInteraction {
   sourceAgent: string;

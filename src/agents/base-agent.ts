@@ -1,4 +1,4 @@
-import { AgentResponse, AgentActivationContext, ValidationResults, Issue, Recommendation } from '../types';
+import { AgentResponse, AgentActivationContext, ValidationResults, Issue, Recommendation } from '../types.js';
 
 export { AgentResponse, AgentActivationContext, ValidationResults, Issue, Recommendation };
 

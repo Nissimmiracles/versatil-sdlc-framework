@@ -3,13 +3,13 @@
  * Has complete visibility into all framework operations and can optimize itself
  */
 
-import { BaseAgent } from '../base-agent';
-import { AgentResponse, AgentActivationContext } from '../agent-types';
-import { VERSATILLogger } from '../../utils/logger';
-import { IsolatedVERSATILOrchestrator } from '../../orchestration/isolated-versatil-orchestrator';
-import { AgenticRAGOrchestrator, AgentMemory } from '../../orchestration/agentic-rag-orchestrator';
-import { PlanFirstOpera, MultiAgentPlan } from '../../orchestration/plan-first-opera';
-import { StackAwareOrchestrator } from '../../orchestration/stack-aware-orchestrator';
+import { BaseAgent } from '../base-agent.js';
+import { AgentResponse, AgentActivationContext } from '../agent-types.js';
+import { VERSATILLogger } from '../../utils/logger.js';
+import { IsolatedVERSATILOrchestrator } from '../../orchestration/isolated-versatil-orchestrator.js';
+import { AgenticRAGOrchestrator, AgentMemory } from '../../orchestration/agentic-rag-orchestrator.js';
+import { PlanFirstOpera, MultiAgentPlan } from '../../orchestration/plan-first-opera.js';
+import { StackAwareOrchestrator } from '../../orchestration/stack-aware-orchestrator.js';
 
 export interface SystemInsight {
   type: 'pattern' | 'inefficiency' | 'optimization' | 'anomaly' | 'learning';

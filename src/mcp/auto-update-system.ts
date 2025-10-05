@@ -4,10 +4,10 @@
  */
 
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { vectorMemoryStore } from '../rag/vector-memory-store';
-import { MCPAutoDiscoveryAgent, MCPDefinition } from '../agents/mcp/mcp-auto-discovery-agent';
-import { environmentScanner } from '../environment/environment-scanner';
+import { VERSATILLogger } from '../utils/logger.js';
+import { vectorMemoryStore } from '../rag/vector-memory-store.js';
+import { MCPAutoDiscoveryAgent, MCPDefinition } from '../agents/mcp/mcp-auto-discovery-agent.js';
+import { environmentScanner } from '../environment/environment-scanner.js';
 
 export interface AutoUpdateConfig {
   enabled: boolean;

@@ -7,9 +7,9 @@
  * - Generate context-aware prompts with historical knowledge
  */
 
-import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent';
-import { EnhancedVectorMemoryStore, MemoryDocument, RAGQuery } from '../rag/enhanced-vector-memory-store';
-import { AnalysisResult } from '../intelligence/pattern-analyzer';
+import { BaseAgent, AgentResponse, AgentActivationContext } from './base-agent.js';
+import { EnhancedVectorMemoryStore, MemoryDocument, RAGQuery } from '../rag/enhanced-vector-memory-store.js';
+import { AnalysisResult } from '../intelligence/pattern-analyzer.js';
 
 export interface RAGConfig {
   maxExamples: number;

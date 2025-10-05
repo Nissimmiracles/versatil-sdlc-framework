@@ -7,9 +7,9 @@
  * This ensures agents understand exactly what needs to be done before starting work
  */
 
-import { versatilDispatcher } from './agent-dispatcher';
-import { cursorClaudeBridge } from './cursor-claude-bridge';
-import { qualityGateEnforcer } from './quality-gate-enforcer';
+import { versatilDispatcher } from './agent-dispatcher.js';
+import { cursorClaudeBridge } from './cursor-claude-bridge.js';
+import { qualityGateEnforcer } from './quality-gate-enforcer.js';
 import path from 'path';
 import { promises as fs } from 'fs';
 

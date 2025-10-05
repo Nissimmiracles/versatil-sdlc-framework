@@ -6,8 +6,8 @@
  * and other cross-file consistency issues.
  */
 
-import { BaseAgent, AgentActivationContext, ValidationResults } from '../agents/base-agent';
-import { AgentRegistry } from '../agents/agent-registry';
+import { BaseAgent, AgentActivationContext, ValidationResults } from '../agents/base-agent.js';
+import { AgentRegistry } from '../agents/agent-registry.js';
 
 export interface TestScenario {
   id: string;
@@ -191,10 +191,10 @@ export const DEFAULT_API_URL = 'https://api.production.com'; // Yet another diff
       mockContent: `
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Dashboard } from './Dashboard';
-import { Profile } from './Profile';
-import { UnusedComponent } from './UnusedComponent'; // Dead import
-import { AnotherUnused } from './AnotherUnused'; // Dead import
+import { Dashboard } from './Dashboard.js';
+import { Profile } from './Profile.js';
+import { UnusedComponent } from './UnusedComponent.js'; // Dead import
+import { AnotherUnused } from './AnotherUnused.js'; // Dead import
 
 function AppRoutes() {
   return (

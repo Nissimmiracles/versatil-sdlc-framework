@@ -3,7 +3,7 @@
  * MCP tool definitions for user feedback collection and analysis
  */
 
-import { VERSATILFeedbackCollector, FeedbackCategory, FeedbackType } from '../feedback/feedback-collector';
+import { VERSATILFeedbackCollector, FeedbackCategory, FeedbackType } from '../feedback/feedback-collector.js';
 
 export interface FeedbackMCPTools {
   versatil_submit_feedback: {

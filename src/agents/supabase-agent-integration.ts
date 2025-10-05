@@ -5,12 +5,12 @@
  * providing seamless integration, learning capabilities, and real-time collaboration.
  */
 
-import { SupabaseVectorStore, CodePattern, AgentSolution, AgentInteraction } from '../lib/supabase-vector-store';
-import { RAGEnabledAgent, AgentRAGContext } from './rag-enabled-agent';
-import { MemoryDocument } from '../rag/enhanced-vector-memory-store';
-import { AnalysisResult } from '../intelligence/pattern-analyzer';
-import { AgentActivationContext } from './base-agent';
-import { VERSATILLogger } from '../utils/logger';
+import { SupabaseVectorStore, CodePattern, AgentSolution, AgentInteraction } from '../lib/supabase-vector-store.js';
+import { RAGEnabledAgent, AgentRAGContext } from './rag-enabled-agent.js';
+import { MemoryDocument } from '../rag/enhanced-vector-memory-store.js';
+import { AnalysisResult } from '../intelligence/pattern-analyzer.js';
+import { AgentActivationContext } from './base-agent.js';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export interface SupabaseRAGConfig {
   supabaseUrl: string;

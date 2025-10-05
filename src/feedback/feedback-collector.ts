@@ -6,7 +6,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export interface UserFeedback {
   id: string;

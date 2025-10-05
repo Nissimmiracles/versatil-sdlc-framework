@@ -8,7 +8,7 @@
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
-import { VERSATILLogger } from '../utils/logger';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export interface UserInteraction {
   id: string;

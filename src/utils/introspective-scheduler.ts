@@ -5,8 +5,8 @@
  * continuous framework monitoring and optimization without user intervention.
  */
 
-import { IntrospectiveAgent } from '../agents/introspective-agent';
-import { VERSATILLogger } from './logger';
+import { IntrospectiveAgent } from '../agents/introspective-agent.js';
+import { VERSATILLogger } from './logger.js';
 import { EventEmitter } from 'events';
 
 export interface SchedulerConfig {

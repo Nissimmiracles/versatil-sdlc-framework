@@ -8,8 +8,8 @@ import { z } from 'zod';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { MicrosegmentationFramework, ProjectSecurityContext } from './microsegmentation-framework';
-import { VERSATILLogger } from '../utils/logger';
+import { MicrosegmentationFramework, ProjectSecurityContext } from './microsegmentation-framework.js';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export const ZeroTrustPolicySchema = z.object({
   never_trust: z.boolean().default(true),

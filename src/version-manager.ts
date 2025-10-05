@@ -6,7 +6,7 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { ChangelogGenerator } from './changelog-generator';
+import { ChangelogGenerator } from './changelog-generator.js';
 
 export type VersionBumpType = 'major' | 'minor' | 'patch' | 'prerelease';
 

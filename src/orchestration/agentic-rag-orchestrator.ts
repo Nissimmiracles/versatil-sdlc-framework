@@ -4,9 +4,9 @@
  */
 
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { IsolatedPaths } from './isolated-versatil-orchestrator';
-import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store';
+import { VERSATILLogger } from '../utils/logger.js';
+import { IsolatedPaths } from './isolated-versatil-orchestrator.js';
+import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
 import * as path from 'path';
 
 export interface AgentMemory {

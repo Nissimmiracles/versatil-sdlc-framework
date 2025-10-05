@@ -23,4 +23,4 @@ export interface AgentCapability {
   enabled: boolean;
 }
 
-export { AgentResponse, AgentActivationContext, Issue, Recommendation } from './base-agent';
+export { AgentResponse, AgentActivationContext, Issue, Recommendation } from './base-agent.js';

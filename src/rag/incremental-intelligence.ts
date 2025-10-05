@@ -3,8 +3,8 @@
  * Framework gets smarter with every interaction
  */
 
-import { EnhancedVectorMemoryStore } from './enhanced-vector-memory-store';
-import { AgentResponse, AgentActivationContext } from '../agents/base-agent';
+import { EnhancedVectorMemoryStore } from './enhanced-vector-memory-store.js';
+import { AgentResponse, AgentActivationContext } from '../agents/base-agent.js';
 
 export interface IntelligenceMetrics {
   totalInteractions: number;

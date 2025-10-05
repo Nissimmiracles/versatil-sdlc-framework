@@ -4,8 +4,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { IsolatedPaths } from './isolated-versatil-orchestrator';
+import { VERSATILLogger } from '../utils/logger.js';
+import { IsolatedPaths } from './isolated-versatil-orchestrator.js';
 import * as path from 'path';
 
 export interface GitHubConfig {

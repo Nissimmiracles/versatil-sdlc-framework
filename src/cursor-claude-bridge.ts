@@ -6,8 +6,8 @@
  * making the BMAD methodology work consistently across both tools
  */
 
-import { versatilDispatcher, AgentActivationContext } from './agent-dispatcher';
-import { versatilDevIntegration } from './development-integration';
+import { versatilDispatcher, AgentActivationContext } from './agent-dispatcher.js';
+import { versatilDevIntegration } from './development-integration.js';
 import path from 'path';
 import { promises as fs } from 'fs';
 

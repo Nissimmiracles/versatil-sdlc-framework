@@ -6,8 +6,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { adaptiveLearning, UserInteraction } from './adaptive-learning';
+import { VERSATILLogger } from '../utils/logger.js';
+import { adaptiveLearning, UserInteraction } from './adaptive-learning.js';
 
 export interface AgentUsageEvent {
   id: string;

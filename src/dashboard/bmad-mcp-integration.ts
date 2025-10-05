@@ -3,8 +3,8 @@
  * Connects Quality Dashboard with Model Context Protocol for real-time agent orchestration
  */
 
-import { BMADQualityDashboard, QualityMetrics } from './bmad-quality-dashboard';
-import { VERSATILLogger } from '../utils/logger';
+import { BMADQualityDashboard, QualityMetrics } from './bmad-quality-dashboard.js';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export interface MCPDashboardTools {
   name: string;

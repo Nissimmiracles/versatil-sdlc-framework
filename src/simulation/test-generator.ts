@@ -7,9 +7,9 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { VERSATILLogger } from '../utils/logger';
-import { FrameworkPromise, TestableScenario } from './feature-mapper';
-import { SimulationScenario, TestCase } from '../agents/simulation-qa';
+import { VERSATILLogger } from '../utils/logger.js';
+import { FrameworkPromise, TestableScenario } from './feature-mapper.js';
+import { SimulationScenario, TestCase } from '../agents/simulation-qa.js';
 
 export interface GeneratedTestSuite {
   id: string;

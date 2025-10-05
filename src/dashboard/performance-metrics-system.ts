@@ -4,8 +4,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { AgenticRAGOrchestrator } from '../orchestration/agentic-rag-orchestrator';
+import { VERSATILLogger } from '../utils/logger.js';
+import { AgenticRAGOrchestrator } from '../orchestration/agentic-rag-orchestrator.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

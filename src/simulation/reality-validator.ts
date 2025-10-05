@@ -12,9 +12,9 @@ import * as path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { GeneratedTestSuite } from './test-generator';
-import { SimulationScenario, TestCase } from '../agents/simulation-qa';
+import { VERSATILLogger } from '../utils/logger.js';
+import { GeneratedTestSuite } from './test-generator.js';
+import { SimulationScenario, TestCase } from '../agents/simulation-qa.js';
 
 const execAsync = promisify(exec);
 

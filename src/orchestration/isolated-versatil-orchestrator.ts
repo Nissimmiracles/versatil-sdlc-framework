@@ -6,10 +6,10 @@
 import * as path from 'path';
 import * as os from 'os';
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { StackAwareOrchestrator } from './stack-aware-orchestrator';
-import { PlanFirstOpera } from './plan-first-opera';
-import { GitHubSyncOrchestrator } from './github-sync-orchestrator';
+import { VERSATILLogger } from '../utils/logger.js';
+import { StackAwareOrchestrator } from './stack-aware-orchestrator.js';
+import { PlanFirstOpera } from './plan-first-opera.js';
+import { GitHubSyncOrchestrator } from './github-sync-orchestrator.js';
 
 export interface IsolatedPaths {
   framework: {

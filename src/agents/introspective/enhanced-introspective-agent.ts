@@ -8,13 +8,13 @@
  * - All other agents and components
  */
 
-import { BaseAgent } from '../base-agent';
-import { AgentResponse, AgentActivationContext } from '../agent-types';
-import { VERSATILLogger } from '../../utils/logger';
-import { vectorMemoryStore, RAGQuery } from '../../rag/vector-memory-store';
-import { OperaOrchestrator, OperaGoal } from '../../opera/opera-orchestrator';
-import { environmentScanner, ProjectContext } from '../../environment/environment-scanner';
-import { AgentRegistry } from '../agent-registry';
+import { BaseAgent } from '../base-agent.js';
+import { AgentResponse, AgentActivationContext } from '../agent-types.js';
+import { VERSATILLogger } from '../../utils/logger.js';
+import { vectorMemoryStore, RAGQuery } from '../../rag/vector-memory-store.js';
+import { OperaOrchestrator, OperaGoal } from '../../opera/opera-orchestrator.js';
+import { environmentScanner, ProjectContext } from '../../environment/environment-scanner.js';
+import { AgentRegistry } from '../agent-registry.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { spawn } from 'child_process';

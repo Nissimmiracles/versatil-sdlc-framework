@@ -14,9 +14,9 @@
  */
 
 import { EventEmitter } from 'events';
-import { ParallelTaskManager, Task, TaskType, Priority, SDLCPhase, CollisionRisk } from '../orchestration/parallel-task-manager';
-import { AutomatedStressTestGenerator, StressTestType, TargetType } from '../testing/automated-stress-test-generator';
-import { DailyAuditSystem, AuditType, CheckCategory } from '../audit/daily-audit-system';
+import { ParallelTaskManager, Task, TaskType, Priority, SDLCPhase, CollisionRisk } from '../orchestration/parallel-task-manager.js';
+import { AutomatedStressTestGenerator, StressTestType, TargetType } from '../testing/automated-stress-test-generator.js';
+import { DailyAuditSystem, AuditType, CheckCategory } from '../audit/daily-audit-system.js';
 
 export interface EnhancedAgentConfig {
   id: string;

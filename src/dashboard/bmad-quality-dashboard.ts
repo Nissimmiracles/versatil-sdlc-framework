@@ -3,8 +3,8 @@
  * Real-time UI/UX Testing Flywheel with Agent Orchestration
  */
 
-import { BMADTestingOrchestrator, UITestingContext, TestingWorkflowResult } from '../testing/bmad-testing-orchestrator';
-import { VERSATILLogger } from '../utils/logger';
+import { BMADTestingOrchestrator, UITestingContext, TestingWorkflowResult } from '../testing/bmad-testing-orchestrator.js';
+import { VERSATILLogger } from '../utils/logger.js';
 import { EventEmitter } from 'events';
 
 export interface QualityMetrics {

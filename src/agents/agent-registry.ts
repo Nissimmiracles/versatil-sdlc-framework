@@ -1,17 +1,17 @@
-import { VERSATILLogger } from '../utils/logger';
-import { BaseAgent } from './base-agent';
-import { EnhancedMaria } from './enhanced-maria';
-import { EnhancedJames } from './enhanced-james';
-import { EnhancedMarcus } from './enhanced-marcus';
-import { SarahPm } from './sarah-pm';
-import { AlexBa } from './alex-ba';
-import { DrAiMl } from './dr-ai-ml';
-import { DevopsDan } from './devops-dan';
-import { SecuritySam } from './security-sam';
-import { ArchitectureDan } from './architecture-dan';
-import { DeploymentOrchestrator } from './deployment-orchestrator';
-import { IntrospectiveAgent } from './introspective-agent';
-import { SimulationQa } from './simulation-qa';
+import { VERSATILLogger } from '../utils/logger.js';
+import { BaseAgent } from './base-agent.js';
+import { EnhancedMaria } from './enhanced-maria.js';
+import { EnhancedJames } from './enhanced-james.js';
+import { EnhancedMarcus } from './enhanced-marcus.js';
+import { SarahPm } from './sarah-pm.js';
+import { AlexBa } from './alex-ba.js';
+import { DrAiMl } from './dr-ai-ml.js';
+import { DevopsDan } from './devops-dan.js';
+import { SecuritySam } from './security-sam.js';
+import { ArchitectureDan } from './architecture-dan.js';
+import { DeploymentOrchestrator } from './deployment-orchestrator.js';
+import { IntrospectiveAgent } from './introspective-agent.js';
+import { SimulationQa } from './simulation-qa.js';
 
 export class AgentRegistry {
   private agents = new Map<string, BaseAgent>();

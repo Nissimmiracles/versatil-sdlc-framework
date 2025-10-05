@@ -5,8 +5,8 @@
  * This service makes the theoretical framework actually work in practice
  */
 
-import { versatilDispatcher } from './agent-dispatcher';
-import type { AgentResponse } from './agent-dispatcher';
+import { versatilDispatcher } from './agent-dispatcher.js';
+import type { AgentResponse } from './agent-dispatcher.js';
 
 interface DevelopmentEnvironment {
   tool: 'claude-code' | 'cursor' | 'vscode';

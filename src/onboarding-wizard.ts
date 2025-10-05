@@ -6,8 +6,8 @@
 import * as readline from 'readline';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { VERSATILAgentDispatcher, AgentTrigger } from './agent-dispatcher';
-import { AdaptiveAgentCreator } from './adaptive-agent-creator';
+import { VERSATILAgentDispatcher, AgentTrigger } from './agent-dispatcher.js';
+import { AdaptiveAgentCreator } from './adaptive-agent-creator.js';
 
 export interface OnboardingResponse {
   projectType: 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'ml' | 'enterprise';

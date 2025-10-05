@@ -9,8 +9,8 @@ import express from 'express';
 import { createServer } from 'http';
 import * as path from 'path';
 import * as fs from 'fs';
-import { VERSATILLogger } from './utils/logger';
-import { PerformanceMonitor } from './analytics/performance-monitor';
+import { VERSATILLogger } from './utils/logger.js';
+import { PerformanceMonitor } from './analytics/performance-monitor.js';
 
 // Initialize logger and performance monitor
 const logger = new VERSATILLogger();

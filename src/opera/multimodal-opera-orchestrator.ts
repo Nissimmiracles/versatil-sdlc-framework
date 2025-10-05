@@ -4,8 +4,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { VERSATILLogger } from '../utils/logger';
-import { vectorMemoryStore, RAGQuery } from '../rag/enhanced-vector-memory-store';
+import { VERSATILLogger } from '../utils/logger.js';
+import { vectorMemoryStore, RAGQuery } from '../rag/enhanced-vector-memory-store.js';
 
 type AIModel = { id: string; name: string; modalities: string[]; strengths: string[]; contextWindow?: number; };
 
