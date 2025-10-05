@@ -261,10 +261,6 @@ export * from './types';
   console.log('\n🚀 Or run directly without building:');
   console.log('  node test-self-referential.cjs');
   console.log('  node enhanced-onboarding.cjs');
-  
-} catch (error) {
-  console.error('❌ Error during fix:', error);
-}
 }
 
 // Run the complete fix
