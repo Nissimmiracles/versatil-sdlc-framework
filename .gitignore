@@ -92,7 +92,7 @@ ehthumbs.db
 Thumbs.db
 
 # Package Managers
-package-lock.json
+# package-lock.json  # Needed for GitHub Actions npm ci
 yarn.lock
 pnpm-lock.yaml
 
