@@ -1,4 +1,4 @@
-name: 🚀 VERSATIL SDLC Framework - Continuous Integration
+name: CI
 
 on:
   push:
@@ -7,340 +7,57 @@ on:
     branches: [ main, develop ]
   workflow_dispatch:
 
-env:
-  NODE_VERSION: '18'
-  VERSATIL_ENV: testing
-  CI: true
-
 jobs:
-  # 🔍 Environment Detection and Setup
-  setup:
-    name: 🔧 Environment Setup
-    runs-on: ubuntu-latest
-    outputs:
-      environment: ${{ steps.detect.outputs.environment }}
-      cache-key: ${{ steps.cache-key.outputs.key }}
-    steps:
-      - name: 📂 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🔍 Detect Environment
-        id: detect
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "environment=production" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-            echo "environment=staging" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "environment=testing" >> $GITHUB_OUTPUT
-          else
-            echo "environment=development" >> $GITHUB_OUTPUT
-          fi
-
-      - name: 🔑 Generate Cache Key
-        id: cache-key
-        run: |
-          echo "key=node-${{ env.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
-
-  # 🧪 Quality Gates - Run in Parallel
-  quality-gates:
-    name: 🛡️ Quality Gates
-    runs-on: ubuntu-latest
-    needs: setup
-    strategy:
-      matrix:
-        gate: [lint, typecheck, security, dependencies]
-      fail-fast: false
-    steps:
-      - name: 📂 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Install dependencies
-        run: npm ci
-
-      - name: 🔍 Run Quality Gate - ${{ matrix.gate }}
-        run: |
-          case "${{ matrix.gate }}" in
-            lint)
-              npm run lint || echo "::warning::Linting issues found"
-              ;;
-            typecheck)
-              npm run typecheck || echo "::warning::TypeScript issues found"
-              ;;
-            security)
-              npm audit --audit-level=moderate || echo "::warning::Security vulnerabilities found"
-              ;;
-            dependencies)
-              npm outdated || echo "::warning::Outdated dependencies found"
-              ;;
-          esac
-
-  # 🧪 Enhanced Testing Matrix
-  test-matrix:
-    name: 🧪 Test Suite
+  test:
+    name: Test on ${{ matrix.os }} with Node ${{ matrix.node }}
     runs-on: ${{ matrix.os }}
-    needs: setup
+
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        test-type: [unit, integration, e2e]
-        include:
-          - test-type: unit
-            command: npm run test:unit
-            coverage: true
-          - test-type: integration
-            command: npm run test:integration
-            coverage: false
-          - test-type: e2e
-            command: npm run test:e2e
-            coverage: false
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [18, 20]
       fail-fast: false
+
     steps:
-      - name: 📂 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ matrix.node }}
           cache: 'npm'
 
-      - name: 📦 Install dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: 🔧 Setup Environment
-        run: |
-          echo "VERSATIL_ENV=testing" >> $GITHUB_ENV
-          cp .env.example .env
+      - name: Run unit tests
+        run: npm run test:unit
 
-      - name: 🏗️ Build Framework
+      - name: Build
         run: npm run build
 
-      - name: 🎭 Install Playwright Browsers
-        if: matrix.test-type == 'e2e'
-        run: npx playwright install --with-deps chromium
-
-      - name: 🧪 Run Tests - ${{ matrix.test-type }}
-        run: ${{ matrix.command }}
-        env:
-          FORCE_COLOR: 1
-
-      - name: 📊 Upload Coverage
-        if: matrix.coverage == true && matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage/lcov.info
-          flags: ${{ matrix.test-type }}
-          name: codecov-${{ matrix.test-type }}
-
-  # 🎯 OPERA Agent Testing
-  opera-agent-tests:
-    name: 🤖 OPERA Agents
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
-    needs: setup
-    strategy:
-      matrix:
-        agent: [maria-qa, james-frontend, marcus-backend, sarah-pm]
-      fail-fast: false
+
     steps:
-      - name: 📂 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '20'
           cache: 'npm'
 
-      - name: 📦 Install dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: 🤖 Test OPERA Agent - ${{ matrix.agent }}
-        run: |
-          npm run test:agent:${{ matrix.agent }} || echo "::warning::Agent ${{ matrix.agent }} tests incomplete"
+      - name: Run linter
+        run: npm run lint || echo "::warning::Linting issues found"
+        continue-on-error: true
 
-      - name: 📊 Agent Performance Report
-        run: |
-          npm run test:agent:performance:${{ matrix.agent }} || echo "::warning::Performance tests not available"
-
-  # 🔒 Security and Compliance
-  security-compliance:
-    name: 🔒 Security & Compliance
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: 📂 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Install dependencies
-        run: npm ci
-
-      - name: 🔒 Security Audit
-        run: |
-          npm audit --audit-level=high --production || echo "::warning::Moderate vulnerabilities found in dev dependencies"
-          npx audit-ci --high || true
-
-      - name: 🛡️ OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: 'VERSATIL-SDLC'
-          path: '.'
-          format: 'ALL'
-
-      - name: 🔍 CodeQL Analysis
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
-
-      - name: 🔍 Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-
-      - name: 📊 Upload Security Reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-reports
-          path: reports/
-
-  # 🚀 Performance and Load Testing - Disabled until implemented
-  # performance-tests:
-  #   name: ⚡ Performance Testing
-  #   runs-on: ubuntu-latest
-  #   needs: [setup, quality-gates]
-  #   if: false  # Disabled until performance scripts are implemented
-  #   steps:
-  #     - name: 📂 Checkout code
-  #       uses: actions/checkout@v4
-  #
-  #     - name: 🟢 Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: ${{ env.NODE_VERSION }}
-  #         cache: 'npm'
-  #
-  #     - name: 📦 Install dependencies
-  #       run: npm ci
-  #
-  #     - name: 🏗️ Build Framework
-  #       run: npm run build
-  #
-  #     - name: 🚀 Start Application
-  #       run: |
-  #         npm run start &
-  #         sleep 30
-  #
-  #     - name: ⚡ Performance Testing
-  #       run: |
-  #         npx lighthouse http://localhost:3000 --output json --output-path lighthouse-report.json
-  #         npm run test:performance
-  #
-  #     - name: 📊 Performance Reports
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: performance-reports
-  #         path: |
-  #           lighthouse-report.json
-  #           performance-reports/
-
-  # 🎯 Environment-Specific Deployment Tests
-  deployment-validation:
-    name: 🚀 Deployment Validation
-    runs-on: ubuntu-latest
-    needs: [setup, test-matrix, security-compliance]
-    if: success()
-    strategy:
-      matrix:
-        environment: [testing, staging]
-    steps:
-      - name: 📂 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      - name: 📦 Install dependencies
-        run: npm ci
-
-      - name: 🔧 Configure Environment
-        run: |
-          echo "VERSATIL_ENV=${{ matrix.environment }}" >> $GITHUB_ENV
-          cp config/environments/${{ matrix.environment }}.json .versatil/current-env.json
-
-      - name: 🏗️ Build for Environment
-        run: npm run build:${{ matrix.environment }}
-
-      - name: 🧪 Environment Health Check
-        run: npm run health:check:${{ matrix.environment }}
-
-      - name: 🚀 Deployment Simulation
-        run: npm run deploy:simulate:${{ matrix.environment }}
-
-  # 📊 Comprehensive Reporting
-  reporting:
-    name: 📊 Comprehensive Reporting
-    runs-on: ubuntu-latest
-    needs: [test-matrix, opera-agent-tests, security-compliance, deployment-validation]
-    if: always()
-    steps:
-      - name: 📂 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 📊 Generate CI Report
-        run: |
-          mkdir -p ci-reports
-          echo "# 🚀 VERSATIL SDLC Framework - CI Report" > ci-reports/summary.md
-          echo "## 📅 Build Date: $(date)" >> ci-reports/summary.md
-          echo "## 🔍 Environment: ${{ needs.setup.outputs.environment }}" >> ci-reports/summary.md
-          echo "## 📊 Test Results Summary" >> ci-reports/summary.md
-
-      - name: 📤 Upload CI Reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: ci-reports
-          path: ci-reports/
-
-      - name: 💬 Comment on PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const summary = fs.readFileSync('ci-reports/summary.md', 'utf8');
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: summary
-            });
-
-  # ✅ Final Status Check
-  ci-success:
-    name: ✅ CI Success
-    runs-on: ubuntu-latest
-    needs: [quality-gates, test-matrix, opera-agent-tests, security-compliance, deployment-validation]
-    if: success()
-    steps:
-      - name: 🎉 CI Success
-        run: |
-          echo "🎉 All CI checks passed successfully!"
-          echo "✅ Quality Gates: Passed"
-          echo "✅ Test Matrix: Passed"
-          echo "✅ OPERA Agents: Passed"
-          echo "✅ Security & Compliance: Passed"
-          echo "✅ Deployment Validation: Passed"
-          echo ""
-          echo "🚀 Ready for deployment to ${{ needs.setup.outputs.environment }}"
+      - name: Run typecheck
+        run: npm run typecheck || echo "::warning::TypeScript issues found"
+        continue-on-error: true

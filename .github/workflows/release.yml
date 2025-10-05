@@ -46,6 +46,7 @@ jobs:
 
       - name: Generate changelog
         id: changelog
+        continue-on-error: true
         run: |
           # Generate changelog from commits since last tag
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")

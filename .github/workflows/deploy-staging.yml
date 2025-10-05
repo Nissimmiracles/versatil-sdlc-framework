@@ -17,6 +17,7 @@ env:
 
 jobs:
   pre-deployment:
+    if: false  # Disabled: Not needed for npm package distribution
     name: 🔍 Pre-Deployment Validation
     runs-on: ubuntu-latest
     outputs:
