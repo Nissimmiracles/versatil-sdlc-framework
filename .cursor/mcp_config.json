@@ -14,6 +14,30 @@
         "RULE_3_DAILY_AUDIT": "true"
       }
     },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "~/.cache/ms-playwright"
+      },
+      "description": "Official Microsoft Playwright MCP for browser automation (Maria-QA, James-Frontend)"
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "description": "Official GitHub MCP for repository operations (Marcus-Backend, Sarah-PM, Alex-BA)"
+    },
+    "exa": {
+      "command": "npx",
+      "args": ["-y", "exa-mcp-server"],
+      "env": {
+        "EXA_API_KEY": "${EXA_API_KEY}"
+      },
+      "description": "Official Exa Labs MCP for AI-powered search and research (Alex-BA, Dr.AI-ML)"
+    },
     "claude-code-mcp": {
       "command": "npx",
       "args": ["-y", "@steipete/claude-code-mcp@latest"],

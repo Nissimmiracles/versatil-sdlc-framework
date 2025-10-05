@@ -53,6 +53,12 @@ export class MCPToolManager {
           result.success = true;
           break;
 
+        case 'exa_mcp':
+        case 'exa_search':
+          result.data = await this.executeExaMCP(context);
+          result.success = true;
+          break;
+
         default:
           throw new Error(`Unknown MCP tool: ${tool}`);
       }
@@ -210,6 +216,84 @@ export class MCPToolManager {
   }
 
   /**
+   * Execute Exa Search MCP for AI-powered research
+   * ✅ PRODUCTION IMPLEMENTATION - Official Exa Labs MCP
+   *
+   * Primary Agents: Alex-BA (requirements research), Dr.AI-ML (ML research)
+   */
+  private async executeExaMCP(context: AgentActivationContext): Promise<any> {
+    try {
+      const { exaMCPExecutor } = await import('./mcp/exa-mcp-executor.js');
+
+      console.log(`🔍 ${context.trigger.agent}: Starting Exa Search MCP research session`);
+
+      // Determine search action based on agent and context
+      let action = 'web_search';
+      let params: any = {};
+
+      // Alex-BA: Requirements and competitive research
+      if (context.trigger.agent === 'Alex-BA') {
+        if (context.userRequest?.includes('company') || context.userRequest?.includes('competitor')) {
+          action = 'company_research';
+          params = {
+            company: this.extractCompanyName(context.userRequest || '')
+          };
+        } else if (context.userRequest?.includes('code') || context.userRequest?.includes('library')) {
+          action = 'get_code_context';
+          params = {
+            library: this.extractLibraryName(context.userRequest || ''),
+            topic: context.userRequest
+          };
+        } else {
+          action = 'web_search';
+          params = {
+            query: context.userRequest || 'software development best practices',
+            numResults: 10,
+            type: 'neural'
+          };
+        }
+      }
+
+      // Dr.AI-ML: ML research and documentation
+      if (context.trigger.agent === 'Dr.AI-ML') {
+        action = 'get_code_context';
+        params = {
+          library: this.extractLibraryName(context.userRequest || 'machine learning'),
+          topic: context.userRequest || 'ML best practices'
+        };
+      }
+
+      // Execute Exa MCP search
+      const searchResult = await exaMCPExecutor.executeExaMCP(action, params);
+
+      if (!searchResult.success) {
+        throw new Error(`Exa Search failed: ${searchResult.error}`);
+      }
+
+      console.log(`✅ Exa Search completed: ${action}`);
+
+      return {
+        agent: context.trigger.agent,
+        action,
+        status: searchResult.success ? 'completed' : 'failed',
+        data: searchResult.data,
+        message: searchResult.success
+          ? `Exa Search ${action} completed successfully`
+          : searchResult.error
+      };
+
+    } catch (error: any) {
+      console.error(`❌ Exa Search MCP execution failed:`, error.message);
+      return {
+        agent: context.trigger.agent,
+        action: 'exa_search',
+        status: 'error',
+        message: `Exa Search MCP failed: ${error.message}`
+      };
+    }
+  }
+
+  /**
    * Helper to call actual MCP functions
    */
   private async callMCPFunction(functionName: string, params: any): Promise<any> {
@@ -343,6 +427,38 @@ export class MCPToolManager {
     // Default component detection
     const matches = filePath.match(/([A-Z][a-zA-Z]+)\.tsx?$/);
     return matches && matches[1] ? matches[1] : 'UnknownComponent';
+  }
+
+  /**
+   * Extract company name from search query
+   */
+  private extractCompanyName(query: string): string {
+    // Remove common words and extract company name
+    const cleaned = query
+      .replace(/company|competitor|research|analyze|about/gi, '')
+      .trim();
+
+    // Extract capitalized words (likely company names)
+    const matches = cleaned.match(/[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*/);
+    return matches ? matches[0] : cleaned || 'Unknown Company';
+  }
+
+  /**
+   * Extract library/framework name from query
+   */
+  private extractLibraryName(query: string): string {
+    // Common library patterns
+    const libraries = ['React', 'Next.js', 'Vue', 'Angular', 'Svelte', 'TypeScript', 'Playwright', 'Jest', 'Node.js'];
+
+    for (const lib of libraries) {
+      if (query.toLowerCase().includes(lib.toLowerCase())) {
+        return lib;
+      }
+    }
+
+    // Extract first capitalized word
+    const matches = query.match(/[A-Z][a-z]+(?:\.[a-z]+)?/);
+    return matches ? matches[0] : 'library';
   }
 
   /**
