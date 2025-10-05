@@ -404,6 +404,13 @@ export class ConfigWizard {
 }
 
 /**
- * Default config wizard instance
+ * Default config wizard instance (singleton)
+ * Lazy-loaded to avoid stdin issues in test environments
  */
-export const defaultConfigWizard = new ConfigWizard();
+let _defaultConfigWizard: ConfigWizard | null = null;
+export function getDefaultConfigWizard(): ConfigWizard {
+  if (!_defaultConfigWizard) {
+    _defaultConfigWizard = new ConfigWizard();
+  }
+  return _defaultConfigWizard;
+}
