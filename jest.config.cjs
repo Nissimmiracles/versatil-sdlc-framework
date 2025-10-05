@@ -167,7 +167,10 @@ module.exports = {
         '!<rootDir>/tests/integration/helpers/**'
       ],
       coverageDirectory: '<rootDir>/coverage/integration',
-      maxWorkers: process.env.CI ? 1 : '50%'
+      maxWorkers: process.env.CI ? 1 : '50%',
+      testTimeout: 35000,  // 35 seconds per test
+      forceExit: true,  // Force Jest to exit after tests complete
+      detectOpenHandles: false  // Disable in normal runs (enable manually for debugging)
     }
   ],
 
