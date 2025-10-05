@@ -152,7 +152,6 @@
     "release:dry": "node scripts/release.cjs patch --dry-run",
     "preversion": "npm run validate && npm run version:check",
     "postversion": "git push && git push --tags",
-    "prepublishOnly": "npm run build:release",
     "update:check": "versatil-update check",
     "update:install": "versatil-update install",
     "update:status": "versatil-update status",
