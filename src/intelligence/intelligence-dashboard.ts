@@ -268,14 +268,33 @@ ${data.usageInsights.improvementOpportunities.map(opp => `- ${opp}`).join('\n')}
     const agentMetrics = [];
 
     for (const agentUsage of usageData.agentUsage) {
+      // Calculate real adaptations from agent intelligence data
+      const agentSpecificData = agentData.agentMetrics?.find((m: any) => m.agentId === agentUsage.agentId);
+      const adaptationsApplied = agentSpecificData?.adaptationsApplied || 0;
+
+      // Calculate average execution time from recent activations
+      const avgExecutionTime = agentUsage.avgResponseTime || agentData.averagePerformance?.avgExecutionTime || 0;
+
+      // Extract learning insights from agent-specific patterns
+      const learningInsights: string[] = [];
+      if (agentUsage.successRate > 0.9) {
+        learningInsights.push('High success rate - performing well');
+      }
+      if (avgExecutionTime < 1000) {
+        learningInsights.push('Fast response times - optimized performance');
+      }
+      if (agentUsage.activations > 100) {
+        learningInsights.push('Frequently activated - core workflow agent');
+      }
+
       agentMetrics.push({
         agentId: agentUsage.agentId,
-        adaptationsApplied: 0, // TODO: Get from agent intelligence data
+        adaptationsApplied,
         successRate: agentUsage.successRate,
-        avgExecutionTime: 0, // TODO: Calculate from performance data
+        avgExecutionTime,
         userSatisfactionScore: usageData.userSatisfaction / 5, // Convert to 0-1 scale
         activationCount: agentUsage.activations,
-        learningInsights: [] // TODO: Extract from learning data
+        learningInsights
       });
     }
 
@@ -283,33 +302,105 @@ ${data.usageInsights.improvementOpportunities.map(opp => `- ${opp}`).join('\n')}
   }
 
   private calculateFileTypeSuccessRate(fileType: string, usageData: any): number {
-    // TODO: Calculate actual success rate per file type
-    return Math.random() * 0.3 + 0.7; // Mock data: 70-100% success rate
+    // Calculate actual success rate from events by file type
+    const fileTypeEvents = (usageData.recentEvents || []).filter((e: any) =>
+      e.metadata?.filePath?.endsWith(fileType)
+    );
+
+    if (fileTypeEvents.length === 0) {
+      return 0.85; // Default 85% if no data
+    }
+
+    const successfulEvents = fileTypeEvents.filter((e: any) => e.outcome === 'success');
+    return successfulEvents.length / fileTypeEvents.length;
   }
 
   private extractPeakUsageHours(usageData: any): string[] {
-    // TODO: Analyze usage patterns to find peak hours
-    return ['09:00-11:00', '14:00-16:00', '20:00-22:00'];
+    // Analyze actual event timestamps to find peak usage hours
+    const hourlyUsage: Map<number, number> = new Map();
+
+    for (const event of (usageData.recentEvents || [])) {
+      if (event.timestamp) {
+        const hour = new Date(event.timestamp).getHours();
+        hourlyUsage.set(hour, (hourlyUsage.get(hour) || 0) + 1);
+      }
+    }
+
+    if (hourlyUsage.size === 0) {
+      return ['09:00-11:00', '14:00-16:00']; // Default business hours
+    }
+
+    // Get top 3 hours by usage
+    const sortedHours = Array.from(hourlyUsage.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([hour]) => {
+        const endHour = (hour + 2) % 24;
+        return `${hour.toString().padStart(2, '0')}:00-${endHour.toString().padStart(2, '0')}:00`;
+      });
+
+    return sortedHours;
   }
 
   private calculateFalsePositiveRate(usageData: any): number {
-    // TODO: Calculate from actual false positive reports
-    return 0.1; // Mock: 10% false positive rate
+    // Calculate from actual false positive feedback
+    const totalEvents = usageData.totalEvents || 0;
+    const falsePositives = (usageData.recentEvents || []).filter((e: any) =>
+      e.feedback === 'false_positive' || e.outcome === 'false_positive'
+    ).length;
+
+    if (totalEvents === 0) return 0.05; // Default 5% if no data
+
+    return Math.min(1.0, falsePositives / totalEvents);
   }
 
   private calculateEngagementTrend(usageData: any): 'increasing' | 'stable' | 'decreasing' {
-    // TODO: Analyze engagement trends over time
-    return 'increasing';
+    // Analyze event frequency over time periods
+    const events = (usageData.recentEvents || []).filter((e: any) => e.timestamp);
+
+    if (events.length < 10) return 'stable'; // Not enough data
+
+    // Sort by timestamp
+    events.sort((a: any, b: any) => a.timestamp - b.timestamp);
+
+    const midpoint = Math.floor(events.length / 2);
+    const firstHalfCount = events.slice(0, midpoint).length;
+    const secondHalfCount = events.slice(midpoint).length;
+
+    const firstHalfTime = (events[midpoint - 1]?.timestamp || 0) - (events[0]?.timestamp || 0);
+    const secondHalfTime = (events[events.length - 1]?.timestamp || 0) - (events[midpoint]?.timestamp || 0);
+
+    if (firstHalfTime === 0 || secondHalfTime === 0) return 'stable';
+
+    const firstHalfRate = firstHalfCount / firstHalfTime;
+    const secondHalfRate = secondHalfCount / secondHalfTime;
+
+    const changeRatio = secondHalfRate / firstHalfRate;
+
+    if (changeRatio > 1.2) return 'increasing';
+    if (changeRatio < 0.8) return 'decreasing';
+    return 'stable';
   }
 
   private estimateActiveUsers(): number {
-    // TODO: Track active user sessions
-    return Math.floor(Math.random() * 10) + 5; // Mock: 5-15 active users
+    // Track unique sessions in recent time window (last 15 minutes)
+    const fifteenMinutesAgo = Date.now() - 15 * 60 * 1000;
+    const recentSessions = new Set();
+
+    // This would ideally track actual sessions, for now estimate from system state
+    const dashboardData = this.cachedData;
+    if (!dashboardData) return 1; // At least the current user
+
+    // Estimate based on recent activity level
+    const recentActivations = dashboardData.realTimeMetrics?.currentActivations || 0;
+    return Math.max(1, Math.ceil(recentActivations / 3)); // Rough estimate: 3 activations per user
   }
 
   private getCurrentActivations(): number {
-    // TODO: Track current agent activations
-    return Math.floor(Math.random() * 5); // Mock: 0-5 current activations
+    // Track number of currently executing agent operations
+    // This would ideally integrate with agent execution tracking
+    // For now, return 0 as we don't have real-time execution state
+    return 0;
   }
 
   private formatUptime(uptimeMs: number): string {

@@ -507,8 +507,50 @@ export class JavaAdapter extends BaseLanguageAdapter {
       lintScore = 100;
     }
 
-    // TODO: Implement cyclomatic complexity analysis
-    const complexityScore = 80;
+    // Run PMD for cyclomatic complexity (alternative: checkstyle)
+    let complexityScore = 80;
+
+    try {
+      // PMD can report cyclomatic complexity
+      const { stdout: pmdOutput } = await execAsync(
+        'pmd check -d . -f text -R category/java/design.xml/CyclomaticComplexity',
+        { cwd: this.rootPath }
+      );
+
+      // Count violations by severity
+      const violations = pmdOutput.split('\n').filter(line => line.includes('CyclomaticComplexity'));
+      const violationCount = violations.length;
+
+      // Convert to score: 0 violations=100, 1-5=85, 6-10=70, 11-20=55, 20+=40
+      if (violationCount === 0) complexityScore = 100;
+      else if (violationCount <= 5) complexityScore = 85;
+      else if (violationCount <= 10) complexityScore = 70;
+      else if (violationCount <= 20) complexityScore = 55;
+      else complexityScore = 40;
+    } catch {
+      // PMD not installed or failed - try checkstyle as fallback
+      try {
+        const { stdout: checkstyleOutput } = await execAsync(
+          'checkstyle -c /google_checks.xml .',
+          { cwd: this.rootPath }
+        );
+
+        // Parse checkstyle complexity warnings
+        const complexityWarnings = checkstyleOutput.split('\n').filter(line =>
+          line.includes('CyclomaticComplexity') || line.includes('complexity')
+        );
+
+        const warningCount = complexityWarnings.length;
+        if (warningCount === 0) complexityScore = 100;
+        else if (warningCount <= 5) complexityScore = 85;
+        else if (warningCount <= 10) complexityScore = 70;
+        else if (warningCount <= 20) complexityScore = 55;
+        else complexityScore = 40;
+      } catch {
+        // Neither PMD nor checkstyle available - use default
+        complexityScore = 80;
+      }
+    }
 
     return {
       testCoverage,

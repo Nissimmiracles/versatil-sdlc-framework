@@ -405,11 +405,44 @@ export class PythonAdapter extends BaseLanguageAdapter {
       lintScore = 100;
     }
 
+    // Run radon for complexity and maintainability
+    let complexityScore = 75;
+    let maintainability = 80;
+
+    try {
+      // Radon CC (Cyclomatic Complexity)
+      const { stdout: ccOutput } = await execAsync('radon cc . -a -s', { cwd: this.rootPath });
+      // Parse average complexity: "Average complexity: A (2.5)"
+      const ccMatch = ccOutput.match(/Average complexity:\s+([A-F])\s+\(([\d.]+)\)/);
+      if (ccMatch) {
+        const grade = ccMatch[1];
+        const avgComplexity = parseFloat(ccMatch[2]);
+        // Convert grade to score: A=100, B=85, C=70, D=55, F=40
+        const gradeScores: Record<string, number> = { 'A': 100, 'B': 85, 'C': 70, 'D': 55, 'F': 40 };
+        complexityScore = gradeScores[grade] || 75;
+      }
+
+      // Radon MI (Maintainability Index)
+      const { stdout: miOutput } = await execAsync('radon mi . -s', { cwd: this.rootPath });
+      // Parse average MI score
+      const miMatch = miOutput.match(/Average MI:\s+([\d.]+)\s+\(([A-C])\)/);
+      if (miMatch) {
+        const miValue = parseFloat(miMatch[1]);
+        // MI ranges: 100-20 (A=good, B=moderate, C=poor)
+        // Convert to 0-100 scale
+        maintainability = Math.min(100, Math.max(0, miValue));
+      }
+    } catch {
+      // Radon not installed or failed - use defaults
+      complexityScore = 75;
+      maintainability = 80;
+    }
+
     return {
       testCoverage,
       lintScore,
-      complexityScore: 75, // TODO: Implement radon complexity analysis
-      maintainability: 80  // TODO: Implement maintainability index
+      complexityScore,
+      maintainability
     };
   }
 

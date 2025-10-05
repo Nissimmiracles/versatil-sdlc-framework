@@ -452,8 +452,27 @@ export class GoAdapter extends BaseLanguageAdapter {
       lintScore = 100;
     }
 
-    // TODO: Implement cyclomatic complexity analysis using gocyclo
-    const complexityScore = 80;
+    // Run gocyclo for cyclomatic complexity
+    let complexityScore = 80;
+
+    try {
+      // gocyclo reports functions with complexity > 10 (default threshold)
+      const { stdout: gocycloOutput } = await execAsync('gocyclo -avg .', { cwd: this.rootPath });
+      // Parse average complexity from output
+      const avgMatch = gocycloOutput.match(/Average:\s+([\d.]+)/);
+      if (avgMatch) {
+        const avgComplexity = parseFloat(avgMatch[1]);
+        // Convert to score: 1-5=100, 6-10=85, 11-15=70, 16-20=55, 20+=40
+        if (avgComplexity <= 5) complexityScore = 100;
+        else if (avgComplexity <= 10) complexityScore = 85;
+        else if (avgComplexity <= 15) complexityScore = 70;
+        else if (avgComplexity <= 20) complexityScore = 55;
+        else complexityScore = 40;
+      }
+    } catch {
+      // gocyclo not installed or failed - use default
+      complexityScore = 80;
+    }
 
     return {
       testCoverage,
