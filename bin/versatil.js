@@ -5,12 +5,12 @@
  * Command-line interface for setup, agent management, and project initialization
  */
 
-const { runOnboardingWizard } = require('../dist/onboarding-wizard');
-const { adaptiveAgentCreator } = require('../dist/adaptive-agent-creator');
-const { VERSATILAgentDispatcher } = require('../dist/agent-dispatcher');
-const { changelogGenerator } = require('../dist/changelog-generator');
-const { versionManager } = require('../dist/version-manager');
-const { gitBackupManager } = require('../dist/git-backup-manager');
+import { runOnboardingWizard } from '../dist/onboarding-wizard.js';
+import { adaptiveAgentCreator } from '../dist/adaptive-agent-creator.js';
+import { VERSATILAgentDispatcher } from '../dist/agent-dispatcher.js';
+import { changelogGenerator } from '../dist/changelog-generator.js';
+import { versionManager } from '../dist/version-manager.js';
+import { gitBackupManager } from '../dist/git-backup-manager.js';
 
 async function main() {
   const command = process.argv[2];

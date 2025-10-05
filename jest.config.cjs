@@ -170,7 +170,7 @@ module.exports = {
   errorOnDeprecated: true,
 
   // Global setup for OPERA integration
-  globalSetup: '<rootDir>/tests/setup/jest-global-setup.js',
+  globalSetup: '<rootDir>/tests/setup/jest-global-setup.cjs',
   globalTeardown: '<rootDir>/tests/setup/jest-global-teardown.ts',
 
   // Enhanced reporting for Maria-QA

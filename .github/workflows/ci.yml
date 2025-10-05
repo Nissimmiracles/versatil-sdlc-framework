@@ -122,6 +122,10 @@ jobs:
       - name: 🏗️ Build Framework
         run: npm run build
 
+      - name: 🎭 Install Playwright Browsers
+        if: matrix.test-type == 'e2e'
+        run: npx playwright install --with-deps chromium
+
       - name: 🧪 Run Tests - ${{ matrix.test-type }}
         run: ${{ matrix.command }}
         env:
@@ -204,7 +208,7 @@ jobs:
         uses: github/codeql-action/analyze@v3
 
       - name: 📊 Upload Security Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-reports
           path: reports/
@@ -242,7 +246,7 @@ jobs:
           npm run test:performance
 
       - name: 📊 Performance Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: performance-reports
           path: |
@@ -304,7 +308,7 @@ jobs:
           echo "## 📊 Test Results Summary" >> ci-reports/summary.md
 
       - name: 📤 Upload CI Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ci-reports
           path: ci-reports/
