@@ -20,7 +20,7 @@ import {
   createStdinMock,
   TestEnvironment,
   CommandResult,
-} from './test-helpers';
+} from './__helpers__/test-helpers';
 import * as path from 'path';
 
 describe('CLI Commands Integration Tests', () => {
