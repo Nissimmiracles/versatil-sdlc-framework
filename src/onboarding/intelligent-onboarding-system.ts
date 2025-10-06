@@ -8,6 +8,7 @@ import { VERSATILLogger } from '../utils/logger.js';
 import { AgenticRAGOrchestrator } from '../orchestration/agentic-rag-orchestrator.js';
 import { ParallelTaskManager } from '../orchestration/parallel-task-manager.js';
 import { DailyAuditSystem } from '../audit/daily-audit-system.js';
+import { CredentialWizard } from './credential-wizard.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { exec } from 'child_process';
@@ -102,22 +103,34 @@ export class IntelligentOnboardingSystem extends EventEmitter {
       // Step 4: Execute onboarding steps in parallel where possible
       const result = await this.executeOnboardingPlan(plan);
 
-      // Step 5: Validate setup and provide recommendations
+      // Step 5: Run credential wizard (if not already configured)
+      const credentialSetup = await this.setupCredentials();
+
+      // Step 6: Validate setup and provide recommendations
       const validation = await this.validateSetup();
 
+      const allRecommendations = [
+        ...result.recommendations || [],
+        ...validation.recommendations || []
+      ];
+
+      // Add credential recommendations if some services are missing
+      if (credentialSetup && credentialSetup.skipped.length > 0) {
+        allRecommendations.push(
+          `Configure ${credentialSetup.skipped.length} skipped service(s): versatil credentials setup`
+        );
+      }
+
       return {
-        success: result.success && validation.success,
+        success: result.success && validation.success && (!credentialSetup || credentialSetup.success),
         message: 'Onboarding completed successfully!',
         nextSteps: [
-          'Explore the VERSATIL framework documentation',
+          'Start the proactive daemon: versatil-daemon start',
           'Try creating your first feature with agent assistance',
           'Run the daily audit to establish baseline metrics',
           'Configure your preferred development workflow'
         ],
-        recommendations: [
-          ...result.recommendations || [],
-          ...validation.recommendations || []
-        ]
+        recommendations: allRecommendations
       };
 
     } catch (error) {
@@ -802,6 +815,30 @@ export class IntelligentOnboardingSystem extends EventEmitter {
       completed: this.completedSteps.size,
       total: this.onboardingSteps.size
     };
+  }
+
+  /**
+   * Setup credentials for external services
+   */
+  private async setupCredentials(): Promise<any> {
+    this.logger.info('Starting credential setup');
+
+    try {
+      console.log('\n═══════════════════════════════════════════════════════════');
+      console.log('\n📦 Step 5: Service Credentials Setup\n');
+      console.log('VERSATIL integrates with external services (Supabase, Vertex AI, etc.)');
+      console.log('Let\'s configure your API keys and credentials.\n');
+
+      const wizard = new CredentialWizard();
+      const result = await wizard.run({ interactive: true });
+
+      return result;
+    } catch (error) {
+      this.logger.error('Credential setup failed', { error });
+      console.log('\n⚠️  Credential setup can be completed later with:');
+      console.log('   versatil setup credentials\n');
+      return null;
+    }
   }
 
   /**

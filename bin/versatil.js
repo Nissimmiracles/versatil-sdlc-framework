@@ -133,6 +133,29 @@ async function main() {
       configCmd.on('exit', code => process.exit(code));
       return;
 
+    case 'credentials':
+    case 'creds':
+      // Delegate to credentials-command.js
+      const credArgs = process.argv.slice(3);
+      const credCmd = spawn('node', ['./bin/credentials-command.js', ...credArgs], { stdio: 'inherit' });
+      credCmd.on('exit', code => process.exit(code));
+      return;
+
+    case 'setup':
+      // Setup wizard with credentials
+      const setupSubcmd = process.argv[3];
+      if (setupSubcmd === 'credentials') {
+        const setupArgs = process.argv.slice(4);
+        const setupCmd = spawn('node', ['./bin/credentials-command.js', 'setup', ...setupArgs], { stdio: 'inherit' });
+        setupCmd.on('exit', code => process.exit(code));
+        return;
+      } else {
+        console.log('🚀 Starting VERSATIL Framework Setup...\n');
+        const { runOnboardingWizard } = await import('../dist/onboarding-wizard.js');
+        await runOnboardingWizard();
+      }
+      break;
+
     case 'doctor':
       console.log('🏥 VERSATIL Framework Health Check\n');
       console.log('Running comprehensive health check...\n');
@@ -170,37 +193,43 @@ USAGE:
   versatil <command> [options]
 
 COMMANDS:
-  init         Interactive setup wizard with BMAD agent customization
-  analyze      Analyze project and suggest additional agents
-  agents       List available agent templates
-  update       Update framework (check|install|status|list|changelog)
-  rollback     Rollback to previous version (list|to|previous|validate)
-  config       Manage preferences (show|set|wizard|profile|validate)
-  doctor       Run comprehensive health check and verification
-  changelog    Generate changelog from git commits
-  version      Auto version bump or manual (major|minor|patch|prerelease)
-  backup       Git backup management (create|status|sync)
-  release      Create full release with changelog and tagging
-  mcp          Start MCP server for Claude Desktop integration
-  health       Check framework status and configuration
-  help         Show this help message
+  init             Interactive setup wizard with BMAD agent customization
+  setup            Setup wizard (credentials: configure API keys)
+  analyze          Analyze project and suggest additional agents
+  agents           List available agent templates
+  credentials      Manage service credentials (setup|list|test)
+  update           Update framework (check|install|status|list|changelog)
+  rollback         Rollback to previous version (list|to|previous|validate)
+  config           Manage preferences (show|set|wizard|profile|validate)
+  doctor           Run comprehensive health check and verification
+  changelog        Generate changelog from git commits
+  version          Auto version bump or manual (major|minor|patch|prerelease)
+  backup           Git backup management (create|status|sync)
+  release          Create full release with changelog and tagging
+  mcp              Start MCP server for Claude Desktop integration
+  health           Check framework status and configuration
+  help             Show this help message
 
 EXAMPLES:
-  versatil init                     # Start interactive onboarding
-  versatil doctor                   # Run health check
-  versatil update check             # Check for framework updates
-  versatil update install           # Install latest update
-  versatil rollback previous        # Rollback to previous version
-  versatil config wizard            # Configure preferences
-  versatil config show              # Show current preferences
-  versatil analyze                  # Get agent recommendations
-  versatil agents                   # See available agent types
-  versatil changelog                # Generate changelog
-  versatil version                  # Auto-analyze and bump version
-  versatil backup create            # Create backup
-  versatil release --github         # Create release with GitHub release
-  versatil mcp /path/to/project     # Start MCP server for Claude Desktop
-  versatil health                   # Quick health check
+  versatil init                         # Start interactive onboarding
+  versatil setup credentials            # Configure API keys for services
+  versatil credentials setup            # Same as above
+  versatil credentials list             # Show configured services
+  versatil credentials test             # Test all credentials
+  versatil doctor                       # Run health check
+  versatil update check                 # Check for framework updates
+  versatil update install               # Install latest update
+  versatil rollback previous            # Rollback to previous version
+  versatil config wizard                # Configure preferences
+  versatil config show                  # Show current preferences
+  versatil analyze                      # Get agent recommendations
+  versatil agents                       # See available agent types
+  versatil changelog                    # Generate changelog
+  versatil version                      # Auto-analyze and bump version
+  versatil backup create                # Create backup
+  versatil release --github             # Create release with GitHub release
+  versatil mcp /path/to/project         # Start MCP server for Claude Desktop
+  versatil health                       # Quick health check
 
 For more information, visit:
 https://github.com/MiraclesGIT/versatil-sdlc-framework

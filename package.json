@@ -8,10 +8,12 @@
     "versatil": "./bin/versatil.js",
     "versatil-daemon": "./bin/versatil-daemon.js",
     "versatil-mcp": "./bin/versatil-mcp.js",
+    "versatil-mcp-setup": "./bin/versatil-mcp-setup.js",
     "versatil-sdlc": "./dist/index-enhanced.js",
     "versatil-update": "./bin/update-command.js",
     "versatil-rollback": "./bin/rollback-command.js",
     "versatil-config": "./bin/config-command.js",
+    "versatil-credentials": "./bin/credentials-command.js",
     "versatil-uninstall": "./scripts/uninstall.cjs"
   },
   "scripts": {
@@ -161,7 +163,9 @@
     "rollback:list": "versatil-rollback list",
     "config:wizard": "versatil-config wizard",
     "config:show": "versatil-config show",
-    "install-mcps": "bash scripts/install-mcps.sh"
+    "install-mcps": "bash scripts/install-mcps.sh",
+    "mcp:setup": "node bin/versatil-mcp-setup.js",
+    "scenarios:test": "node dist/testing/scenarios/run-scenario-tests.js"
   },
   "keywords": [
     "ai-native",

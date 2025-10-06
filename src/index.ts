@@ -38,6 +38,7 @@ export { AgentRegistry } from './agents/agent-registry.js';
 // Export orchestration
 export { ProactiveAgentOrchestrator } from './orchestration/proactive-agent-orchestrator.js';
 export { ParallelTaskManager } from './orchestration/parallel-task-manager.js';
+export { AgentPool } from './agents/agent-pool.js';
 
 // Export RAG system
 export { EnhancedVectorMemoryStore } from './rag/enhanced-vector-memory-store.js';
@@ -48,3 +49,7 @@ export { PromptGenerator} from './intelligence/prompt-generator.js';
 
 // Export utilities
 export { VERSATILLogger } from './utils/logger.js';
+
+// Export MCP system
+export { MCPAutoConfigurator, mcpAutoConfigurator } from './mcp/mcp-auto-configurator.js';
+export { MCPHealthMonitor } from './mcp/mcp-health-monitor.js';
