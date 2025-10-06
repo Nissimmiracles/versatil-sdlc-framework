@@ -18,6 +18,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.3.1] - 2025-10-06
+
+### 🔌 Seamless MCP Installation - Integrated Setup Experience
+
+This patch release integrates MCP dependency installation directly into the framework setup wizard, providing a seamless onboarding experience.
+
+### Added - Automated MCP Installation
+
+#### **Postinstall Wizard Integration**
+- **MCP Installation Prompt** - Automatically prompts users during first-time setup
+  - Interactive prompt: "Would you like to install MCP dependencies now? (Y/n)"
+  - Runs `scripts/install-mcps.sh` automatically if user accepts
+  - Clear messaging about 11 MCP integrations (Core + Optional)
+  - Graceful fallbacks with helpful error messages
+
+#### **User Experience Improvements**
+- **Integrated Installation Flow** - MCP setup now part of framework onboarding
+  1. Configure preferences? (Y/n)
+  2. Install MCP dependencies? (Y/n) ← NEW
+  3. See getting started guide
+
+- **Getting Started Guide Updates** - Added MCP installation to tips section
+  - "Install MCP dependencies: npm run install-mcps"
+  - Users reminded about MCP installation even if they skip during setup
+
+#### **CI/CD Enhancements**
+- **CI Detection** - Automatically skips MCP installation in CI environments
+- **skipOptionalDependencies: true** - Optimized CI preferences
+- **Clear Messaging** - Informative output about MCP dependencies being skipped
+
+### Changed
+
+#### **Installation Script (`scripts/install-mcps.sh`)**
+- Now integrated into postinstall wizard flow
+- Can be run manually: `npm run install-mcps`
+- Can be run automatically during setup
+- Improved error handling and user feedback
+
+### Benefits
+
+- ✅ **Seamless Onboarding**: Users install MCPs during initial setup
+- ✅ **No Extra Steps**: MCP installation integrated into workflow
+- ✅ **User Choice**: Optional - users can skip and install later
+- ✅ **Graceful Fallbacks**: Clear error messages and fallback instructions
+- ✅ **CI-Friendly**: Automatically skips in CI/CD environments
+
+### Usage
+
+**First-Time Installation:**
+```bash
+npm install -g versatil-sdlc-framework
+# → Postinstall wizard runs
+# → Prompts for configuration
+# → Prompts for MCP installation ← NEW
+# → Shows getting started guide
+```
+
+**Manual MCP Installation:**
+```bash
+npm run install-mcps
+# Or directly:
+bash scripts/install-mcps.sh
+```
+
+### Technical Details
+
+- **File**: `scripts/postinstall-wizard.cjs` (54 lines added)
+- **Function**: `promptMCPInstallation()` - Handles MCP installation flow
+- **Integration Point**: After configuration wizard, before getting started guide
+- **CI Detection**: Uses `isCI()` function to skip in automated environments
+
+---
+
 ## [4.3.0] - 2025-10-06
 
 ### 🎉 Enterprise CI/CD Pipeline - Complete Workflow Ecosystem
