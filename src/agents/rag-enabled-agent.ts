@@ -28,14 +28,29 @@ export interface AgentRAGContext {
   };
 }
 
+/**
+ * RAG cache entry with TTL
+ */
+interface RAGCacheEntry {
+  context: AgentRAGContext;
+  timestamp: number;
+  query: string;
+}
+
 export abstract class RAGEnabledAgent extends BaseAgent {
   protected vectorStore?: EnhancedVectorMemoryStore;
   protected ragConfig: RAGConfig;
+  private ragCache: Map<string, RAGCacheEntry>;
+  private readonly RAG_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor(vectorStore?: EnhancedVectorMemoryStore) {
     super();
     this.vectorStore = vectorStore;
     this.ragConfig = this.getDefaultRAGConfig();
+    this.ragCache = new Map();
+
+    // Cleanup expired cache entries every minute
+    setInterval(() => this.cleanupExpiredCache(), 60 * 1000);
   }
 
   /**
@@ -77,7 +92,7 @@ export abstract class RAGEnabledAgent extends BaseAgent {
   protected abstract runPatternAnalysis(context: AgentActivationContext): Promise<AnalysisResult>;
 
   /**
-   * Retrieve relevant context from vector memory
+   * Retrieve relevant context from vector memory (with caching)
    */
   protected async retrieveRelevantContext(
     context: AgentActivationContext,
@@ -85,6 +100,16 @@ export abstract class RAGEnabledAgent extends BaseAgent {
   ): Promise<AgentRAGContext> {
     if (!this.vectorStore) {
       return this.getEmptyRAGContext();
+    }
+
+    // Generate cache key from file path and content hash
+    const cacheKey = this.generateCacheKey(context);
+
+    // Check cache first (5-minute TTL)
+    const cached = this.ragCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.RAG_CACHE_TTL) {
+      console.log(`[${this.id}] RAG cache hit for ${context.filePath}`);
+      return cached.context;
     }
 
     const retrievals: AgentRAGContext = {
@@ -107,11 +132,85 @@ export abstract class RAGEnabledAgent extends BaseAgent {
       // 4. Get agent-specific expertise
       retrievals.agentExpertise = await this.retrieveAgentExpertise(context);
 
-    } catch (error) {
+      // Store in cache
+      this.ragCache.set(cacheKey, {
+        context: retrievals,
+        timestamp: Date.now(),
+        query: context.filePath || 'unknown'
+      });
+
+      console.log(`[${this.id}] RAG cache stored for ${context.filePath}`);
+
+    } catch (error: any) {
       console.warn(`RAG retrieval failed for ${this.id}:`, error.message);
     }
 
     return retrievals;
+  }
+
+  /**
+   * Generate cache key from context
+   */
+  private generateCacheKey(context: AgentActivationContext): string {
+    const filePath = context.filePath || 'unknown';
+    const contentHash = this.hashContent(context.content || '');
+    return `${this.id}:${filePath}:${contentHash}`;
+  }
+
+  /**
+   * Simple content hash for cache key
+   */
+  private hashContent(content: string): string {
+    let hash = 0;
+    for (let i = 0; i < Math.min(content.length, 1000); i++) {
+      const char = content.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash.toString(36);
+  }
+
+  /**
+   * Cleanup expired cache entries
+   */
+  private cleanupExpiredCache(): void {
+    const now = Date.now();
+    let expiredCount = 0;
+
+    for (const [key, entry] of this.ragCache.entries()) {
+      if (now - entry.timestamp >= this.RAG_CACHE_TTL) {
+        this.ragCache.delete(key);
+        expiredCount++;
+      }
+    }
+
+    if (expiredCount > 0) {
+      console.log(`[${this.id}] Cleaned up ${expiredCount} expired RAG cache entries`);
+    }
+  }
+
+  /**
+   * Clear all cache (useful for testing)
+   */
+  protected clearRAGCache(): void {
+    this.ragCache.clear();
+    console.log(`[${this.id}] RAG cache cleared`);
+  }
+
+  /**
+   * Get cache statistics
+   */
+  protected getRAGCacheStats(): {
+    size: number;
+    oldest: number | null;
+    newest: number | null;
+  } {
+    const entries = Array.from(this.ragCache.values());
+    return {
+      size: entries.length,
+      oldest: entries.length > 0 ? Math.min(...entries.map(e => e.timestamp)) : null,
+      newest: entries.length > 0 ? Math.max(...entries.map(e => e.timestamp)) : null
+    };
   }
 
   /**
