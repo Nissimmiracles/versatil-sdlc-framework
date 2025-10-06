@@ -30,7 +30,7 @@ The VERSATIL SDLC Framework prioritizes security at every level:
 ### 🚨 Critical Security Issues
 For **critical security vulnerabilities** that could affect user safety or data:
 
-**📧 Email**: security@versatil-platform.com
+**📧 Email**: security@versatil.vc
 
 **Include in your report:**
 - Detailed description of the vulnerability
@@ -126,8 +126,8 @@ For enterprise deployments, additional security measures include:
 ## Security Contact Information
 
 ### 📧 Primary Contacts
-- **Security Team**: security@versatil-platform.com
-- **Emergency Contact**: emergency@versatil-platform.com
+- **Security Team**: security@versatil.vc
+- **Emergency Contact**: emergency@versatil.vc
 - **PGP Key**: Available on request
 
 ### 🔐 Secure Communication

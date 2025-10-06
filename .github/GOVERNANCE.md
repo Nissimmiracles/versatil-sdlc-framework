@@ -81,7 +81,7 @@ The VERSATIL SDLC Framework aims to revolutionize software development by provid
 4. **Permanent Ban**: Complete removal from community
 
 ### 📋 Reporting Process
-1. Report to conduct@versatil-platform.com
+1. Report to conduct@versatil.vc
 2. 48-hour acknowledgment guarantee
 3. Investigation within 7 days
 4. Decision and action within 14 days
@@ -143,10 +143,10 @@ The VERSATIL SDLC Framework aims to revolutionize software development by provid
 4. Attend [Monthly Office Hours](https://github.com/MiraclesGIT/versatil-sdlc-framework/discussions/categories/office-hours)
 
 ### 📧 Contact Information
-- **General Questions**: support@versatil-platform.com
-- **Security Issues**: security@versatil-platform.com
-- **Governance Concerns**: governance@versatil-platform.com
-- **Code of Conduct**: conduct@versatil-platform.com
+- **General Questions**: support@versatil.vc
+- **Security Issues**: security@versatil.vc
+- **Governance Concerns**: governance@versatil.vc
+- **Code of Conduct**: conduct@versatil.vc
 
 ---
 

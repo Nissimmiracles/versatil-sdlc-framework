@@ -109,14 +109,14 @@ Welcome to the VERSATIL community! We're here to help you succeed with AI-native
 ### 🚨 Emergency Issues
 **For production-critical problems affecting business operations:**
 
-📧 **Email**: emergency@versatil-platform.com
+📧 **Email**: emergency@versatil.vc
 ⏱️ **Response**: Within 4 hours during business hours
 🎯 **Scope**: Security vulnerabilities, data loss, system down
 
 ### 🏢 Enterprise Support
 **For organizations using VERSATIL at scale:**
 
-📧 **Contact**: enterprise@versatil-platform.com
+📧 **Contact**: enterprise@versatil.vc
 📊 **Includes**:
 - Dedicated support channel
 - Priority issue resolution
@@ -172,10 +172,10 @@ Active community helpers get:
 ## 📞 Contact Information
 
 ### 📧 Email Contacts
-- **General Support**: support@versatil-platform.com
-- **Technical Issues**: technical@versatil-platform.com
-- **Community Questions**: community@versatil-platform.com
-- **Partnership Inquiries**: partnerships@versatil-platform.com
+- **General Support**: support@versatil.vc
+- **Technical Issues**: technical@versatil.vc
+- **Community Questions**: community@versatil.vc
+- **Partnership Inquiries**: partnerships@versatil.vc
 
 ### 🌐 Social Media
 - **Twitter/X**: [@VersatilSDLC](https://twitter.com/VersatilSDLC)

@@ -699,7 +699,7 @@ We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md
 
 ### Community Resources
 
-- **📧 Email**: support@versatil-framework.com
+- **📧 Email**: info@versatil.vc
 - **💬 Discord**: [VERSATIL Community](https://discord.gg/versatil-sdlc)
 - **📚 Documentation**: [docs.versatil-framework.com](https://docs.versatil-framework.com)
 - **🎥 Tutorials**: [YouTube Channel](https://youtube.com/@versatil-sdlc)
@@ -828,10 +828,10 @@ await enhancedOPERA.executeOPERAWorkflow(
 
 ### Technical Support
 
-- **📧 Technical Support**: tech-support@versatil-framework.com
-- **🚨 Security Issues**: security@versatil-framework.com
-- **💼 Enterprise Sales**: enterprise@versatil-framework.com
-- **🤝 Partnerships**: partnerships@versatil-framework.com
+- **📧 Technical Support**: info@versatil.vc
+- **🚨 Security Issues**: info@versatil.vc
+- **💼 Enterprise Sales**: info@versatil.vc
+- **🤝 Partnerships**: info@versatil.vc
 
 ### Documentation & Resources
 
@@ -851,7 +851,7 @@ For enterprise deployments, we offer:
 - **Training & Onboarding** for your development teams
 - **SLA Guarantees** with 99.9% uptime commitment
 
-[Contact Enterprise Sales →](mailto:enterprise@versatil-framework.com)
+[Contact Enterprise Sales →](mailto:info@versatil.vc)
 
 ---
 
@@ -892,7 +892,7 @@ Special thanks to:
 | **🤖 Agent Guide** | [Agent Development](./docs/AGENT_DEVELOPMENT.md) | Create custom agents |
 | **🔒 Security** | [Security Policy](./SECURITY.md) | Security guidelines and reporting |
 | **🤝 Contributing** | [Contributing Guide](./CONTRIBUTING.md) | How to contribute to the project |
-| **💼 Enterprise** | [Enterprise Features](mailto:enterprise@versatil-framework.com) | Enterprise deployment options |
+| **💼 Enterprise** | [Enterprise Features](mailto:info@versatil.vc) | Enterprise deployment options |
 | **🎯 Examples** | [Examples Repo](https://github.com/versatil-platform/examples) | Real-world usage examples |
 | **💬 Community** | [Discord Server](https://discord.gg/versatil-sdlc) | Join our developer community |
 

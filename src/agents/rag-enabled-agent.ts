@@ -51,7 +51,10 @@ export abstract class RAGEnabledAgent extends BaseAgent {
     this.ragCache = new Map();
 
     // Cleanup expired cache entries every minute (store reference for cleanup)
-    this.cacheCleanupInterval = setInterval(() => this.cleanupExpiredCache(), 60 * 1000);
+    // Skip in test environments to prevent timeout issues
+    if (process.env.NODE_ENV !== 'test' && process.env.JEST_WORKER_ID === undefined) {
+      this.cacheCleanupInterval = setInterval(() => this.cleanupExpiredCache(), 60 * 1000);
+    }
   }
 
   /**

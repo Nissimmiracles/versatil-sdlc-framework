@@ -255,7 +255,7 @@ Active contributors may be invited to become maintainers with:
 ### Emergency Support
 For critical issues affecting production deployments:
 - **Emergency Issues**: Use priority labels
-- **Security Vulnerabilities**: Email security@versatil-platform.com
+- **Security Vulnerabilities**: Email security@versatil.vc
 - **Urgent Fixes**: Tag maintainers directly
 
 ## 🎯 Project Roadmap
@@ -297,7 +297,7 @@ For critical issues affecting production deployments:
 - **Repeat Offenses**: Temporary restrictions
 - **Serious Violations**: Permanent bans
 
-Report issues to conduct@versatil-platform.com
+Report issues to conduct@versatil.vc
 
 ## 🏆 Thank You!
 

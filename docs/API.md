@@ -530,4 +530,4 @@ interface ContextAssessment {
 - 📖 [Full Documentation](https://docs.versatil-platform.com)
 - 💬 [Discord Community](https://discord.gg/versatil)
 - 🐛 [Report Issues](https://github.com/versatil-platform/versatil-sdlc-framework/issues)
-- 📧 [Email Support](mailto:support@versatil-platform.com)
+- 📧 [Email Support](mailto:support@versatil.vc)

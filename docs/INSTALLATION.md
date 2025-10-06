@@ -316,7 +316,7 @@ tail -f versatil.debug.log
 
 ### Support Channels
 
-- 📧 **Email**: support@versatil-platform.com
+- 📧 **Email**: support@versatil.vc
 - 💬 **Discord**: [VERSATIL Community](https://discord.gg/versatil)
 - 🐛 **Issues**: [GitHub Issues](https://github.com/versatil-platform/versatil-sdlc-framework/issues)
 - 📖 **Docs**: [Full Documentation](https://docs.versatil-platform.com)
