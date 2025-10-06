@@ -360,9 +360,18 @@ export class AgentPool extends EventEmitter {
   }
 
   /**
-   * Clear all pools
+   * Clear all pools (with proper cleanup to prevent memory leaks)
    */
   async clearAll(): Promise<void> {
+    // Destroy agents before clearing pools
+    for (const [type, pool] of this.warmAgents.entries()) {
+      for (const agent of pool) {
+        if (typeof (agent as any).destroy === 'function') {
+          (agent as any).destroy();
+        }
+      }
+    }
+
     this.warmAgents.clear();
     this.statistics = {
       totalRequests: 0,

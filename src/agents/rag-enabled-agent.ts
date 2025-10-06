@@ -42,6 +42,7 @@ export abstract class RAGEnabledAgent extends BaseAgent {
   protected ragConfig: RAGConfig;
   private ragCache: Map<string, RAGCacheEntry>;
   private readonly RAG_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private cacheCleanupInterval: NodeJS.Timeout | null = null;
 
   constructor(vectorStore?: EnhancedVectorMemoryStore) {
     super();
@@ -49,8 +50,8 @@ export abstract class RAGEnabledAgent extends BaseAgent {
     this.ragConfig = this.getDefaultRAGConfig();
     this.ragCache = new Map();
 
-    // Cleanup expired cache entries every minute
-    setInterval(() => this.cleanupExpiredCache(), 60 * 1000);
+    // Cleanup expired cache entries every minute (store reference for cleanup)
+    this.cacheCleanupInterval = setInterval(() => this.cleanupExpiredCache(), 60 * 1000);
   }
 
   /**
@@ -211,6 +212,22 @@ export abstract class RAGEnabledAgent extends BaseAgent {
       oldest: entries.length > 0 ? Math.min(...entries.map(e => e.timestamp)) : null,
       newest: entries.length > 0 ? Math.max(...entries.map(e => e.timestamp)) : null
     };
+  }
+
+  /**
+   * Destroy agent and cleanup resources (prevent memory leaks)
+   */
+  public destroy(): void {
+    // Clear cache cleanup interval
+    if (this.cacheCleanupInterval) {
+      clearInterval(this.cacheCleanupInterval);
+      this.cacheCleanupInterval = null;
+    }
+
+    // Clear cache
+    this.ragCache.clear();
+
+    console.log(`[${this.id}] Agent destroyed and resources cleaned up`);
   }
 
   /**
