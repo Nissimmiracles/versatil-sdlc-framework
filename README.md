@@ -12,6 +12,12 @@
 ![Security](https://img.shields.io/badge/security-enterprise%20grade-red.svg)
 ![Test Coverage](https://img.shields.io/badge/coverage-85%25+-brightgreen.svg)
 
+[![CI](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/CI/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/ci.yml)
+[![NPM Publish](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/Publish%20to%20npm/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/npm-publish.yml)
+[![MCP Integration](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/MCP%20Integration%20Tests/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/mcp-integration.yml)
+[![Security Scan](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/Security%20Scanning/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/security-scan.yml)
+[![Agent Performance](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/Agent%20Performance%20Benchmarks/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/agent-performance.yml)
+
 **🌟 The world's first autonomous AI-Native SDLC framework with 11-MCP ecosystem, RAG memory, OPERA orchestration, and self-learning agents achieving ZERO CONTEXT LOSS.**
 
 ### 🎉 Version 4.2.0 Features - COMPLETE 11-MCP Ecosystem:
@@ -878,6 +884,8 @@ Special thanks to:
 |----------|------|-------------|
 | **🚀 Quick Start** | [Installation Guide](#-installation--setup) | Get started in 5 minutes |
 | **📚 Documentation** | [Full Docs](https://docs.versatil-framework.com) | Complete framework documentation |
+| **🔄 Workflows** | [Workflows Guide](./docs/WORKFLOWS.md) | GitHub Actions workflows documentation |
+| **🎭 MCP Integrations** | [MCP Status](./docs/MCP_INTEGRATIONS_STATUS.md) | 11-MCP ecosystem details |
 | **🤖 Agent Guide** | [Agent Development](./docs/AGENT_DEVELOPMENT.md) | Create custom agents |
 | **🔒 Security** | [Security Policy](./SECURITY.md) | Security guidelines and reporting |
 | **🤝 Contributing** | [Contributing Guide](./CONTRIBUTING.md) | How to contribute to the project |
