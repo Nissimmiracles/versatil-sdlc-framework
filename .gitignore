@@ -157,4 +157,5 @@ vulnerability-reports/
 
 # CI/CD Artifacts
 artifacts/
-.github/workflows/artifacts/
+.github/workflows/artifacts/.versatil/
+versatil/
