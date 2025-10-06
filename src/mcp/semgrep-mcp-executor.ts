@@ -102,9 +102,8 @@ export class SemgrepMCPExecutor {
     try {
       console.log(`🔒 Running security check for ${language} code...`);
 
-      // In production, this would call semgrep binary or API
-      // Using OWASP Top 10 ruleset by default
-      const findings: SemgrepFinding[] = this.mockSecurityScan(code, language);
+      // Call actual Semgrep binary or fallback to pattern detection
+      const findings: SemgrepFinding[] = await this.runSemgrepScan(code, language, filePath);
 
       const criticalCount = findings.filter(f => f.extra.severity === 'ERROR').length;
       const warningCount = findings.filter(f => f.extra.severity === 'WARNING').length;
@@ -398,9 +397,47 @@ export class SemgrepMCPExecutor {
   }
 
   /**
-   * Mock security scan for demonstration
+   * Run actual Semgrep scan or fallback to pattern detection
    */
-  private mockSecurityScan(code: string, language: string): SemgrepFinding[] {
+  private async runSemgrepScan(code: string, language: string, filePath: string): Promise<SemgrepFinding[]> {
+    // Try to run actual Semgrep if available
+    try {
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+      const { writeFile, unlink } = await import('fs/promises');
+      const { join } = await import('path');
+      const tmpDir = await import('os').then(os => os.tmpdir());
+
+      // Write code to temporary file
+      const tmpFile = join(tmpDir, `semgrep-scan-${Date.now()}.${language}`);
+      await writeFile(tmpFile, code);
+
+      try {
+        // Run Semgrep if installed
+        const { stdout } = await execAsync(`semgrep --json --config=auto "${tmpFile}"`);
+        const results = JSON.parse(stdout);
+
+        // Clean up
+        await unlink(tmpFile);
+
+        return results.results || [];
+      } catch (semgrepError) {
+        // Semgrep not installed or failed, use fallback
+        console.warn('⚠️  Semgrep binary not found, using pattern-based fallback');
+        await unlink(tmpFile).catch(() => {});
+        return this.patternBasedScan(code, language);
+      }
+    } catch (error) {
+      // Fallback to pattern-based detection
+      return this.patternBasedScan(code, language);
+    }
+  }
+
+  /**
+   * Pattern-based security scan (fallback when Semgrep not installed)
+   */
+  private patternBasedScan(code: string, language: string): SemgrepFinding[] {
     const findings: SemgrepFinding[] = [];
 
     // Check for common vulnerabilities

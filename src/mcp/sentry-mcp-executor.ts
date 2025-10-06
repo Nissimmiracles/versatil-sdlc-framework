@@ -130,8 +130,8 @@ export class SentryMCPExecutor {
         }
       };
 
-      // Get stack trace
-      const stackTrace = this.getMockStackTrace();
+      // Get stack trace from Sentry API or parse from issue
+      const stackTrace = await this.getStackTraceFromIssue(issueId);
 
       return {
         success: true,
@@ -549,30 +549,102 @@ export class SentryMCPExecutor {
   }
 
   /**
-   * Get mock stack trace
+   * Get stack trace from Sentry issue (real implementation)
    */
-  private getMockStackTrace(): any[] {
-    return [
-      {
-        filename: 'app/components/UserProfile.tsx',
-        function: 'handleSubmit',
-        lineno: 42,
-        colno: 15,
-        context: [
-          [40, '  const handleSubmit = async () => {'],
-          [41, '    setLoading(true);'],
-          [42, '    const name = user.name; // Error here'],
-          [43, '    await updateProfile({ name });'],
-          [44, '    setLoading(false);']
-        ]
-      },
-      {
-        filename: 'app/hooks/useUserProfile.ts',
-        function: 'fetchUserData',
-        lineno: 23,
-        colno: 10
+  private async getStackTraceFromIssue(issueId: string): Promise<any[]> {
+    try {
+      if (!this.sentryClient) {
+        // Fallback: parse from generic error format
+        return this.parseGenericStackTrace('');
       }
-    ];
+
+      // Try to fetch actual stack trace from Sentry API
+      const url = `${this.sentryApiUrl}/issues/${issueId}/events/latest/`;
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${this.sentryAuthToken}`
+        }
+      });
+
+      if (!response.ok) {
+        console.warn('⚠️  Failed to fetch Sentry stack trace, using fallback');
+        return this.parseGenericStackTrace('');
+      }
+
+      const event = await response.json();
+
+      // Extract stack trace from Sentry event
+      if (event.exception && event.exception.values && event.exception.values[0]) {
+        const exception = event.exception.values[0];
+        if (exception.stacktrace && exception.stacktrace.frames) {
+          return exception.stacktrace.frames.map((frame: any) => ({
+            filename: frame.filename || frame.abs_path || 'unknown',
+            function: frame.function || 'anonymous',
+            lineno: frame.lineno || 0,
+            colno: frame.colno || 0,
+            context: frame.context_line ? [[frame.lineno, frame.context_line]] : []
+          }));
+        }
+      }
+
+      // Fallback if no stack trace in event
+      return this.parseGenericStackTrace('');
+    } catch (error) {
+      console.warn('⚠️  Error fetching stack trace:', error);
+      return this.parseGenericStackTrace('');
+    }
+  }
+
+  /**
+   * Parse generic JavaScript stack trace string (fallback)
+   */
+  private parseGenericStackTrace(stack: string): any[] {
+    if (!stack) {
+      return [{
+        filename: 'unknown',
+        function: 'unknown',
+        lineno: 0,
+        colno: 0,
+        context: []
+      }];
+    }
+
+    const frames: any[] = [];
+    const lines = stack.split('\n').filter(line => line.trim());
+
+    for (const line of lines) {
+      // Parse format: "at functionName (filename:line:column)"
+      const match = line.match(/at\s+(.+?)\s+\((.+?):(\d+):(\d+)\)/);
+      if (match) {
+        frames.push({
+          function: match[1],
+          filename: match[2],
+          lineno: parseInt(match[3]),
+          colno: parseInt(match[4]),
+          context: []
+        });
+      } else {
+        // Simple format: "at filename:line:column"
+        const simpleMatch = line.match(/at\s+(.+?):(\d+):(\d+)/);
+        if (simpleMatch) {
+          frames.push({
+            function: 'anonymous',
+            filename: simpleMatch[1],
+            lineno: parseInt(simpleMatch[2]),
+            colno: parseInt(simpleMatch[3]),
+            context: []
+          });
+        }
+      }
+    }
+
+    return frames.length > 0 ? frames : [{
+      filename: 'parse_error',
+      function: 'unknown',
+      lineno: 0,
+      colno: 0,
+      context: []
+    }];
   }
 
   /**

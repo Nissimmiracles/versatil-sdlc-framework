@@ -6,6 +6,7 @@
   "main": "dist/index.js",
   "bin": {
     "versatil": "./bin/versatil.js",
+    "versatil-daemon": "./bin/versatil-daemon.js",
     "versatil-mcp": "./bin/versatil-mcp.js",
     "versatil-sdlc": "./dist/index-enhanced.js",
     "versatil-update": "./bin/update-command.js",
