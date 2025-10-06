@@ -59,3 +59,7 @@ export { MCPHealthMonitor } from './mcp/mcp-health-monitor.js';
 // Export conversation backup system
 export { ConversationBackupManager, getConversationBackupManager } from './conversation-backup-manager.js';
 export type { ConversationMessage, ConversationSnapshot } from './conversation-backup-manager.js';
+
+// Export UI system
+export { StatuslineManager, getGlobalStatusline, setGlobalStatusline } from './ui/statusline-manager.js';
+export type { AgentProgress, StatuslineOptions } from './ui/statusline-manager.js';
