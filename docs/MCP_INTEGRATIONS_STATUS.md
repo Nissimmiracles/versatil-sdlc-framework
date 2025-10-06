@@ -275,17 +275,29 @@ npm install n8n-workflow
 
 ## 📋 Recommendations
 
-### Immediate Actions (v4.0.1 → v4.0.2)
+### Immediate Actions (v4.3.0+)
 
 1. **✅ Update Documentation** (COMPLETED)
    - [x] Clarify in `docs/mcp-integration.md` what's production-ready vs. planned
    - [x] Create this status document
 
-2. **⚠️ Add Code Comments** (NEXT)
+2. **✅ MCP Installation Script** (COMPLETED v4.3.0)
+   - [x] Created `scripts/install-mcps.sh` for easy MCP installation
+   - [x] Added `npm run install-mcps` command
+   - [x] Handles core MCPs (Playwright, GitHub, Exa) and optional MCPs (Vertex AI, Sentry, Semgrep)
+
+   **Usage**:
+   ```bash
+   npm run install-mcps
+   # Or directly:
+   bash scripts/install-mcps.sh
+   ```
+
+3. **⚠️ Add Code Comments** (NEXT)
    - [ ] Mark stub implementations with `// TODO: Stub implementation - not functional`
    - [ ] Add warnings in JSDoc comments
 
-3. **🗑️ Clean Up Stubs** (OPTIONAL)
+4. **🗑️ Clean Up Stubs** (OPTIONAL)
    - Option A: Remove all stub code
    - Option B: Keep stubs but add clear warnings
    - Option C: Implement real integrations

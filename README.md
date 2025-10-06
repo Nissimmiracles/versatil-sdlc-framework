@@ -114,6 +114,9 @@ cd versatil-sdlc-framework
 npm install
 npm run setup
 
+# Install optional MCP dependencies
+npm run install-mcps
+
 # Start framework
 npm start
 ```

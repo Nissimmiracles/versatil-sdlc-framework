@@ -159,7 +159,8 @@
     "rollback": "versatil-rollback previous",
     "rollback:list": "versatil-rollback list",
     "config:wizard": "versatil-config wizard",
-    "config:show": "versatil-config show"
+    "config:show": "versatil-config show",
+    "install-mcps": "bash scripts/install-mcps.sh"
   },
   "keywords": [
     "ai-native",
