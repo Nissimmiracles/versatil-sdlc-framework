@@ -14,6 +14,7 @@
     "versatil-rollback": "./bin/rollback-command.js",
     "versatil-config": "./bin/config-command.js",
     "versatil-credentials": "./bin/credentials-command.js",
+    "versatil-conversation": "./bin/conversation-manager.js",
     "versatil-uninstall": "./scripts/uninstall.cjs"
   },
   "scripts": {

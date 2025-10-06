@@ -55,3 +55,7 @@ export { VERSATILLogger } from './utils/logger.js';
 // Export MCP system
 export { MCPAutoConfigurator, mcpAutoConfigurator } from './mcp/mcp-auto-configurator.js';
 export { MCPHealthMonitor } from './mcp/mcp-health-monitor.js';
+
+// Export conversation backup system
+export { ConversationBackupManager, getConversationBackupManager } from './conversation-backup-manager.js';
+export type { ConversationMessage, ConversationSnapshot } from './conversation-backup-manager.js';
