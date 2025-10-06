@@ -11,6 +11,7 @@ import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.j
 import { AgentPool } from '../agents/agent-pool.js';
 import { MCPHealthMonitor } from '../mcp/mcp-health-monitor.js';
 import { EventDrivenOrchestrator } from '../orchestration/event-driven-orchestrator.js';
+import { StatuslineManager } from '../ui/statusline-manager.js';
 
 class ProactiveDaemon {
   private orchestrator: ProactiveAgentOrchestrator;
@@ -18,6 +19,7 @@ class ProactiveDaemon {
   private agentPool: AgentPool;
   private mcpHealthMonitor: MCPHealthMonitor;
   private eventOrchestrator: EventDrivenOrchestrator | null = null;
+  private statusline: StatuslineManager;
   private projectPath: string;
   private activationCount: number = 0;
 
@@ -52,6 +54,16 @@ class ProactiveDaemon {
       baseDelay: 1000,
       maxDelay: 8000,
       backoffMultiplier: 2
+    });
+
+    // Initialize statusline manager for real-time visibility
+    this.statusline = new StatuslineManager({
+      maxWidth: 120,
+      maxAgents: 3,
+      showRAG: true,
+      showMCP: true,
+      showProgress: true,
+      refreshRate: 200 // Update every 200ms
     });
 
     this.log('🚀 VERSATIL Proactive Daemon initialized');
@@ -89,17 +101,35 @@ class ProactiveDaemon {
 
     // Setup event listeners for statusline updates
     this.eventOrchestrator.on('agent:activated', (data) => {
+      this.statusline.startAgent(data.agentId, 'Activating...');
       this.log(`   🤖 ${data.agentId} activated`);
-    });
-    this.eventOrchestrator.on('agent:completed', (data) => {
-      this.activationCount++;
-      this.log(`   ✅ ${data.agentId} completed`);
-    });
-    this.eventOrchestrator.on('chain:completed', (data) => {
-      this.log(`   ✅ Chain complete: ${data.agents.length} agents, ${data.duration}ms`);
+      this.printStatusline();
     });
 
+    this.eventOrchestrator.on('agent:completed', (data) => {
+      this.activationCount++;
+      this.statusline.completeAgent(data.agentId);
+      this.log(`   ✅ ${data.agentId} completed`);
+      this.printStatusline();
+    });
+
+    this.eventOrchestrator.on('chain:completed', (data) => {
+      this.log(`   ✅ Chain complete: ${data.agents.length} agents, ${data.duration}ms`);
+      this.printStatusline();
+    });
+
+    // Listen to statusline render events
+    this.statusline.on('render', (output: string) => {
+      if (output) {
+        // Statusline output is handled by printStatusline()
+      }
+    });
+
+    // Start auto-refresh for duration updates
+    this.statusline.startAutoRefresh();
+
     this.log('   ✅ Event-driven handoffs active (target: <150ms latency)');
+    this.log('   ✅ Real-time statusline enabled');
 
     // Start orchestrator monitoring
     this.orchestrator.startMonitoring(this.projectPath);
@@ -172,9 +202,19 @@ class ProactiveDaemon {
     if (this.eventOrchestrator) {
       await this.eventOrchestrator.shutdown();
     }
+    this.statusline.destroy();
     await this.agentPool.shutdown();
     this.log('✅ Daemon stopped gracefully');
     process.exit(0);
+  }
+
+  private printStatusline(): void {
+    const statusOutput = this.statusline.getStatusline();
+    if (statusOutput) {
+      console.log('\n📊 Active Agents:');
+      console.log(statusOutput);
+      console.log(''); // Blank line for spacing
+    }
   }
 
   private log(message: string): void {
