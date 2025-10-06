@@ -42,6 +42,7 @@
     "test:coverage": "node scripts/show-framework-active.cjs && jest --coverage",
     "test:unit": "jest --selectProjects UNIT",
     "test:integration": "jest --selectProjects INTEGRATION",
+    "test:stress": "jest --selectProjects STRESS",
     "test:e2e": "playwright test --project=chromium-desktop",
     "test:e2e:all": "playwright test",
     "test:visual": "node test/generate-visual-report.cjs",

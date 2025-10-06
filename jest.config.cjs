@@ -117,6 +117,46 @@ module.exports = {
     './jest-unit.config.cjs',
     {
       displayName: {
+        name: 'STRESS',
+        color: 'red'
+      },
+      rootDir: __dirname,
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      transform: {
+        '^.+\\.(ts|tsx)$': ['ts-jest', {
+          tsconfig: 'tsconfig.test.json',
+          isolatedModules: true,
+          useESM: false,
+          babelConfig: false,
+          diagnostics: false
+        }]
+      },
+      moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+      transformIgnorePatterns: [
+        'node_modules/(?!(@modelcontextprotocol)/)'
+      ],
+      moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+        '^@/(.*)$': '<rootDir>/src/$1',
+        '^@/types/(.*)$': '<rootDir>/src/types/$1',
+        '^@/agents/(.*)$': '<rootDir>/src/agents/$1',
+        '^@/services/(.*)$': '<rootDir>/src/services/$1',
+        '^@/utils/(.*)$': '<rootDir>/src/utils/$1',
+        '^@/tests/(.*)$': '<rootDir>/tests/$1'
+      },
+      setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+      testMatch: [
+        '<rootDir>/tests/stress/**/*.{ts,tsx}'
+      ],
+      coverageDirectory: '<rootDir>/coverage/stress',
+      maxWorkers: process.env.CI ? 1 : '50%',
+      testTimeout: 300000, // 5 minutes for stress tests
+      forceExit: true,
+      detectOpenHandles: false
+    },
+    {
+      displayName: {
         name: 'INTEGRATION',
         color: 'magenta'
       },

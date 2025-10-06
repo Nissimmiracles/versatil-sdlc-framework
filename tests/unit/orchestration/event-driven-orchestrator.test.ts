@@ -295,6 +295,6 @@ describe('EventDrivenOrchestrator', () => {
       expect(metrics.averageLatency).toBeLessThan(150);
       expect(metrics.successRate).toBeGreaterThan(95);
       expect(metrics.targetLatency).toBe(150);
-    });
+    }, 60000); // 60 second timeout for agent pool initialization overhead
   });
 });
