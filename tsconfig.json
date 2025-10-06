@@ -27,7 +27,8 @@
     "allowUnusedLabels": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "downlevelIteration": true
   },
   "include": [
     "src/**/*"
