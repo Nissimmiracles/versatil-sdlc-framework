@@ -50,7 +50,7 @@ Allowed_In_Project:
 OPERA represents a revolutionary approach to AI-native software development, where specialized agents work in harmony through:
 
 ### Core Principles
-1. **Proactive Intelligence** - Agents work automatically, not on command
+1. **Proactive Intelligence** - Agents work automatically via daemon (`versatil-daemon start`)
 2. **Isolation First** - Framework and project completely separated
 3. **Specialization over Generalization** - Each agent masters specific domains
 4. **Context Preservation** - Zero information loss through RAG + Claude memory
@@ -77,7 +77,7 @@ Proactive_Activation_Examples:
       - Check for missing test cases
       - Validate assertions
       - Show inline suggestions
-    User_Experience: "Suggestions appear automatically as you code"
+    User_Experience: "Run 'versatil-daemon start' to enable auto-activation"
 
   Scenario_2_Component:
     User_Action: "Edit Button.tsx"

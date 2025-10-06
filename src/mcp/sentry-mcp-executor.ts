@@ -52,11 +52,15 @@ export class SentryMCPExecutor {
   private sentryDsn: string;
   private sentryAuthToken: string;
   private sentryOrg: string;
+  private sentryApiUrl: string;
+  private sentryClient: any;
 
   constructor() {
     this.sentryDsn = process.env.SENTRY_DSN || '';
     this.sentryAuthToken = process.env.SENTRY_AUTH_TOKEN || '';
     this.sentryOrg = process.env.SENTRY_ORG || '';
+    this.sentryApiUrl = process.env.SENTRY_API_URL || 'https://sentry.io/api/0';
+    this.sentryClient = this.sentryAuthToken ? true : null;
   }
 
   /**
@@ -571,11 +575,11 @@ export class SentryMCPExecutor {
         return this.parseGenericStackTrace('');
       }
 
-      const event = await response.json();
+      const event: any = await response.json();
 
       // Extract stack trace from Sentry event
       if (event.exception && event.exception.values && event.exception.values[0]) {
-        const exception = event.exception.values[0];
+        const exception: any = event.exception.values[0];
         if (exception.stacktrace && exception.stacktrace.frames) {
           return exception.stacktrace.frames.map((frame: any) => ({
             filename: frame.filename || frame.abs_path || 'unknown',
