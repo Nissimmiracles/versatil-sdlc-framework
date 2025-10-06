@@ -39,6 +39,8 @@ export { AgentRegistry } from './agents/agent-registry.js';
 export { ProactiveAgentOrchestrator } from './orchestration/proactive-agent-orchestrator.js';
 export { ParallelTaskManager } from './orchestration/parallel-task-manager.js';
 export { AgentPool } from './agents/agent-pool.js';
+export { EventDrivenOrchestrator, AgentEvent } from './orchestration/event-driven-orchestrator.js';
+export type { HandoffRequest, AgentEventData } from './orchestration/event-driven-orchestrator.js';
 
 // Export RAG system
 export { EnhancedVectorMemoryStore } from './rag/enhanced-vector-memory-store.js';
