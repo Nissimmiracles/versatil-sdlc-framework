@@ -658,7 +658,7 @@ describe('VERSATIL Public Release - Persona Tests', () => {
   // FULL CAPABILITY VERIFICATION
   // ========================================
   describe('Full Capability Verification', () => {
-    it('All 6 BMAD agents are available', () => {
+    it('All 6 OPERA agents are available', () => {
       const {
         EnhancedMaria,
         EnhancedJames,

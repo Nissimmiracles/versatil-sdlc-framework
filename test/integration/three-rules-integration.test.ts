@@ -12,14 +12,14 @@ import { VersatilOrchestrator } from '../../src/core/versatil-orchestrator.js';
 import { ParallelTaskManager, Task, TaskType, Priority, SDLCPhase } from '../../src/orchestration/parallel-task-manager.js';
 import { AutomatedStressTestGenerator, TargetType } from '../../src/testing/automated-stress-test-generator.js';
 import { DailyAuditSystem } from '../../src/audit/daily-audit-system.js';
-import { EnhancedBMADConfigManager } from '../../src/agents/enhanced-bmad-config.js';
+import { EnhancedOPERAConfigManager } from '../../src/agents/enhanced-opera-config.js';
 
 describe('VERSATIL Framework - Three Rules Integration', () => {
   let orchestrator: VersatilOrchestrator;
   let taskManager: ParallelTaskManager;
   let stressTestGenerator: AutomatedStressTestGenerator;
   let auditSystem: DailyAuditSystem;
-  let configManager: EnhancedBMADConfigManager;
+  let configManager: EnhancedOPERAConfigManager;
 
   beforeAll(async () => {
     // Initialize the orchestrator with test configuration
@@ -506,7 +506,7 @@ describe('VERSATIL Framework - Three Rules Integration', () => {
     });
   });
 
-  describe('BMAD Agent Integration', () => {
+  describe('OPERA Agent Integration', () => {
     test('should enhance Maria-QA with all three rules', async () => {
       const mariaConfig = configManager.getAgentConfig('maria-qa');
 

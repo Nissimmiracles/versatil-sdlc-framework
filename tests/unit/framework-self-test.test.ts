@@ -19,9 +19,9 @@ describe('VERSATIL Framework Self-Testing', () => {
       expect(process.env['NODE_ENV']).toBe('test');
     });
 
-    it('should validate BMAD methodology is active', () => {
-      // Test that BMAD principles are being applied
-      const bmadPrinciples = [
+    it('should validate OPERA methodology is active', () => {
+      // Test that OPERA principles are being applied
+      const operaPrinciples = [
         'Specialization over Generalization',
         'Context Preservation',
         'Quality-First Approach',
@@ -29,9 +29,9 @@ describe('VERSATIL Framework Self-Testing', () => {
         'Continuous Integration'
       ];
 
-      expect(bmadPrinciples).toHaveLength(5);
-      expect(bmadPrinciples).toContain('Context Preservation');
-      expect(bmadPrinciples).toContain('Quality-First Approach');
+      expect(operaPrinciples).toHaveLength(5);
+      expect(operaPrinciples).toContain('Context Preservation');
+      expect(operaPrinciples).toContain('Quality-First Approach');
     });
 
     it('should meet Enhanced Maria-QA performance standards', () => {
@@ -46,7 +46,7 @@ describe('VERSATIL Framework Self-Testing', () => {
       const result = testOperation();
       const executionTime = Date.now() - startTime;
 
-      // BMAD performance requirement: operations should be fast
+      // OPERA performance requirement: operations should be fast
       expect(executionTime).toBeLessThan(10);
       expect(result).toEqual(['Maria-QA']);
     });

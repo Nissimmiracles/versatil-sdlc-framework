@@ -35,7 +35,7 @@ test.describe('Performance Monitoring - Enhanced Maria-QA', () => {
     });
 
     if (performanceMetrics) {
-      // BMAD performance standards
+      // OPERA performance standards
       expect(performanceMetrics.firstContentfulPaint).toBeLessThan(1800); // < 1.8s
       expect(performanceMetrics.domContentLoaded).toBeLessThan(2000); // < 2s
     }

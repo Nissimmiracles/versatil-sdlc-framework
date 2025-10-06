@@ -1,5 +1,5 @@
 /**
- * Tests for BaseAgent - Core BMAD Agent Functionality
+ * Tests for BaseAgent - Core OPERA Agent Functionality
  */
 
 import { BaseAgent, AgentActivationContext, ValidationResults } from '../../src/agents/base-agent';

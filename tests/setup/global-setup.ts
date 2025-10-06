@@ -76,9 +76,9 @@ async function globalSetup(config: FullConfig) {
 
     await context.close();
 
-    // BMAD methodology setup
-    console.log('🎯 Initializing BMAD Agent Integration...');
-    (global as any).bmadConfig = {
+    // OPERA methodology setup
+    console.log('🎯 Initializing OPERA Agent Integration...');
+    (global as any).operaConfig = {
       mariaQA: {
         qualityGates: {
           visualRegression: { threshold: 0.1 },

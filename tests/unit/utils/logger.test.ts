@@ -65,7 +65,7 @@ describe('VERSATILLogger', () => {
   });
 
   describe('Framework Self-Logging Validation', () => {
-    it('should support enhanced BMAD logging patterns', () => {
+    it('should support enhanced OPERA logging patterns', () => {
       const metadata = {
         agentId: 'maria-qa',
         activationTime: Date.now(),
@@ -105,7 +105,7 @@ describe('VERSATILLogger', () => {
 
       const executionTime = Date.now() - startTime;
 
-      // BMAD requirement: 100 log messages should complete in under 100ms
+      // OPERA requirement: 100 log messages should complete in under 100ms
       expect(executionTime).toBeLessThan(100);
       expect(consoleLogSpy).toHaveBeenCalledTimes(100);
     });

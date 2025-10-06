@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 /**
  * VERSATIL SDLC Framework - Enhanced Maria-QA E2E Test Example
  *
- * This test demonstrates the Enhanced BMAD methodology with Chrome MCP integration
+ * This test demonstrates the Enhanced OPERA methodology with Chrome MCP integration
  * for comprehensive end-to-end testing with quality gates enforcement.
  */
 
@@ -12,9 +12,9 @@ test.describe('Enhanced Maria-QA - Chrome MCP Integration', () => {
     // Enhanced Maria-QA setup with Chrome MCP
     await page.goto('/');
 
-    // BMAD context preservation setup
+    // OPERA context preservation setup
     await page.addInitScript(() => {
-      window.bmadContext = {
+      window.operaContext = {
         agent: 'Enhanced Maria-QA',
         testType: 'e2e',
         qualityGates: {
@@ -65,7 +65,7 @@ test.describe('Enhanced Maria-QA - Chrome MCP Integration', () => {
     });
   });
 
-  test('should validate BMAD quality gates', async ({ page }) => {
+  test('should validate OPERA quality gates', async ({ page }) => {
     // Configuration consistency check
     await test.step('Verify configuration consistency', async () => {
       const apiEndpoint = await page.evaluate(() => {
@@ -99,8 +99,8 @@ test.describe('Enhanced Maria-QA - Chrome MCP Integration', () => {
   });
 });
 
-// BMAD methodology integration test
-test.describe('BMAD Agent Coordination', () => {
+// OPERA methodology integration test
+test.describe('OPERA Agent Coordination', () => {
   test('should demonstrate agent handoff capabilities', async ({ page }) => {
     await page.goto('/');
 

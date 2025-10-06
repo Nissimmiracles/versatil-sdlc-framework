@@ -103,7 +103,7 @@ describe('AgentRegistry', () => {
       expect(process.env.NODE_ENV).toBe('test');
     });
 
-    it('should meet BMAD methodology quality standards', () => {
+    it('should meet OPERA methodology quality standards', () => {
       // Enhanced Maria-QA standards applied to framework itself
       const startTime = Date.now();
 
@@ -116,7 +116,7 @@ describe('AgentRegistry', () => {
 
       const executionTime = Date.now() - startTime;
 
-      // BMAD performance requirement: registration should be fast
+      // OPERA performance requirement: registration should be fast
       expect(executionTime).toBeLessThan(100);
 
       // Verify agent was registered correctly

@@ -103,8 +103,8 @@ declare module 'versatil-sdlc-framework' {
     on(event: 'goal_completed' | 'goal_failed' | 'decision_made' | 'step_completed' | 'human_intervention_required', callback: Function): void;
   }
 
-  // Enhanced BMAD Types
-  export interface EnhancedBMADConfig {
+  // Enhanced OPERA Types
+  export interface EnhancedOPERAConfig {
     ragEnabled: boolean;
     operaEnabled: boolean;
     autonomousMode: boolean;
@@ -113,7 +113,7 @@ declare module 'versatil-sdlc-framework' {
     learningRate: number;
   }
 
-  export interface BMADContext {
+  export interface OPERAContext {
     projectId: string;
     phase: string;
     activeAgents: string[];
@@ -128,10 +128,10 @@ declare module 'versatil-sdlc-framework' {
     autonomousActions?: any[];
   }
 
-  export class EnhancedBMADCoordinator {
-    createContext(projectId: string): Promise<BMADContext>;
-    getContext(projectId: string): Promise<BMADContext>;
-    executeBMADWorkflow(projectId: string, requirements: string): Promise<void>;
+  export class EnhancedOPERACoordinator {
+    createContext(projectId: string): Promise<OPERAContext>;
+    getContext(projectId: string): Promise<OPERAContext>;
+    executeOPERAWorkflow(projectId: string, requirements: string): Promise<void>;
     getEnhancedAgent(agentId: string): BaseAgent | undefined;
     setRAGEnabled(enabled: boolean): void;
     setAutonomousMode(enabled: boolean): void;
@@ -189,7 +189,7 @@ declare module 'versatil-sdlc-framework' {
 
   // Exports
   export const vectorMemoryStore: VectorMemoryStore;
-  export const enhancedBMAD: EnhancedBMADCoordinator;
+  export const enhancedOPERA: EnhancedOPERACoordinator;
   
   // Functions
   export function startEnhancedServer(): Promise<void>;

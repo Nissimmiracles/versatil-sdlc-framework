@@ -6,7 +6,7 @@
  */
 
 import { 
-  enhancedBMAD, 
+  enhancedOPERA, 
   vectorMemoryStore,
   OperaOrchestrator 
 } from 'versatil-sdlc-framework';

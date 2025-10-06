@@ -43,7 +43,7 @@ async function globalTeardown(config: FullConfig) {
         },
         performance: {
           enabled: true,
-          budget: (global as any).bmadConfig?.mariaQA?.qualityGates?.performance?.budget,
+          budget: (global as any).operaConfig?.mariaQA?.qualityGates?.performance?.budget,
           status: 'MONITORED'
         },
         accessibility: {
@@ -58,9 +58,9 @@ async function globalTeardown(config: FullConfig) {
         }
       },
 
-      // BMAD methodology metrics
-      bmadMetrics: {
-        contextPreservation: (global as any).bmadConfig?.contextPreservation?.enabled || false,
+      // OPERA methodology metrics
+      operaMetrics: {
+        contextPreservation: (global as any).operaConfig?.contextPreservation?.enabled || false,
         agentCoordination: true,
         qualityFirst: true
       }
@@ -76,9 +76,9 @@ async function globalTeardown(config: FullConfig) {
     const reportPath = path.join(resultsDir, 'maria-qa-report.json');
     fs.writeFileSync(reportPath, JSON.stringify(reportData, null, 2));
 
-    // Generate BMAD compliance report
-    console.log('🎯 Generating BMAD Compliance Report...');
-    const bmadReport = {
+    // Generate OPERA compliance report
+    console.log('🎯 Generating OPERA Compliance Report...');
+    const operaReport = {
       compliant: true,
       agent: 'Enhanced Maria-QA',
       capabilities: [
@@ -93,14 +93,14 @@ async function globalTeardown(config: FullConfig) {
       recommendations: []
     };
 
-    const bmadReportPath = path.join(resultsDir, 'bmad-compliance.json');
-    fs.writeFileSync(bmadReportPath, JSON.stringify(bmadReport, null, 2));
+    const operaReportPath = path.join(resultsDir, 'opera-compliance.json');
+    fs.writeFileSync(operaReportPath, JSON.stringify(operaReport, null, 2));
 
     // Chrome MCP cleanup
     console.log('🔧 Cleaning up Chrome MCP resources...');
 
     // Clear any global state
-    delete (global as any).bmadConfig;
+    delete (global as any).operaConfig;
     delete (global as any).securityBaseline;
 
     // Performance cleanup

@@ -12,7 +12,7 @@ test.describe('VERSATIL SDLC Framework - Core Functionality', () => {
     // Verify framework title and branding
     await expect(page).toHaveTitle(/VERSATIL SDLC Framework/);
     await expect(page.locator('nav h1')).toContainText('VERSATIL SDLC Framework');
-    await expect(page.locator('nav p')).toContainText('Enhanced BMAD Testing Environment');
+    await expect(page.locator('nav p')).toContainText('Enhanced OPERA Testing Environment');
   });
 
   test('should display agent system status correctly', async ({ page }) => {
@@ -62,15 +62,15 @@ test.describe('VERSATIL SDLC Framework - Core Functionality', () => {
     expect(statusData.recommendations).toBeInstanceOf(Array);
   });
 
-  test('should initialize BMAD context for testing', async ({ page }) => {
+  test('should initialize OPERA context for testing', async ({ page }) => {
     await page.goto('/');
 
-    // Verify BMAD context is available in browser
-    const bmadContext = await page.evaluate(() => (window as any).bmadContext);
-    expect(bmadContext).toBeDefined();
-    expect(bmadContext.framework).toBe('VERSATIL SDLC');
-    expect(bmadContext.agents).toContain('Enhanced-Maria');
-    expect(bmadContext.agents).toContain('Enhanced-James');
+    // Verify OPERA context is available in browser
+    const operaContext = await page.evaluate(() => (window as any).operaContext);
+    expect(operaContext).toBeDefined();
+    expect(operaContext.framework).toBe('VERSATIL SDLC');
+    expect(operaContext.agents).toContain('Enhanced-Maria');
+    expect(operaContext.agents).toContain('Enhanced-James');
   });
 
   test('should monitor performance metrics', async ({ page }) => {
@@ -87,11 +87,11 @@ test.describe('VERSATIL SDLC Framework - Core Functionality', () => {
   });
 });
 
-test.describe('BMAD Methodology Validation', () => {
-  test('should display BMAD methodology status', async ({ page }) => {
+test.describe('OPERA Methodology Validation', () => {
+  test('should display OPERA methodology status', async ({ page }) => {
     await page.goto('/');
 
-    // Verify BMAD components are listed
+    // Verify OPERA components are listed
     await expect(page.locator('text=Agent Specialization: Working')).toBeVisible();
     await expect(page.locator('text=Quality Gates: Configured')).toBeVisible();
     await expect(page.locator('text=Real-time Testing: Active')).toBeVisible();
@@ -100,10 +100,10 @@ test.describe('BMAD Methodology Validation', () => {
   test('should validate quality gates configuration', async ({ page }) => {
     await page.goto('/');
 
-    const bmadContext = await page.evaluate(() => (window as any).bmadContext);
-    expect(bmadContext.qualityGates.performance).toBe(true);
-    expect(bmadContext.qualityGates.accessibility).toBe(true);
-    expect(bmadContext.qualityGates.security).toBe(true);
-    expect(bmadContext.qualityGates.visual).toBe(true);
+    const operaContext = await page.evaluate(() => (window as any).operaContext);
+    expect(operaContext.qualityGates.performance).toBe(true);
+    expect(operaContext.qualityGates.accessibility).toBe(true);
+    expect(operaContext.qualityGates.security).toBe(true);
+    expect(operaContext.qualityGates.visual).toBe(true);
   });
 });

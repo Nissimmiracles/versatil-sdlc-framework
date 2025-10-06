@@ -6,9 +6,9 @@
  */
 
 // Mock implementations for demo purposes
-const enhancedBMAD = {
+const enhancedOPERA = {
   createContext: async (id) => console.log(`Creating context: ${id}`),
-  executeBMADWorkflow: async (id, req) => console.log(`Executing workflow for: ${id}`)
+  executeOPERAWorkflow: async (id, req) => console.log(`Executing workflow for: ${id}`)
 };
 
 const vectorMemoryStore = {
@@ -47,13 +47,13 @@ export async function helloAutonomousWorld() {
   console.log('\n📚 Phase 1: First Interaction (No Prior Knowledge)\n');
   
   const projectId = 'hello-world-' + Date.now();
-  await enhancedBMAD.createContext(projectId);
+  await enhancedOPERA.createContext(projectId);
   
   console.log('🤖 User: "Create a hello world function"');
   console.log('⏱️  Measuring response time without memory...\n');
   
   const startTime1 = Date.now();
-  await enhancedBMAD.executeBMADWorkflow(
+  await enhancedOPERA.executeOPERAWorkflow(
     projectId,
     'Create a hello world function'
   );
@@ -81,13 +81,13 @@ export async function helloAutonomousWorld() {
   console.log('\n📚 Phase 2: Similar Request (Using Memory)\n');
   
   const projectId2 = 'hello-user-' + Date.now();
-  await enhancedBMAD.createContext(projectId2);
+  await enhancedOPERA.createContext(projectId2);
   
   console.log('🤖 User: "Create a hello user function that takes a name parameter"');
   console.log('🧠 Agent will use memory from previous interaction...\n');
   
   const startTime2 = Date.now();
-  await enhancedBMAD.executeBMADWorkflow(
+  await enhancedOPERA.executeOPERAWorkflow(
     projectId2,
     'Create a hello user function that takes a name parameter'
   );
@@ -160,7 +160,7 @@ export async function autonomousBugFixJourney() {
   `);
   
   const projectId = 'bugfix-demo-' + Date.now();
-  await enhancedBMAD.createContext(projectId);
+  await enhancedOPERA.createContext(projectId);
   
   // Simulate a complex bug scenario
   console.log('\n🐛 Scenario: Memory leak in user service causing server crashes\n');
@@ -289,7 +289,7 @@ export async function fullProjectSimulation() {
   console.log('   • Mobile push notification support\n');
   
   const projectId = 'notification-system-' + Date.now();
-  await enhancedBMAD.createContext(projectId);
+  await enhancedOPERA.createContext(projectId);
   
   // Show Opera's planning
   console.log('🧠 Opera Analyzing Requirements...\n');

@@ -67,7 +67,7 @@ export class VERSATILTestServer {
 <body>
     <nav>
         <h1>🚀 VERSATIL SDLC Framework</h1>
-        <p>Enhanced BMAD Testing Environment</p>
+        <p>Enhanced OPERA Testing Environment</p>
     </nav>
 
     <main>
@@ -105,7 +105,7 @@ export class VERSATILTestServer {
             </div>
         </div>
 
-        <h2>BMAD Methodology Status</h2>
+        <h2>OPERA Methodology Status</h2>
         <ul>
             <li>✅ Agent Specialization: Working</li>
             <li>⚠️ Context Preservation: Partial</li>
@@ -115,8 +115,8 @@ export class VERSATILTestServer {
     </main>
 
     <script>
-        // BMAD Context for testing
-        window.bmadContext = {
+        // OPERA Context for testing
+        window.operaContext = {
             framework: 'VERSATIL SDLC',
             version: '1.1.0',
             agents: ['Enhanced-Maria', 'Enhanced-James', 'Enhanced-Marcus', 'SimulationQA'],
@@ -170,13 +170,13 @@ export class VERSATILTestServer {
         capabilities: {
           agentActivation: { score: 85, status: 'working' },
           mcpIntegration: { score: 90, status: 'working' },
-          bmadMethodology: { score: 60, status: 'partial' },
+          operaMethodology: { score: 60, status: 'partial' },
           testingInfrastructure: { score: 75, status: 'partial' },
           cliOperations: { score: 40, status: 'broken' }
         },
         recommendations: [
           'Fix CLI hanging scripts',
-          'Improve BMAD context preservation',
+          'Improve OPERA context preservation',
           'Enhance testing coverage'
         ]
       });

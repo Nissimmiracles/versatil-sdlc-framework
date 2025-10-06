@@ -377,7 +377,7 @@ This major version focuses on repository cleanup and organization for better dev
 
 ### Changed (BREAKING)
 - **Repository Structure**: Removed 140+ legacy documentation files
-  - Deleted all `BMAD-*.md`, `ARCHON-*.md`, `SESSION_*.md`, `PHASE_*.md` files
+  - Deleted all `OPERA-*.md`, `ARCHON-*.md`, `SESSION_*.md`, `PHASE_*.md` files
   - Deleted all `V2_*.md`, `V3_*.md` status/report files
   - Removed `.rebranding-backup-*` directories
   - Cleaned up root-level test/demo scripts (28 files)

@@ -6,7 +6,7 @@
  */
 
 import { 
-  enhancedBMAD, 
+  enhancedOPERA, 
   vectorMemoryStore,
   OperaOrchestrator 
 } from 'versatil-sdlc-framework';
@@ -47,7 +47,7 @@ Requirements:
   console.log('📋 Requirements:', requirements);
   
   // Execute autonomous workflow
-  await enhancedBMAD.executeBMADWorkflow(projectId, requirements);
+  await enhancedOPERA.executeOPERAWorkflow(projectId, requirements);
   
   console.log('\n🤖 Opera is orchestrating the entire microservices architecture...\n');
   

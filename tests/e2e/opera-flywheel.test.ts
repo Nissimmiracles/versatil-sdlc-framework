@@ -1,17 +1,17 @@
 /**
- * VERSATIL SDLC Framework - BMAD UI/UX Testing Flywheel E2E Test
+ * VERSATIL SDLC Framework - OPERA UI/UX Testing Flywheel E2E Test
  * Validates the operational UI/UX testing flywheel implementation
  */
 
 import { test, expect } from '@playwright/test';
 
-test.describe('BMAD UI/UX Testing Flywheel', () => {
+test.describe('OPERA UI/UX Testing Flywheel', () => {
   test('should demonstrate operational testing flywheel capabilities', async ({ page }) => {
     await page.goto('/');
 
     // Verify the framework is running with operational flywheel
     await expect(page.locator('text=Framework Quality Dashboard')).toBeVisible();
-    await expect(page.locator('text=BMAD Methodology Status')).toBeVisible();
+    await expect(page.locator('text=OPERA Methodology Status')).toBeVisible();
     await expect(page.locator('text=Agent Specialization: Working')).toBeVisible();
     await expect(page.locator('text=Real-time Testing: Active')).toBeVisible();
   });
@@ -29,7 +29,7 @@ test.describe('BMAD UI/UX Testing Flywheel', () => {
   test('should show operational agent system', async ({ page }) => {
     await page.goto('/');
 
-    // Verify all Enhanced BMAD agents are operational
+    // Verify all Enhanced OPERA agents are operational
     await expect(page.locator('text=Enhanced Maria-QA: Active')).toBeVisible();
     await expect(page.locator('text=Enhanced James: Active')).toBeVisible();
     await expect(page.locator('text=Enhanced Marcus: Active')).toBeVisible();
@@ -38,16 +38,16 @@ test.describe('BMAD UI/UX Testing Flywheel', () => {
     await expect(page.locator('text=Chrome MCP: Connected')).toBeVisible();
   });
 
-  test('should validate BMAD context for testing flywheel', async ({ page }) => {
+  test('should validate OPERA context for testing flywheel', async ({ page }) => {
     await page.goto('/');
 
-    // Verify BMAD context includes quality gates
-    const bmadContext = await page.evaluate(() => (window as any).bmadContext);
-    expect(bmadContext.framework).toBe('VERSATIL SDLC');
-    expect(bmadContext.qualityGates.performance).toBe(true);
-    expect(bmadContext.qualityGates.accessibility).toBe(true);
-    expect(bmadContext.qualityGates.security).toBe(true);
-    expect(bmadContext.qualityGates.visual).toBe(true);
+    // Verify OPERA context includes quality gates
+    const operaContext = await page.evaluate(() => (window as any).operaContext);
+    expect(operaContext.framework).toBe('VERSATIL SDLC');
+    expect(operaContext.qualityGates.performance).toBe(true);
+    expect(operaContext.qualityGates.accessibility).toBe(true);
+    expect(operaContext.qualityGates.security).toBe(true);
+    expect(operaContext.qualityGates.visual).toBe(true);
   });
 
   test('should demonstrate honest framework assessment', async ({ page }) => {

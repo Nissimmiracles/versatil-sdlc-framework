@@ -187,13 +187,13 @@ async function main() {
     case '-h':
     default:
       console.log(`
-🚀 VERSATIL SDLC Framework - AI-Native Development with BMAD Methodology
+🚀 VERSATIL SDLC Framework - AI-Native Development with OPERA Methodology
 
 USAGE:
   versatil <command> [options]
 
 COMMANDS:
-  init             Interactive setup wizard with BMAD agent customization
+  init             Interactive setup wizard with OPERA agent customization
   setup            Setup wizard (credentials: configure API keys)
   analyze          Analyze project and suggest additional agents
   agents           List available agent templates
