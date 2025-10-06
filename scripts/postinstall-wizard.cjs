@@ -102,6 +102,9 @@ async function main() {
     await createDefaultPreferences();
   }
 
+  // Ask about MCP installation
+  await promptMCPInstallation();
+
   showGettingStarted();
 }
 
@@ -145,6 +148,7 @@ async function setupForCI() {
 
   console.log('✅ CI configuration complete\n');
   console.log('Framework is ready for automated workflows.\n');
+  console.log('ℹ️  MCP dependencies skipped in CI (use skipOptionalDependencies: true)\n');
 }
 
 /**
@@ -212,11 +216,61 @@ function showGettingStarted() {
   console.log('  • GitHub: https://github.com/MiraclesGIT/versatil-sdlc-framework');
   console.log('  • Quick Reference: versatil-sdlc-framework/QUICKSTART.md\n');
   console.log('💡 Tips:\n');
+  console.log('  • Install MCP dependencies: npm run install-mcps');
   console.log('  • Update framework: versatil update check');
   console.log('  • Change settings: versatil config wizard');
   console.log('  • Get help anytime: versatil <command> --help\n');
   console.log('═══════════════════════════════════════════════════════════\n');
   console.log('Happy coding! 🚀\n');
+}
+
+/**
+ * Prompt for MCP installation
+ */
+async function promptMCPInstallation() {
+  console.log('\n═══════════════════════════════════════════════════════════');
+  console.log('🔌 MCP (Model Context Protocol) Dependencies\n');
+  console.log('The framework supports 11 MCP integrations for enhanced capabilities:');
+  console.log('  • Core: Playwright, GitHub, Exa Search');
+  console.log('  • Optional: Vertex AI, Sentry, Semgrep, and more\n');
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  const installMCPs = await new Promise(resolve => {
+    rl.question('Would you like to install MCP dependencies now? (Y/n): ', answer => {
+      resolve(answer.toLowerCase() !== 'n');
+    });
+  });
+
+  rl.close();
+
+  if (installMCPs) {
+    console.log('\n🚀 Starting MCP installation...\n');
+    try {
+      const scriptPath = path.join(__dirname, 'install-mcps.sh');
+
+      // Check if script exists
+      if (fs.existsSync(scriptPath)) {
+        await execAsync(`bash "${scriptPath}"`, {
+          stdio: 'inherit',
+          shell: '/bin/bash'
+        });
+        console.log('\n✅ MCP installation complete\n');
+      } else {
+        console.log('⚠️  MCP installation script not found');
+        console.log('You can install MCPs later with: npm run install-mcps\n');
+      }
+    } catch (error) {
+      console.log('\n⚠️  MCP installation encountered issues');
+      console.log('You can install MCPs later with: npm run install-mcps\n');
+    }
+  } else {
+    console.log('\n📝 MCP installation skipped.\n');
+    console.log('You can install MCPs later with: npm run install-mcps\n');
+  }
 }
 
 /**
