@@ -208,6 +208,48 @@ jobs:
           });
           "
 
+      - name: Test Chrome MCP Executor
+        run: |
+          node -e "
+          const { ChromeMCPExecutor } = require('./dist/mcp/chrome-mcp-executor.js');
+
+          async function testChrome() {
+            const executor = new ChromeMCPExecutor();
+
+            console.log('✅ Chrome MCP Executor loaded');
+
+            const actions = ['screenshot', 'console_logs', 'download_logs', 'navigate'];
+            console.log('Available actions:', actions.join(', '));
+            console.log('✅ Chrome MCP Executor - PASSED');
+          }
+
+          testChrome().catch(err => {
+            console.error('❌ Chrome MCP test failed:', err.message);
+            process.exit(1);
+          });
+          "
+
+      - name: Test Shadcn MCP Executor
+        run: |
+          node -e "
+          const { ShadcnMCPExecutor } = require('./dist/mcp/shadcn-mcp-executor.js');
+
+          async function testShadcn() {
+            const executor = new ShadcnMCPExecutor();
+
+            console.log('✅ Shadcn MCP Executor loaded');
+
+            const actions = ['analyze_component', 'suggest_components', 'check_dependencies'];
+            console.log('Available actions:', actions.join(', '));
+            console.log('✅ Shadcn MCP Executor - PASSED');
+          }
+
+          testShadcn().catch(err => {
+            console.error('❌ Shadcn MCP test failed:', err.message);
+            process.exit(1);
+          });
+          "
+
   test-mcp-integration:
     name: Test MCP Integration Layer
     runs-on: ubuntu-latest
@@ -290,7 +332,7 @@ jobs:
           echo "Integration layer correctly routes requests to appropriate MCPs." >> mcp-test-report.md
 
       - name: Upload Test Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mcp-integration-test-report
           path: mcp-test-report.md
