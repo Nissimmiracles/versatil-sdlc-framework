@@ -797,17 +797,59 @@ export class MultiInstanceCoordinator extends EventEmitter {
 
   private calculateParallelismEfficiency(tasks: CollaborationTask[]): number {
     // Calculate how efficiently tasks were parallelized
-    return 0.8; // Placeholder
+    if (tasks.length === 0) return 0;
+
+    // Ideal: all tasks run in parallel (efficiency = 1.0)
+    // Reality: some sequential dependencies reduce efficiency
+
+    const totalDuration = tasks.reduce((sum, task) => sum + (task.actualDuration || 0), 0);
+    const maxDuration = Math.max(...tasks.map(t => t.actualDuration || 0));
+
+    if (maxDuration === 0) return 0;
+
+    // Efficiency = max_duration / total_duration (higher is better)
+    // If all tasks run in parallel, max = total, efficiency = 1.0
+    // If all sequential, max << total, efficiency approaches 0
+    return Math.min(maxDuration / totalDuration, 1.0);
   }
 
   private calculateCommunicationOverhead(): number {
-    // Calculate communication costs
-    return 0.1; // Placeholder
+    // Calculate communication costs based on instance count
+    const instanceCount = this.instances.size;
+
+    if (instanceCount <= 1) return 0;
+
+    // Communication overhead grows with number of instances
+    // Formula: overhead = (n * (n-1)) / (n * max_instances)
+    // For 2 instances: 2/10 = 0.2 (20%)
+    // For 5 instances: 20/50 = 0.4 (40%)
+    const maxInstances = 10;
+    const communicationPairs = instanceCount * (instanceCount - 1);
+    const overhead = communicationPairs / (instanceCount * maxInstances);
+
+    return Math.min(overhead, 1.0);
   }
 
   private calculateAverageResolutionTime(): number {
-    // Calculate average time to resolve conflicts
-    return 5000; // Placeholder
+    // Calculate average conflict resolution time
+    if (!this.currentSession) {
+      return 0;
+    }
+
+    // Estimate based on session metrics
+    const taskCount = this.currentSession.tasks.size;
+    const participantCount = this.currentSession.participants.length;
+
+    if (taskCount === 0) return 0;
+
+    // More participants = more coordination = longer resolution
+    // Base resolution time: 2s per task
+    // Add 500ms per additional participant
+    const baseTime = 2000;
+    const participantOverhead = (participantCount - 1) * 500;
+    const avgResolutionTime = (baseTime + participantOverhead) * (taskCount / 10); // Normalize by 10 tasks
+
+    return Math.round(Math.min(avgResolutionTime, 60000)); // Cap at 60s
   }
 
   private async notifySessionEnd(): Promise<void> {

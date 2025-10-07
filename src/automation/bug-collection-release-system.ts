@@ -751,7 +751,36 @@ Highlight any violations of OPERA methodology or framework conventions.
   }
 
   private async checkPerformanceImprovement(): Promise<boolean> {
-    return true; // Placeholder
+    // Check if recent commits include performance improvements
+    try {
+      // Get recent commit messages
+      const { stdout } = await execAsync('git log -10 --oneline');
+
+      // Look for performance-related keywords
+      const perfKeywords = ['perf', 'performance', 'optimize', 'faster', 'speed', 'efficiency'];
+      const hasPerf = perfKeywords.some(keyword => stdout.toLowerCase().includes(keyword));
+
+      if (!hasPerf) {
+        return false;
+      }
+
+      // Run performance benchmarks if available
+      try {
+        const benchResult = await execAsync('npm run test:performance 2>&1 || true', { timeout: 60000 });
+
+        // Check if benchmarks show improvement
+        return benchResult.stdout.includes('improvement') ||
+               benchResult.stdout.includes('faster') ||
+               benchResult.stdout.includes('optimized');
+
+      } catch (error) {
+        // If no benchmark script, accept commit message indication
+        return hasPerf;
+      }
+
+    } catch (error) {
+      return false;
+    }
   }
 
   private incrementVersion(current: string, type: 'patch' | 'minor' | 'major'): string {

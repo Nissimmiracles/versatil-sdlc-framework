@@ -582,14 +582,56 @@ export class IntelligentContextCache extends EventEmitter {
   }
 
   private async analyzeProjectStructure(projectPath: string): Promise<any> {
-    // Placeholder for project structure analysis
-    return {
-      path: projectPath,
-      name: projectPath.split('/').pop(),
-      type: 'web-application',
-      framework: 'typescript',
-      structure: 'standard'
-    };
+    // Real project structure analysis
+    const { promises: fs } = await import('fs');
+    const { join } = await import('path');
+
+    try {
+      // Check for common framework indicators
+      const packageJson = await this.safeReadJson(join(projectPath, 'package.json'));
+
+      let framework = 'unknown';
+      let type = 'library';
+
+      if (packageJson?.dependencies) {
+        if (packageJson.dependencies['next']) framework = 'next';
+        else if (packageJson.dependencies['react']) framework = 'react';
+        else if (packageJson.dependencies['vue']) framework = 'vue';
+        else if (packageJson.dependencies['angular']) framework = 'angular';
+        else if (packageJson.dependencies['express']) framework = 'express';
+        else if (packageJson.dependencies['fastify']) framework = 'fastify';
+      }
+
+      // Determine project type
+      const hasSrc = await fs.access(join(projectPath, 'src')).then(() => true).catch(() => false);
+      const hasPublic = await fs.access(join(projectPath, 'public')).then(() => true).catch(() => false);
+      const hasApi = await fs.access(join(projectPath, 'api')).then(() => true).catch(() => false);
+
+      if (hasPublic || framework === 'next' || framework === 'react') {
+        type = 'web-application';
+      } else if (hasApi || framework === 'express' || framework === 'fastify') {
+        type = 'api-service';
+      }
+
+      return {
+        path: projectPath,
+        name: packageJson?.name || projectPath.split('/').pop(),
+        type,
+        framework,
+        structure: hasSrc ? 'src-based' : 'root-based',
+        hasTests: await fs.access(join(projectPath, 'test')).then(() => true).catch(() =>
+                   fs.access(join(projectPath, '__tests__')).then(() => true).catch(() => false))
+      };
+
+    } catch (error) {
+      return {
+        path: projectPath,
+        name: projectPath.split('/').pop(),
+        type: 'unknown',
+        framework: 'unknown',
+        structure: 'unknown'
+      };
+    }
   }
 
   private async analyzeDependencies(projectPath: string): Promise<any> {
@@ -611,21 +653,107 @@ export class IntelligentContextCache extends EventEmitter {
   }
 
   private async analyzeCodeMetrics(projectPath: string): Promise<any> {
-    // Placeholder for code metrics analysis
-    return {
-      files: 0,
-      lines: 0,
-      complexity: 'medium',
-      testCoverage: 0
-    };
+    // Real code metrics analysis
+    const { exec } = await import('child_process');
+    const { promisify } = await import('util');
+    const execAsync = promisify(exec);
+
+    try {
+      // Count TypeScript/JavaScript files
+      const { stdout: fileCount } = await execAsync(
+        `find "${projectPath}/src" -type f \\( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \\) 2>/dev/null | wc -l`,
+        { timeout: 10000 }
+      ).catch(() => ({ stdout: '0' }));
+
+      // Count lines of code
+      const { stdout: lineCount } = await execAsync(
+        `find "${projectPath}/src" -type f \\( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \\) -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}'`,
+        { timeout: 10000 }
+      ).catch(() => ({ stdout: '0' }));
+
+      const files = parseInt(fileCount.trim()) || 0;
+      const lines = parseInt(lineCount.trim()) || 0;
+
+      // Estimate complexity based on lines per file
+      const avgLinesPerFile = files > 0 ? lines / files : 0;
+      let complexity: 'low' | 'medium' | 'high' = 'medium';
+
+      if (avgLinesPerFile < 100) complexity = 'low';
+      else if (avgLinesPerFile > 300) complexity = 'high';
+
+      // Check test coverage if available
+      let testCoverage = 0;
+      const coverageFile = join(projectPath, 'coverage', 'coverage-summary.json');
+      const coverageData = await this.safeReadJson(coverageFile);
+
+      if (coverageData?.total?.lines?.pct !== undefined) {
+        testCoverage = coverageData.total.lines.pct;
+      }
+
+      return {
+        files,
+        lines,
+        complexity,
+        testCoverage,
+        avgLinesPerFile: Math.round(avgLinesPerFile)
+      };
+
+    } catch (error) {
+      return {
+        files: 0,
+        lines: 0,
+        complexity: 'unknown',
+        testCoverage: 0
+      };
+    }
   }
 
   private async generateAgentRecommendations(projectPath: string): Promise<any> {
-    // Placeholder for agent recommendations
+    // Real agent recommendations based on project analysis
+    const structure = await this.analyzeProjectStructure(projectPath);
+    const recommended: string[] = [];
+    const reasons: string[] = [];
+    let confidence = 0.7;
+
+    // Always recommend QA agent
+    recommended.push('maria-qa');
+    reasons.push('Testing and quality assurance essential for all projects');
+
+    // Frontend agents
+    if (structure.type === 'web-application' || ['react', 'vue', 'angular', 'next'].includes(structure.framework)) {
+      recommended.push('james-frontend');
+      reasons.push(`Frontend development with ${structure.framework}`);
+      confidence += 0.1;
+    }
+
+    // Backend agents
+    if (structure.type === 'api-service' || ['express', 'fastify'].includes(structure.framework)) {
+      recommended.push('marcus-backend');
+      reasons.push(`Backend API development with ${structure.framework}`);
+      confidence += 0.1;
+    }
+
+    // PM agent for larger projects
+    const metrics = await this.analyzeCodeMetrics(projectPath);
+    if (metrics.files > 50) {
+      recommended.push('sarah-pm');
+      reasons.push('Large project benefits from project management');
+      confidence += 0.05;
+    }
+
+    // BA agent if has requirements docs
+    const { promises: fs } = await import('fs');
+    const hasRequirements = await fs.access(join(projectPath, 'docs', 'requirements')).then(() => true).catch(() => false);
+    if (hasRequirements) {
+      recommended.push('alex-ba');
+      reasons.push('Requirements documentation detected');
+      confidence += 0.05;
+    }
+
     return {
-      recommended: ['maria-qa', 'james-frontend', 'marcus-backend'],
-      confidence: 0.9,
-      reasons: ['TypeScript project', 'Web application structure']
+      recommended,
+      confidence: Math.min(confidence, 1.0),
+      reasons
     };
   }
 
