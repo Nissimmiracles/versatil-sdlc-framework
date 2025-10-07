@@ -709,13 +709,50 @@ export class SDLCOrchestrator extends EventEmitter {
    * Helper methods
    */
   private isPhaseCompleted(phase: string): boolean {
-    // Implementation would check actual phase completion status
-    return true; // Simplified for now
+    const phaseObj = this.phases.get(phase);
+    if (!phaseObj) return false;
+
+    // Phase is completed if current phase has moved past it
+    const phaseNames = Array.from(this.phases.keys());
+    const targetIndex = phaseNames.indexOf(phase);
+    const currentIndex = phaseNames.indexOf(this.currentState.currentPhase);
+
+    // If current phase is ahead, the target phase is completed
+    if (currentIndex > targetIndex) return true;
+
+    // If it's the current phase, check quality score
+    if (currentIndex === targetIndex) {
+      const threshold = phaseObj.qualityGates?.[0]?.criteria?.[0]?.threshold || 0;
+      const minQuality = typeof threshold === 'number' ? threshold : parseFloat(threshold);
+      return this.currentState.qualityScore >= minQuality;
+    }
+
+    return false;
   }
 
   private async validatePhaseOutput(output: string, phase: string): Promise<boolean> {
-    // Implementation would validate actual phase outputs
-    return true; // Simplified for now
+    const phaseObj = this.phases.get(phase);
+    if (!phaseObj) return false;
+
+    // Check if output is in the expected outputs list
+    if (!phaseObj.outputs.includes(output)) {
+      this.logger.warn('Unexpected output for phase', { phase, output });
+      return false;
+    }
+
+    // Validate output exists and has content
+    if (!output || output.trim().length === 0) {
+      this.logger.warn('Empty output for phase', { phase, output });
+      return false;
+    }
+
+    // Additional validation: check if output meets phase-specific requirements
+    if (phase === this.currentState.currentPhase && this.currentState.qualityScore < 70) {
+      this.logger.warn('Output quality below threshold', { phase, output, qualityScore: this.currentState.qualityScore });
+      return false;
+    }
+
+    return true;
   }
 
   private async getMetricValue(metric: string, phase: string): Promise<any> {
@@ -775,13 +812,130 @@ export class SDLCOrchestrator extends EventEmitter {
   }
 
   private async evaluateTrigger(trigger: string, value: any): Promise<boolean> {
-    // Implementation would evaluate trigger conditions
-    return Math.random() > 0.7; // Simplified for now
+    try {
+      // Parse trigger condition (e.g., "value > 80", "value < threshold", "value === 'failed'")
+      const operators = ['>=', '<=', '===', '!==', '>', '<', '==', '!='];
+
+      for (const op of operators) {
+        if (trigger.includes(op)) {
+          const [left, right] = trigger.split(op).map(s => s.trim());
+
+          // Evaluate left side (usually 'value')
+          const leftValue = left === 'value' ? value : parseFloat(left);
+
+          // Evaluate right side (could be number, string, or variable)
+          let rightValue: any = right;
+          if (!isNaN(parseFloat(right))) {
+            rightValue = parseFloat(right);
+          } else if (right === 'true') {
+            rightValue = true;
+          } else if (right === 'false') {
+            rightValue = false;
+          }
+
+          // Perform comparison
+          switch (op) {
+            case '>': return leftValue > rightValue;
+            case '<': return leftValue < rightValue;
+            case '>=': return leftValue >= rightValue;
+            case '<=': return leftValue <= rightValue;
+            case '===': return leftValue === rightValue;
+            case '!==': return leftValue !== rightValue;
+            case '==': return leftValue == rightValue;
+            case '!=': return leftValue != rightValue;
+          }
+        }
+      }
+
+      // If no operator found, treat as boolean check
+      return Boolean(value);
+    } catch (error) {
+      this.logger.warn('Failed to evaluate trigger', { trigger, value, error });
+      return false;
+    }
   }
 
   private async applyAdaptation(adaptation: string, feedback: any): Promise<void> {
-    // Implementation would apply adaptations to the system
-    this.logger.debug('Applying adaptation', { adaptation, feedback: feedback.id }, 'sdlc-orchestrator');
+    this.logger.info('Applying adaptation to SDLC', { adaptation, feedback: feedback.id });
+
+    try {
+      // Parse adaptation command (e.g., "increase_threshold:test-coverage:90")
+      const [action, ...params] = adaptation.split(':');
+
+      switch (action) {
+        case 'increase_threshold':
+          if (params.length >= 2) {
+            const [metric, newThreshold] = params;
+            await this.updateQualityThreshold(metric, parseFloat(newThreshold));
+          }
+          break;
+
+        case 'decrease_threshold':
+          if (params.length >= 2) {
+            const [metric, newThreshold] = params;
+            await this.updateQualityThreshold(metric, parseFloat(newThreshold));
+          }
+          break;
+
+        case 'add_feedback_loop':
+          if (params.length >= 1) {
+            const loopType = params[0];
+            await this.addFeedbackLoop(loopType, feedback);
+          }
+          break;
+
+        case 'modify_phase':
+          if (params.length >= 2) {
+            const [phaseName, modification] = params;
+            await this.modifyPhaseConfiguration(phaseName, modification);
+          }
+          break;
+
+        default:
+          this.logger.warn('Unknown adaptation action', { action, adaptation });
+      }
+
+      // Record adaptation in history
+      const history = this.feedbackHistory.get(feedback.id) || [];
+      history.push({
+        timestamp: new Date(),
+        adaptation,
+        appliedSuccessfully: true
+      });
+      this.feedbackHistory.set(feedback.id, history);
+
+    } catch (error) {
+      this.logger.error('Failed to apply adaptation', { adaptation, error });
+    }
+  }
+
+  private async updateQualityThreshold(metric: string, threshold: number): Promise<void> {
+    // Update quality gate thresholds dynamically
+    for (const [phaseName, phase] of this.phases.entries()) {
+      if (phase.qualityGates) {
+        phase.qualityGates.forEach(gate => {
+          gate.criteria.forEach(criteria => {
+            if (criteria.metric === metric) {
+              this.logger.info('Updated quality threshold', { phase: phaseName, metric, oldThreshold: criteria.threshold, newThreshold: threshold });
+              criteria.threshold = threshold;
+            }
+          });
+        });
+      }
+    }
+  }
+
+  private async addFeedbackLoop(loopType: string, feedback: any): Promise<void> {
+    this.logger.info('Adding new feedback loop', { loopType, feedbackId: feedback.id });
+    // Feedback loop would be added to the system dynamically
+  }
+
+  private async modifyPhaseConfiguration(phaseName: string, modification: string): Promise<void> {
+    const phase = this.phases.get(phaseName);
+    if (phase) {
+      this.logger.info('Modifying phase configuration', { phaseName, modification });
+      // Phase modification logic would be applied here
+    }
   }
 
   private generateNextActions(phase: string): string[] {
@@ -798,22 +952,85 @@ export class SDLCOrchestrator extends EventEmitter {
   }
 
   private calculateQualityTrend(): string {
-    // Implementation would calculate quality trend from history
-    return 'improving';
+    // Analyze current quality score against phase quality gates
+    const currentPhase = this.phases.get(this.currentState.currentPhase);
+    if (!currentPhase || !currentPhase.qualityGates || currentPhase.qualityGates.length === 0) {
+      return 'stable';
+    }
+
+    const threshold = currentPhase.qualityGates[0].criteria[0]?.threshold || 80;
+    const targetQuality = typeof threshold === 'number' ? threshold : parseFloat(threshold);
+    const currentQuality = this.currentState.qualityScore;
+
+    if (currentQuality > targetQuality + 10) return 'improving';
+    if (currentQuality < targetQuality - 10) return 'declining';
+    return 'stable';
   }
 
   private getAdaptationHistory(): any[] {
-    // Implementation would return adaptation history
-    return Array.from(this.feedbackHistory.values()).flat();
+    const adaptations: any[] = [];
+
+    // Extract all adaptations from feedback history
+    for (const [feedbackId, history] of this.feedbackHistory.entries()) {
+      history.forEach((entry: any) => {
+        if (entry.adaptation) {
+          adaptations.push({
+            feedbackId,
+            timestamp: entry.timestamp,
+            adaptation: entry.adaptation,
+            success: entry.appliedSuccessfully
+          });
+        }
+      });
+    }
+
+    // Sort by timestamp (most recent first)
+    return adaptations.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 
   private generateRecommendations(): string[] {
-    // Implementation would generate intelligent recommendations
-    return [
-      'Consider increasing test coverage in development phase',
-      'Implement more feedback loops for user experience',
-      'Optimize deployment pipeline for faster releases'
-    ];
+    const recommendations: string[] = [];
+
+    // Check current quality score
+    if (this.currentState.qualityScore < 80) {
+      recommendations.push(`Improve quality in ${this.currentState.currentPhase} phase (current: ${this.currentState.qualityScore}%, target: 80%+)`);
+    }
+
+    // Check for blockers
+    if (this.currentState.blockers.length > 0) {
+      recommendations.push(`Address ${this.currentState.blockers.length} active blocker(s): ${this.currentState.blockers.slice(0, 2).join(', ')}`);
+    }
+
+    // Analyze quality trend
+    const trend = this.calculateQualityTrend();
+    if (trend === 'declining') {
+      recommendations.push('⚠️ Quality below target - review recent changes and increase testing');
+    } else if (trend === 'improving') {
+      recommendations.push('✅ Quality above target - maintain current practices');
+    }
+
+    // Check feedback loops
+    if (this.currentState.feedbackActive.length < 2) {
+      recommendations.push('Activate more feedback loops to improve continuous improvement cycle');
+    }
+
+    // Check phase progress
+    if (this.currentState.phaseProgress < 50) {
+      recommendations.push(`Accelerate ${this.currentState.currentPhase} phase progress (current: ${this.currentState.phaseProgress}%)`);
+    }
+
+    // Overall progress recommendations
+    if (this.currentState.overallProgress > 75) {
+      recommendations.push('Prepare for deployment - review quality gates and finalize documentation');
+    }
+
+    // If no specific recommendations, provide general best practices
+    if (recommendations.length === 0) {
+      recommendations.push('Maintain current quality standards and consider incremental improvements');
+      recommendations.push('Review and optimize phase transitions for better efficiency');
+    }
+
+    return recommendations.slice(0, 5); // Limit to top 5 recommendations
   }
 
   async transitionPhase(targetPhase: string, context?: any): Promise<any> {
