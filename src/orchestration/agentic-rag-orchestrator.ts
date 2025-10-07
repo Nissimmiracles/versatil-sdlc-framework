@@ -118,7 +118,23 @@ export class AgenticRAGOrchestrator extends EventEmitter {
   
   // Agent-specific memory indexes
   private agentMemories: Map<string, AgentMemory[]> = new Map();
-  
+
+  // Planning and execution tracking
+  private currentPlan: {
+    id: string;
+    steps: Array<{ id: string; description: string; status: 'pending' | 'in-progress' | 'completed' | 'failed'; agent?: string }>;
+    completed: number;
+    total: number;
+    startedAt?: number;
+    blockers: Array<{ id: string; description: string; severity: 'low' | 'medium' | 'high' }>;
+  } = {
+    id: '',
+    steps: [],
+    completed: 0,
+    total: 0,
+    blockers: []
+  };
+
   // Pattern detection and learning
   private patternDetector = {
     codePatterns: new Map<string, Pattern>(),
@@ -712,10 +728,92 @@ export class AgenticRAGOrchestrator extends EventEmitter {
       return { total: 0, covered: 0 };
     }
   }
-  private async getCurrentPlan(): Promise<any> { return {}; }
-  private async calculateProgress(): Promise<number> { return 0; }
-  private async identifyBlockers(): Promise<Blocker[]> { return []; }
-  private async getNextSteps(): Promise<Step[]> { return []; }
+  private async getCurrentPlan(): Promise<any> {
+    // Return current execution plan with detailed status
+    return {
+      ...this.currentPlan,
+      progressPercentage: this.currentPlan.total > 0
+        ? (this.currentPlan.completed / this.currentPlan.total) * 100
+        : 0,
+      duration: this.currentPlan.startedAt
+        ? Date.now() - this.currentPlan.startedAt
+        : 0,
+      estimatedCompletion: this.currentPlan.startedAt && this.currentPlan.completed > 0
+        ? this.currentPlan.startedAt + ((Date.now() - this.currentPlan.startedAt) / this.currentPlan.completed) * this.currentPlan.total
+        : null
+    };
+  }
+
+  private async calculateProgress(): Promise<number> {
+    // Calculate real progress percentage
+    if (this.currentPlan.total === 0) return 0;
+
+    return (this.currentPlan.completed / this.currentPlan.total) * 100;
+  }
+
+  private async identifyBlockers(): Promise<Blocker[]> {
+    // Identify blockers from plan execution
+    const blockers: Blocker[] = [];
+
+    // Check for failed steps
+    for (const step of this.currentPlan.steps) {
+      if (step.status === 'failed') {
+        blockers.push({
+          id: `blocker-${step.id}`,
+          description: `Step failed: ${step.description}`,
+          severity: 'high'
+        });
+      }
+    }
+
+    // Check for long-running pending steps
+    const longRunningSteps = this.currentPlan.steps.filter(
+      s => s.status === 'in-progress'
+    );
+
+    if (longRunningSteps.length > 3) {
+      blockers.push({
+        id: 'blocker-concurrent',
+        description: `Too many concurrent steps (${longRunningSteps.length}), may indicate resource contention`,
+        severity: 'medium'
+      });
+    }
+
+    // Add existing blockers from plan
+    blockers.push(...this.currentPlan.blockers.map(b => ({
+      ...b,
+      severity: b.severity
+    } as Blocker)));
+
+    return blockers;
+  }
+
+  private async getNextSteps(): Promise<Step[]> {
+    // Generate next steps from current plan state
+    const nextSteps: Step[] = [];
+
+    // Get pending steps
+    const pendingSteps = this.currentPlan.steps.filter(s => s.status === 'pending');
+
+    for (const step of pendingSteps.slice(0, 5)) { // Next 5 steps
+      nextSteps.push({
+        id: step.id,
+        description: step.description,
+        agent: step.agent || 'auto-assign'
+      });
+    }
+
+    // If no pending steps but plan not complete, suggest completion
+    if (nextSteps.length === 0 && this.currentPlan.completed < this.currentPlan.total) {
+      nextSteps.push({
+        id: 'complete-plan',
+        description: 'Review and finalize plan execution',
+        agent: 'sarah-pm'
+      });
+    }
+
+    return nextSteps;
+  }
   private async getTimeline(): Promise<Timeline> {
     return {
       start: new Date(),

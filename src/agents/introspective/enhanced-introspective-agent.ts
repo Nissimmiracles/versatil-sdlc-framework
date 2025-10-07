@@ -888,20 +888,582 @@ You are the guardian of both the framework and the project.`;
     return [];
   }
 
-  // Missing method implementations
-  private async handleStepFailure(data: any): Promise<void> {}
-  private async predictPotentialIssues(): Promise<any[]> { return []; }
-  private async optimizeFrameworkPerformance(): Promise<void> {}
-  private async learnFromPattern(pattern: any): Promise<void> {}
-  private async analyzeProjectContext(): Promise<any> { return this.projectContext; }
-  private async handleFrameworkError(error: any): Promise<void> {}
-  private async handleQuery(query: string): Promise<any> { return {}; }
-  private async analyzeWithFullContext(context: any): Promise<any> { return {}; }
-  private async initiateEmergencyProtocol(issue: any): Promise<void> {}
-  private async storeProjectHealthInsights(insights: any): Promise<void> {}
-  private async storeDeepAnalysisResults(results: any): Promise<void> {}
-  private async analyzeChangeImpact(changes: any): Promise<any> { return {}; }
-  private async learnFromFileChange(change: any): Promise<void> {}
+  // Production implementations
+  private async handleStepFailure(data: any): Promise<void> {
+    const { step, goal, error } = data;
+
+    this.logger.warn('Step failure detected', {
+      step: step.id,
+      goal: goal.id,
+      error: error.message
+    }, 'introspective');
+
+    // Store failure pattern
+    await vectorMemoryStore.storeMemory({
+      content: JSON.stringify({
+        type: 'step_failure',
+        step,
+        goal,
+        error,
+        timestamp: Date.now()
+      }),
+      metadata: {
+        agentId: this.id,
+        timestamp: Date.now(),
+        tags: ['failure', 'step', goal.type, 'learning']
+      }
+    });
+
+    // Check if failure is critical
+    if (step.critical || goal.priority === 'high') {
+      // Create recovery goal
+      const recoveryGoal: OperaGoal = {
+        id: `recover-${step.id}-${Date.now()}`,
+        type: 'bug_fix',
+        description: `Recover from failed step: ${step.description}`,
+        priority: 'high',
+        status: 'pending',
+        constraints: ['Preserve goal progress', 'Fix root cause'],
+        successCriteria: ['Step executes successfully', 'No regression']
+      };
+
+      await this.opera.addGoal(recoveryGoal);
+    }
+  }
+
+  private async predictPotentialIssues(): Promise<any[]> {
+    const issues: any[] = [];
+
+    // Check test coverage
+    if (this.projectContext?.quality?.testCoverage !== undefined) {
+      const coverage = this.projectContext.quality.testCoverage;
+      if (coverage < 60) {
+        issues.push({
+          type: 'quality',
+          severity: 'medium',
+          description: `Low test coverage: ${coverage}%`,
+          recommendation: 'Increase test coverage to at least 80%',
+          confidence: 0.9,
+          impact: 'Higher risk of undetected bugs'
+        });
+      }
+    }
+
+    // Check for recurring errors
+    const recentErrors = Array.from(this.errorPatterns.values()).slice(-10);
+    if (recentErrors.length > 0) {
+      const errorTypes = new Map<string, number>();
+
+      for (const error of recentErrors) {
+        const type = error.goalType || 'unknown';
+        errorTypes.set(type, (errorTypes.get(type) || 0) + 1);
+      }
+
+      for (const [type, count] of errorTypes) {
+        if (count >= 3) {
+          issues.push({
+            type: 'reliability',
+            severity: 'high',
+            description: `Recurring failure pattern: ${type} (${count} occurrences in last 10)`,
+            recommendation: 'Investigate and fix root cause to prevent future failures',
+            confidence: 0.95,
+            impact: 'System instability, reduced reliability'
+          });
+        }
+      }
+    }
+
+    // Check for performance degradation
+    if (this.enhancedMetrics.frameworkHealth < 80) {
+      issues.push({
+        type: 'performance',
+        severity: 'high',
+        description: `Framework health degraded to ${this.enhancedMetrics.frameworkHealth}%`,
+        recommendation: 'Run deep analysis to identify bottlenecks',
+        confidence: 1.0,
+        impact: 'Slower development, potential failures'
+      });
+    }
+
+    // Check for memory efficiency issues
+    if (this.enhancedMetrics.memoryEfficiency < 70) {
+      issues.push({
+        type: 'resource',
+        severity: 'medium',
+        description: `Memory efficiency at ${this.enhancedMetrics.memoryEfficiency}%`,
+        recommendation: 'Optimize memory usage, clear old cached data',
+        confidence: 0.85,
+        impact: 'Slower queries, increased resource usage'
+      });
+    }
+
+    // Check for anti-patterns
+    if (this.projectContext?.patterns?.antiPatterns?.length > 0) {
+      const antiPatternCount = this.projectContext.patterns.antiPatterns.length;
+      issues.push({
+        type: 'code_quality',
+        severity: antiPatternCount > 5 ? 'high' : 'medium',
+        description: `${antiPatternCount} anti-patterns detected in codebase`,
+        recommendation: 'Refactor code to eliminate anti-patterns',
+        confidence: 0.9,
+        impact: 'Technical debt, harder maintenance'
+      });
+    }
+
+    // Store predictions
+    this.enhancedMetrics.predictedIssues = issues;
+
+    return issues;
+  }
+
+  private async optimizeFrameworkPerformance(): Promise<void> {
+    this.logger.info('Optimizing framework performance', {}, 'introspective');
+
+    // 1. Clean old error patterns (keep last 100)
+    if (this.errorPatterns.size > 100) {
+      const entries = Array.from(this.errorPatterns.entries());
+      const toKeep = entries.slice(-100);
+      this.errorPatterns.clear();
+      toKeep.forEach(([k, v]) => this.errorPatterns.set(k, v));
+    }
+
+    // 2. Clean old success patterns (keep last 100)
+    if (this.successPatterns.size > 100) {
+      const entries = Array.from(this.successPatterns.entries());
+      const toKeep = entries.slice(-100);
+      this.successPatterns.clear();
+      toKeep.forEach(([k, v]) => this.successPatterns.set(k, v));
+    }
+
+    // 3. Reset agent performance metrics if stale
+    const now = Date.now();
+    if (now - this.enhancedMetrics.lastFullScan > 24 * 60 * 60 * 1000) {
+      this.enhancedMetrics.agentPerformance.clear();
+    }
+
+    // 4. Create optimization goal for any identified bottlenecks
+    const bottlenecks: string[] = [];
+
+    if (this.enhancedMetrics.memoryEfficiency < 70) {
+      bottlenecks.push('Memory efficiency');
+    }
+
+    if (this.enhancedMetrics.operaEffectiveness < 70) {
+      bottlenecks.push('Opera effectiveness');
+    }
+
+    if (bottlenecks.length > 0) {
+      const goal: OperaGoal = {
+        id: `optimize-${Date.now()}`,
+        type: 'optimization',
+        description: `Optimize framework bottlenecks: ${bottlenecks.join(', ')}`,
+        priority: 'medium',
+        status: 'pending',
+        constraints: ['No breaking changes', 'Maintain functionality'],
+        successCriteria: ['Performance metrics improved', 'All tests pass']
+      };
+
+      await this.opera.addGoal(goal);
+    }
+
+    this.logger.info('Performance optimization complete', {
+      patternsRetained: this.errorPatterns.size + this.successPatterns.size,
+      bottlenecksIdentified: bottlenecks.length
+    }, 'introspective');
+  }
+
+  private async learnFromPattern(context: any): Promise<void> {
+    const { pattern, type, outcome } = context;
+
+    // Store in appropriate pattern map
+    if (outcome === 'success') {
+      this.successPatterns.set(`${type}-${Date.now()}`, pattern);
+    } else {
+      this.errorPatterns.set(`${type}-${Date.now()}`, pattern);
+    }
+
+    // Store in RAG for long-term memory
+    await vectorMemoryStore.storeMemory({
+      content: JSON.stringify({
+        type: 'learned_pattern',
+        pattern,
+        patternType: type,
+        outcome,
+        timestamp: Date.now()
+      }),
+      metadata: {
+        agentId: this.id,
+        timestamp: Date.now(),
+        tags: ['pattern', 'learning', type, outcome]
+      }
+    });
+
+    this.enhancedMetrics.learnedPatterns++;
+
+    this.logger.info('Pattern learned', {
+      type,
+      outcome,
+      totalPatterns: this.enhancedMetrics.learnedPatterns
+    }, 'introspective');
+  }
+
+  private async analyzeProjectContext(): Promise<AgentResponse> {
+    // Refresh project context
+    this.projectContext = await environmentScanner.scanEnvironment();
+
+    if (!this.projectContext) {
+      return this.formatResponse({
+        error: 'Unable to scan project context',
+        status: 'failed'
+      });
+    }
+
+    // Compile comprehensive context report
+    const contextReport = {
+      projectInfo: this.projectContext.projectInfo || {},
+      technology: this.projectContext.technology || {},
+      structure: this.projectContext.structure || {},
+      quality: this.projectContext.quality || {},
+      patterns: this.projectContext.patterns || {},
+      codebaseStats: this.projectContext.codebase ? {
+        totalFiles: (this.projectContext.codebase.components?.length || 0) +
+                    (this.projectContext.codebase.tests?.length || 0) +
+                    (this.projectContext.codebase.utilities?.length || 0),
+        components: this.projectContext.codebase.components?.length || 0,
+        tests: this.projectContext.codebase.tests?.length || 0,
+        utilities: this.projectContext.codebase.utilities?.length || 0
+      } : {}
+    };
+
+    return this.formatResponse(contextReport);
+  }
+
+  private async handleFrameworkError(error: string): Promise<void> {
+    this.logger.error('Framework error detected', { error }, 'introspective');
+
+    // Store error for pattern analysis
+    this.errorPatterns.set(`framework-${Date.now()}`, {
+      type: 'framework_error',
+      error,
+      timestamp: Date.now()
+    });
+
+    // Store in RAG
+    await vectorMemoryStore.storeMemory({
+      content: JSON.stringify({
+        type: 'framework_error',
+        error,
+        timestamp: Date.now(),
+        stackTrace: new Error().stack
+      }),
+      metadata: {
+        agentId: this.id,
+        timestamp: Date.now(),
+        tags: ['error', 'framework', 'critical']
+      }
+    });
+
+    // Create fix goal
+    const goal: OperaGoal = {
+      id: `fix-framework-${Date.now()}`,
+      type: 'bug_fix',
+      description: `Fix framework error: ${error}`,
+      priority: 'high',
+      status: 'pending',
+      constraints: ['Preserve framework stability', 'Add error handling'],
+      successCriteria: ['Error resolved', 'Tests pass', 'No regression']
+    };
+
+    await this.opera.addGoal(goal);
+
+    // Increment autonomous fix counter
+    this.enhancedMetrics.autonomousFixCount++;
+  }
+
+  private async handleQuery(query: string): Promise<AgentResponse> {
+    this.logger.info('Processing introspective query', { query }, 'introspective');
+
+    // Query similar memories
+    const ragQuery: RAGQuery = {
+      query,
+      topK: 5
+    };
+
+    const memories = await vectorMemoryStore.queryMemories(ragQuery);
+
+    // Compile response from memories
+    const insights: any[] = [];
+
+    for (const doc of memories.documents) {
+      try {
+        const memory = JSON.parse(doc.content);
+        insights.push(memory);
+      } catch {
+        insights.push({ content: doc.content });
+      }
+    }
+
+    return {
+      agentId: this.id,
+      message: `Found ${insights.length} relevant insights`,
+      priority: 'low',
+      suggestions: insights.map(i => ({
+        type: i.type || 'insight',
+        priority: 'low',
+        message: i.description || JSON.stringify(i).substring(0, 100),
+        actions: ['Review', 'Apply']
+      })),
+      handoffTo: [],
+      context: {
+        query,
+        insights,
+        totalMemories: memories.documents.length
+      }
+    };
+  }
+
+  private async analyzeWithFullContext(filePath: string): Promise<AgentResponse> {
+    this.logger.info('Analyzing file with full context', { filePath }, 'introspective');
+
+    // Read file
+    let fileContent = '';
+    try {
+      fileContent = await fs.readFile(filePath, 'utf-8');
+    } catch (error: any) {
+      return this.formatResponse({
+        error: `Unable to read file: ${error.message}`,
+        filePath
+      });
+    }
+
+    // Analyze file in project context
+    const analysis = {
+      filePath,
+      fileSize: fileContent.length,
+      lines: fileContent.split('\n').length,
+      type: this.detectFileType(filePath),
+      issues: [] as any[],
+      recommendations: [] as any[]
+    };
+
+    // Check for common issues
+    if (fileContent.includes('TODO') || fileContent.includes('FIXME')) {
+      const todoCount = (fileContent.match(/TODO/g) || []).length;
+      const fixmeCount = (fileContent.match(/FIXME/g) || []).length;
+
+      analysis.issues.push({
+        type: 'technical_debt',
+        severity: 'low',
+        description: `File contains ${todoCount} TODOs and ${fixmeCount} FIXMEs`
+      });
+    }
+
+    // Check file size
+    if (analysis.lines > 500) {
+      analysis.issues.push({
+        type: 'maintainability',
+        severity: 'medium',
+        description: `Large file (${analysis.lines} lines) - consider splitting`
+      });
+
+      analysis.recommendations.push({
+        type: 'refactor',
+        message: 'Consider splitting into smaller, more focused modules'
+      });
+    }
+
+    // Check for stub implementations
+    if (fileContent.includes('return []') || fileContent.includes('return {}')) {
+      analysis.issues.push({
+        type: 'implementation',
+        severity: 'medium',
+        description: 'Possible stub implementations detected'
+      });
+    }
+
+    return {
+      agentId: this.id,
+      message: `Analysis complete for ${filePath}`,
+      priority: analysis.issues.length > 0 ? 'medium' : 'low',
+      suggestions: [
+        ...analysis.issues.map(i => ({
+          type: i.type,
+          priority: i.severity === 'high' ? 'high' : 'medium',
+          message: i.description,
+          actions: ['Review', 'Fix']
+        })),
+        ...analysis.recommendations.map(r => ({
+          type: r.type,
+          priority: 'low',
+          message: r.message,
+          actions: ['Consider', 'Implement']
+        }))
+      ],
+      handoffTo: [],
+      context: analysis
+    };
+  }
+
+  private async initiateEmergencyProtocol(issues: any[]): Promise<void> {
+    this.logger.error('EMERGENCY: Initiating emergency protocol', {
+      issueCount: issues.length,
+      issues: issues.map(i => i.message)
+    }, 'introspective');
+
+    // Create high-priority emergency goal
+    const emergencyGoal: OperaGoal = {
+      id: `emergency-${Date.now()}`,
+      type: 'bug_fix',
+      description: `EMERGENCY: Resolve ${issues.length} critical issues`,
+      priority: 'high',
+      status: 'pending',
+      constraints: [
+        'Address all critical issues',
+        'Preserve system stability',
+        'Document resolution steps'
+      ],
+      successCriteria: [
+        'All critical issues resolved',
+        'System health restored to 80%+',
+        'No new issues introduced'
+      ]
+    };
+
+    await this.opera.addGoal(emergencyGoal);
+
+    // Store emergency event
+    await vectorMemoryStore.storeMemory({
+      content: JSON.stringify({
+        type: 'emergency_event',
+        issues,
+        goal: emergencyGoal,
+        timestamp: Date.now()
+      }),
+      metadata: {
+        agentId: this.id,
+        timestamp: Date.now(),
+        tags: ['emergency', 'critical', 'protocol']
+      }
+    });
+
+    // Increment fix counter
+    this.enhancedMetrics.autonomousFixCount++;
+  }
+
+  private async storeProjectHealthInsights(insights: any): Promise<void> {
+    await vectorMemoryStore.storeMemory({
+      content: JSON.stringify({
+        type: 'project_health_insights',
+        insights,
+        timestamp: Date.now()
+      }),
+      metadata: {
+        agentId: this.id,
+        timestamp: Date.now(),
+        tags: ['health', 'project', 'insights']
+      }
+    });
+  }
+
+  private async storeDeepAnalysisResults(results: any): Promise<void> {
+    await vectorMemoryStore.storeMemory({
+      content: JSON.stringify({
+        type: 'deep_analysis',
+        results,
+        timestamp: Date.now()
+      }),
+      metadata: {
+        agentId: this.id,
+        timestamp: Date.now(),
+        tags: ['analysis', 'deep', 'insights']
+      }
+    });
+  }
+
+  private async analyzeChangeImpact(change: any): Promise<any> {
+    const { path: filePath, type } = change;
+
+    // Determine impact based on file location and type
+    const impact = {
+      severity: 'low' as 'low' | 'medium' | 'high',
+      affectedAreas: [] as string[],
+      risks: [] as string[],
+      recommendations: [] as string[]
+    };
+
+    // Check if it's a critical file
+    const criticalPatterns = [
+      'src/opera/',
+      'src/agents/',
+      'src/rag/',
+      'package.json',
+      'tsconfig.json'
+    ];
+
+    for (const pattern of criticalPatterns) {
+      if (filePath.includes(pattern)) {
+        impact.severity = 'high';
+        impact.affectedAreas.push(pattern.replace('src/', '').replace('/', ''));
+        impact.risks.push(`Changes to critical ${pattern} may affect core functionality`);
+        impact.recommendations.push('Run full test suite before committing');
+        break;
+      }
+    }
+
+    // Check change type
+    if (type === 'deleted') {
+      impact.severity = 'high';
+      impact.risks.push('File deletion may break imports and dependencies');
+      impact.recommendations.push('Verify no other files depend on this module');
+    }
+
+    // Check for test files
+    if (filePath.includes('.test.') || filePath.includes('__tests__')) {
+      impact.affectedAreas.push('testing');
+      impact.recommendations.push('Ensure test coverage is maintained');
+    }
+
+    return impact;
+  }
+
+  private async learnFromFileChange(change: any): Promise<void> {
+    const { path: filePath, type } = change;
+
+    // Store change pattern for learning
+    await vectorMemoryStore.storeMemory({
+      content: JSON.stringify({
+        type: 'file_change_pattern',
+        filePath,
+        changeType: type,
+        timestamp: Date.now()
+      }),
+      metadata: {
+        agentId: this.id,
+        timestamp: Date.now(),
+        tags: ['change', 'pattern', 'learning', type]
+      }
+    });
+
+    this.enhancedMetrics.learnedPatterns++;
+  }
+
+  private detectFileType(filePath: string): string {
+    const ext = path.extname(filePath);
+
+    if (filePath.includes('.test.') || filePath.includes('__tests__')) {
+      return 'test';
+    } else if (ext === '.ts' || ext === '.tsx') {
+      return 'typescript';
+    } else if (ext === '.js' || ext === '.jsx') {
+      return 'javascript';
+    } else if (ext === '.json') {
+      return 'config';
+    } else if (ext === '.md') {
+      return 'documentation';
+    }
+
+    return 'unknown';
+  }
 
   // ... Additional implementations ...
 
