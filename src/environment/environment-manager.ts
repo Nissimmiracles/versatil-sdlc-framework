@@ -16,7 +16,6 @@ export interface EnvironmentConfig {
   settings: {
     debug: boolean;
     hotReload: boolean;
-    mockExternalServices: boolean;
     strictValidation: boolean;
     verboseLogging: boolean;
     optimizations?: boolean;
