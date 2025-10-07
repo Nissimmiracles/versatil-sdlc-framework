@@ -578,37 +578,147 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
   // Specialized bottleneck detection methods
   private async detectPerformanceBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
-    // Analyze code execution patterns, database queries, API response times
-    return [
-      {
-        type: BottleneckType.PERFORMANCE,
-        severity: 'high',
-        location: 'API endpoint /users/search',
-        impact: {
-          developmentSpeed: -30,
-          teamMorale: -10,
-          codeQuality: -20,
-          deliveryTimeline: -25,
-          resourceUtilization: -40,
-          innovation: -15,
-          costMultiplier: 1.5
-        },
-        rootCauses: [
-          {
-            category: 'technical',
-            description: 'N+1 query problem in user search',
-            confidence: 0.9,
-            dependencies: ['database', 'ORM'],
-            historicalFrequency: 0.3,
-            solutionComplexity: 'moderate'
-          }
-        ],
-        solutions: [],
-        urgency: 8.5,
-        estimatedResolutionTime: 4 * 60 * 60 * 1000, // 4 hours
-        conflictingConstraints: ['performance vs simplicity']
+    const bottlenecks: BottleneckAnalysis[] = [];
+    try {
+      const { execSync } = require('child_process');
+
+      // Search for performance-related keywords in code
+      const performanceKeywords = ['slow', 'performance', 'timeout', 'lag', 'optimize', 'bottleneck'];
+      let performanceCommentCount = 0;
+
+      for (const keyword of performanceKeywords) {
+        try {
+          const result = execSync(
+            `git grep -i "${keyword}" -- "*.ts" "*.tsx" "*.js" "*.jsx" | wc -l`,
+            { cwd: projectPath, encoding: 'utf8' }
+          ).trim();
+          performanceCommentCount += parseInt(result) || 0;
+        } catch {
+          // Keyword not found - continue
+        }
       }
-    ];
+
+      if (performanceCommentCount > 10) {
+        bottlenecks.push({
+          type: BottleneckType.PERFORMANCE,
+          severity: performanceCommentCount > 30 ? 'high' : 'medium',
+          location: `Codebase-wide (${performanceCommentCount} performance-related comments)`,
+          impact: {
+            developmentSpeed: -25,
+            teamMorale: -15,
+            codeQuality: -30,
+            deliveryTimeline: -20,
+            resourceUtilization: -35,
+            innovation: -10,
+            costMultiplier: 1.6
+          },
+          rootCauses: [
+            {
+              category: 'technical',
+              description: `High density of performance-related comments/TODOs (${performanceCommentCount} instances)`,
+              confidence: 0.75,
+              dependencies: ['code-quality', 'architecture'],
+              historicalFrequency: 0.5,
+              solutionComplexity: 'complex'
+            }
+          ],
+          solutions: [],
+          urgency: performanceCommentCount > 30 ? 8.0 : 6.5,
+          estimatedResolutionTime: 7 * 24 * 60 * 60 * 1000,
+          conflictingConstraints: ['performance vs development speed']
+        });
+      }
+
+      // Check for performance-related commits
+      try {
+        const perfCommits = execSync(
+          'git log --since="90 days ago" --grep="performance\\|slow\\|optimize\\|speed" --oneline | wc -l',
+          { cwd: projectPath, encoding: 'utf8' }
+        ).trim();
+
+        const perfCommitCount = parseInt(perfCommits) || 0;
+
+        if (perfCommitCount > 5) {
+          bottlenecks.push({
+            type: BottleneckType.PERFORMANCE,
+            severity: 'medium',
+            location: `Recent commit history (${perfCommitCount} performance fixes in 90 days)`,
+            impact: {
+              developmentSpeed: -20,
+              teamMorale: -10,
+              codeQuality: -25,
+              deliveryTimeline: -15,
+              resourceUtilization: -30,
+              innovation: -15,
+              costMultiplier: 1.4
+            },
+            rootCauses: [
+              {
+                category: 'technical',
+                description: `Recurring performance issues requiring ${perfCommitCount} fixes in 90 days`,
+                confidence: 0.8,
+                dependencies: ['system-architecture', 'performance-monitoring'],
+                historicalFrequency: 0.6,
+                solutionComplexity: 'complex'
+              }
+            ],
+            solutions: [],
+            urgency: 7.0,
+            estimatedResolutionTime: 14 * 24 * 60 * 60 * 1000,
+            conflictingConstraints: ['quick fixes vs architectural refactoring']
+          });
+        }
+      } catch {
+        // No performance commits found or git log failed
+      }
+
+      // Check for large files (potential bundle bloat)
+      try {
+        const largeFiles = execSync(
+          'find . -type f \\( -name "*.js" -o -name "*.ts" -o -name "*.tsx" \\) -size +100k | wc -l',
+          { cwd: projectPath, encoding: 'utf8' }
+        ).trim();
+
+        const largeFileCount = parseInt(largeFiles) || 0;
+
+        if (largeFileCount > 5) {
+          bottlenecks.push({
+            type: BottleneckType.PERFORMANCE,
+            severity: 'medium',
+            location: `Bundle size (${largeFileCount} files > 100KB)`,
+            impact: {
+              developmentSpeed: -15,
+              teamMorale: -5,
+              codeQuality: -20,
+              deliveryTimeline: -10,
+              resourceUtilization: -25,
+              innovation: -5,
+              costMultiplier: 1.3
+            },
+            rootCauses: [
+              {
+                category: 'technical',
+                description: `${largeFileCount} large source files indicate potential bundle bloat`,
+                confidence: 0.7,
+                dependencies: ['build-system', 'code-splitting'],
+                historicalFrequency: 0.4,
+                solutionComplexity: 'moderate'
+              }
+            ],
+            solutions: [],
+            urgency: 5.5,
+            estimatedResolutionTime: 5 * 24 * 60 * 60 * 1000,
+            conflictingConstraints: ['code organization vs bundle size']
+          });
+        }
+      } catch {
+        // find command failed - skip
+      }
+
+    } catch (error) {
+      // Not a git repo or commands unavailable - silent skip
+    }
+    return bottlenecks;
   }
 
   private async detectVelocityBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
