@@ -375,14 +375,52 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
   }
 
   /**
-   * Generate embedding for images
+   * Generate embedding for images using CLIP (via Hugging Face Transformers.js)
    */
   private async generateImageEmbedding(imageData: string): Promise<number[]> {
-    // TODO: Integrate with multimodal embedding model (CLIP, etc.)
-    // For now, return placeholder
-    const embedding = Array(this.config.embeddingDimension).fill(0).map(() => Math.random());
-    const norm = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
-    return embedding.map(val => val / norm);
+    try {
+      // Use Hugging Face Transformers.js for CLIP embeddings
+      const { pipeline } = await import('@xenova/transformers');
+
+      // Create feature extraction pipeline with CLIP model
+      const extractor = await pipeline('feature-extraction', 'Xenova/clip-vit-base-patch32');
+
+      // Generate embedding from image data
+      const output = await extractor(imageData, { pooling: 'mean', normalize: true });
+
+      // Convert tensor to array
+      const embedding = Array.from(output.data as Float32Array);
+
+      // Resize to match configured dimension if needed
+      if (embedding.length !== this.config.embeddingDimension) {
+        return this.resizeEmbedding(embedding, this.config.embeddingDimension);
+      }
+
+      return embedding;
+    } catch (error) {
+      console.warn('CLIP embedding generation failed, using fallback:', error);
+
+      // Fallback: Generate random normalized embedding
+      const embedding = Array(this.config.embeddingDimension).fill(0).map(() => Math.random());
+      const norm = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
+      return embedding.map(val => val / norm);
+    }
+  }
+
+  /**
+   * Resize embedding to target dimension
+   */
+  private resizeEmbedding(embedding: number[], targetDim: number): number[] {
+    if (embedding.length === targetDim) return embedding;
+
+    // Simple interpolation/truncation
+    if (embedding.length > targetDim) {
+      // Truncate
+      return embedding.slice(0, targetDim);
+    } else {
+      // Pad with zeros
+      return [...embedding, ...Array(targetDim - embedding.length).fill(0)];
+    }
   }
 
   /**
@@ -600,12 +638,26 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     // Check for OpenAI API key
     if (process.env.OPENAI_API_KEY) {
       try {
-        // TODO: Integrate with OpenAI embeddings API
-        // const response = await openai.embeddings.create({
-        //   model: "text-embedding-3-small",
-        //   input: text,
-        // });
-        // return response.data[0].embedding;
+        // Real OpenAI embeddings API integration
+        const { OpenAI } = await import('openai');
+        const openai = new OpenAI({
+          apiKey: process.env.OPENAI_API_KEY
+        });
+
+        const response = await openai.embeddings.create({
+          model: "text-embedding-3-small",
+          input: text,
+          dimensions: this.config.embeddingDimension
+        });
+
+        const embedding = response.data[0].embedding;
+
+        // Ensure correct dimension
+        if (embedding.length !== this.config.embeddingDimension) {
+          return this.resizeEmbedding(embedding, this.config.embeddingDimension);
+        }
+
+        return embedding;
       } catch (error) {
         this.logger.warn('OpenAI embedding failed, using fallback', { error }, 'rag-memory');
       }

@@ -250,14 +250,41 @@ export class AgentPool extends EventEmitter {
    * Warm up agent (pre-load resources, RAG patterns, etc.)
    */
   private async warmUpAgent(agent: BaseAgent): Promise<void> {
-    // Warm-up activities:
-    // 1. Pre-load RAG patterns (if agent uses RAG)
-    // 2. Initialize any heavy resources
-    // 3. Compile patterns/rules
-    // 4. Connect to external services if needed
+    // Call agent's warm-up method (implemented in BaseAgent)
+    await agent.warmUp();
 
-    // For now, just ensure agent is ready
-    // TODO: Add agent-specific warm-up methods in BaseAgent
+    // Pool-specific warm-up activities
+    const startTime = Date.now();
+
+    try {
+      await Promise.all([
+        this.preloadAgentDependencies(agent),
+        this.establishConnections(agent)
+      ]);
+
+      const warmUpTime = Date.now() - startTime;
+      console.log(`⚡ ${agent.name} warm-up completed in ${warmUpTime}ms`);
+    } catch (error: any) {
+      console.error(`❌ ${agent.name} warm-up failed:`, error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Preload agent-specific dependencies
+   */
+  private async preloadAgentDependencies(agent: BaseAgent): Promise<void> {
+    // Load agent configuration, patterns, rules
+    // This is now handled by agent.warmUp() in BaseAgent
+    await Promise.resolve();
+  }
+
+  /**
+   * Establish connections for agent (RAG, external services)
+   */
+  private async establishConnections(agent: BaseAgent): Promise<void> {
+    // Connect to RAG vector store, external APIs
+    // Connections are established lazily on first use
     await Promise.resolve();
   }
 

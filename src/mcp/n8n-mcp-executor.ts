@@ -422,13 +422,22 @@ export class N8nMCPExecutor {
   }
 
   /**
-   * Helper: Calculate next cron execution time
+   * Helper: Calculate next cron execution time using cron-parser
    */
   private getNextCronExecution(cronExpression: string): string {
-    // Simple placeholder - in production use a proper cron parser
-    const now = new Date();
-    const next = new Date(now.getTime() + 3600000); // +1 hour
-    return next.toISOString();
+    try {
+      // Use cron-parser for accurate cron expression parsing
+      const parser = require('cron-parser');
+      const interval = parser.parseExpression(cronExpression);
+      const next = interval.next().toDate();
+      return next.toISOString();
+    } catch (error) {
+      // Fallback for invalid cron expressions
+      console.warn(`Invalid cron expression: ${cronExpression}`, error);
+      const now = new Date();
+      const next = new Date(now.getTime() + 3600000); // +1 hour fallback
+      return next.toISOString();
+    }
   }
 
   /**

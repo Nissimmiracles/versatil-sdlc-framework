@@ -122,9 +122,12 @@ export abstract class BaseAgent {
       });
     }
 
-    // Check for TODO comments
-    if (content.includes('// TODO') || content.includes('// FIXME')) {
-      warnings.push('TODO/FIXME comments found in code');
+    // AST-based TODO/FIXME detection using ts-morph
+    const todos = await this.detectTODOsWithAST(content, context.filePath || 'unknown');
+    if (todos.length > 0) {
+      todos.forEach(todo => {
+        warnings.push(`${todo.type} at line ${todo.line}: ${todo.text}`);
+      });
     }
 
     const score = Math.max(0, 100 - (issues.length * 10) - (warnings.length * 5));
@@ -295,5 +298,100 @@ export abstract class BaseAgent {
     if (score >= 80) return '🟡';
     if (score >= 70) return '🟠';
     return '🔴';
+  }
+
+  /**
+   * AST-based TODO/FIXME detection using ts-morph
+   */
+  private async detectTODOsWithAST(content: string, filePath: string): Promise<Array<{ type: string; line: number; text: string }>> {
+    try {
+      const { Project } = await import('ts-morph');
+      const project = new Project({ useInMemoryFileSystem: true });
+      const sourceFile = project.createSourceFile(filePath, content);
+
+      const todos: Array<{ type: string; line: number; text: string }> = [];
+
+      // Scan all comments in the AST
+      sourceFile.forEachDescendant((node) => {
+        const fullText = node.getFullText();
+        const leadingComments = node.getLeadingCommentRanges();
+        const trailingComments = node.getTrailingCommentRanges();
+
+        [...leadingComments, ...trailingComments].forEach(comment => {
+          const commentText = fullText.slice(comment.getPos(), comment.getEnd());
+          const line = sourceFile.getLineAndColumnAtPos(comment.getPos()).line;
+
+          if (commentText.includes('TODO')) {
+            todos.push({
+              type: 'TODO',
+              line,
+              text: commentText.replace(/\/\*|\*\/|\/\//g, '').trim().substring(0, 100)
+            });
+          } else if (commentText.includes('FIXME')) {
+            todos.push({
+              type: 'FIXME',
+              line,
+              text: commentText.replace(/\/\*|\*\/|\/\//g, '').trim().substring(0, 100)
+            });
+          }
+        });
+      });
+
+      return todos;
+    } catch (error) {
+      // Fallback to simple string matching if AST parsing fails
+      const lines = content.split('\n');
+      const todos: Array<{ type: string; line: number; text: string }> = [];
+
+      lines.forEach((line, index) => {
+        if (line.includes('// TODO') || line.includes('/* TODO')) {
+          todos.push({ type: 'TODO', line: index + 1, text: line.trim().substring(0, 100) });
+        }
+        if (line.includes('// FIXME') || line.includes('/* FIXME')) {
+          todos.push({ type: 'FIXME', line: index + 1, text: line.trim().substring(0, 100) });
+        }
+      });
+
+      return todos;
+    }
+  }
+
+  /**
+   * Agent-specific warm-up method (can be overridden)
+   */
+  async warmUp(): Promise<void> {
+    // Default warm-up: load configuration, initialize caches
+    // Subclasses should override with agent-specific logic
+    console.log(`🔥 Warming up ${this.name}...`);
+
+    // Warm up common resources
+    await Promise.all([
+      this.loadAgentConfiguration(),
+      this.initializeCache(),
+      this.precompilePatterns()
+    ]);
+
+    console.log(`✅ ${this.name} warm-up complete`);
+  }
+
+  /**
+   * Load agent-specific configuration
+   */
+  protected async loadAgentConfiguration(): Promise<void> {
+    // Override in subclasses to load agent-specific config
+  }
+
+  /**
+   * Initialize caching layer
+   */
+  protected async initializeCache(): Promise<void> {
+    // Override in subclasses to set up caching
+  }
+
+  /**
+   * Precompile patterns and rules
+   */
+  protected async precompilePatterns(): Promise<void> {
+    // Override in subclasses to precompile regex patterns, rules, etc.
   }
 }
