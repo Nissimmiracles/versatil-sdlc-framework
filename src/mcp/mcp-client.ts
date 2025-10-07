@@ -6,22 +6,7 @@
 import { AgentRegistry } from '../agents/agent-registry.js';
 import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator.js';
 import { VERSATILLogger } from '../utils/logger.js';
-
-// Mock interfaces for compilation
-interface MockAgentActivationContext {
-  triggeredBy?: string;
-  priority?: string;
-  timestamp?: string;
-  [key: string]: any;
-}
-
-interface MockAgentResponse {
-  success: boolean;
-  agentId?: string;
-  agentType?: string;
-  suggestions?: any[];
-  metadata?: Record<string, any>;
-}
+import type { AgentResponse, AgentActivationContext } from '../agents/base-agent.js';
 
 export interface MCPClientConfig {
   serverPath: string;
@@ -128,41 +113,65 @@ export class VERSATILMCPClient {
    * Handle agent activation requests
    */
   private async handleAgentActivation(args: any): Promise<MCPToolResponse> {
-    const { agentId, context, priority = 'normal' } = args;
+    const { agentId, context, priority = 'normal', filePath, content } = args;
 
     if (!agentId) {
       return { success: false, error: 'Agent ID is required' };
     }
 
-    const activationContext = {
+    // Get agent from registry
+    const agent = this.agentRegistry.getAgent(agentId);
+    if (!agent) {
+      return { success: false, error: `Agent not found: ${agentId}` };
+    }
+
+    // Build activation context
+    const activationContext: AgentActivationContext = {
       triggeredBy: 'mcp-client',
       priority,
       timestamp: new Date().toISOString(),
+      filePath: filePath || context?.filePath,
+      fileContent: content || context?.fileContent,
+      userQuery: context?.userQuery,
+      projectPath: context?.projectPath || process.cwd(),
       ...context
     };
 
-    // Mock agent activation for testing
-    const result: MockAgentResponse = {
-      success: true,
-      agentId,
-      agentType: 'opera-agent',
-      suggestions: ['Agent activation simulated via MCP'],
-      metadata: { mcpActivation: true }
-    };
+    try {
+      // Real agent activation
+      const result: AgentResponse = await agent.activate(activationContext);
 
-    return {
-      success: result.success,
-      data: {
-        agentId: result.agentId,
-        status: result.success ? 'activated' : 'failed',
-        suggestions: result.suggestions || [],
-        metadata: result.metadata || {}
-      },
-      metadata: {
-        executionTime: Date.now(),
-        agentType: result.agentType || 'unknown'
-      }
-    };
+      return {
+        success: true,
+        data: {
+          agentId: result.agentId || agent.id,
+          agentName: agent.name,
+          status: 'activated',
+          message: result.message,
+          suggestions: result.suggestions || [],
+          handoffTo: result.handoffTo || [],
+          priority: result.priority || 'normal',
+          analysis: result.analysis,
+          context: result.context,
+          data: result.data
+        },
+        metadata: {
+          executionTime: Date.now(),
+          agentType: agent.id,
+          activationContext
+        }
+      };
+    } catch (error) {
+      this.logger.error(`Agent activation failed: ${agentId}`, { error });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        data: {
+          agentId,
+          status: 'error'
+        }
+      };
+    }
   }
 
   /**
@@ -171,45 +180,54 @@ export class VERSATILMCPClient {
   private async handleSDLCOrchestration(args: any): Promise<MCPToolResponse> {
     const { action, fromPhase, toPhase, context } = args;
 
-    switch (action) {
-      case 'transition':
-        if (!fromPhase || !toPhase) {
-          return { success: false, error: 'Phase transition requires fromPhase and toPhase' };
-        }
-
-        // Mock SDLC orchestration for testing
-        const transitionResult = {
-          success: true,
-          qualityScore: 87.5,
-          activatedAgents: ['enhanced-maria', 'architecture-dan'],
-          recommendations: ['Continue with quality gates', 'Monitor agent performance']
-        };
-
-        return {
-          success: transitionResult.success,
-          data: {
-            transition: `${fromPhase} → ${toPhase}`,
-            qualityScore: transitionResult.qualityScore,
-            activatedAgents: transitionResult.activatedAgents || [],
-            recommendations: transitionResult.recommendations || []
+    try {
+      switch (action) {
+        case 'transition':
+          if (!toPhase) {
+            return { success: false, error: 'Phase transition requires toPhase' };
           }
-        };
 
-      case 'status':
-        // Mock SDLC status for testing
-        const statusResult = {
-          currentPhase: 'Development',
-          completeness: 91.3,
-          qualityScore: 87.5,
-          activeAgents: ['enhanced-maria', 'enhanced-james', 'architecture-dan']
-        };
-        return {
-          success: true,
-          data: statusResult
-        };
+          // Real SDLC phase transition
+          const transitionResult = await this.sdlcOrchestrator.transitionPhase(toPhase, context);
 
-      default:
-        return { success: false, error: `Unknown SDLC action: ${action}` };
+          return {
+            success: transitionResult.success !== false,
+            data: {
+              transition: `${fromPhase || 'current'} → ${toPhase}`,
+              currentPhase: transitionResult.currentPhase || toPhase,
+              qualityScore: transitionResult.qualityScore || 0,
+              activatedAgents: transitionResult.activatedAgents || [],
+              recommendations: transitionResult.recommendations || [],
+              blockers: transitionResult.blockers || [],
+              nextActions: transitionResult.nextActions || []
+            }
+          };
+
+        case 'status':
+          // Real SDLC status from orchestrator
+          const statusResult = this.sdlcOrchestrator.getStatus();
+          return {
+            success: true,
+            data: {
+              currentPhase: statusResult.currentPhase || 'unknown',
+              phaseProgress: statusResult.phaseProgress || 0,
+              overallProgress: statusResult.overallProgress || 0,
+              qualityScore: statusResult.qualityScore || 0,
+              activeAgents: statusResult.activeAgents || [],
+              blockers: statusResult.blockers || [],
+              feedbackActive: statusResult.feedbackActive || []
+            }
+          };
+
+        default:
+          return { success: false, error: `Unknown SDLC action: ${action}` };
+      }
+    } catch (error) {
+      this.logger.error('SDLC orchestration failed', { error, action });
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error)
+      };
     }
   }
 
