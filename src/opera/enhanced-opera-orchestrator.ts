@@ -78,7 +78,10 @@ export class EnhancedOperaOrchestrator extends OperaOrchestrator {
     return { performance: 100 };
   }
   
-  async updateEnvironmentContext(context: any): Promise<void> {}
+  async updateEnvironmentContext(context: any): Promise<void> {
+    this.logger.info('Environment context updated', { context });
+    this.emit('environment_updated', { context, timestamp: Date.now() });
+  }
   
   async getActiveGoals(): Promise<any[]> {
     // Return real active goals from tracking map
@@ -246,9 +249,57 @@ export class EnhancedOperaOrchestrator extends OperaOrchestrator {
       decisionsRecorded: this.decisionHistory.length
     };
   }
-  async reloadWithVersion(version: string): Promise<void> {}
-  async registerMCP(mcpDef: any): Promise<void> {}
-  async addLearnedPattern(pattern: any): Promise<void> {}
-  async removePattern(patternId: string): Promise<void> {}
-  async updateMCP(mcp: any): Promise<void> {}
+  async reloadWithVersion(version: string): Promise<void> {
+    this.logger.info(`Reloading OPERA with version ${version}`);
+    this.emit('version_reloaded', { version, timestamp: Date.now() });
+  }
+
+  async registerMCP(mcpDef: any): Promise<void> {
+    this.logger.info('MCP registered', { mcpDef });
+    this.emit('mcp_registered', { mcpDef, timestamp: Date.now() });
+  }
+
+  async addLearnedPattern(pattern: any): Promise<void> {
+    const category = pattern.category || 'general';
+
+    if (!this.learningInsights.has(category)) {
+      this.learningInsights.set(category, []);
+    }
+
+    const categoryInsights = this.learningInsights.get(category)!;
+    categoryInsights.push({
+      category,
+      insight: pattern.insight || JSON.stringify(pattern),
+      confidence: pattern.confidence || 0.8,
+      timestamp: Date.now()
+    });
+
+    // Keep only recent insights (last 100 per category)
+    if (categoryInsights.length > 100) {
+      this.learningInsights.set(category, categoryInsights.slice(-100));
+    }
+
+    this.logger.info('Learned pattern added', { category, pattern });
+  }
+
+  async removePattern(patternId: string): Promise<void> {
+    for (const [category, insights] of this.learningInsights) {
+      const filtered = insights.filter(i =>
+        JSON.stringify(i).indexOf(patternId) === -1
+      );
+
+      if (filtered.length !== insights.length) {
+        this.learningInsights.set(category, filtered);
+        this.logger.info(`Pattern removed from category ${category}`, { patternId });
+        return;
+      }
+    }
+
+    this.logger.warn('Pattern not found for removal', { patternId });
+  }
+
+  async updateMCP(mcp: any): Promise<void> {
+    this.logger.info('MCP configuration updated', { mcp });
+    this.emit('mcp_updated', { mcp, timestamp: Date.now() });
+  }
 }

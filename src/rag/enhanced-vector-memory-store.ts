@@ -670,9 +670,58 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
   }
 
   // Missing method implementations
-  private async loadExistingMemories(): Promise<void> {}
+  private async loadExistingMemories(): Promise<void> {
+    try {
+      // Load from Supabase if configured
+      const { data, error } = await this.supabase
+        .from('versatil_memories')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1000);
+
+      if (error) throw error;
+
+      if (data) {
+        for (const row of data) {
+          const doc: MemoryDocument = {
+            id: row.id,
+            content: row.content,
+            contentType: row.content_type || 'text',
+            metadata: row.metadata || {},
+            embedding: row.embedding || []
+          };
+          this.memories.set(doc.id, doc);
+        }
+
+        this.logger.info(`Loaded ${data.length} existing memories from Supabase`);
+      }
+    } catch (error) {
+      this.logger.warn('Could not load existing memories', { error });
+    }
+  }
+
   private generateMemoryId(doc?: any): string { return `mem-${Date.now()}-${Math.random()}`; }
-  private async persistMemory(doc: MemoryDocument): Promise<void> {}
+
+  private async persistMemory(doc: MemoryDocument): Promise<void> {
+    try {
+      // Persist to Supabase
+      const { error } = await this.supabase
+        .from('versatil_memories')
+        .upsert({
+          id: doc.id,
+          content: doc.content,
+          metadata: doc.metadata,
+          embedding: doc.embedding,
+          created_at: new Date().toISOString()
+        });
+
+      if (error) {
+        this.logger.warn('Failed to persist memory to Supabase', { error });
+      }
+    } catch (error) {
+      this.logger.warn('Error persisting memory', { error });
+    }
+  }
   private applyFilters(documents: MemoryDocument[], filters: any): MemoryDocument[] { return documents; }
   private cosineSimilarity(vec1: number[], vec2: number[]): number {
     return vec1.reduce((sum, val, i) => sum + val * (vec2[i] || 0), 0);
@@ -685,7 +734,15 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
   async queryMemories(query: string | RAGQuery): Promise<any> {
     return await this.queryMemoriesInternal(typeof query === 'string' ? { query } : query);
   }
-  async close(): Promise<void> {}
+  async close(): Promise<void> {
+    this.logger.info('Closing Enhanced Vector Memory Store');
+
+    // Clear in-memory cache
+    this.memories.clear();
+
+    // No need to close Supabase client (it's stateless)
+    this.logger.info('Enhanced Vector Memory Store closed');
+  }
 
   // ============================================================================
   // AGENT-SPECIFIC RAG METHODS WITH EDGE FUNCTION INTEGRATION

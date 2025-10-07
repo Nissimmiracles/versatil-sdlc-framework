@@ -575,13 +575,62 @@ export class AgenticRAGOrchestrator extends EventEmitter {
   }
 
   // Implement all the get* methods...
-  private async getSupabaseSchema(): Promise<any> { return {}; }
+  private async getSupabaseSchema(): Promise<any> {
+    const { promises: fs } = await import('fs');
+    const { join } = await import('path');
+
+    try {
+      // Try to read schema from common locations
+      const schemaPath = join(process.cwd(), 'supabase', 'migrations');
+      const files = await fs.readdir(schemaPath).catch(() => []);
+
+      const tables: any[] = [];
+
+      for (const file of files) {
+        if (file.endsWith('.sql')) {
+          const content = await fs.readFile(join(schemaPath, file), 'utf-8');
+          // Simple table extraction
+          const tableMatches = content.match(/create table\s+(\w+)/gi);
+          if (tableMatches) {
+            tables.push(...tableMatches.map(m => ({ name: m.split(/\s+/)[2] })));
+          }
+        }
+      }
+
+      return { tables };
+    } catch (error) {
+      return { tables: [] };
+    }
+  }
   private async getSupabaseEdgeFunctions(): Promise<EdgeFunction[]> { return []; }
   private async getRLSPolicies(): Promise<RLSPolicy[]> { return []; }
   private async getRealtimeChannels(): Promise<string[]> { return []; }
-  private async getVercelConfig(): Promise<any> { return {}; }
+  private async getVercelConfig(): Promise<any> {
+    const { promises: fs } = await import('fs');
+    const { join } = await import('path');
+
+    try {
+      const vercelPath = join(process.cwd(), 'vercel.json');
+      const content = await fs.readFile(vercelPath, 'utf-8');
+      return JSON.parse(content);
+    } catch (error) {
+      return { builds: [], routes: [], env: {} };
+    }
+  }
+
   private getVercelEnv(): Record<string, string> { return {}; }
-  private async getVercelAnalytics(): Promise<any> { return {}; }
+
+  private async getVercelAnalytics(): Promise<any> {
+    // Return analytics data structure
+    return {
+      pageViews: 0,
+      uniqueVisitors: 0,
+      topPages: [],
+      deviceBreakdown: {},
+      locationBreakdown: {},
+      timestamp: Date.now()
+    };
+  }
   private async getVercelDeployments(): Promise<Deployment[]> { return []; }
   private async getN8NWorkflows(): Promise<Workflow[]> { return []; }
   private async getN8NCredentials(): Promise<string[]> { return []; }
@@ -973,8 +1022,48 @@ export class AgenticRAGOrchestrator extends EventEmitter {
     }
   }
 
-  async searchAllStores(query: any): Promise<any[]> { return []; }
-  async getMemoryStatistics(): Promise<any> { return {}; }
+  async searchAllStores(query: any): Promise<any[]> {
+    const results = [];
+
+    // Search across all memory stores
+    for (const [type, store] of Object.entries(this.memoryStores)) {
+      try {
+        const storeResults = await store.searchMemories(query.query || query, { limit: query.limit || 10 });
+        results.push(...storeResults.map((r: any) => ({ ...r, storeType: type })));
+      } catch (error) {
+        this.logger.warn(`Error searching ${type} store`, { error });
+      }
+    }
+
+    return results;
+  }
+
+  async getMemoryStatistics(): Promise<any> {
+    const stats: any = {
+      totalMemories: 0,
+      byType: {},
+      byAgent: {},
+      recentActivity: []
+    };
+
+    // Aggregate statistics from all stores
+    for (const [type, store] of Object.entries(this.memoryStores)) {
+      try {
+        const memories = await store.getAllMemories();
+        stats.byType[type] = memories.length;
+        stats.totalMemories += memories.length;
+      } catch (error) {
+        stats.byType[type] = 0;
+      }
+    }
+
+    // Agent-specific stats
+    for (const [agentId, memories] of this.agentMemories) {
+      stats.byAgent[agentId] = memories.length;
+    }
+
+    return stats;
+  }
 
   /**
    * Store rule execution result for learning

@@ -36,7 +36,10 @@ export class OperaOrchestrator extends EventEmitter {
     };
   }
 
-  async initialize(): Promise<void> {}
+  async initialize(): Promise<void> {
+    // Base initialization - subclasses should override for specific setup
+    this.emit('initialized', { timestamp: Date.now() });
+  }
 
   async getActiveGoals(filter?: any, options?: any): Promise<any> {
     return [];
@@ -71,15 +74,21 @@ export class OperaOrchestrator extends EventEmitter {
     return this.createGoal(goal);
   }
 
-  async pauseAutonomous(reason?: string): Promise<void> {}
+  async pauseAutonomous(reason?: string): Promise<void> {
+    this.emit('autonomous_paused', { reason, timestamp: Date.now() });
+  }
 
-  async resumeAutonomous(reason?: string): Promise<void> {}
+  async resumeAutonomous(reason?: string): Promise<void> {
+    this.emit('autonomous_resumed', { reason, timestamp: Date.now() });
+  }
 
   async analyzeProject(projectPath: string): Promise<any> {
     return {};
   }
 
-  async startAutonomous(): Promise<void> {}
+  async startAutonomous(): Promise<void> {
+    this.emit('autonomous_started', { timestamp: Date.now() });
+  }
 
   async getGoalStatus(goalId: string): Promise<any> {
     return { status: 'unknown' };
@@ -97,7 +106,10 @@ export class OperaOrchestrator extends EventEmitter {
     return {};
   }
 
-  async overrideGoal(options: any): Promise<void> {}
+  async overrideGoal(options: any): Promise<void> {
+    const { goalId, updates } = options;
+    this.emit('goal_overridden', { goalId, updates, timestamp: Date.now() });
+  }
 
   async getCurrentContext(detailed?: any): Promise<any> {
     return {};
@@ -107,5 +119,7 @@ export class OperaOrchestrator extends EventEmitter {
     return {};
   }
 
-  async updateMCP(mcp: any): Promise<void> {}
+  async updateMCP(mcp: any): Promise<void> {
+    this.emit('mcp_updated', { mcp, timestamp: Date.now() });
+  }
 }

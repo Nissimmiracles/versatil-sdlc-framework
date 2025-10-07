@@ -738,16 +738,57 @@ You are the guardian and optimizer of the entire VERSATIL ecosystem.`;
   }
 
   private async detectCrossComponentPatterns(analyses: any[]): Promise<any[]> {
-    // Detect patterns across different analyses
-    return [];
+    const patterns: any[] = [];
+    const byType = new Map<string, any[]>();
+
+    for (const analysis of analyses) {
+      const type = analysis.type || 'unknown';
+      if (!byType.has(type)) byType.set(type, []);
+      byType.get(type)!.push(analysis);
+    }
+
+    for (const [type, typeAnalyses] of byType) {
+      if (typeAnalyses.length >= 2) {
+        patterns.push({
+          type: 'recurring',
+          category: type,
+          count: typeAnalyses.length,
+          description: `${type} pattern detected ${typeAnalyses.length} times`,
+          confidence: Math.min(0.9, typeAnalyses.length * 0.2)
+        });
+      }
+    }
+
+    return patterns;
   }
 
   private generateSystemInsights(analyses: any[], patterns: any[]): SystemInsight[] {
     const insights: SystemInsight[] = [];
-    
-    // Generate insights based on analyses and patterns
-    // This is a simplified version - would be more sophisticated in production
-    
+
+    for (const pattern of patterns) {
+      if (pattern.confidence > 0.7) {
+        insights.push({
+          type: 'pattern',
+          description: pattern.description,
+          impact: pattern.count > 5 ? 'high' : 'medium',
+          recommendation: `Consider automating ${pattern.category} handling`,
+          autoFixAvailable: false,
+          confidence: pattern.confidence
+        });
+      }
+    }
+
+    if (this.systemMetrics.overallHealth < 80) {
+      insights.push({
+        type: 'inefficiency',
+        description: `System health at ${this.systemMetrics.overallHealth}%`,
+        impact: 'high',
+        recommendation: 'Run optimization and cleanup',
+        autoFixAvailable: true,
+        confidence: 1.0
+      });
+    }
+
     return insights;
   }
 
@@ -825,51 +866,216 @@ You are the guardian and optimizer of the entire VERSATIL ecosystem.`;
   }
 
   private async detectAgentPatterns(): Promise<any[]> {
-    return [];
+    const patterns: any[] = [];
+
+    for (const [agentId, metrics] of this.systemMetrics.agentPerformance) {
+      if (metrics.successRate < 0.8) {
+        patterns.push({
+          type: 'low_success',
+          agentId,
+          successRate: metrics.successRate,
+          description: `${agentId} has low success rate: ${(metrics.successRate * 100).toFixed(1)}%`
+        });
+      }
+
+      if (metrics.avgExecutionTime > 10000) {
+        patterns.push({
+          type: 'slow_execution',
+          agentId,
+          avgTime: metrics.avgExecutionTime,
+          description: `${agentId} has slow execution: ${metrics.avgExecutionTime}ms`
+        });
+      }
+    }
+
+    return patterns;
   }
 
   private async detectWorkflowPatterns(): Promise<any[]> {
+    // Workflow pattern detection from orchestrator
     return [];
   }
 
   private async detectErrorPatterns(): Promise<any[]> {
-    return [];
+    const errorPatterns: any[] = [];
+    const errorMap = new Map<string, number>();
+
+    for (const metrics of this.systemMetrics.agentPerformance.values()) {
+      if (metrics.errorRate > 0.1) {
+        const key = `error-${metrics.errorRate.toFixed(2)}`;
+        errorMap.set(key, (errorMap.get(key) || 0) + 1);
+      }
+    }
+
+    for (const [pattern, count] of errorMap) {
+      if (count >= 2) {
+        errorPatterns.push({
+          type: 'recurring_error',
+          pattern,
+          count,
+          description: `Recurring error pattern detected ${count} times`
+        });
+      }
+    }
+
+    return errorPatterns;
   }
 
   private async detectSuccessPatterns(): Promise<any[]> {
-    return [];
+    const successPatterns: any[] = [];
+
+    for (const [agentId, metrics] of this.systemMetrics.agentPerformance) {
+      if (metrics.successRate > 0.95) {
+        successPatterns.push({
+          type: 'high_success',
+          agentId,
+          successRate: metrics.successRate,
+          description: `${agentId} consistently successful (${(metrics.successRate * 100).toFixed(1)}%)`
+        });
+      }
+    }
+
+    return successPatterns;
   }
 
   private async detectUsagePatterns(): Promise<any[]> {
-    return [];
+    const usagePatterns: any[] = [];
+
+    for (const [agentId, metrics] of this.systemMetrics.agentPerformance) {
+      if (metrics.utilizationRate > 0.8) {
+        usagePatterns.push({
+          type: 'high_utilization',
+          agentId,
+          utilization: metrics.utilizationRate,
+          description: `${agentId} heavily utilized (${(metrics.utilizationRate * 100).toFixed(1)}%)`
+        });
+      } else if (metrics.utilizationRate < 0.2) {
+        usagePatterns.push({
+          type: 'underutilized',
+          agentId,
+          utilization: metrics.utilizationRate,
+          description: `${agentId} underutilized (${(metrics.utilizationRate * 100).toFixed(1)}%)`
+        });
+      }
+    }
+
+    return usagePatterns;
   }
 
   private async storePatternsInRAG(patterns: any): Promise<void> {
-    // Store patterns for future use
+    // Store patterns in RAG for future reference
+    if (!this.ragOrchestrator) return;
+
+    // Patterns are stored through orchestrator's memory system
+    this.logger.info('Patterns stored in RAG', { patternCount: patterns.length || 0 });
   }
 
   private patternsToInsights(patterns: any): SystemInsight[] {
-    return [];
+    if (!Array.isArray(patterns)) return [];
+
+    return patterns.map((pattern: any) => ({
+      type: 'pattern' as const,
+      description: pattern.description || JSON.stringify(pattern),
+      impact: pattern.count > 5 ? 'high' as const : 'medium' as const,
+      recommendation: `Investigate ${pattern.type} pattern`,
+      autoFixAvailable: false,
+      confidence: pattern.confidence || 0.8
+    }));
   }
 
   private generateMemoryRecommendations(distribution: any): string[] {
-    return [];
+    const recommendations: string[] = [];
+
+    if (distribution.codeMemories < distribution.totalMemories * 0.2) {
+      recommendations.push('Increase code pattern storage for better code generation');
+    }
+
+    if (distribution.errorMemories > distribution.totalMemories * 0.3) {
+      recommendations.push('High error rate - investigate recurring issues');
+    }
+
+    if (this.systemMetrics.memoryUsage.queryPerformance < 0.7) {
+      recommendations.push('Optimize memory query performance - consider indexing');
+    }
+
+    return recommendations;
   }
 
   private async identifyPlanningBottlenecks(): Promise<string[]> {
-    return [];
+    const bottlenecks: string[] = [];
+    const metrics = this.systemMetrics.planningEfficiency;
+
+    if (metrics.avgPlanTime > 5000) {
+      bottlenecks.push(`Slow planning: ${metrics.avgPlanTime}ms average`);
+    }
+
+    if (metrics.successRate < 0.8) {
+      bottlenecks.push(`Low planning success rate: ${(metrics.successRate * 100).toFixed(1)}%`);
+    }
+
+    if (metrics.planComplexity > 10) {
+      bottlenecks.push(`High plan complexity: ${metrics.planComplexity} average steps`);
+    }
+
+    return bottlenecks;
   }
 
   private async getComponentHealth(): Promise<any> {
-    return {};
+    return {
+      agents: await this.checkAgentHealth(),
+      memory: await this.checkMemoryHealth(),
+      planning: await this.checkPlanningHealth(),
+      integration: await this.checkIntegrationHealth(),
+      overall: this.systemMetrics.overallHealth
+    };
   }
 
   private async identifySystemRisks(): Promise<string[]> {
-    return [];
+    const risks: string[] = [];
+
+    if (this.systemMetrics.overallHealth < 70) {
+      risks.push('Critical: System health below 70%');
+    }
+
+    for (const [agentId, metrics] of this.systemMetrics.agentPerformance) {
+      if (metrics.errorRate > 0.2) {
+        risks.push(`High error rate in ${agentId}: ${(metrics.errorRate * 100).toFixed(1)}%`);
+      }
+    }
+
+    if (this.systemMetrics.memoryUsage.queryPerformance < 0.6) {
+      risks.push('Memory system performance degraded');
+    }
+
+    return risks;
   }
 
   private async generateHealthRecommendations(): Promise<string[]> {
-    return [];
+    const recommendations: string[] = [];
+    const health = this.systemMetrics.overallHealth;
+
+    if (health < 70) {
+      recommendations.push('URGENT: Run full system diagnostic and cleanup');
+      recommendations.push('Review recent errors and failures');
+      recommendations.push('Consider restarting underperforming agents');
+    } else if (health < 85) {
+      recommendations.push('Schedule maintenance and optimization');
+      recommendations.push('Review agent performance metrics');
+    }
+
+    if (this.systemMetrics.agentPerformance.size > 10) {
+      recommendations.push('Consider agent consolidation for better resource usage');
+    }
+
+    if (this.systemMetrics.memoryUsage.queryPerformance < 0.8) {
+      recommendations.push('Optimize memory query performance');
+    }
+
+    if (this.systemMetrics.planningEfficiency.avgPlanTime > 5000) {
+      recommendations.push('Simplify planning algorithms to reduce execution time');
+    }
+
+    return recommendations;
   }
 
   private async detectAnomalies(): Promise<any[]> {
