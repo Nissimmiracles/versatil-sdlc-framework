@@ -253,9 +253,21 @@ export class VERSATILFeedbackCollector extends EventEmitter {
   }
 
   private async generateContext(): Promise<FeedbackContext> {
+    // Read version from package.json
+    let frameworkVersion = '5.0.0'; // Fallback
+    try {
+      const { readFile } = await import('fs/promises');
+      const { join } = await import('path');
+      const pkgPath = join(process.cwd(), 'package.json');
+      const pkgData = JSON.parse(await readFile(pkgPath, 'utf-8'));
+      frameworkVersion = pkgData.version;
+    } catch (error) {
+      console.warn('Could not read package.json version, using fallback');
+    }
+
     return {
       projectPath: process.cwd(),
-      frameworkVersion: '1.0.0', // TODO: Get from package.json
+      frameworkVersion,
       systemInfo: {
         platform: process.platform,
         nodeVersion: process.version,

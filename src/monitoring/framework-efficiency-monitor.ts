@@ -728,13 +728,32 @@ export class FrameworkEfficiencyMonitor extends EventEmitter {
   private async checkVersionCompatibility(): Promise<VersionCompatibility> {
     console.log('  🔄 Checking version compatibility...');
 
-    // TODO: Implement actual version checking
+    // Real version checking from package.json
+    let current_version = '5.0.0';
+    try {
+      const { readFile } = await import('fs/promises');
+      const { join } = await import('path');
+      const pkgData = JSON.parse(await readFile(join(process.cwd(), 'package.json'), 'utf-8'));
+      current_version = pkgData.version;
+    } catch (error) {
+      console.warn('Could not read package.json, using default version');
+    }
+
+    // Check for breaking changes between versions
+    const breakingChanges: string[] = [];
+    const majorVersion = parseInt(current_version.split('.')[0]);
+
+    if (majorVersion < 5) {
+      breakingChanges.push('MCP interface changes require update');
+      breakingChanges.push('Agent activation context structure changed');
+    }
+
     return {
-      current_version: '2.0.0',
-      migration_ready: true,
-      breaking_changes: [],
-      compatibility_score: 100,
-      upgrade_blockers: []
+      current_version,
+      migration_ready: breakingChanges.length === 0,
+      breaking_changes: breakingChanges,
+      compatibility_score: breakingChanges.length === 0 ? 100 : Math.max(0, 100 - (breakingChanges.length * 20)),
+      upgrade_blockers: breakingChanges.length > 0 ? ['Migration script required'] : []
     };
   }
 
