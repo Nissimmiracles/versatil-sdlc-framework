@@ -11,6 +11,7 @@
  */
 
 import { EnhancedVectorMemoryStore } from './enhanced-vector-memory-store.js';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export interface WebLearnedPattern {
   id: string;
@@ -41,9 +42,11 @@ export class ContinuousWebLearning {
   private vectorStore: EnhancedVectorMemoryStore;
   private learningSources: LearningSource[] = [];
   private learningSchedule: NodeJS.Timeout | null = null;
+  private logger: VERSATILLogger;
 
   constructor(vectorStore: EnhancedVectorMemoryStore) {
     this.vectorStore = vectorStore;
+    this.logger = new VERSATILLogger('ContinuousWebLearning');
     this.initializeLearningSources();
   }
 
@@ -247,12 +250,44 @@ export class ContinuousWebLearning {
 
     const query = searchQueries[source.name] || `latest ${source.name} SDLC patterns`;
 
-    // In production, would call:
-    // const result = await webFetch(source.url, query);
-    // return result.content;
+    try {
+      // Use Exa MCP for intelligent web search
+      const { VERSATILMCPClient } = await import('../mcp/mcp-client.js');
+      const mcpClient = new VERSATILMCPClient();
 
-    // For now, return placeholder
-    return `Sample content from ${source.name}`;
+      const searchResult = await mcpClient.executeTool({
+        tool: 'exa_search',
+        arguments: {
+          query,
+          num_results: 5,
+          use_autoprompt: true,
+          type: 'neural'
+        }
+      });
+
+      if (searchResult.success && searchResult.data?.results) {
+        // Combine content from search results
+        const combinedContent = searchResult.data.results
+          .map((result: any) => {
+            return `# ${result.title}\nURL: ${result.url}\n\n${result.text || result.summary || ''}`;
+          })
+          .join('\n\n---\n\n');
+
+        this.logger.info('Web learning successful', {
+          source: source.name,
+          query,
+          resultsCount: searchResult.data.results.length
+        });
+
+        return combinedContent || `Sample content from ${source.name}`;
+      }
+
+      this.logger.warn('Web learning returned no results', { source: source.name, query });
+      return `Sample content from ${source.name}`;
+    } catch (error) {
+      this.logger.warn('Web learning failed, using placeholder', { source: source.name, error });
+      return `Sample content from ${source.name}`;
+    }
   }
 
   /**

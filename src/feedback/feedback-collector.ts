@@ -354,8 +354,148 @@ export class VERSATILFeedbackCollector extends EventEmitter {
       priority: 'critical',
     };
 
-    // TODO: Integration with issue tracking system
-    // TODO: Automated notifications to development team
+    // Create issue in configured tracker
+    try {
+      const issueUrl = await this.createIssueInTracker(feedback);
+      feedback.resolution.resolution = `Issue created: ${issueUrl}`;
+      this.logger.info('Urgent feedback tracked', { feedbackId: feedback.id, issueUrl });
+    } catch (error) {
+      this.logger.error('Failed to create tracking issue', { feedbackId: feedback.id, error });
+    }
+
+    // Send notifications
+    await this.notifyDevelopmentTeam(feedback);
+  }
+
+  private async createIssueInTracker(feedback: UserFeedback): Promise<string> {
+    const issueTracker = process.env.ISSUE_TRACKER || 'github';
+
+    try {
+      switch (issueTracker) {
+        case 'github':
+          return await this.createGitHubIssue(feedback);
+        case 'jira':
+          return await this.createJiraIssue(feedback);
+        default:
+          this.logger.warn('Unknown issue tracker, skipping', { issueTracker });
+          return 'no-tracker-configured';
+      }
+    } catch (error) {
+      this.logger.error('Failed to create issue', { issueTracker, error });
+      throw error;
+    }
+  }
+
+  private async createGitHubIssue(feedback: UserFeedback): Promise<string> {
+    const { VERSATILMCPClient } = await import('../mcp/mcp-client.js');
+    const mcpClient = new VERSATILMCPClient();
+
+    const result = await mcpClient.executeTool({
+      tool: 'github_create_issue',
+      arguments: {
+        owner: process.env.GITHUB_OWNER,
+        repo: process.env.GITHUB_REPO,
+        title: `[Feedback-${feedback.category}] ${feedback.message.substring(0, 80)}`,
+        body: `## User Feedback\n\n**Category**: ${feedback.category}\n**Message**: ${feedback.message}\n\n**Context**: ${JSON.stringify(feedback.context, null, 2)}\n\n**Type**: ${feedback.type}\n**User ID**: ${feedback.userId || 'anonymous'}\n**Timestamp**: ${feedback.timestamp}`,
+        labels: ['feedback', feedback.category.toLowerCase(), feedback.urgent ? 'urgent' : 'normal']
+      }
+    });
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to create GitHub issue');
+    }
+
+    return result.data?.issue_url || result.data?.html_url || 'github-issue-created';
+  }
+
+  private async createJiraIssue(feedback: UserFeedback): Promise<string> {
+    if (!process.env.JIRA_URL || !process.env.JIRA_EMAIL || !process.env.JIRA_API_TOKEN) {
+      throw new Error('Jira credentials not configured');
+    }
+
+    const response = await fetch(`${process.env.JIRA_URL}/rest/api/2/issue`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`${process.env.JIRA_EMAIL}:${process.env.JIRA_API_TOKEN}`).toString('base64')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        fields: {
+          project: { key: process.env.JIRA_PROJECT_KEY },
+          summary: `[Feedback-${feedback.category}] ${feedback.message.substring(0, 80)}`,
+          description: `h2. User Feedback\n\n*Category*: ${feedback.category}\n*Message*: ${feedback.message}\n\n*Context*: ${JSON.stringify(feedback.context)}\n\n*Type*: ${feedback.type}\n*User ID*: ${feedback.userId || 'anonymous'}`,
+          issuetype: { name: 'Task' },
+          priority: { name: feedback.urgent ? 'Highest' : 'High' }
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Jira API error: ${response.status}`);
+    }
+
+    const data: any = await response.json();
+    return `${process.env.JIRA_URL}/browse/${data.key}`;
+  }
+
+  private async notifyDevelopmentTeam(feedback: UserFeedback): Promise<void> {
+    const notificationChannel = process.env.NOTIFICATION_CHANNEL || 'slack';
+
+    try {
+      switch (notificationChannel) {
+        case 'slack':
+          await this.sendSlackNotification(feedback);
+          break;
+        case 'email':
+          this.logger.info('Email notifications not yet implemented');
+          break;
+        default:
+          this.logger.warn('Unknown notification channel', { notificationChannel });
+      }
+    } catch (error) {
+      this.logger.error('Failed to send notification', { notificationChannel, error });
+    }
+  }
+
+  private async sendSlackNotification(feedback: UserFeedback): Promise<void> {
+    if (!process.env.SLACK_WEBHOOK_URL) {
+      this.logger.warn('Slack webhook not configured, skipping notification');
+      return;
+    }
+
+    const response = await fetch(process.env.SLACK_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: `🚨 Urgent Feedback: ${feedback.category}`,
+        blocks: [
+          {
+            type: 'header',
+            text: { type: 'plain_text', text: `${feedback.urgent ? '🚨' : '⚠️'} ${feedback.category}: Urgent Feedback` }
+          },
+          {
+            type: 'section',
+            text: { type: 'mrkdwn', text: `*Message*: ${feedback.message}` }
+          },
+          {
+            type: 'section',
+            fields: [
+              { type: 'mrkdwn', text: `*Type*: ${feedback.type}` },
+              { type: 'mrkdwn', text: `*User*: ${feedback.userId || 'anonymous'}` },
+              { type: 'mrkdwn', text: `*Timestamp*: ${feedback.timestamp.toISOString()}` }
+            ]
+          },
+          {
+            type: 'context',
+            elements: [{ type: 'mrkdwn', text: `Feedback ID: ${feedback.id}` }]
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Slack notification failed: ${response.status}`);
+    }
   }
 
   private async routeFeedback(feedback: UserFeedback): Promise<void> {

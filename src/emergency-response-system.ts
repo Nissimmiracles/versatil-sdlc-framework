@@ -610,14 +610,86 @@ class EmergencyResponseSystem {
   private async diagnosticsAPIFailure(context: EmergencyContext, response: EmergencyResponse): Promise<void> {
     console.log('🌐 Diagnosing API failure...');
 
-    // This would check API endpoints, network connectivity, etc.
+    const diagnostics = await this.runApiHealthChecks();
+
     response.timeline.push({
       timestamp: new Date(),
       agent: 'Emergency System',
-      action: 'API diagnostics placeholder',
-      result: 'success',
-      details: 'API diagnostics would check endpoint health, network connectivity, and service status'
+      action: 'API health diagnostics',
+      result: diagnostics.allHealthy ? 'success' : 'partial',
+      details: `Checked ${diagnostics.endpoints.length} endpoints: ${diagnostics.healthyCount}/${diagnostics.endpoints.length} healthy. Failed: ${diagnostics.failedEndpoints.join(', ') || 'none'}`
     });
+
+    // Add individual endpoint results
+    diagnostics.endpoints.forEach(endpoint => {
+      response.timeline.push({
+        timestamp: new Date(),
+        agent: 'API Diagnostics',
+        action: `Check ${endpoint.name}`,
+        result: endpoint.healthy ? 'success' : 'failure',
+        details: endpoint.healthy
+          ? `${endpoint.status} (${endpoint.responseTime}ms)`
+          : `Error: ${endpoint.error}`
+      });
+    });
+  }
+
+  private async runApiHealthChecks(): Promise<{
+    endpoints: Array<{name: string; url: string; status?: number; responseTime?: number; healthy: boolean; error?: string}>;
+    healthyCount: number;
+    failedEndpoints: string[];
+    allHealthy: boolean;
+  }> {
+    const diagnostics = {
+      endpoints: [] as Array<{name: string; url: string; status?: number; responseTime?: number; healthy: boolean; error?: string}>,
+      healthyCount: 0,
+      failedEndpoints: [] as string[],
+      allHealthy: true
+    };
+
+    const endpointsToCheck = [
+      { url: process.env.API_BASE_URL ? `${process.env.API_BASE_URL}/health` : 'http://localhost:3000/health', name: 'API Health' },
+      { url: process.env.API_BASE_URL ? `${process.env.API_BASE_URL}/api/status` : 'http://localhost:3000/api/status', name: 'API Status' },
+      { url: process.env.SUPABASE_URL ? `${process.env.SUPABASE_URL}/rest/v1/` : '', name: 'Supabase REST' }
+    ].filter(e => e.url); // Filter out empty URLs
+
+    for (const endpoint of endpointsToCheck) {
+      try {
+        const start = Date.now();
+        const response = await fetch(endpoint.url, {
+          signal: AbortSignal.timeout(5000),
+          method: 'GET'
+        });
+        const responseTime = Date.now() - start;
+
+        const healthy = response.ok;
+        diagnostics.endpoints.push({
+          name: endpoint.name,
+          url: endpoint.url,
+          status: response.status,
+          responseTime,
+          healthy
+        });
+
+        if (healthy) {
+          diagnostics.healthyCount++;
+        } else {
+          diagnostics.failedEndpoints.push(endpoint.name);
+          diagnostics.allHealthy = false;
+        }
+      } catch (error) {
+        diagnostics.endpoints.push({
+          name: endpoint.name,
+          url: endpoint.url,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          healthy: false
+        });
+        diagnostics.failedEndpoints.push(endpoint.name);
+        diagnostics.allHealthy = false;
+      }
+    }
+
+    return diagnostics;
   }
 
   /**
