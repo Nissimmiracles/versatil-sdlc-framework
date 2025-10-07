@@ -2803,50 +2803,102 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   }
 
   private async generateSimplificationSolutions(bottleneck: BottleneckAnalysis): Promise<BreakthroughSolution[]> {
+    // Generate simplification strategy based on bottleneck type
+    const constraintName = bottleneck.type.replace(/_/g, ' ');
+    const primaryRootCause = bottleneck.rootCauses[0]?.description || 'Complexity';
+
+    // Severity-based urgency
+    const severityMultiplier = bottleneck.severity === 'critical' ? 1.5 :
+                                bottleneck.severity === 'high' ? 1.2 : 1.0;
+
+    // Calculate reduction potential from impact metrics
+    const avgComplexityImpact = Math.abs(bottleneck.impact.codeQuality + bottleneck.impact.innovation) / 2;
+    const reductionTarget = Math.round(avgComplexityImpact * severityMultiplier * 0.5); // 50% of impact
+
+    // Type-specific simplification targets
+    const simplificationTargets: Record<string, string[]> = {
+      'technical_debt': ['Delete unused code', 'Consolidate duplicates', 'Simplify over-engineered solutions'],
+      'cognitive_overload': ['Reduce WIP', 'Simplify architecture', 'Extract services'],
+      'integration_complexity': ['Reduce dependencies', 'Simplify interfaces', 'Consolidate integrations'],
+      'process_inefficiency': ['Remove approval steps', 'Automate manual work', 'Eliminate meetings']
+    };
+
+    const targets = simplificationTargets[bottleneck.type] || ['Reduce complexity', 'Simplify structure', 'Remove non-essential elements'];
+
     return [{
-      id: `simplify-${Date.now()}`,
-      name: 'Simplification: Remove Unnecessary Complexity',
+      id: `simplify-${bottleneck.type}-${Date.now()}`,
+      name: `Simplification: Reduce ${constraintName} Complexity`,
       type: SolutionType.SIMPLIFICATION,
       approach: SolutionApproach.INCREMENTAL,
-      description: `Eliminate non-essential elements in ${bottleneck.location}`,
+      description: `Eliminate unnecessary complexity in ${bottleneck.location}. Root cause: ${primaryRootCause}. Targets: ${targets.join(', ')}`,
       implementation: {
-        phases: [{
-          name: 'Identify removable components',
-          description: 'Classify elements as essential vs unnecessary',
-          duration: 2 * 24 * 60 * 60 * 1000,
-          resources: ['Team review time'],
-          deliverables: ['Complexity audit'],
-          risks: ['Removing something important'],
-          dependencies: []
-        }],
-        prerequisites: ['Test coverage'],
+        phases: [
+          {
+            name: 'Complexity Audit',
+            description: `Identify all complexity sources in ${bottleneck.location}`,
+            duration: bottleneck.estimatedResolutionTime * 0.2,
+            resources: ['Code review team', 'Domain expert'],
+            deliverables: ['Complexity inventory', 'Essential vs non-essential classification'],
+            risks: ['Missing essential complexity'],
+            dependencies: bottleneck.rootCauses[0]?.dependencies || []
+          },
+          {
+            name: 'Simplification Execution',
+            description: targets.join('; '),
+            duration: bottleneck.estimatedResolutionTime * 0.6,
+            resources: ['Development team'],
+            deliverables: targets.map(t => `${t} complete`),
+            risks: ['Breaking functionality', 'Regression bugs'],
+            dependencies: ['Complexity audit complete', 'Test coverage adequate']
+          },
+          {
+            name: 'Validation',
+            description: 'Verify functionality preserved and complexity reduced',
+            duration: bottleneck.estimatedResolutionTime * 0.2,
+            resources: ['QA team'],
+            deliverables: ['Complexity metrics improved', 'All tests passing'],
+            risks: ['Missed regressions'],
+            dependencies: ['Simplification complete']
+          }
+        ],
+        prerequisites: ['Adequate test coverage', 'Team alignment on what is essential'],
         milestones: [{
-          name: 'Complexity reduced',
-          description: '20% reduction in code/processes',
-          successCriteria: ['Metrics improved', 'Functionality preserved'],
-          validationMethod: 'Automated testing',
-          timeframe: 14 * 24 * 60 * 60 * 1000
+          name: `${reductionTarget}% Complexity Reduction`,
+          description: `Reduce complexity in ${bottleneck.location} by ${reductionTarget}%`,
+          successCriteria: bottleneck.rootCauses.map(rc => `${rc.description} addressed`),
+          validationMethod: 'Automated testing + complexity metrics',
+          timeframe: bottleneck.estimatedResolutionTime
         }],
-        rollbackPlan: ['Git revert available'],
-        successMetrics: ['Reduced LOC', 'Improved maintainability'],
-        monitoringStrategy: 'Continuous testing'
+        rollbackPlan: ['Git revert available', 'Feature flags for gradual rollout'],
+        successMetrics: [
+          `${reductionTarget}% reduction in ${constraintName}`,
+          'Improved code quality metrics',
+          'Reduced cognitive load (team survey)'
+        ],
+        monitoringStrategy: 'Continuous complexity tracking + regression testing'
       },
-      constraints: [],
+      constraints: bottleneck.conflictingConstraints.map(c => ({
+        type: 'organizational' as const,
+        description: c,
+        severity: 0.5,
+        flexibility: 0.7, // Simplification is usually flexible
+        workarounds: ['Incremental approach', 'Parallel old/new systems']
+      })),
       benefits: [{
         category: 'maintainability',
-        description: 'Reduced cognitive load',
-        quantification: '20-40% complexity reduction',
+        description: `Reduce ${constraintName} improving maintainability and velocity`,
+        quantification: `${reductionTarget}% complexity reduction`,
         timeline: 'short_term',
-        confidence: 0.85
+        confidence: bottleneck.rootCauses[0]?.confidence || 0.8
       }],
       risks: [{
-        description: 'May remove subtly important code',
-        probability: 0.2,
+        description: 'May accidentally remove subtly important code/processes',
+        probability: 0.25,
         impact: 0.6,
-        mitigation: ['Comprehensive testing'],
-        contingency: ['Rollback plan']
+        mitigation: ['Comprehensive testing', 'Gradual rollout', 'Code review'],
+        contingency: ['Rollback plan', 'Restore from git']
       }],
-      confidence: 0.85,
+      confidence: 0.85 - (bottleneck.urgency * 0.03), // Higher urgency = slightly lower confidence
       novelty: 0.3,
       elegance: 0.95,
       sustainability: 0.9,
@@ -2855,50 +2907,94 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   }
 
   private async generateAutomationSolutions(bottleneck: BottleneckAnalysis): Promise<BreakthroughSolution[]> {
+    const constraintName = bottleneck.type.replace(/_/g, ' ');
+    const primaryRootCause = bottleneck.rootCauses[0]?.description || 'Manual processes';
+
+    // Type-specific automation targets
+    const automationTargets: Record<string, string[]> = {
+      'technical_debt': ['Automated refactoring tools', 'Dependency update automation', 'Code quality automation'],
+      'process_inefficiency': ['CI/CD automation', 'Deployment automation', 'Testing automation'],
+      'development_velocity': ['Code generation', 'Boilerplate automation', 'Documentation generation'],
+      'communication': ['Status update automation', 'Notification systems', 'Dashboard automation']
+    };
+
+    const targets = automationTargets[bottleneck.type] || ['Process automation', 'Workflow automation', 'Tool integration'];
+    const timeSavingsPercent = Math.min(Math.abs(bottleneck.impact.resourceUtilization) * 1.5, 80);
+
     return [{
-      id: `automate-${Date.now()}`,
-      name: 'Automation: Eliminate Manual Work',
+      id: `automate-${bottleneck.type}-${Date.now()}`,
+      name: `Automation: Eliminate Manual ${constraintName}`,
       type: SolutionType.AUTOMATION,
       approach: SolutionApproach.INCREMENTAL,
-      description: `Automate repetitive tasks in ${bottleneck.location}`,
+      description: `Automate repetitive tasks in ${bottleneck.location}. Root cause: ${primaryRootCause}. Targets: ${targets.join(', ')}`,
       implementation: {
-        phases: [{
-          name: 'Identify automation opportunities',
-          description: 'Map manual processes and calculate ROI',
-          duration: 3 * 24 * 60 * 60 * 1000,
-          resources: ['Process mapping time'],
-          deliverables: ['Automation candidates list'],
-          risks: ['Over-automation'],
-          dependencies: []
-        }],
-        prerequisites: ['Scripting capability'],
+        phases: [
+          {
+            name: 'Automation Opportunity Analysis',
+            description: `Map manual processes in ${bottleneck.location} and calculate automation ROI`,
+            duration: bottleneck.estimatedResolutionTime * 0.25,
+            resources: ['Process analyst', 'Automation engineer'],
+            deliverables: ['Process map', 'ROI calculations', 'Automation candidate list'],
+            risks: ['Missing high-value targets'],
+            dependencies: bottleneck.rootCauses[0]?.dependencies || []
+          },
+          {
+            name: 'Automation Implementation',
+            description: targets.join('; '),
+            duration: bottleneck.estimatedResolutionTime * 0.6,
+            resources: ['Development team', 'DevOps engineer'],
+            deliverables: targets.map(t => `${t} implemented`),
+            risks: ['Automation brittleness', 'Over-engineering'],
+            dependencies: ['ROI analysis complete']
+          },
+          {
+            name: 'Validation & Monitoring',
+            description: 'Verify automation reliability and measure time savings',
+            duration: bottleneck.estimatedResolutionTime * 0.15,
+            resources: ['QA team'],
+            deliverables: ['Automation test suite', 'Monitoring dashboard'],
+            risks: ['Undetected failures'],
+            dependencies: ['Automation implemented']
+          }
+        ],
+        prerequisites: ['Scripting/automation capability', 'Team training on automation tools'],
         milestones: [{
-          name: 'First automation live',
-          description: 'Highest-ROI process automated',
-          successCriteria: ['Time saved', 'Error reduction'],
-          validationMethod: 'Metrics tracking',
-          timeframe: 14 * 24 * 60 * 60 * 1000
+          name: `${Math.round(timeSavingsPercent)}% Time Savings Achieved`,
+          description: `Automate ${bottleneck.location} reducing manual effort by ${Math.round(timeSavingsPercent)}%`,
+          successCriteria: bottleneck.rootCauses.map(rc => `${rc.description} automated`),
+          validationMethod: 'Time tracking + error rate monitoring',
+          timeframe: bottleneck.estimatedResolutionTime
         }],
-        rollbackPlan: ['Manual fallback procedures'],
-        successMetrics: ['Time saved', 'Error rate'],
-        monitoringStrategy: 'Automated metrics'
+        rollbackPlan: ['Manual fallback procedures documented', 'Gradual rollout with manual override'],
+        successMetrics: [
+          `${Math.round(timeSavingsPercent)}% time savings`,
+          'Error rate reduction',
+          'Team satisfaction improved'
+        ],
+        monitoringStrategy: 'Automated metrics collection + alerting on failures'
       },
-      constraints: [],
+      constraints: bottleneck.conflictingConstraints.map(c => ({
+        type: 'technical' as const,
+        description: c,
+        severity: 0.4,
+        flexibility: 0.8,
+        workarounds: ['Phased automation', 'Hybrid manual/automated approach']
+      })),
       benefits: [{
         category: 'productivity',
-        description: 'Eliminate repetitive work',
-        quantification: '50-80% time savings',
+        description: `Eliminate manual ${constraintName} through automation`,
+        quantification: `${Math.round(timeSavingsPercent)}% time savings`,
         timeline: 'medium_term',
-        confidence: 0.9
+        confidence: bottleneck.rootCauses[0]?.confidence || 0.85
       }],
       risks: [{
-        description: 'Automation may break with changes',
+        description: 'Automation may fail silently or break with system changes',
         probability: 0.3,
-        impact: 0.4,
-        mitigation: ['Robust testing'],
-        contingency: ['Manual procedures']
+        impact: 0.5,
+        mitigation: ['Robust testing', 'Monitoring and alerting', 'Regular maintenance'],
+        contingency: ['Manual fallback procedures', 'On-call support']
       }],
-      confidence: 0.88,
+      confidence: 0.88 - (bottleneck.urgency * 0.02),
       novelty: 0.4,
       elegance: 0.8,
       sustainability: 0.95,
@@ -2907,50 +3003,91 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   }
 
   private async generateParadigmShiftSolutions(bottleneck: BottleneckAnalysis): Promise<BreakthroughSolution[]> {
+    const constraintName = bottleneck.type.replace(/_/g, ' ');
+    const primaryRootCause = bottleneck.rootCauses[0]?.description || 'Current approach';
+
+    // Paradigm shifts based on conflicting constraints (TRIZ principle)
+    const hasConflicts = bottleneck.conflictingConstraints.length > 0;
+    const paradigmShift = hasConflicts
+      ? `Resolve ${bottleneck.conflictingConstraints[0]} contradiction through innovation`
+      : `Question fundamental assumptions about ${constraintName}`;
+
+    const breakthroughPotential = Math.abs(bottleneck.impact.innovation + bottleneck.impact.deliveryTimeline) / 2;
+
     return [{
-      id: `paradigm-${Date.now()}`,
-      name: 'Paradigm Shift: Question Core Assumptions',
+      id: `paradigm-${bottleneck.type}-${Date.now()}`,
+      name: `Paradigm Shift: ${paradigmShift}`,
       type: SolutionType.PARADIGM_CHANGE,
       approach: SolutionApproach.REVOLUTIONARY,
-      description: `Challenge fundamental assumptions behind ${bottleneck.location}`,
+      description: `Challenge fundamental assumptions behind ${bottleneck.location}. Root cause: ${primaryRootCause}. ${hasConflicts ? `Conflicting constraints: ${bottleneck.conflictingConstraints.join(' vs ')}` : 'Seek 10x improvement through new paradigm'}`,
       implementation: {
-        phases: [{
-          name: 'List and challenge assumptions',
-          description: 'Brainstorm and question all underlying assumptions',
-          duration: 2 * 24 * 60 * 60 * 1000,
-          resources: ['Team brainstorming time'],
-          deliverables: ['Assumptions document'],
-          risks: ['Team resistance'],
-          dependencies: []
-        }],
-        prerequisites: ['Organizational buy-in'],
+        phases: [
+          {
+            name: 'Assumption Mapping',
+            description: `List all assumptions underlying ${bottleneck.location}`,
+            duration: bottleneck.estimatedResolutionTime * 0.15,
+            resources: ['Cross-functional team', 'External facilitator'],
+            deliverables: ['Assumptions inventory', 'Constraint map'],
+            risks: ['Missing hidden assumptions'],
+            dependencies: bottleneck.rootCauses[0]?.dependencies || []
+          },
+          {
+            name: 'Paradigm Exploration',
+            description: hasConflicts ? `Seek innovations that resolve ${bottleneck.conflictingConstraints.join(' vs ')}` : 'Explore radically different approaches',
+            duration: bottleneck.estimatedResolutionTime * 0.3,
+            resources: ['Innovation team', 'Domain experts from other fields'],
+            deliverables: ['Alternative paradigm concepts', 'TRIZ analysis (if conflicts present)'],
+            risks: ['Solutions too radical for organization'],
+            dependencies: ['Assumption mapping complete']
+          },
+          {
+            name: 'Proof of Concept',
+            description: `Validate new paradigm with small-scale prototype`,
+            duration: bottleneck.estimatedResolutionTime * 0.55,
+            resources: ['Prototype team', 'Early adopters'],
+            deliverables: ['Working prototype', 'Viability assessment'],
+            risks: ['Prototype fails to prove concept'],
+            dependencies: ['Paradigm selected']
+          }
+        ],
+        prerequisites: ['Organizational buy-in for radical change', 'Budget for experimentation'],
         milestones: [{
-          name: 'New paradigm validated',
-          description: 'Proof-of-concept demonstrates viability',
-          successCriteria: ['10x improvement potential'],
-          validationMethod: 'Prototype testing',
-          timeframe: 30 * 24 * 60 * 60 * 1000
+          name: `${Math.round(breakthroughPotential * 10)}x Improvement Demonstrated`,
+          description: `Prototype shows potential to ${hasConflicts ? 'resolve contradictions' : 'achieve breakthrough'}`,
+          successCriteria: bottleneck.rootCauses.map(rc => `${rc.description} eliminated or transformed`),
+          validationMethod: 'Prototype testing + metrics comparison',
+          timeframe: bottleneck.estimatedResolutionTime
         }],
-        rollbackPlan: ['Maintain old system during transition'],
-        successMetrics: ['Problem elimination', 'Team excitement'],
-        monitoringStrategy: 'Prototype validation'
+        rollbackPlan: ['Maintain old system during transition', 'Dual-track approach (parallel systems)'],
+        successMetrics: [
+          hasConflicts ? `${bottleneck.conflictingConstraints[0]} contradiction resolved` : 'Breakthrough achieved',
+          `${Math.round(breakthroughPotential * 10)}x improvement potential`,
+          'Team alignment on new paradigm'
+        ],
+        monitoringStrategy: 'Prototype validation + staged rollout'
       },
-      constraints: [],
+      constraints: bottleneck.conflictingConstraints.map(c => ({
+        type: 'organizational' as const,
+        description: c,
+        severity: 0.8, // High severity for paradigm shifts
+        flexibility: 0.3, // Low flexibility - fundamental change needed
+        workarounds: ['TRIZ contradiction resolution', 'Seek technology that eliminates trade-off']
+      })),
       benefits: [{
         category: 'innovation',
-        description: 'Eliminate entire class of problems',
-        quantification: '10x improvement possible',
+        description: hasConflicts ? `Resolve ${bottleneck.conflictingConstraints[0]} through paradigm shift` : `Eliminate ${constraintName} class of problems`,
+        quantification: `${Math.round(breakthroughPotential * 10)}x improvement potential`,
         timeline: 'long_term',
-        confidence: 0.5
+        confidence: 0.5 + (hasConflicts ? 0.15 : 0) // Higher confidence if specific conflicts identified
       }],
       risks: [{
-        description: 'May require complete redesign',
+        description: 'May require complete system redesign and organizational change',
         probability: 0.7,
         impact: 0.8,
-        mitigation: ['Incremental transition'],
-        contingency: ['Dual-track approach']
+        mitigation: ['Incremental transition', 'Parallel old/new systems', 'Change management program'],
+        contingency: ['Dual-track approach', 'Revert if prototype fails']
       }],
-      confidence: 0.6,
+      confidence: 0.5 + (bottleneck.rootCauses[0]?.confidence || 0) * 0.2, // Confidence based on root cause understanding
       novelty: 1.0,
       elegance: 0.9,
       sustainability: 0.7,
@@ -2960,62 +3097,101 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
   private async generateLoopBreakingSolutions(loop: StruggleLoop): Promise<BreakthroughSolution[]> {
     const strategies: Record<string, string> = {
-      'repeated_failed_attempts': 'Add validation gate',
+      'repeated_failed_attempts': 'Add validation gate before attempts',
       'analysis_paralysis': 'Impose decision deadlines',
-      'overcomplicated_solution': 'Complexity budget',
-      'missing_perspective': 'External review',
-      'wrong_problem_definition': 'Problem validation phase',
-      'insufficient_knowledge': 'Documentation requirement',
-      'cognitive_bias': 'Decision frameworks',
-      'resource_thrashing': 'WIP limits'
+      'overcomplicated_solution': 'Implement complexity budget',
+      'missing_perspective': 'Require external review',
+      'wrong_problem_definition': 'Add problem validation phase',
+      'insufficient_knowledge': 'Enforce documentation requirements',
+      'cognitive_bias': 'Implement decision frameworks',
+      'resource_thrashing': 'Enforce WIP limits',
+      'perfectionism_trap': 'Set "good enough" criteria',
+      'scope_creep': 'Freeze scope with change control'
     };
 
-    const strategy = strategies[loop.pattern] || 'Pattern interruption';
+    const strategy = strategies[loop.pattern] || 'Install pattern interruption';
+    const patternName = loop.pattern.replace(/_/g, ' ');
+
+    // Calculate urgency from loop metrics
+    const iterationUrgency = Math.min(loop.iterations / 10, 1.0); // 10+ iterations = max urgency
+    const energyUrgency = loop.energyDrain; // Already 0-1
+    const durationUrgency = Math.min(loop.duration / (30 * 24 * 60 * 60 * 1000), 1.0); // 30+ days = max urgency
+    const avgUrgency = (iterationUrgency + energyUrgency + durationUrgency) / 3;
+
+    // Reduction target based on loop severity
+    const reductionTarget = Math.round(70 + (avgUrgency * 20)); // 70-90% reduction
 
     return [{
-      id: `break-loop-${Date.now()}`,
-      name: `Break Loop: ${strategy}`,
+      id: `break-loop-${loop.pattern}-${Date.now()}`,
+      name: `Break ${patternName.toUpperCase()} Loop: ${strategy}`,
       type: SolutionType.PROCESS_OPTIMIZATION,
       approach: SolutionApproach.INCREMENTAL,
-      description: `Interrupt ${loop.pattern} pattern`,
+      description: `Interrupt ${patternName} pattern (${loop.iterations} iterations, ${(loop.energyDrain * 100).toFixed(0)}% energy drain). Strategy: ${strategy}`,
       implementation: {
-        phases: [{
-          name: 'Install circuit breaker',
-          description: 'Set up loop detection and intervention',
-          duration: 2 * 24 * 60 * 60 * 1000,
-          resources: ['Process design time'],
-          deliverables: ['Loop detection system'],
-          risks: ['False positives'],
-          dependencies: []
-        }],
-        prerequisites: ['Team awareness'],
+        phases: [
+          {
+            name: 'Circuit Breaker Design',
+            description: `Design intervention to detect and break ${patternName} pattern`,
+            duration: Math.min(loop.duration * 0.1, 3 * 24 * 60 * 60 * 1000), // 10% of loop duration, max 3 days
+            resources: ['Process analyst', 'Team lead'],
+            deliverables: ['Circuit breaker specification', 'Trigger conditions'],
+            risks: ['Intervention too restrictive'],
+            dependencies: []
+          },
+          {
+            name: 'Implementation',
+            description: strategy,
+            duration: Math.min(loop.duration * 0.2, 7 * 24 * 60 * 60 * 1000), // 20% of loop duration, max 7 days
+            resources: ['Development team', 'Process owner'],
+            deliverables: ['Circuit breaker active', 'Team trained on new process'],
+            risks: ['Resistance to process change'],
+            dependencies: ['Circuit breaker designed']
+          },
+          {
+            name: 'Monitoring & Adjustment',
+            description: 'Track loop frequency and adjust intervention as needed',
+            duration: Math.min(loop.duration * 0.7, 14 * 24 * 60 * 60 * 1000), // 70% of loop duration, max 14 days
+            resources: ['Team coach'],
+            deliverables: [`${reductionTarget}% loop reduction confirmed`],
+            risks: ['Loop shifts to different pattern'],
+            dependencies: ['Circuit breaker implemented']
+          }
+        ],
+        prerequisites: ['Team awareness of loop pattern', 'Buy-in for process change'],
         milestones: [{
-          name: 'Loop broken',
-          description: 'Pattern frequency reduced 70%',
-          successCriteria: ['Reduced iterations'],
-          validationMethod: 'Pattern tracking',
-          timeframe: 14 * 24 * 60 * 60 * 1000
+          name: `${reductionTarget}% Loop Reduction`,
+          description: `Reduce ${patternName} pattern from ${loop.iterations} iterations to ${Math.round(loop.iterations * (1 - reductionTarget/100))}`,
+          successCriteria: [
+            `Iterations reduced by ${reductionTarget}%`,
+            `Energy drain reduced from ${(loop.energyDrain * 100).toFixed(0)}% to ${((loop.energyDrain * (1 - reductionTarget/100)) * 100).toFixed(0)}%`
+          ],
+          validationMethod: 'Pattern tracking + team survey',
+          timeframe: loop.duration
         }],
-        rollbackPlan: ['Remove intervention'],
-        successMetrics: ['Loop frequency', 'Energy drain'],
-        monitoringStrategy: 'Pattern tracking'
+        rollbackPlan: ['Remove intervention if ineffective', 'Try alternative approaches from loop.alternativeApproaches'],
+        successMetrics: [
+          `${reductionTarget}% reduction in loop frequency`,
+          `Energy drain reduced by ${reductionTarget}%`,
+          'Team productivity improved'
+        ],
+        monitoringStrategy: 'Continuous pattern tracking + weekly team check-ins'
       },
       constraints: [],
       benefits: [{
         category: 'productivity',
-        description: 'Break destructive pattern',
-        quantification: '70%+ reduction',
+        description: `Break ${patternName} destructive pattern saving ${(loop.energyDrain * 100).toFixed(0)}% wasted energy`,
+        quantification: `${reductionTarget}% reduction in loop iterations`,
         timeline: 'short_term',
-        confidence: 0.8
+        confidence: loop.confidence
       }],
       risks: [{
-        description: 'Loop may shift form',
-        probability: 0.3,
-        impact: 0.5,
-        mitigation: ['Monitor variants'],
-        contingency: ['Adapt intervention']
+        description: 'Loop may shift to different pattern variant or team may resist intervention',
+        probability: 1 - loop.breakthroughProbability, // Lower breakthrough probability = higher risk
+        impact: loop.energyDrain, // Impact proportional to current energy drain
+        mitigation: ['Monitor for pattern variants', 'Involve team in solution design', 'Gradual rollout'],
+        contingency: loop.exitStrategies.map(es => es.name)
       }],
-      confidence: 0.8,
+      confidence: loop.confidence,
       novelty: 0.5,
       elegance: 0.7,
       sustainability: 0.85,
@@ -3024,50 +3200,93 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   }
 
   private async generateMetaLevelSolutions(metaAnalysis: MetaAnalysis): Promise<BreakthroughSolution[]> {
+    // Identify meta-level improvement areas from metaAnalysis
+    const improvementAreas: string[] = [];
+
+    if (metaAnalysis.teamDynamics.burnoutRisk > 0.6) improvementAreas.push('Reduce team burnout risk');
+    if (metaAnalysis.teamDynamics.decisionMakingSpeed < 0.5) improvementAreas.push('Improve decision-making speed');
+    if (metaAnalysis.processEfficiency.errorRate > 0.2) improvementAreas.push('Reduce process error rate');
+    if (metaAnalysis.processEfficiency.cycleTime > 14 * 24 * 60 * 60 * 1000) improvementAreas.push('Reduce cycle time');
+    if (metaAnalysis.cognitiveLoad.complexityLevel > 0.7) improvementAreas.push('Reduce cognitive complexity');
+    if (metaAnalysis.innovationIndex.experimentationRate < 0.3) improvementAreas.push('Increase experimentation rate');
+    if (metaAnalysis.collaborationQuality.meetingEfficiency < 0.6) improvementAreas.push('Improve collaboration efficiency');
+
+    const primaryArea = improvementAreas[0] || 'Optimize problem-solving effectiveness';
+    const improvementPotential = Math.round(
+      (1 - metaAnalysis.teamDynamics.decisionMakingSpeed) * 50 +
+      metaAnalysis.processEfficiency.errorRate * 30 +
+      metaAnalysis.cognitiveLoad.complexityLevel * 20
+    );
+
     return [{
       id: `meta-${Date.now()}`,
-      name: 'Meta-Level: Optimize the Optimization Process',
+      name: `Meta-Level: ${primaryArea}`,
       type: SolutionType.METHODOLOGY_SHIFT,
       approach: SolutionApproach.REVOLUTIONARY,
-      description: 'Improve how we identify and solve problems',
+      description: `Optimize how the team works at a meta-level. Focus areas: ${improvementAreas.join('; ')}. Current metrics: decision speed ${(metaAnalysis.teamDynamics.decisionMakingSpeed * 100).toFixed(0)}%, error rate ${(metaAnalysis.processEfficiency.errorRate * 100).toFixed(0)}%, complexity ${(metaAnalysis.cognitiveLoad.complexityLevel * 100).toFixed(0)}%`,
       implementation: {
-        phases: [{
-          name: 'Analyze problem-solving effectiveness',
-          description: 'Review past solutions and identify patterns',
-          duration: 3 * 24 * 60 * 60 * 1000,
-          resources: ['Team reflection time'],
-          deliverables: ['Meta-analysis report'],
-          risks: ['Analysis paralysis'],
-          dependencies: []
-        }],
-        prerequisites: ['Leadership buy-in'],
+        phases: [
+          {
+            name: 'Meta-Analysis Deep Dive',
+            description: `Analyze team dynamics (burnout: ${(metaAnalysis.teamDynamics.burnoutRisk * 100).toFixed(0)}%), process efficiency (throughput: ${metaAnalysis.processEfficiency.throughput}/month), and innovation index`,
+            duration: 3 * 24 * 60 * 60 * 1000,
+            resources: ['Team reflection session', 'External facilitator'],
+            deliverables: ['Comprehensive meta-analysis report', 'Improvement roadmap'],
+            risks: ['Over-analysis leading to paralysis'],
+            dependencies: []
+          },
+          {
+            name: 'Process Redesign',
+            description: improvementAreas.join('; '),
+            duration: 7 * 24 * 60 * 60 * 1000,
+            resources: ['Process improvement team', 'Change management support'],
+            deliverables: improvementAreas.map(area => `${area} strategy implemented`),
+            risks: ['Team resistance to change', 'Disruption to ongoing work'],
+            dependencies: ['Meta-analysis complete']
+          },
+          {
+            name: 'Rollout & Measurement',
+            description: 'Deploy new processes and measure meta-level improvements',
+            duration: 20 * 24 * 60 * 60 * 1000,
+            resources: ['Change champions', 'Metrics dashboard'],
+            deliverables: ['New processes active', 'Metrics showing improvement'],
+            risks: ['Regression to old habits'],
+            dependencies: ['Process redesign complete']
+          }
+        ],
+        prerequisites: ['Leadership buy-in for process change', 'Team willingness to experiment'],
         milestones: [{
-          name: 'Improved process deployed',
-          description: 'New problem-solving framework in use',
-          successCriteria: ['Faster resolution', 'Better solutions'],
-          validationMethod: 'Comparative metrics',
+          name: `${improvementPotential}% Meta-Level Improvement`,
+          description: `Achieve measurable improvement in ${improvementAreas.length} areas`,
+          successCriteria: improvementAreas.map(area => `${area} metrics improved 20%+`),
+          validationMethod: 'Before/after metrics comparison',
           timeframe: 30 * 24 * 60 * 60 * 1000
         }],
-        rollbackPlan: ['Return to old process'],
-        successMetrics: ['Problem resolution speed', 'Solution quality'],
-        monitoringStrategy: 'Meta-metrics tracking'
+        rollbackPlan: ['Return to previous processes if no improvement after 30 days'],
+        successMetrics: [
+          `Decision speed improved to ${Math.min((metaAnalysis.teamDynamics.decisionMakingSpeed * 1.3 * 100), 100).toFixed(0)}%`,
+          `Error rate reduced to ${(metaAnalysis.processEfficiency.errorRate * 0.7 * 100).toFixed(0)}%`,
+          `Cognitive load reduced to ${(metaAnalysis.cognitiveLoad.complexityLevel * 0.8 * 100).toFixed(0)}%`,
+          'Team satisfaction improved'
+        ],
+        monitoringStrategy: 'Weekly meta-metrics review + quarterly deep retrospective'
       },
       constraints: [],
       benefits: [{
         category: 'innovation',
-        description: 'Improve all future problem-solving',
-        quantification: 'Compound improvement over time',
+        description: `Improve ${improvementAreas.length} meta-level aspects of how the team works, creating compound improvements`,
+        quantification: `${improvementPotential}% improvement potential across team dynamics, process efficiency, and innovation`,
         timeline: 'long_term',
-        confidence: 0.75
+        confidence: 0.7 + (metaAnalysis.innovationIndex.experimentationRate * 0.2) // Higher experimentation rate = higher confidence
       }],
       risks: [{
-        description: 'Meta-optimization overhead',
+        description: 'Meta-optimization overhead may slow down concrete work temporarily',
         probability: 0.4,
-        impact: 0.5,
-        mitigation: ['Time-box meta-work'],
-        contingency: ['Focus on concrete problems']
+        impact: 0.4,
+        mitigation: ['Time-box meta-work to 10% of team capacity', 'Focus on high-ROI improvements first'],
+        contingency: ['Return to previous processes', 'Focus on concrete problems instead']
       }],
-      confidence: 0.75,
+      confidence: 0.7 + (metaAnalysis.teamDynamics.psychologicalSafety * 0.2), // Higher psychological safety = higher confidence in process change
       novelty: 0.8,
       elegance: 0.85,
       sustainability: 0.9,
