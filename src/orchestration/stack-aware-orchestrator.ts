@@ -598,13 +598,81 @@ export class StackAwareOrchestrator extends EventEmitter {
   }
 
   private async getGitHubPRs(): Promise<any[]> {
-    // Would use GitHub API
-    return [];
+    try {
+      const { VERSATILMCPClient } = await import('../mcp/mcp-client.js');
+      const mcpClient = new VERSATILMCPClient();
+
+      const result = await mcpClient.executeTool({
+        tool: 'github_list_prs',
+        arguments: {
+          owner: process.env.GITHUB_OWNER,
+          repo: process.env.GITHUB_REPO,
+          state: 'open'
+        }
+      });
+
+      if (result.success && result.data?.prs) {
+        return result.data.prs;
+      }
+
+      return [];
+    } catch (error) {
+      this.logger.warn('Failed to fetch GitHub PRs', { error });
+      return [];
+    }
   }
 
   private async extractTODOs(): Promise<string[]> {
-    // Would scan codebase for TODO comments
-    return [];
+    try {
+      const { Project } = await import('ts-morph');
+      const { readdir, readFile } = await import('fs/promises');
+      const { join } = await import('path');
+
+      const srcPath = join(this.paths.project.root || process.cwd(), 'src');
+      const todos: string[] = [];
+
+      // Recursively scan TypeScript files
+      const scanDirectory = async (dir: string): Promise<void> => {
+        try {
+          const entries = await readdir(dir, { withFileTypes: true });
+
+          for (const entry of entries) {
+            const fullPath = join(dir, entry.name);
+
+            if (entry.isDirectory()) {
+              await scanDirectory(fullPath);
+            } else if (entry.isFile() && /\.(ts|tsx|js|jsx)$/.test(entry.name)) {
+              const content = await readFile(fullPath, 'utf-8');
+              const project = new Project({ useInMemoryFileSystem: true });
+              const sourceFile = project.createSourceFile(fullPath, content);
+
+              const fullText = sourceFile.getFullText();
+
+              sourceFile.forEachDescendant(node => {
+                const comments = [...node.getLeadingCommentRanges(), ...node.getTrailingCommentRanges()];
+
+                comments.forEach(comment => {
+                  const text = fullText.slice(comment.getPos(), comment.getEnd());
+                  if (/TODO|FIXME|HACK|XXX/.test(text)) {
+                    const line = sourceFile.getLineAndColumnAtPos(comment.getPos()).line;
+                    const relativePath = fullPath.replace(this.paths.project.root || process.cwd(), '');
+                    todos.push(`${relativePath}:${line} - ${text.trim()}`);
+                  }
+                });
+              });
+            }
+          }
+        } catch (error) {
+          // Skip directories that can't be read
+        }
+      };
+
+      await scanDirectory(srcPath);
+      return todos;
+    } catch (error) {
+      this.logger.warn('TODO extraction failed', { error });
+      return [];
+    }
   }
 
   /**

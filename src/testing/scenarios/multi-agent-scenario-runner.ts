@@ -235,7 +235,29 @@ export class MultiAgentScenarioRunner {
           action: 'Implement OAuth APIs and security patterns',
           context: {
             filePath: 'src/api/auth.ts',
-            content: 'export const authRouter = express.Router(); // TODO: OAuth'
+            content: `
+import express from 'express';
+import passport from 'passport';
+import { Strategy as GitHubStrategy } from 'passport-github2';
+
+export const authRouter = express.Router();
+
+// GitHub OAuth Strategy
+passport.use(new GitHubStrategy({
+  clientID: process.env.GITHUB_CLIENT_ID || '',
+  clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
+  callbackURL: '/auth/github/callback'
+}, (accessToken, refreshToken, profile, done) => {
+  // User creation logic
+  return done(null, profile);
+}));
+
+authRouter.get('/github', passport.authenticate('github'));
+authRouter.get('/github/callback',
+  passport.authenticate('github', { failureRedirect: '/login' }),
+  (req, res) => res.redirect('/dashboard')
+);
+`
           },
           expectedDuration: 15000,
           dependencies: [1],

@@ -8,6 +8,8 @@
 
 import { BaseAgent, AgentActivationContext, ValidationResults } from '../agents/base-agent.js';
 import { AgentRegistry } from '../agents/agent-registry.js';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
 export interface TestScenario {
   id: string;
@@ -40,10 +42,23 @@ export class AgentTestingFramework {
 
   constructor(agentRegistry: AgentRegistry) {
     this.agentRegistry = agentRegistry;
-    this.initializeTestScenarios();
+    // Scenarios will be loaded lazily on first test run
   }
 
-  private initializeTestScenarios(): void {
+  /**
+   * Load test fixture from file system
+   */
+  private async loadFixture(fixtureName: string): Promise<string> {
+    try {
+      const fixturePath = join(process.cwd(), 'tests', 'fixtures', 'code-samples', fixtureName);
+      return await readFile(fixturePath, 'utf-8');
+    } catch (error) {
+      console.error(`Failed to load fixture: ${fixtureName}`, error);
+      throw error;
+    }
+  }
+
+  private async initializeTestScenarios(): Promise<void> {
     // Based on the Enhanced Maria analysis, these are the key scenarios that should be caught
 
     // 1. VERSSAI Brain Route Bug - The original problem that Maria missed
@@ -53,22 +68,7 @@ export class AgentTestingFramework {
       description: 'Detect debugging wrapper code in production routes that caused the original issue',
       testType: 'configuration',
       severity: 'critical',
-      mockContent: `
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-
-function App() {
-  return (
-    <Routes>
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/osint-brain" element={
-        <div style={{ color: 'purple' }}>🧠 Route Test</div>
-      } />
-      <Route path="/profile" element={<Profile />} />
-    </Routes>
-  );
-}
-      `,
+      mockContent: await this.loadFixture('react-debug-route.tsx'),
       filePath: 'src/App.tsx',
       expectedIssues: [
         'debugging-code',
@@ -89,20 +89,7 @@ function App() {
       description: 'Detect mismatches between navigation menu items and actual route definitions',
       testType: 'navigation',
       severity: 'high',
-      mockContent: `
-const navigationItems = [
-  { key: 'dashboard', label: 'Dashboard', path: '/dashboard' },
-  { key: 'osint-brain', label: 'OSINT Brain', path: '/osint-brain' },
-  { key: 'analytics', label: 'Analytics', path: '/analytics' }
-];
-
-// Routes defined elsewhere
-<Routes>
-  <Route path="/dashboard" element={<Dashboard />} />
-  {/* Missing: /osint-brain route */}
-  <Route path="/reports" element={<Reports />} /> {/* Extra route not in menu */}
-</Routes>
-      `,
+      mockContent: await this.loadFixture('menu-route-mismatch.tsx'),
       filePath: 'src/navigation/NavigationConfig.tsx',
       expectedIssues: [
         'navigation-route-mismatch',
@@ -121,25 +108,7 @@ const navigationItems = [
       description: 'Validate profile context state consistency with navigation permissions',
       testType: 'integration',
       severity: 'high',
-      mockContent: `
-const ProfileProvider = ({ children }) => {
-  const [profile, setProfile] = useState(null);
-
-  const navigate = useNavigate();
-
-  const handleNavigation = (path) => {
-    // Missing context validation
-    navigate(path);
-  };
-
-  // Profile context doesn't validate navigation permissions
-  return (
-    <ProfileContext.Provider value={{ profile, handleNavigation }}>
-      {children}
-    </ProfileContext.Provider>
-  );
-};
-      `,
+      mockContent: await this.loadFixture('profile-context-nav.tsx'),
       filePath: 'src/context/ProfileContext.tsx',
       expectedIssues: [
         'profile-context-inconsistency',
@@ -158,18 +127,7 @@ const ProfileProvider = ({ children }) => {
       description: 'Detect configuration values that are inconsistent across files',
       testType: 'configuration',
       severity: 'medium',
-      mockContent: `
-// File 1: config.ts
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
-
-// File 2: services.ts (in same content for testing)
-const apiClient = axios.create({
-  baseURL: 'http://localhost:8080', // Different from config!
-});
-
-// File 3: constants.ts (in same content for testing)
-export const DEFAULT_API_URL = 'https://api.production.com'; // Yet another different URL!
-      `,
+      mockContent: await this.loadFixture('config-drift.ts'),
       filePath: 'src/config/config.ts',
       expectedIssues: [
         'configuration-drift',
@@ -188,24 +146,7 @@ export const DEFAULT_API_URL = 'https://api.production.com'; // Yet another diff
       description: 'Detect unused route definitions and imports',
       testType: 'configuration',
       severity: 'medium',
-      mockContent: `
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { Dashboard } from './Dashboard.js';
-import { Profile } from './Profile.js';
-import { UnusedComponent } from './UnusedComponent.js'; // Dead import
-import { AnotherUnused } from './AnotherUnused.js'; // Dead import
-
-function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/profile" element={<Profile />} />
-      {/* UnusedComponent and AnotherUnused are imported but never used */}
-    </Routes>
-  );
-}
-      `,
+      mockContent: await this.loadFixture('dead-code-routes.tsx'),
       filePath: 'src/routes/AppRoutes.tsx',
       expectedIssues: [
         'dead-code'
@@ -223,19 +164,7 @@ function AppRoutes() {
       description: 'Detect missing integration tests for critical navigation flows',
       testType: 'integration',
       severity: 'medium',
-      mockContent: `
-describe('Navigation Tests', () => {
-  test('should navigate to dashboard', () => {
-    // Basic unit test only
-    render(<Dashboard />);
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-  });
-
-  // Missing: Integration tests for navigation flows
-  // Missing: Tests for profile context navigation
-  // Missing: Tests for route-menu consistency
-});
-      `,
+      mockContent: await this.loadFixture('integration-test-gaps.test.tsx'),
       filePath: 'src/__tests__/Navigation.test.tsx',
       expectedIssues: [
         'integration-gap'
@@ -253,23 +182,7 @@ describe('Navigation Tests', () => {
       description: 'Detect mismatches between frontend expectations and backend API contracts',
       testType: 'integration',
       severity: 'high',
-      mockContent: `
-// Frontend expects this interface
-interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  avatar_url: string; // snake_case
-}
-
-// But API endpoint returns this (different naming)
-const fetchUserProfile = async (id: string) => {
-  const response = await fetch(\`/api/users/\${id}\`);
-  const data = await response.json();
-  // API returns: { id, name, email, avatarUrl } // camelCase!
-  return data as UserProfile; // Type assertion hides the mismatch
-};
-      `,
+      mockContent: await this.loadFixture('api-contract-mismatch.ts'),
       filePath: 'src/services/UserService.ts',
       expectedIssues: [
         'api-parameter-naming-inconsistency',
@@ -288,26 +201,7 @@ const fetchUserProfile = async (id: string) => {
       description: 'Detect security issues in configuration and API setup',
       testType: 'security',
       severity: 'critical',
-      mockContent: `
-// Hardcoded API key - security risk
-const API_KEY = 'sk-test-fake-key-for-testing-only';
-
-// Insecure API configuration
-const apiConfig = {
-  baseURL: 'http://localhost:3000', // Not HTTPS
-  timeout: 30000,
-  headers: {
-    'Authorization': \`Bearer \${API_KEY}\`, // Hardcoded secret
-    'X-API-Key': 'another-hardcoded-key'
-  }
-};
-
-// Missing input validation
-const processUserInput = (input) => {
-  document.innerHTML = input; // XSS vulnerability
-  eval(input); // Code injection vulnerability
-};
-      `,
+      mockContent: await this.loadFixture('security-config-issues.ts'),
       filePath: 'src/config/ApiConfig.ts',
       expectedIssues: [
         'insecure-api-patterns',
@@ -328,6 +222,13 @@ const processUserInput = (input) => {
    */
   public async runAllTests(): Promise<TestResult[]> {
     console.log('🚀 Running comprehensive agent testing framework...');
+
+    // Initialize test scenarios (lazy loading with real fixtures)
+    if (this.testScenarios.length === 0) {
+      await this.initializeTestScenarios();
+      console.log(`🧪 Loaded ${this.testScenarios.length} test scenarios from fixtures`);
+    }
+
     this.testResults = [];
 
     for (const scenario of this.testScenarios) {
@@ -583,6 +484,11 @@ const processUserInput = (input) => {
    * Run tests for a specific scenario
    */
   public async runScenarioTests(scenarioId: string): Promise<TestResult[]> {
+    // Initialize test scenarios if not already loaded
+    if (this.testScenarios.length === 0) {
+      await this.initializeTestScenarios();
+    }
+
     const scenario = this.testScenarios.find(s => s.id === scenarioId);
     if (!scenario) {
       throw new Error(`Scenario ${scenarioId} not found`);
@@ -600,9 +506,12 @@ const processUserInput = (input) => {
   }
 
   /**
-   * Get all test scenarios
+   * Get all test scenarios (async to support lazy loading)
    */
-  public getTestScenarios(): TestScenario[] {
+  public async getTestScenarios(): Promise<TestScenario[]> {
+    if (this.testScenarios.length === 0) {
+      await this.initializeTestScenarios();
+    }
     return [...this.testScenarios];
   }
 
