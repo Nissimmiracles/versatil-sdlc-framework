@@ -2192,143 +2192,548 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
   // Meta-analysis methods
   private async analyzeTeamDynamics(projectPath: string): Promise<TeamDynamicsAnalysis> {
-    return {
-      communicationPatterns: ['async-heavy', 'documentation-poor'],
-      decisionMakingSpeed: 0.6,
-      conflictResolutionEfficiency: 0.7,
-      knowledgeSharing: 0.5,
-      psychologicalSafety: 0.8,
-      creativityLevel: 0.6,
-      burnoutRisk: 0.4,
-      skillComplementarity: 0.8
-    };
+    try {
+      const { execSync } = require('child_process');
+
+      // Analyze contributor activity
+      const contributors = execSync(
+        'git log --since="90 days ago" --pretty=format:"%an" | sort | uniq',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim().split('\n').filter(Boolean);
+
+      const contributorCount = contributors.length;
+
+      // Analyze commit frequency (decision-making proxy)
+      const totalCommits = parseInt(execSync(
+        'git log --since="90 days ago" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const commitsPerDay = totalCommits / 90;
+      const decisionMakingSpeed = Math.min(commitsPerDay / 5, 1.0); // 5 commits/day = 1.0
+
+      // Analyze collaboration patterns (co-authored commits)
+      const coAuthoredCommits = parseInt(execSync(
+        'git log --since="90 days ago" --grep="Co-authored-by" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const collaborationRate = totalCommits > 0 ? coAuthoredCommits / totalCommits : 0;
+      const knowledgeSharing = Math.min(collaborationRate * 2, 1.0);
+
+      // Communication patterns detection
+      const communicationPatterns: string[] = [];
+      if (collaborationRate > 0.2) communicationPatterns.push('collaborative');
+      if (collaborationRate < 0.1) communicationPatterns.push('siloed');
+      if (commitsPerDay > 3) communicationPatterns.push('high-velocity');
+      if (commitsPerDay < 1) communicationPatterns.push('slow-paced');
+
+      // Skill complementarity (based on contributor distribution)
+      const skillComplementarity = Math.min(contributorCount / 5, 1.0); // 5+ contributors = 1.0
+
+      return {
+        communicationPatterns: communicationPatterns.length > 0 ? communicationPatterns : ['average-collaboration'],
+        decisionMakingSpeed,
+        conflictResolutionEfficiency: 0.7, // Requires PR analysis - use default
+        knowledgeSharing,
+        psychologicalSafety: 0.75, // Requires qualitative analysis - use default
+        creativityLevel: Math.min(contributorCount / 3, 1.0), // More contributors = more creativity
+        burnoutRisk: commitsPerDay > 10 ? 0.7 : 0.3, // High velocity may indicate burnout
+        skillComplementarity
+      };
+    } catch (error) {
+      // Git not available or not a repo - return defaults
+      return {
+        communicationPatterns: ['unknown'],
+        decisionMakingSpeed: 0.5,
+        conflictResolutionEfficiency: 0.5,
+        knowledgeSharing: 0.5,
+        psychologicalSafety: 0.5,
+        creativityLevel: 0.5,
+        burnoutRisk: 0.5,
+        skillComplementarity: 0.5
+      };
+    }
   }
 
   private async analyzeProcessEfficiency(projectPath: string): Promise<ProcessEfficiencyAnalysis> {
-    return {
-      bottlenecks: ['code-review', 'deployment'],
-      redundancies: ['manual-testing', 'duplicate-documentation'],
-      automationOpportunities: ['testing', 'deployment', 'documentation'],
-      feedbackLoops: ['user-feedback', 'performance-monitoring'],
-      qualityGates: ['peer-review', 'automated-testing'],
-      cycleTime: 7 * 24 * 60 * 60 * 1000, // 7 days
-      throughput: 12, // features per month
-      errorRate: 0.15
-    };
+    try {
+      const { execSync } = require('child_process');
+
+      // Detect stale branches (bottleneck indicator)
+      const staleBranches = parseInt(execSync(
+        'git branch -r | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const bottlenecks: string[] = [];
+      if (staleBranches > 10) bottlenecks.push('branch-management');
+      if (staleBranches > 20) bottlenecks.push('code-review');
+
+      // Calculate average cycle time (branch creation to merge)
+      let avgCycleTime = 7 * 24 * 60 * 60 * 1000; // Default 7 days
+      try {
+        const recentMerges = execSync(
+          'git log --since="30 days ago" --merges --pretty=format:"%ct" | head -10',
+          { cwd: projectPath, encoding: 'utf8' }
+        ).trim().split('\n').filter(Boolean);
+
+        if (recentMerges.length > 0) {
+          avgCycleTime = 5 * 24 * 60 * 60 * 1000; // Estimate 5 days if active merging
+        }
+      } catch {
+        // Default cycle time
+      }
+
+      // Calculate throughput (features per month)
+      const monthlyCommits = parseInt(execSync(
+        'git log --since="30 days ago" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const throughput = Math.max(Math.floor(monthlyCommits / 10), 1); // Estimate 10 commits per feature
+
+      // Estimate error rate from revert patterns
+      const totalCommits = parseInt(execSync(
+        'git log --since="90 days ago" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 1;
+
+      const revertCommits = parseInt(execSync(
+        'git log --since="90 days ago" --grep="revert\\|Revert" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const errorRate = Math.min(revertCommits / totalCommits, 0.5);
+
+      // Detect automation opportunities
+      const automationOpportunities: string[] = [];
+      if (errorRate > 0.1) automationOpportunities.push('automated-testing');
+      if (staleBranches > 15) automationOpportunities.push('CI/CD-automation');
+      if (throughput < 5) automationOpportunities.push('workflow-automation');
+
+      return {
+        bottlenecks: bottlenecks.length > 0 ? bottlenecks : ['none-detected'],
+        redundancies: [], // Requires code analysis - empty for now
+        automationOpportunities: automationOpportunities.length > 0 ? automationOpportunities : ['well-automated'],
+        feedbackLoops: ['git-history'], // Basic feedback loop
+        qualityGates: errorRate < 0.1 ? ['effective-testing'] : ['testing-improvement-needed'],
+        cycleTime: avgCycleTime,
+        throughput,
+        errorRate
+      };
+    } catch (error) {
+      // Git not available - return defaults
+      return {
+        bottlenecks: ['unknown'],
+        redundancies: [],
+        automationOpportunities: [],
+        feedbackLoops: [],
+        qualityGates: [],
+        cycleTime: 7 * 24 * 60 * 60 * 1000,
+        throughput: 10,
+        errorRate: 0.1
+      };
+    }
   }
 
   private async analyzeToolEffectiveness(projectPath: string): Promise<ToolEffectivenessAnalysis> {
-    return {
-      utilizationRate: { 'vscode': 0.9, 'github': 0.8, 'docker': 0.6 },
-      learningCurve: { 'vscode': 0.2, 'github': 0.3, 'docker': 0.7 },
-      integrationQuality: { 'vscode': 0.9, 'github': 0.8, 'docker': 0.6 },
-      maintenanceOverhead: { 'vscode': 0.1, 'github': 0.2, 'docker': 0.4 },
-      alternatives: { 'docker': ['podman', 'containerd'] },
-      recommendations: ['Improve Docker knowledge', 'Consider Docker alternatives']
-    };
+    try {
+      const fs = require('fs');
+      const path = require('path');
+
+      // Analyze package.json for tool usage
+      const packageJsonPath = path.join(projectPath, 'package.json');
+      const utilizationRate: Record<string, number> = {};
+      const recommendations: string[] = [];
+
+      if (fs.existsSync(packageJsonPath)) {
+        const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+        const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
+
+        // Estimate utilization based on dependency count
+        const depCount = Object.keys(deps).length;
+        utilizationRate['npm'] = Math.min(depCount / 50, 1.0);
+
+        // Check for common tools
+        if (deps['typescript']) utilizationRate['typescript'] = 0.9;
+        if (deps['jest'] || deps['mocha']) utilizationRate['testing'] = 0.8;
+        if (deps['eslint']) utilizationRate['linting'] = 0.85;
+
+        // Recommendations based on missing tools
+        if (!deps['typescript']) recommendations.push('Consider TypeScript for type safety');
+        if (!deps['jest'] && !deps['mocha']) recommendations.push('Add automated testing framework');
+        if (!deps['eslint']) recommendations.push('Add ESLint for code quality');
+      }
+
+      return {
+        utilizationRate: Object.keys(utilizationRate).length > 0 ? utilizationRate : { 'tools': 0.7 },
+        learningCurve: {}, // Requires team survey - empty
+        integrationQuality: {}, // Requires analysis - empty
+        maintenanceOverhead: {}, // Requires analysis - empty
+        alternatives: {},
+        recommendations: recommendations.length > 0 ? recommendations : ['Tool stack appears complete']
+      };
+    } catch (error) {
+      // File system error - return defaults
+      return {
+        utilizationRate: { 'tools': 0.7 },
+        learningCurve: {},
+        integrationQuality: {},
+        maintenanceOverhead: {},
+        alternatives: {},
+        recommendations: []
+      };
+    }
   }
 
   private async analyzeKnowledgeGaps(projectPath: string): Promise<KnowledgeGapAnalysis> {
-    return {
-      criticalGaps: ['system-architecture', 'performance-optimization'],
-      learningPriorities: ['kubernetes', 'microservices', 'monitoring'],
-      expertiseDistribution: { 'frontend': 0.8, 'backend': 0.6, 'devops': 0.4 },
-      documentationQuality: 0.6,
-      knowledgeTransferRate: 0.5,
-      externalDependencies: ['cloud-provider', 'third-party-apis']
-    };
+    try {
+      const { execSync } = require('child_process');
+
+      // Analyze file ownership concentration
+      const fileOwnership = execSync(
+        'git log --pretty=format:"%an" --name-only | grep -v "^$" | sort | uniq -c | sort -nr | head -20',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim().split('\n').filter(Boolean);
+
+      const criticalGaps: string[] = [];
+      const expertiseDistribution: Record<string, number> = {};
+
+      // Check for single-point-of-failure files (one owner)
+      if (fileOwnership.length > 0 && fileOwnership.length < 5) {
+        criticalGaps.push('knowledge-concentration');
+      }
+
+      // Analyze documentation quality (README, docs/)
+      let docQuality = 0.5;
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        if (fs.existsSync(path.join(projectPath, 'README.md'))) docQuality += 0.2;
+        if (fs.existsSync(path.join(projectPath, 'docs'))) docQuality += 0.2;
+        docQuality = Math.min(docQuality, 1.0);
+      } catch {
+        // File system error
+      }
+
+      // Estimate knowledge transfer rate from collaboration
+      const totalCommits = parseInt(execSync(
+        'git log --since="90 days ago" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 1;
+
+      const coAuthoredCommits = parseInt(execSync(
+        'git log --since="90 days ago" --grep="Co-authored-by" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const knowledgeTransferRate = Math.min(coAuthoredCommits / totalCommits, 1.0);
+
+      if (docQuality < 0.6) criticalGaps.push('insufficient-documentation');
+      if (knowledgeTransferRate < 0.1) criticalGaps.push('poor-knowledge-sharing');
+
+      return {
+        criticalGaps: criticalGaps.length > 0 ? criticalGaps : ['none-identified'],
+        learningPriorities: criticalGaps.map(gap => `improve-${gap}`),
+        expertiseDistribution: expertiseDistribution, // Requires code analysis by domain
+        documentationQuality: docQuality,
+        knowledgeTransferRate,
+        externalDependencies: [] // Requires dependency analysis
+      };
+    } catch (error) {
+      return {
+        criticalGaps: ['analysis-unavailable'],
+        learningPriorities: [],
+        expertiseDistribution: {},
+        documentationQuality: 0.5,
+        knowledgeTransferRate: 0.5,
+        externalDependencies: []
+      };
+    }
   }
 
   private async analyzeCognitiveLoad(projectPath: string): Promise<CognitiveLoadAnalysis> {
-    return {
-      complexityLevel: 0.7,
-      contextSwitching: 0.6,
-      informationOverload: 0.5,
-      multitaskingPenalty: 0.4,
-      focusFragmentation: 0.6,
-      simplificationOpportunities: ['reduce-dependencies', 'extract-services', 'improve-abstractions']
-    };
+    try {
+      const { execSync } = require('child_process');
+      const fs = require('fs');
+      const path = require('path');
+
+      // Analyze dependency count (complexity indicator)
+      let depCount = 0;
+      try {
+        const packageJsonPath = path.join(projectPath, 'package.json');
+        if (fs.existsSync(packageJsonPath)) {
+          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+          depCount = Object.keys({ ...packageJson.dependencies, ...packageJson.devDependencies }).length;
+        }
+      } catch {
+        // No package.json
+      }
+
+      const complexityLevel = Math.min(depCount / 100, 1.0); // 100+ deps = 1.0
+
+      // Analyze branch switching frequency (context switching proxy)
+      const branches = parseInt(execSync(
+        'git branch -a | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const contextSwitching = Math.min(branches / 20, 1.0); // 20+ branches = 1.0
+
+      // Simplification opportunities
+      const simplificationOpportunities: string[] = [];
+      if (depCount > 50) simplificationOpportunities.push('reduce-dependencies');
+      if (branches > 15) simplificationOpportunities.push('consolidate-branches');
+      if (complexityLevel > 0.7) simplificationOpportunities.push('simplify-architecture');
+
+      return {
+        complexityLevel,
+        contextSwitching,
+        informationOverload: complexityLevel * 0.8, // Proxy based on complexity
+        multitaskingPenalty: contextSwitching * 0.7, // Proxy based on branches
+        focusFragmentation: (complexityLevel + contextSwitching) / 2,
+        simplificationOpportunities: simplificationOpportunities.length > 0 ? simplificationOpportunities : ['low-complexity']
+      };
+    } catch (error) {
+      return {
+        complexityLevel: 0.5,
+        contextSwitching: 0.5,
+        informationOverload: 0.5,
+        multitaskingPenalty: 0.5,
+        focusFragmentation: 0.5,
+        simplificationOpportunities: []
+      };
+    }
   }
 
   private async analyzeInnovationIndex(projectPath: string): Promise<InnovationIndexAnalysis> {
-    return {
-      experimentationRate: 0.3,
-      riskTolerance: 0.6,
-      ideaGeneration: 0.7,
-      implementationSpeed: 0.5,
-      learningVelocity: 0.6,
-      adaptabilityScore: 0.7
-    };
+    try {
+      const { execSync } = require('child_process');
+
+      // Analyze experimental branches (feature/, experiment/, prototype/)
+      const experimentalBranches = parseInt(execSync(
+        'git branch -a | grep -E "feature/|experiment/|prototype/" | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const totalBranches = parseInt(execSync(
+        'git branch -a | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 1;
+
+      const experimentationRate = Math.min(experimentalBranches / totalBranches, 1.0);
+
+      // Analyze feature vs fix commit ratio (risk tolerance proxy)
+      const featureCommits = parseInt(execSync(
+        'git log --since="90 days ago" --grep="feat:\\|feature:" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const fixCommits = parseInt(execSync(
+        'git log --since="90 days ago" --grep="fix:\\|bugfix:" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const totalCommits = featureCommits + fixCommits || 1;
+      const riskTolerance = Math.min(featureCommits / totalCommits, 1.0);
+
+      // Analyze commit frequency (implementation speed)
+      const commitsPerDay = parseInt(execSync(
+        'git log --since="30 days ago" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) / 30;
+
+      const implementationSpeed = Math.min(commitsPerDay / 3, 1.0); // 3 commits/day = 1.0
+
+      return {
+        experimentationRate,
+        riskTolerance,
+        ideaGeneration: experimentationRate * 0.8, // Proxy based on experimentation
+        implementationSpeed,
+        learningVelocity: (experimentationRate + implementationSpeed) / 2,
+        adaptabilityScore: (experimentationRate + riskTolerance + implementationSpeed) / 3
+      };
+    } catch (error) {
+      return {
+        experimentationRate: 0.5,
+        riskTolerance: 0.5,
+        ideaGeneration: 0.5,
+        implementationSpeed: 0.5,
+        learningVelocity: 0.5,
+        adaptabilityScore: 0.5
+      };
+    }
   }
 
   private async analyzeCollaborationQuality(projectPath: string): Promise<CollaborationQualityAnalysis> {
-    return {
-      syncVsAsync: 0.3,
-      meetingEfficiency: 0.6,
-      documentationSharing: 0.5,
-      crossFunctionalAlignment: 0.7,
-      feedbackQuality: 0.8,
-      decisionTransparency: 0.6
-    };
+    try {
+      const { execSync } = require('child_process');
+      const fs = require('fs');
+      const path = require('path');
+
+      // Analyze PR review patterns (collaboration proxy)
+      let meetingEfficiency = 0.5;
+      try {
+        const prComments = parseInt(execSync(
+          'gh pr list --state all --limit 100 --json comments --jq ".[].comments | length" | awk \'{sum+=$1} END {print sum}\'',
+          { cwd: projectPath, encoding: 'utf8' }
+        ).trim()) || 0;
+
+        if (prComments > 100) meetingEfficiency = 0.8; // High engagement
+        else if (prComments > 50) meetingEfficiency = 0.6;
+      } catch {
+        // gh not available
+      }
+
+      // Analyze documentation (README, docs/)
+      let documentationSharing = 0.3;
+      if (fs.existsSync(path.join(projectPath, 'README.md'))) documentationSharing += 0.3;
+      if (fs.existsSync(path.join(projectPath, 'docs'))) documentationSharing += 0.3;
+
+      // Analyze commit message quality (feedback proxy)
+      const avgCommitLength = parseInt(execSync(
+        'git log --since="30 days ago" --pretty=format:"%s" | awk \'{sum+=length($0)} END {print int(sum/NR)}\'',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 30;
+
+      const feedbackQuality = Math.min(avgCommitLength / 50, 1.0); // 50+ chars = detailed
+
+      // Analyze co-authored commits (cross-functional alignment)
+      const totalCommits = parseInt(execSync(
+        'git log --since="90 days ago" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 1;
+
+      const coAuthoredCommits = parseInt(execSync(
+        'git log --since="90 days ago" --grep="Co-authored-by" --oneline | wc -l',
+        { cwd: projectPath, encoding: 'utf8' }
+      ).trim()) || 0;
+
+      const crossFunctionalAlignment = Math.min(coAuthoredCommits / totalCommits * 3, 1.0);
+
+      return {
+        syncVsAsync: documentationSharing, // Proxy: more docs = more async
+        meetingEfficiency,
+        documentationSharing,
+        crossFunctionalAlignment,
+        feedbackQuality,
+        decisionTransparency: (feedbackQuality + documentationSharing) / 2
+      };
+    } catch (error) {
+      return {
+        syncVsAsync: 0.5,
+        meetingEfficiency: 0.5,
+        documentationSharing: 0.5,
+        crossFunctionalAlignment: 0.5,
+        feedbackQuality: 0.5,
+        decisionTransparency: 0.5
+      };
+    }
   }
 
   // Solution generation methods
   private async generateConstraintTheorySolutions(bottleneck: BottleneckAnalysis): Promise<BreakthroughSolution[]> {
+    // Generate constraint-specific solution based on bottleneck type and details
+    const constraintName = bottleneck.type.replace(/_/g, ' ').toUpperCase();
+    const primaryRootCause = bottleneck.rootCauses[0]?.description || 'System constraint';
+
+    // Map severity to urgency multiplier
+    const severityMultiplier = bottleneck.severity === 'critical' ? 1.5 :
+                                bottleneck.severity === 'high' ? 1.2 : 1.0;
+
+    // Calculate estimated improvement based on impact metrics
+    const avgImpact = Math.abs(
+      (bottleneck.impact.developmentSpeed +
+       bottleneck.impact.deliveryTimeline +
+       bottleneck.impact.resourceUtilization) / 3
+    );
+
+    const improvementPercentage = Math.round(avgImpact * severityMultiplier);
+
     return [
       {
-        id: `constraint_${Date.now()}`,
-        name: 'Constraint Theory Solution',
+        id: `constraint_${bottleneck.type}_${Date.now()}`,
+        name: `TOC: Eliminate ${constraintName} Constraint`,
         type: SolutionType.CONSTRAINT_REMOVAL,
         approach: SolutionApproach.PROVEN,
-        description: 'Apply Theory of Constraints to identify and eliminate system bottleneck',
+        description: `Apply Theory of Constraints to eliminate ${constraintName} at ${bottleneck.location}. Root cause: ${primaryRootCause}`,
         implementation: {
           phases: [
             {
-              name: 'Constraint Identification',
-              description: 'Identify the system constraint limiting overall performance',
-              duration: 2 * 60 * 60 * 1000,
-              resources: ['senior-developer', 'system-architect'],
-              deliverables: ['constraint-analysis-report'],
-              risks: ['incorrect-identification'],
-              dependencies: ['system-monitoring-data']
+              name: 'Constraint Analysis',
+              description: `Analyze ${constraintName} constraint at ${bottleneck.location}`,
+              duration: bottleneck.estimatedResolutionTime * 0.2, // 20% of total time
+              resources: ['Team lead', 'Domain expert'],
+              deliverables: ['Constraint analysis document', 'Impact quantification'],
+              risks: [`Misidentification of root cause`],
+              dependencies: bottleneck.rootCauses[0]?.dependencies || []
+            },
+            {
+              name: 'Solution Design',
+              description: `Design solution to address: ${primaryRootCause}`,
+              duration: bottleneck.estimatedResolutionTime * 0.3, // 30% of total time
+              resources: ['Architect', 'Senior developers'],
+              deliverables: ['Solution design', 'Implementation plan'],
+              risks: ['Solution complexity', 'Resource availability'],
+              dependencies: ['Constraint analysis complete']
+            },
+            {
+              name: 'Implementation',
+              description: `Execute constraint removal at ${bottleneck.location}`,
+              duration: bottleneck.estimatedResolutionTime * 0.5, // 50% of total time
+              resources: ['Development team'],
+              deliverables: ['Constraint eliminated', 'Metrics improved'],
+              risks: [`Downstream bottleneck creation`],
+              dependencies: ['Solution design approved']
             }
           ],
-          prerequisites: ['system-monitoring', 'performance-baseline'],
+          prerequisites: ['Team alignment', 'Resource allocation'],
           milestones: [
             {
-              name: 'Constraint Identified',
-              description: 'Primary system constraint clearly identified',
-              successCriteria: ['measurable-bottleneck', 'validated-impact'],
-              validationMethod: 'performance-testing',
-              timeframe: 2 * 60 * 60 * 1000
+              name: `${constraintName} Resolved`,
+              description: `${bottleneck.location} constraint eliminated`,
+              successCriteria: bottleneck.rootCauses.map(rc => `${rc.description} resolved`),
+              validationMethod: 'Metric tracking',
+              timeframe: bottleneck.estimatedResolutionTime
             }
           ],
-          rollbackPlan: ['revert-changes', 'restore-baseline'],
-          successMetrics: ['throughput-increase', 'cycle-time-reduction'],
-          monitoringStrategy: 'continuous-performance-monitoring'
+          rollbackPlan: ['Revert changes', 'Monitor for regressions'],
+          successMetrics: [
+            `${improvementPercentage}% improvement in system throughput`,
+            'Development velocity increased',
+            'Team morale improved'
+          ],
+          monitoringStrategy: 'Continuous constraint monitoring (identify next constraint)'
         },
-        constraints: [],
+        constraints: bottleneck.conflictingConstraints.map(c => ({
+          type: 'organizational' as const,
+          description: c,
+          severity: 0.6,
+          flexibility: 0.5,
+          workarounds: ['Apply TRIZ principles', 'Seek paradigm shift']
+        })),
         benefits: [
           {
             category: 'performance',
-            description: 'Significant system throughput improvement',
-            quantification: '30-50% performance increase',
+            description: `Eliminate ${constraintName} improving system throughput`,
+            quantification: `${improvementPercentage}% improvement expected`,
             timeline: 'short_term',
-            confidence: 0.8
+            confidence: bottleneck.rootCauses[0]?.confidence || 0.8
           }
         ],
         risks: [
           {
-            description: 'Solution may create new bottlenecks downstream',
-            probability: 0.3,
-            impact: 0.6,
-            mitigation: ['monitor-downstream-systems', 'gradual-implementation'],
-            contingency: ['rollback-plan', 'alternative-solutions']
+            description: 'Constraint migration: New bottleneck may emerge downstream',
+            probability: 0.4,
+            impact: 0.5,
+            mitigation: ['Monitor all metrics', 'Continuous TOC analysis'],
+            contingency: ['Identify and address next constraint']
           }
         ],
-        confidence: 0.85,
+        confidence: (10 - bottleneck.urgency) / 10, // Higher urgency = lower solution confidence
         novelty: 0.3,
-        elegance: 0.8,
+        elegance: 0.85,
         sustainability: 0.9,
         scalability: 0.8
       }
