@@ -518,7 +518,33 @@ export class PythonAdapter extends BaseLanguageAdapter {
     // Parse pyproject.toml (poetry)
     const pyproject = join(this.rootPath, 'pyproject.toml');
     if (existsSync(pyproject)) {
-      // TODO: Parse TOML file for dependencies
+      try {
+        const toml = require('@iarna/toml');
+        const content = readFileSync(pyproject, 'utf-8');
+        const parsed: any = toml.parse(content);
+
+        // Poetry dependencies
+        if (parsed.tool?.poetry?.dependencies) {
+          Object.keys(parsed.tool.poetry.dependencies).forEach(dep => {
+            if (dep !== 'python') {
+              const version = parsed.tool.poetry.dependencies[dep];
+              deps[dep] = typeof version === 'string' ? version : 'latest';
+            }
+          });
+        }
+
+        // PEP 621 dependencies
+        if (parsed.project?.dependencies && Array.isArray(parsed.project.dependencies)) {
+          parsed.project.dependencies.forEach((dep: string) => {
+            const parts = dep.split('==');
+            const name = parts[0];
+            const version = parts[1] || 'latest';
+            deps[name] = version;
+          });
+        }
+      } catch (error) {
+        console.warn('Failed to parse pyproject.toml:', error);
+      }
     }
 
     return deps;
