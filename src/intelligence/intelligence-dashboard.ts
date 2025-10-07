@@ -88,7 +88,7 @@ export class IntelligenceDashboard {
     this.cachedData = {
       systemOverview: {
         totalAgentsWrapped: agentIntelligenceData.wrappedAgents,
-        learningEnabled: true, // TODO: Get from configuration
+        learningEnabled: process.env.VERSATIL_LEARNING_ENABLED !== 'false', // Default: true, can be disabled via env
         totalInteractions: usageAnalyticsData.totalEvents,
         avgUserSatisfaction: usageAnalyticsData.userSatisfaction,
         systemUptime: now - this.startTime
