@@ -66,6 +66,10 @@ export class IntegratedSecurityOrchestrator extends EventEmitter {
   private versatilHome: string;
   private securityEnabled: boolean = true;
   private monitoringInterval: NodeJS.Timeout | null = null;
+  private blockedProjects: Set<string> = new Set();
+  private networkIsolatedProjects?: Set<string>;
+  private operationalMode: 'normal' | 'emergency' = 'normal';
+  private pausedOperations?: Set<string>;
 
   constructor(frameworkRoot: string) {
     super();
@@ -367,11 +371,23 @@ export class IntegratedSecurityOrchestrator extends EventEmitter {
   }
 
   private blockProjectAccess(incident: SecurityIncident): void {
-    // Implementation would block project operations
     this.logger.warn('Project access blocked due to security incident', {
       incident_id: incident.id,
       project_id: incident.project_id
     });
+
+    // Block project operations
+    if (incident.project_id) {
+      this.blockedProjects.add(incident.project_id);
+
+      // Emit event to notify other systems
+      this.emit('projectAccessBlocked', {
+        projectId: incident.project_id,
+        incidentId: incident.id,
+        severity: incident.severity,
+        timestamp: new Date()
+      });
+    }
   }
 
   private enhanceProjectMonitoring(projectId?: string): void {
@@ -396,15 +412,45 @@ export class IntegratedSecurityOrchestrator extends EventEmitter {
     });
   }
 
-  private backupProjectState(projectId: string): void {
+  private async backupProjectState(projectId: string): Promise<void> {
     try {
       const backupPath = path.join(this.versatilHome, 'security', 'backups', projectId);
       fs.mkdirSync(backupPath, { recursive: true });
 
-      // Implementation would backup project state
+      // Create backup manifest
+      const manifest = {
+        projectId,
+        timestamp: new Date().toISOString(),
+        backupPath,
+        files: [] as string[]
+      };
+
+      // Backup critical project files
+      const projectPath = path.join(this.versatilHome, 'projects', projectId);
+      if (fs.existsSync(projectPath)) {
+        const files = fs.readdirSync(projectPath);
+
+        for (const file of files) {
+          const sourcePath = path.join(projectPath, file);
+          const destPath = path.join(backupPath, file);
+
+          if (fs.statSync(sourcePath).isFile()) {
+            fs.copyFileSync(sourcePath, destPath);
+            manifest.files.push(file);
+          }
+        }
+      }
+
+      // Write manifest
+      fs.writeFileSync(
+        path.join(backupPath, 'manifest.json'),
+        JSON.stringify(manifest, null, 2)
+      );
+
       this.logger.info('Project state backed up for forensic analysis', {
         project_id: projectId,
-        backup_path: backupPath
+        backup_path: backupPath,
+        files_backed_up: manifest.files.length
       });
     } catch (error) {
       this.logger.error('Failed to backup project state', { project_id: projectId, error });
@@ -412,8 +458,28 @@ export class IntegratedSecurityOrchestrator extends EventEmitter {
   }
 
   private isolateNetworkAccess(projectId?: string): void {
-    // Implementation would isolate network access
     this.logger.warn('Network isolation activated', { project_id: projectId });
+
+    if (projectId) {
+      // Add project to network isolation list
+      if (!this.networkIsolatedProjects) {
+        this.networkIsolatedProjects = new Set();
+      }
+      this.networkIsolatedProjects.add(projectId);
+
+      // Emit event to notify network layer
+      this.emit('networkIsolated', {
+        projectId,
+        timestamp: new Date(),
+        restrictions: ['outbound-http', 'outbound-https', 'git-remote']
+      });
+    } else {
+      // Global network isolation
+      this.emit('globalNetworkIsolation', {
+        timestamp: new Date(),
+        level: 'complete'
+      });
+    }
   }
 
   private triggerForensicAnalysis(incident: SecurityIncident): void {
@@ -442,8 +508,26 @@ export class IntegratedSecurityOrchestrator extends EventEmitter {
   }
 
   private pauseNonEssentialOperations(): void {
-    // Implementation would pause non-critical framework operations
     this.logger.warn('Non-essential operations paused due to security emergency');
+
+    // Set operational mode to emergency
+    this.operationalMode = 'emergency';
+
+    // Emit event to notify all orchestrators
+    this.emit('operationsPaused', {
+      mode: 'emergency',
+      timestamp: new Date(),
+      allowedOperations: ['security-scan', 'incident-response', 'logging']
+    });
+
+    // Pause specific operations
+    this.pausedOperations = new Set([
+      'agent-activation',
+      'mcp-execution',
+      'code-generation',
+      'auto-updates',
+      'background-learning'
+    ]);
   }
 
   private preserveEvidence(incident: SecurityIncident): void {
@@ -797,9 +881,35 @@ export class IntegratedSecurityOrchestrator extends EventEmitter {
     };
   }
 
-  private collectSystemLogs(): any[] {
-    // Implementation would collect relevant system logs
-    return [];
+  private async collectSystemLogs(): Promise<any[]> {
+    const logs: any[] = [];
+
+    try {
+      const logsPath = path.join(this.versatilHome, 'logs');
+
+      if (fs.existsSync(logsPath)) {
+        const logFiles = fs.readdirSync(logsPath).filter(f => f.endsWith('.log'));
+
+        for (const logFile of logFiles.slice(-10)) { // Last 10 log files
+          const logPath = path.join(logsPath, logFile);
+          const content = fs.readFileSync(logPath, 'utf-8');
+
+          logs.push({
+            file: logFile,
+            path: logPath,
+            size: fs.statSync(logPath).size,
+            modified: fs.statSync(logPath).mtime,
+            preview: content.split('\n').slice(-50).join('\n') // Last 50 lines
+          });
+        }
+      }
+
+      this.logger.info('System logs collected', { count: logs.length });
+    } catch (error) {
+      this.logger.error('Failed to collect system logs', { error });
+    }
+
+    return logs;
   }
 
   private collectRecentSecurityEvents(): any[] {

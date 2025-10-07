@@ -713,9 +713,6 @@ class EmergencyResponseSystem {
   private async executeCoordinatedFix(context: EmergencyContext, response: EmergencyResponse): Promise<void> {
     console.log('🔧 EXECUTING COORDINATED FIX...');
 
-    // This would coordinate the actual fix execution between agents
-    // For now, we simulate the coordination
-
     response.timeline.push({
       timestamp: new Date(),
       agent: 'Emergency Coordinator',
@@ -724,15 +721,60 @@ class EmergencyResponseSystem {
       details: `Fix coordination started for ${context.type} emergency`
     });
 
-    // Simulate agent collaboration
+    // Real agent collaboration for emergency fixes
     for (const agent of response.activatedAgents) {
-      response.timeline.push({
-        timestamp: new Date(),
-        agent,
-        action: 'Emergency fix contribution',
-        result: 'success',
-        details: `${agent} contributed to emergency fix resolution`
-      });
+      try {
+        // Activate agent with emergency context
+        const agentInstance = await this.getAgentInstance(agent);
+
+        if (agentInstance) {
+          const fixResult = await agentInstance.activate({
+            triggeredBy: 'emergency-response',
+            priority: 'critical',
+            timestamp: new Date().toISOString(),
+            projectPath: process.cwd(),
+            userQuery: `Emergency fix for ${context.type}: ${context.errorMessage}`,
+            filePath: context.affectedFiles?.[0],
+            fileContent: context.stackTrace
+          });
+
+          response.timeline.push({
+            timestamp: new Date(),
+            agent,
+            action: 'Emergency fix contribution',
+            result: fixResult.status === 'error' ? 'failure' : 'success',
+            details: fixResult.message || `${agent} contributed to emergency fix resolution`
+          });
+        }
+      } catch (error) {
+        response.timeline.push({
+          timestamp: new Date(),
+          agent,
+          action: 'Emergency fix contribution',
+          result: 'failure',
+          details: `${agent} failed: ${error instanceof Error ? error.message : String(error)}`
+        });
+      }
+    }
+  }
+
+  private async getAgentInstance(agentName: string): Promise<any> {
+    // Import and return the specific agent
+    try {
+      if (agentName === 'enhanced-maria') {
+        const { EnhancedMaria } = await import('./agents/enhanced-maria.js');
+        return new EnhancedMaria();
+      } else if (agentName === 'enhanced-james') {
+        const { EnhancedJames } = await import('./agents/enhanced-james.js');
+        return new EnhancedJames();
+      } else if (agentName === 'enhanced-marcus') {
+        const { EnhancedMarcus } = await import('./agents/enhanced-marcus.js');
+        return new EnhancedMarcus();
+      }
+      return null;
+    } catch (error) {
+      console.error(`Failed to load agent ${agentName}:`, error);
+      return null;
     }
   }
 
@@ -753,12 +795,58 @@ class EmergencyResponseSystem {
           break;
 
         case 'router_failure':
-          // This would test router functionality with Chrome MCP
-          validationPassed = true; // Placeholder
+          // Test router functionality with real test
+          try {
+            const testResult = await execAsync('npm test -- --testNamePattern="Router" --silent', {
+              timeout: 30000
+            });
+            validationPassed = testResult.stdout.includes('PASS') && !testResult.stderr;
+          } catch (error) {
+            validationPassed = false;
+          }
+          break;
+
+        case 'runtime_error':
+          // Re-run failing tests to validate fix
+          try {
+            const testResult = await execAsync('npm test -- --silent', {
+              timeout: 60000
+            });
+            validationPassed = testResult.stdout.includes('PASS') && !testResult.stderr;
+          } catch (error) {
+            validationPassed = false;
+          }
+          break;
+
+        case 'dependency_conflict':
+          // Validate build and deployment readiness
+          try {
+            const buildResult = await execAsync('npm run build', { timeout: 120000 });
+            validationPassed = !buildResult.stderr && buildResult.stdout.includes('success');
+          } catch (error) {
+            validationPassed = false;
+          }
+          break;
+
+        case 'security_vulnerability':
+          // Run security audit
+          try {
+            const auditResult = await execAsync('npm audit --audit-level=high', { timeout: 30000 });
+            validationPassed = !auditResult.stdout.includes('vulnerabilities');
+          } catch (error) {
+            // npm audit returns non-zero when vulnerabilities found
+            validationPassed = false;
+          }
           break;
 
         default:
-          validationPassed = true; // Placeholder for other types
+          // For unknown types, run basic health check
+          try {
+            const healthCheck = await execAsync('npm run typecheck', { timeout: 60000 });
+            validationPassed = !healthCheck.stderr;
+          } catch (error) {
+            validationPassed = false;
+          }
       }
 
       response.timeline.push({

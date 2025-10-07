@@ -8,6 +8,11 @@ import { VERSATILLogger } from '../utils/logger.js';
 import { vectorMemoryStore } from '../rag/vector-memory-store.js';
 import { MCPAutoDiscoveryAgent, MCPDefinition } from '../agents/mcp/mcp-auto-discovery-agent.js';
 import { environmentScanner } from '../environment/environment-scanner.js';
+import { exaMCPExecutor } from './exa-mcp-executor.js';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 export interface AutoUpdateConfig {
   enabled: boolean;
@@ -154,8 +159,8 @@ export class MCPAutoUpdateSystem extends EventEmitter {
     const searchQueries = this.generateSearchQueries(projectContext);
     
     for (const query of searchQueries) {
-      // Simulate web search (in production, use web_search tool)
-      const results = await this.simulateWebSearch(query);
+      // Real web search using Exa MCP
+      const results = await this.realWebSearch(query);
       
       for (const result of results) {
         // Check if MCP is already known
@@ -242,8 +247,8 @@ export class MCPAutoUpdateSystem extends EventEmitter {
    */
   private async checkSecurityUpdates(): Promise<MCPUpdate[]> {
     const securityUpdates: MCPUpdate[] = [];
-    
-    // Check security advisories (simulated)
+
+    // Check security advisories via npm audit
     const advisories = await this.fetchSecurityAdvisories();
     
     for (const advisory of advisories) {
@@ -460,32 +465,156 @@ export class MCPAutoUpdateSystem extends EventEmitter {
     return queries;
   }
   
-  private async simulateWebSearch(query: string): Promise<MCPDefinition[]> {
-    // In production, this would use the web_search tool
-    // For now, return simulated results based on query
-    
+  private async realWebSearch(query: string): Promise<MCPDefinition[]> {
     const results: MCPDefinition[] = [];
-    
-    if (query.includes('react')) {
-      results.push({
-        id: 'react-performance-mcp',
-        name: 'React Performance MCP',
+
+    try {
+      // Use real Exa MCP for web search
+      const searchResult = await exaMCPExecutor.executeExaMCP('web_search', {
+        query: `${query} Model Context Protocol MCP`,
+        numResults: 5,
+        type: 'auto',
+        includeDomains: ['github.com', 'npmjs.com', 'mcp-registry.dev']
+      });
+
+      if (searchResult.success && searchResult.data?.results) {
+        for (const item of searchResult.data.results) {
+          // Extract MCP information from search results
+          const mcpId = this.extractMCPId(item.url, item.title);
+
+          if (mcpId && !this.isKnownMCP(mcpId)) {
+            // Parse MCP definition from search result
+            const mcpDef = await this.parseMCPFromSearchResult(item, query);
+
+            if (mcpDef) {
+              results.push(mcpDef);
+            }
+          }
+        }
+      }
+
+      this.logger.info(`Web search found ${results.length} new MCPs`, {
+        query,
+        total_results: searchResult.data?.results?.length || 0
+      }, 'mcp-update');
+
+    } catch (error) {
+      this.logger.error('Web search failed', { query, error }, 'mcp-update');
+    }
+
+    return results;
+  }
+
+  /**
+   * Extract MCP ID from URL or title
+   */
+  private extractMCPId(url: string, title: string): string | null {
+    // Extract from npm package URL
+    const npmMatch = url.match(/npmjs\.com\/package\/([^\/\?]+)/);
+    if (npmMatch) return npmMatch[1];
+
+    // Extract from GitHub repo URL
+    const githubMatch = url.match(/github\.com\/[^\/]+\/([^\/\?]+)/);
+    if (githubMatch) return githubMatch[1].replace(/-mcp$/, '');
+
+    // Extract from title
+    const titleMatch = title.match(/([a-z0-9\-]+)-mcp/i);
+    if (titleMatch) return titleMatch[1];
+
+    return null;
+  }
+
+  /**
+   * Parse MCP definition from search result
+   */
+  private async parseMCPFromSearchResult(searchResult: any, originalQuery: string): Promise<MCPDefinition | null> {
+    try {
+      const { url, title, snippet } = searchResult;
+      const mcpId = this.extractMCPId(url, title);
+
+      if (!mcpId) return null;
+
+      // Determine category from query and snippet
+      const category = this.inferCategory(originalQuery, snippet);
+
+      // Extract capabilities from snippet
+      const capabilities = this.extractCapabilities(snippet, title);
+
+      // Build install command
+      const installCommand = url.includes('npmjs.com')
+        ? `npm install ${mcpId}`
+        : `npm install ${mcpId}-mcp`;
+
+      return {
+        id: mcpId,
+        name: title.replace(/\s*-\s*npm.*$/i, '').trim(),
         command: 'npx',
-        args: ['@community/react-performance-mcp'],
-        description: 'Performance monitoring and optimization for React apps',
-        category: 'monitoring',
-        capabilities: ['performance-profiling', 'bundle-analysis', 'render-optimization'],
-        requiredFor: ['react-optimization'],
-        installCommand: 'npm install @community/react-performance-mcp',
+        args: [mcpId],
+        description: snippet,
+        category,
+        capabilities,
+        requiredFor: [originalQuery],
+        installCommand,
         configTemplate: {},
-        documentation: 'https://github.com/community/react-performance-mcp',
-        autoDetectTriggers: ['react', 'performance'],
+        documentation: url,
+        autoDetectTriggers: [mcpId, ...capabilities],
         channel: 'community',
         version: '1.0.0'
-      });
+      };
+
+    } catch (error) {
+      this.logger.error('Failed to parse MCP from search result', { error }, 'mcp-update');
+      return null;
     }
-    
-    return results;
+  }
+
+  /**
+   * Infer MCP category from context
+   */
+  private inferCategory(query: string, snippet: string): string {
+    const text = `${query} ${snippet}`.toLowerCase();
+
+    if (text.includes('test') || text.includes('qa')) return 'testing';
+    if (text.includes('database') || text.includes('sql')) return 'database';
+    if (text.includes('api') || text.includes('rest')) return 'api';
+    if (text.includes('ui') || text.includes('frontend')) return 'ui';
+    if (text.includes('deploy') || text.includes('ci/cd')) return 'deployment';
+    if (text.includes('monitor') || text.includes('observability')) return 'monitoring';
+    if (text.includes('search') || text.includes('data')) return 'data';
+    if (text.includes('ai') || text.includes('ml')) return 'ai-ml';
+
+    return 'utility';
+  }
+
+  /**
+   * Extract capabilities from text
+   */
+  private extractCapabilities(snippet: string, title: string): string[] {
+    const capabilities = new Set<string>();
+    const text = `${snippet} ${title}`.toLowerCase();
+
+    // Common capability patterns
+    const patterns = [
+      /\b(test|testing|qa|quality)\b/,
+      /\b(deploy|deployment|ci\/cd)\b/,
+      /\b(monitor|monitoring|observability)\b/,
+      /\b(search|query|lookup)\b/,
+      /\b(database|db|sql|postgres|mysql)\b/,
+      /\b(api|rest|graphql)\b/,
+      /\b(ui|frontend|react|vue)\b/,
+      /\b(ai|ml|machine learning)\b/,
+      /\b(security|auth|authentication)\b/,
+      /\b(performance|optimization)\b/
+    ];
+
+    for (const pattern of patterns) {
+      const match = text.match(pattern);
+      if (match) {
+        capabilities.add(match[1]);
+      }
+    }
+
+    return Array.from(capabilities);
   }
   
   private identifyMissingCapabilities(context: any): string[] {
@@ -544,12 +673,29 @@ export class MCPAutoUpdateSystem extends EventEmitter {
   }
   
   private async checkNPMVersion(installCommand: string): Promise<string> {
-    // Extract package name from install command
-    const packageName = installCommand.match(/@?[\w\-\/]+$/)?.[0];
-    
-    // In production, query npm registry
-    // For now, return simulated version
-    return '1.2.1';
+    try {
+      // Extract package name from install command
+      const packageName = installCommand.match(/@?[\w\-\/]+$/)?.[0];
+
+      if (!packageName) {
+        return '0.0.0';
+      }
+
+      // Query npm registry for latest version
+      const { stdout } = await execAsync(`npm view ${packageName} version`, {
+        timeout: 5000
+      });
+
+      const version = stdout.trim();
+
+      this.logger.debug(`NPM version check: ${packageName} -> ${version}`, {}, 'mcp-update');
+
+      return version || '0.0.0';
+
+    } catch (error) {
+      this.logger.error('Failed to check npm version', { installCommand, error }, 'mcp-update');
+      return '0.0.0';
+    }
   }
   
   private isNewerVersion(v1: string, v2: string): boolean {
@@ -582,8 +728,42 @@ export class MCPAutoUpdateSystem extends EventEmitter {
   }
   
   private async fetchSecurityAdvisories(): Promise<any[]> {
-    // In production, check security databases
-    return [];
+    const advisories: any[] = [];
+
+    try {
+      // Run npm audit to check for security vulnerabilities
+      const { stdout } = await execAsync('npm audit --json', {
+        cwd: process.cwd(),
+        timeout: 10000
+      }).catch(() => ({ stdout: '{}' })); // npm audit returns non-zero on vulnerabilities
+
+      const auditResult = JSON.parse(stdout);
+
+      if (auditResult.vulnerabilities) {
+        for (const [packageName, vulnData] of Object.entries(auditResult.vulnerabilities)) {
+          const vuln = vulnData as any;
+
+          // Check if this is an MCP package
+          if (packageName.includes('mcp') || packageName.includes('model-context')) {
+            advisories.push({
+              id: `npm-${vuln.via?.[0]?.source || Date.now()}`,
+              mcpId: packageName,
+              severity: vuln.severity as 'low' | 'medium' | 'high' | 'critical',
+              description: vuln.via?.[0]?.title || 'Security vulnerability detected',
+              range: vuln.range,
+              fixAvailable: !!vuln.fixAvailable
+            });
+          }
+        }
+      }
+
+      this.logger.info(`Found ${advisories.length} security advisories for MCPs`, {}, 'mcp-update');
+
+    } catch (error) {
+      this.logger.error('Failed to fetch security advisories', { error }, 'mcp-update');
+    }
+
+    return advisories;
   }
   
   private async getMCPById(id: string): Promise<MCPDefinition> {
@@ -596,8 +776,64 @@ export class MCPAutoUpdateSystem extends EventEmitter {
   }
   
   private async searchMCPRegistry(source: string): Promise<MCPDefinition[]> {
-    // In production, query MCP registries
-    return [];
+    const mcps: MCPDefinition[] = [];
+
+    try {
+      // Use Exa MCP to crawl registry pages
+      const crawlResult = await exaMCPExecutor.executeExaMCP('crawl', { url: source });
+
+      if (crawlResult.success && crawlResult.data?.content) {
+        const content = crawlResult.data.content;
+
+        // Extract MCP package references from content
+        const packageMatches = content.matchAll(/(@[\w\-]+\/)?[\w\-]+-mcp/g);
+
+        for (const match of packageMatches) {
+          const packageName = match[0];
+
+          // Check if already known
+          if (!this.isKnownMCP(packageName)) {
+            // Get package info from npm
+            try {
+              const { stdout } = await execAsync(`npm view ${packageName} --json`, {
+                timeout: 5000
+              });
+
+              const pkgInfo = JSON.parse(stdout);
+
+              // Build MCP definition from npm info
+              mcps.push({
+                id: packageName,
+                name: pkgInfo.name,
+                command: 'npx',
+                args: [packageName],
+                description: pkgInfo.description || 'No description available',
+                category: this.inferCategory('', pkgInfo.description || ''),
+                capabilities: pkgInfo.keywords?.filter((k: string) => k !== 'mcp') || [],
+                requiredFor: [],
+                installCommand: `npm install ${packageName}`,
+                configTemplate: {},
+                documentation: pkgInfo.homepage || pkgInfo.repository?.url || source,
+                autoDetectTriggers: [packageName],
+                channel: 'community',
+                version: pkgInfo.version
+              });
+
+            } catch (error) {
+              // Skip if package not found in npm
+              continue;
+            }
+          }
+        }
+
+        this.logger.info(`Found ${mcps.length} MCPs from registry ${source}`, {}, 'mcp-update');
+      }
+
+    } catch (error) {
+      this.logger.error(`Failed to search MCP registry: ${source}`, { error }, 'mcp-update');
+    }
+
+    return mcps;
   }
   
   private async installNewMCP(mcp: MCPDefinition): Promise<void> {
