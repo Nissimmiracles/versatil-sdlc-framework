@@ -12,6 +12,7 @@ import { AgentRegistry } from '../agents/agent-registry.js';
 import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator.js';
 import { VERSATILLogger } from '../utils/logger.js';
 import { PerformanceMonitor } from '../analytics/performance-monitor.js';
+import { chromeMCPExecutor } from './chrome-mcp-executor.js';
 
 export interface VERSATILMCPConfig {
   name: string;
@@ -315,6 +316,79 @@ export class VERSATILMCPServerV2 {
       }
     );
 
+    // Chrome MCP Tools for Browser Automation Testing
+    this.server.tool(
+      'chrome_navigate',
+      'Navigate to URL using real Chrome browser (Maria-QA)',
+      {
+        url: z.string().url(),
+      },
+      async ({ url }) => {
+        const result = await chromeMCPExecutor.executeChromeMCP('navigate', { url });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
+
+    this.server.tool(
+      'chrome_snapshot',
+      'Capture screenshot and DOM snapshot (Maria-QA)',
+      {},
+      async () => {
+        const result = await chromeMCPExecutor.executeChromeMCP('snapshot');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
+
+    this.server.tool(
+      'chrome_test_component',
+      'Execute automated component tests (Maria-QA)',
+      {
+        component: z.string(),
+      },
+      async ({ component }) => {
+        const result = await chromeMCPExecutor.executeChromeMCP('test_component', { component });
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
+
+    this.server.tool(
+      'chrome_close',
+      'Close Chrome browser session (Maria-QA)',
+      {},
+      async () => {
+        const result = await chromeMCPExecutor.executeChromeMCP('close');
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
+
     this.server.tool(
       'versatil_health_check',
       'Comprehensive framework health check',
@@ -392,7 +466,7 @@ export class VERSATILMCPServerV2 {
       }
     );
 
-    this.config.logger.info('VERSATIL MCP tools registered successfully', { count: 10 });
+    this.config.logger.info('VERSATIL MCP tools registered successfully', { count: 14 });
   }
 
   async start(): Promise<void> {
@@ -401,7 +475,7 @@ export class VERSATILMCPServerV2 {
     this.config.logger.info('VERSATIL MCP Server started', {
       name: this.config.name,
       version: this.config.version,
-      tools: 10,
+      tools: 14,
     });
   }
 

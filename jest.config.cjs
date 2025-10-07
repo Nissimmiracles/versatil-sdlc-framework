@@ -79,15 +79,13 @@ module.exports = {
     '^@/tests/(.*)$': '<rootDir>/tests/$1'
   },
 
-  testTimeout: 15000, // Increased for OPERA methodology
   verbose: process.env.CI ? false : true,
   collectCoverage: process.env.JEST_COVERAGE === 'true',
 
   // Enhanced resource management for hybrid setup
   maxWorkers: process.env.CI ? 1 : '50%',
   logHeapUsage: true,
-  detectOpenHandles: true,
-  forceExit: true,
+  detectOpenHandles: false,  // Disabled to prevent hanging (enable manually for debugging)
 
   // Enhanced coverage thresholds for OPERA compliance
   coverageThreshold: {
@@ -151,8 +149,6 @@ module.exports = {
       ],
       coverageDirectory: '<rootDir>/coverage/stress',
       maxWorkers: process.env.CI ? 1 : '50%',
-      testTimeout: 300000, // 5 minutes for stress tests
-      forceExit: true,
       detectOpenHandles: false
     },
     {
@@ -208,8 +204,6 @@ module.exports = {
       ],
       coverageDirectory: '<rootDir>/coverage/integration',
       maxWorkers: process.env.CI ? 1 : '50%',
-      testTimeout: 35000,  // 35 seconds per test
-      forceExit: true,  // Force Jest to exit after tests complete
       detectOpenHandles: false  // Disable in normal runs (enable manually for debugging)
     }
   ],
