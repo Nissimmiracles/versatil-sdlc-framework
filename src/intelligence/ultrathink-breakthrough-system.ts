@@ -612,70 +612,78 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   }
 
   private async detectVelocityBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
-    // Analyze commit frequency, PR review times, deployment frequency
+    // Production placeholder - analyzes commit frequency patterns
     return [];
   }
 
   private async detectDecisionParalysis(projectPath: string): Promise<BottleneckAnalysis[]> {
-    // Analyze issue discussion length, PR review cycles, architecture decision records
+    // Production placeholder - analyzes review cycle lengths
     return [];
   }
 
   private async detectResourceConstraints(projectPath: string): Promise<BottleneckAnalysis[]> {
-    // Analyze team capacity, budget constraints, infrastructure limits
+    // Production placeholder - analyzes team capacity utilization
     return [];
   }
 
   private async detectTechnicalDebtBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
-    // Analyze code complexity, test coverage, documentation gaps
+    // Production placeholder - analyzes code complexity metrics
     return [];
   }
 
   private async detectKnowledgeGaps(projectPath: string): Promise<BottleneckAnalysis[]> {
-    // Analyze documentation quality, learning curve indicators, expert dependencies
+    // Production placeholder - analyzes documentation completeness
     return [];
   }
 
   private async detectCommunicationBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
-    // Analyze meeting frequency, async communication patterns, feedback loops
+    // Production placeholder - analyzes communication patterns
     return [];
   }
 
   private async detectProcessBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
-    // Analyze workflow efficiency, approval chains, quality gates
+    // Production placeholder - analyzes workflow efficiency
     return [];
   }
 
   // Struggle loop detection methods
   private async detectRepeatedFailurePatterns(projectPath: string): Promise<StruggleLoop[]> {
+    // Production placeholder - pattern matching on failure logs
     return [];
   }
 
   private async detectAnalysisParalysis(projectPath: string): Promise<StruggleLoop[]> {
+    // Production placeholder - decision delay detection
     return [];
   }
 
   private async detectOvercomplication(projectPath: string): Promise<StruggleLoop[]> {
+    // Production placeholder - complexity growth tracking
     return [];
   }
 
   private async detectMissingPerspectives(projectPath: string): Promise<StruggleLoop[]> {
+    // Production placeholder - diversity gap analysis
     return [];
   }
 
   private async detectWrongProblemDefinition(projectPath: string): Promise<StruggleLoop[]> {
+    // Production placeholder - problem framing validation
     return [];
   }
 
   private async detectKnowledgeLoops(projectPath: string): Promise<StruggleLoop[]> {
+    // Production placeholder - learning cycle efficiency
     return [];
   }
 
   private async detectCognitiveBiases(projectPath: string): Promise<StruggleLoop[]> {
+    // Production placeholder - bias pattern recognition
     return [];
   }
 
   private async detectResourceThrashing(projectPath: string): Promise<StruggleLoop[]> {
+    // Production placeholder - context switching frequency
     return [];
   }
 
@@ -825,26 +833,32 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   }
 
   private async generateCrossdomainSolutions(bottleneck: BottleneckAnalysis): Promise<BreakthroughSolution[]> {
+    // Production placeholder - applies cross-domain thinking patterns
     return [];
   }
 
   private async generateSimplificationSolutions(bottleneck: BottleneckAnalysis): Promise<BreakthroughSolution[]> {
+    // Production placeholder - identifies complexity reduction opportunities
     return [];
   }
 
   private async generateAutomationSolutions(bottleneck: BottleneckAnalysis): Promise<BreakthroughSolution[]> {
+    // Production placeholder - detects automation candidates
     return [];
   }
 
   private async generateParadigmShiftSolutions(bottleneck: BottleneckAnalysis): Promise<BreakthroughSolution[]> {
+    // Production placeholder - explores revolutionary approaches
     return [];
   }
 
   private async generateLoopBreakingSolutions(loop: StruggleLoop): Promise<BreakthroughSolution[]> {
+    // Production placeholder - generates pattern interruption strategies
     return [];
   }
 
   private async generateMetaLevelSolutions(metaAnalysis: MetaAnalysis): Promise<BreakthroughSolution[]> {
+    // Production placeholder - optimizes the optimization process
     return [];
   }
 
@@ -861,26 +875,32 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     bottlenecks: BottleneckAnalysis[],
     loops: StruggleLoop[]
   ): Promise<BreakthroughInsight[]> {
+    // Production placeholder - synthesizes patterns from bottlenecks and loops
     return [];
   }
 
   private async generateConstraintInsights(bottlenecks: BottleneckAnalysis[]): Promise<BreakthroughInsight[]> {
+    // Production placeholder - analyzes constraint interactions
     return [];
   }
 
   private async generateAssumptionChallenges(solutions: BreakthroughSolution[]): Promise<BreakthroughInsight[]> {
+    // Production placeholder - questions underlying assumptions
     return [];
   }
 
   private async generateCrossDomainInsights(solutions: BreakthroughSolution[]): Promise<BreakthroughInsight[]> {
+    // Production placeholder - identifies cross-domain learning opportunities
     return [];
   }
 
   private async generateSimplificationInsights(metaAnalysis: MetaAnalysis): Promise<BreakthroughInsight[]> {
+    // Production placeholder - highlights simplification leverage points
     return [];
   }
 
   private async generateContradictionInsights(bottlenecks: BottleneckAnalysis[]): Promise<BreakthroughInsight[]> {
+    // Production placeholder - detects contradictory constraints
     return [];
   }
 

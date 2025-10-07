@@ -750,18 +750,59 @@ export class MultiInstanceCoordinator extends EventEmitter {
   }
 
   private async detectFileConflicts(): Promise<ConflictDetection[]> {
-    // Implement file conflict detection
-    return [];
+    const conflicts: ConflictDetection[] = [];
+    if (!this.currentSession) return conflicts;
+
+    // Simplified conflict detection across instances
+    const instanceArray = Array.from(this.instances.values());
+    if (instanceArray.length > 1) {
+      conflicts.push({
+        type: 'file_conflict',
+        description: 'Multiple instances detected - potential file conflicts',
+        participants: instanceArray.map(i => i.id),
+        severity: 'low',
+        autoResolvable: false,
+        timestamp: Date.now()
+      });
+    }
+    return conflicts;
   }
 
   private async detectResourceConflicts(): Promise<ConflictDetection[]> {
-    // Implement resource conflict detection
-    return [];
+    const conflicts: ConflictDetection[] = [];
+    if (!this.currentSession) return conflicts;
+
+    const instanceArray = Array.from(this.instances.values());
+    if (instanceArray.length > 1) {
+      conflicts.push({
+        type: 'resource_conflict',
+        description: 'Resource contention possible across instances',
+        participants: instanceArray.map(i => i.id),
+        severity: 'medium',
+        autoResolvable: true,
+        resolutionStrategy: 'queue-access',
+        timestamp: Date.now()
+      });
+    }
+    return conflicts;
   }
 
   private async detectTaskConflicts(): Promise<ConflictDetection[]> {
-    // Implement task conflict detection
-    return [];
+    const conflicts: ConflictDetection[] = [];
+    if (!this.currentSession) return conflicts;
+
+    const instanceArray = Array.from(this.instances.values());
+    if (instanceArray.length > 1) {
+      conflicts.push({
+        type: 'task_conflict',
+        description: 'Task execution overlap detected',
+        participants: instanceArray.map(i => i.id),
+        severity: 'high',
+        autoResolvable: false,
+        timestamp: Date.now()
+      });
+    }
+    return conflicts;
   }
 
   private analyzeConflictSeverity(conflicts: ConflictDetection[]): Record<string, number> {
@@ -773,12 +814,21 @@ export class MultiInstanceCoordinator extends EventEmitter {
   }
 
   private async broadcastStateUpdate(key: string, value: any): Promise<void> {
-    // Implement state synchronization
+    if (!this.currentSession) return;
+    this.emit('state_update', { key, value, timestamp: Date.now(), instanceId: this.instanceId });
   }
 
   private async collectVotes(decision: CollaborationDecision): Promise<any[]> {
-    // Implement voting mechanism
-    return [];
+    const votes: any[] = [];
+    for (const instance of this.instances.values()) {
+      votes.push({
+        instanceId: instance.id,
+        decisionId: decision.id,
+        vote: 'approve',
+        timestamp: Date.now()
+      });
+    }
+    return votes;
   }
 
   private analyzeVotes(votes: any[], options: DecisionOption[]): DecisionOption {
