@@ -2741,63 +2741,130 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   }
 
   private async generateCrossdomainSolutions(bottleneck: BottleneckAnalysis): Promise<BreakthroughSolution[]> {
-    // Apply cross-domain thinking based on bottleneck type
-    const crossDomainMappings: Record<string, string> = {
-      'performance': 'Manufacturing lean principles',
-      'development_velocity': 'Sports interval training methods',
-      'technical_debt': 'Financial compound interest management',
-      'process_inefficiency': 'Logistics optimization'
+    const constraintName = bottleneck.type.replace(/_/g, ' ');
+    const primaryRootCause = bottleneck.rootCauses[0]?.description || 'System constraint';
+
+    // Enhanced cross-domain mappings with specific transferable patterns
+    const crossDomainMappings: Record<string, { domain: string; pattern: string; application: string }> = {
+      'performance': {
+        domain: 'Manufacturing (Lean/Toyota Production System)',
+        pattern: 'Eliminate waste, optimize flow, reduce batch sizes',
+        application: 'Identify performance waste → optimize hot paths → reduce transaction sizes'
+      },
+      'development_velocity': {
+        domain: 'Sports Training (Interval Training)',
+        pattern: 'Alternate high-intensity bursts with recovery periods',
+        application: 'Sprint cycles with retrospective recovery → sustainable high velocity'
+      },
+      'technical_debt': {
+        domain: 'Finance (Compound Interest)',
+        pattern: 'Small debts compound exponentially if not paid regularly',
+        application: 'Pay technical debt "interest" continuously → prevent exponential growth'
+      },
+      'process_inefficiency': {
+        domain: 'Logistics (Supply Chain Optimization)',
+        pattern: 'Minimize handoffs, optimize routing, parallel processing',
+        application: 'Reduce approval handoffs → streamline workflows → parallelize where possible'
+      },
+      'decision_paralysis': {
+        domain: 'Military (OODA Loop)',
+        pattern: 'Observe, Orient, Decide, Act faster than opponent',
+        application: 'Time-box decisions → "good enough" over perfect → iterate quickly'
+      },
+      'communication': {
+        domain: 'Aviation (Crew Resource Management)',
+        pattern: 'Structured communication protocols prevent disasters',
+        application: 'Implement standup protocols → clear escalation paths → psychological safety'
+      }
     };
 
-    const domain = crossDomainMappings[bottleneck.type] || 'General systems thinking';
+    const crossDomain = crossDomainMappings[bottleneck.type] || {
+      domain: 'Systems Thinking (General)',
+      pattern: 'Understand interconnections and leverage points',
+      application: 'Map system dependencies → identify leverage points → intervene strategically'
+    };
+
+    // Calculate improvement potential from innovation and deliveryTimeline impacts
+    const innovationPotential = Math.abs(bottleneck.impact.innovation + bottleneck.impact.deliveryTimeline) / 2;
+    const improvementMultiplier = Math.round(3 + (innovationPotential / 20)); // 3x-8x potential
 
     return [{
-      id: `cross-domain-${Date.now()}`,
-      name: `Cross-Domain Approach: ${domain}`,
+      id: `cross-domain-${bottleneck.type}-${Date.now()}`,
+      name: `Cross-Domain: ${crossDomain.domain}`,
       type: SolutionType.PARADIGM_CHANGE,
       approach: SolutionApproach.REVOLUTIONARY,
-      description: `Apply ${domain} to address ${bottleneck.location}`,
+      description: `Apply ${crossDomain.domain} to ${bottleneck.location}. Root cause: ${primaryRootCause}. Pattern: ${crossDomain.pattern}. Application: ${crossDomain.application}`,
       implementation: {
-        phases: [{
-          name: 'Research analogous domain',
-          description: `Study ${domain} and identify transferable patterns`,
-          duration: 3 * 24 * 60 * 60 * 1000,
-          resources: ['Research time', 'Domain experts'],
-          deliverables: ['Pattern analysis'],
-          risks: ['Domain mismatch'],
-          dependencies: []
-        }],
-        prerequisites: ['Open mindset', 'Time for exploration'],
+        phases: [
+          {
+            name: 'Domain Research',
+            description: `Study ${crossDomain.domain} and identify transferable patterns for ${constraintName}`,
+            duration: bottleneck.estimatedResolutionTime * 0.25,
+            resources: ['Domain expert consultant', 'Research time'],
+            deliverables: ['Pattern analysis document', 'Transferability assessment'],
+            risks: ['Domain analogy may not map well to software'],
+            dependencies: bottleneck.rootCauses[0]?.dependencies || []
+          },
+          {
+            name: 'Pattern Adaptation',
+            description: `Adapt pattern: ${crossDomain.pattern} to ${bottleneck.location}`,
+            duration: bottleneck.estimatedResolutionTime * 0.35,
+            resources: ['Innovation team', 'Domain translator'],
+            deliverables: ['Adapted solution design', 'Implementation plan'],
+            risks: ['Over-literalism in applying analogy'],
+            dependencies: ['Domain research complete']
+          },
+          {
+            name: 'Pilot Implementation',
+            description: `Apply ${crossDomain.application} to small scope`,
+            duration: bottleneck.estimatedResolutionTime * 0.4,
+            resources: ['Development team', 'Early adopters'],
+            deliverables: ['Pilot results', 'Lessons learned'],
+            risks: ['Cultural resistance to novel approach'],
+            dependencies: ['Pattern adapted']
+          }
+        ],
+        prerequisites: ['Open mindset', 'Willingness to experiment', 'Budget for exploration'],
         milestones: [{
-          name: 'Pattern identified',
-          description: 'Transferable pattern found',
-          successCriteria: ['Clear analogy'],
-          validationMethod: 'Peer review',
-          timeframe: 7 * 24 * 60 * 60 * 1000
+          name: `${improvementMultiplier}x Improvement Demonstrated`,
+          description: `Cross-domain approach achieves ${improvementMultiplier}x better results than conventional methods`,
+          successCriteria: bottleneck.rootCauses.map(rc => `${rc.description} addressed via cross-domain innovation`),
+          validationMethod: 'Pilot metrics vs baseline comparison',
+          timeframe: bottleneck.estimatedResolutionTime
         }],
-        rollbackPlan: ['Return to conventional approach'],
-        successMetrics: ['Problem resolution', 'Team learning'],
-        monitoringStrategy: 'Experimentation tracking'
+        rollbackPlan: ['Return to conventional approach if pilot fails', 'Document learnings'],
+        successMetrics: [
+          `${improvementMultiplier}x improvement over baseline`,
+          'Novel solution validated',
+          'Team learning from cross-domain thinking'
+        ],
+        monitoringStrategy: 'Pilot experimentation tracking + broader rollout if successful'
       },
-      constraints: [],
+      constraints: bottleneck.conflictingConstraints.map(c => ({
+        type: 'organizational' as const,
+        description: c,
+        severity: 0.6,
+        flexibility: 0.5, // Medium flexibility - novel approaches can navigate constraints differently
+        workarounds: ['Cross-domain analogy may reveal constraint is not fundamental', 'Pattern from other domain may bypass constraint']
+      })),
       benefits: [{
         category: 'innovation',
-        description: 'Novel approach from unexpected source',
-        quantification: 'Potential breakthrough',
+        description: `Novel ${crossDomain.domain} approach to ${constraintName}`,
+        quantification: `${improvementMultiplier}x improvement potential through paradigm shift`,
         timeline: 'medium_term',
-        confidence: 0.6
+        confidence: bottleneck.rootCauses[0]?.confidence || 0.6
       }],
       risks: [{
-        description: 'Domain analogy may not translate',
-        probability: 0.4,
+        description: 'Cross-domain analogy may not translate to software context or team may resist unfamiliar approach',
+        probability: 0.45,
         impact: 0.5,
-        mitigation: ['Rapid prototyping'],
-        contingency: ['Standard solutions available']
+        mitigation: ['Rapid prototyping', 'Involve team in domain research', 'Start with small pilot'],
+        contingency: ['Standard solutions available as fallback', 'Learn from failed experiment']
       }],
-      confidence: 0.7,
-      novelty: 0.9,
-      elegance: 0.7,
-      sustainability: 0.8,
+      confidence: 0.65 + (bottleneck.rootCauses[0]?.confidence || 0) * 0.15, // Boost confidence if root cause well understood
+      novelty: 0.95,
+      elegance: 0.75,
+      sustainability: 0.75,
       scalability: 0.7
     }];
   }
