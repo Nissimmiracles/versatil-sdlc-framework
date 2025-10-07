@@ -570,11 +570,148 @@ export class AgenticRAGOrchestrator extends EventEmitter {
   private async getN8NWorkflows(): Promise<Workflow[]> { return []; }
   private async getN8NCredentials(): Promise<string[]> { return []; }
   private async getRecentExecutions(): Promise<Execution[]> { return []; }
-  private async getShadcnComponents(): Promise<ShadcnComponent[]> { return []; }
-  private async getThemeConfig(): Promise<ThemeConfig> { return { colors: {}, fonts: {} }; }
-  private async getAppRoutes(): Promise<AppRoute[]> { return []; }
-  private async getPlaywrightTests(): Promise<PlaywrightTest[]> { return []; }
-  private async getCoverageReport(): Promise<CoverageReport> { return { total: 0, covered: 0 }; }
+  private async getShadcnComponents(): Promise<ShadcnComponent[]> {
+    const { promises: fs } = await import('fs');
+    const { join } = await import('path');
+
+    try {
+      const componentsPath = join(process.cwd(), 'components', 'ui');
+      const files = await fs.readdir(componentsPath).catch(() => []);
+
+      return files
+        .filter(f => f.endsWith('.tsx') || f.endsWith('.ts'))
+        .map(f => ({
+          name: f.replace(/\.(tsx?|jsx?)$/, ''),
+          path: join(componentsPath, f),
+          props: {} // Will be populated from component analysis
+        } as ShadcnComponent));
+    } catch (error) {
+      return [];
+    }
+  }
+
+  private async getThemeConfig(): Promise<ThemeConfig> {
+    const { promises: fs } = await import('fs');
+    const { join } = await import('path');
+
+    try {
+      const tailwindPath = join(process.cwd(), 'tailwind.config.js');
+      const content = await fs.readFile(tailwindPath, 'utf-8');
+
+      // Simple extraction of theme colors and fonts
+      const colors: Record<string, any> = {};
+      const fonts: Record<string, any> = {};
+
+      // Extract colors from config
+      const colorMatch = content.match(/colors:\s*{([^}]+)}/);
+      if (colorMatch) {
+        const colorLines = colorMatch[1].split(',');
+        for (const line of colorLines) {
+          const [key, value] = line.split(':').map(s => s.trim());
+          if (key && value) {
+            colors[key.replace(/['"]/g, '')] = value.replace(/['"]/g, '');
+          }
+        }
+      }
+
+      // Extract fonts from config
+      const fontMatch = content.match(/fontFamily:\s*{([^}]+)}/);
+      if (fontMatch) {
+        const fontLines = fontMatch[1].split(',');
+        for (const line of fontLines) {
+          const [key, value] = line.split(':').map(s => s.trim());
+          if (key && value) {
+            fonts[key.replace(/['"]/g, '')] = value.replace(/['"]/g, '');
+          }
+        }
+      }
+
+      return { colors, fonts };
+    } catch (error) {
+      return { colors: {}, fonts: {} };
+    }
+  }
+
+  private async getAppRoutes(): Promise<AppRoute[]> {
+    const { promises: fs } = await import('fs');
+    const { join } = await import('path');
+    const { exec } = await import('child_process');
+    const { promisify } = await import('util');
+    const execAsync = promisify(exec);
+
+    try {
+      // Find route files (Next.js app router or pages)
+      const { stdout } = await execAsync(
+        `find ${process.cwd()} -type f \\( -name "page.tsx" -o -name "route.ts" -o -path "*/pages/*.tsx" \\) 2>/dev/null`,
+        { timeout: 10000 }
+      );
+
+      const files = stdout.trim().split('\n').filter(Boolean);
+
+      return files.map(filePath => ({
+        path: filePath.replace(process.cwd(), ''),
+        component: filePath.split('/').pop() || ''
+      } as AppRoute));
+    } catch (error) {
+      return [];
+    }
+  }
+
+  private async getPlaywrightTests(): Promise<PlaywrightTest[]> {
+    const { promises: fs } = await import('fs');
+    const { join } = await import('path');
+
+    try {
+      const testsPath = join(process.cwd(), 'tests');
+      const e2ePath = join(process.cwd(), 'e2e');
+
+      // Check both common test directories
+      const testFiles: string[] = [];
+
+      for (const dir of [testsPath, e2ePath]) {
+        try {
+          const files = await fs.readdir(dir, { recursive: true });
+          for (const file of files as string[]) {
+            if (file.endsWith('.spec.ts') || file.endsWith('.test.ts')) {
+              testFiles.push(join(dir, file));
+            }
+          }
+        } catch {
+          // Directory doesn't exist, skip
+        }
+      }
+
+      return testFiles.map(filePath => ({
+        name: filePath.split('/').pop()?.replace(/\.(spec|test)\.ts$/, '') || '',
+        path: filePath,
+        status: 'pending'
+      } as PlaywrightTest));
+    } catch (error) {
+      return [];
+    }
+  }
+
+  private async getCoverageReport(): Promise<CoverageReport> {
+    const { promises: fs } = await import('fs');
+    const { join } = await import('path');
+
+    try {
+      const coveragePath = join(process.cwd(), 'coverage', 'coverage-summary.json');
+      const content = await fs.readFile(coveragePath, 'utf-8');
+      const data = JSON.parse(content);
+
+      if (data.total) {
+        return {
+          total: data.total.lines.total || 0,
+          covered: data.total.lines.covered || 0
+        };
+      }
+
+      return { total: 0, covered: 0 };
+    } catch (error) {
+      return { total: 0, covered: 0 };
+    }
+  }
   private async getCurrentPlan(): Promise<any> { return {}; }
   private async calculateProgress(): Promise<number> { return 0; }
   private async identifyBlockers(): Promise<Blocker[]> { return []; }
