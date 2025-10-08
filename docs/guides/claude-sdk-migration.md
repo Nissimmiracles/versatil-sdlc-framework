@@ -382,6 +382,91 @@ const result = query({
 **Migration Action Required:**
 If you were relying on Claude Code's default system prompt, you must now explicitly set it using the preset option.
 
+#### Settings Loading Behavior Change
+
+**Before (v0.0.x):**
+- Loaded all settings automatically from multiple sources
+```typescript
+// Automatically loaded from:
+// - ~/.claude/settings.json (user)
+// - .claude/settings.json (project)
+// - .claude/settings.local.json (local)
+// - CLAUDE.md files
+// - Custom slash commands
+const result = query({ prompt: "Hello" });
+```
+
+**After (v0.1.0+):**
+- **No settings loaded by default**
+- Must explicitly specify setting sources:
+
+```typescript
+// To get the old behavior (load all settings):
+const result = query({
+  prompt: "Hello",
+  options: {
+    settingSources: ["user", "project", "local"]
+  }
+});
+
+// Or load only specific sources:
+const result = query({
+  prompt: "Hello",
+  options: {
+    settingSources: ["project"]  // Only project settings
+  }
+});
+```
+
+**Migration Action Required:**
+If you were relying on automatic settings loading (CLAUDE.md, slash commands, etc.), you must now explicitly set `settingSources` option.
+
+### Python v0.0.x → v0.1.0+
+
+#### Settings Loading Behavior Change
+
+**Before (v0.0.x):**
+- Loaded all settings automatically from multiple sources
+```python
+# Automatically loaded from:
+# - ~/.claude/settings.json (user)
+# - .claude/settings.json (project)
+# - .claude/settings.local.json (local)
+# - CLAUDE.md files
+# - Custom slash commands
+async for message in query(prompt="Hello"):
+    print(message)
+```
+
+**After (v0.1.0+):**
+- **No settings loaded by default**
+- Must explicitly specify setting sources:
+
+```python
+# To get the old behavior (load all settings):
+from claude_agent_sdk import query, ClaudeAgentOptions
+
+async for message in query(
+    prompt="Hello",
+    options=ClaudeAgentOptions(
+        setting_sources=["user", "project", "local"]
+    )
+):
+    print(message)
+
+# Or load only specific sources:
+async for message in query(
+    prompt="Hello",
+    options=ClaudeAgentOptions(
+        setting_sources=["project"]  # Only project settings
+    )
+):
+    print(message)
+```
+
+**Migration Action Required:**
+If you were relying on automatic settings loading in Python, you must now explicitly set `setting_sources` in `ClaudeAgentOptions`.
+
 ---
 
 ## Verification Checklist
