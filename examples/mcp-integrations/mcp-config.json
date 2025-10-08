@@ -1,0 +1,41 @@
+{
+  "$schema": "./mcp-config.schema.json",
+  "description": "Community MCP Health Monitoring Configuration",
+  "mcpServers": {
+    "antd-components": {
+      "package": "@jzone-mcp/antd-components-mcp",
+      "timeout": 10000,
+      "testCommands": ["--version"],
+      "criticalityLevel": "medium",
+      "description": "Ant Design v5.27.4 component documentation"
+    }
+  },
+  "checkInterval": 300000,
+  "logFile": "logs/mcp-health.log",
+  "alertThreshold": 3,
+  "comments": {
+    "mcpServers": "Add your community MCP servers here",
+    "timeout": "Timeout in milliseconds (10000 = 10 seconds)",
+    "testCommands": "Commands to test server availability",
+    "criticalityLevel": "low | medium | high - determines alert urgency",
+    "checkInterval": "Interval between health checks in milliseconds (300000 = 5 minutes)",
+    "alertThreshold": "Number of consecutive failures before alerting"
+  },
+  "examples": {
+    "material-ui": {
+      "package": "@example/mui-components-mcp",
+      "timeout": 10000,
+      "criticalityLevel": "medium"
+    },
+    "chakra-ui": {
+      "package": "@example/chakra-components-mcp",
+      "timeout": 10000,
+      "criticalityLevel": "low"
+    },
+    "tailwind": {
+      "package": "@example/tailwind-mcp",
+      "timeout": 10000,
+      "criticalityLevel": "low"
+    }
+  }
+}
