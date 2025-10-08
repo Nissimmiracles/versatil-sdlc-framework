@@ -8,7 +8,16 @@ on:
   workflow_dispatch:
 
 jobs:
+  # Pre-test MCP servers before running main tests
+  # Implements "Pre-Test All MCP Servers" rule from CLAUDE.md
+  mcp-health:
+    name: MCP Health Check
+    uses: ./.github/workflows/mcp-health-check.yml
+    with:
+      mcp-servers: 'chrome,github'
+
   test:
+    needs: mcp-health
     name: Test on ${{ matrix.os }} with Node ${{ matrix.node }}
     runs-on: ${{ matrix.os }}
 

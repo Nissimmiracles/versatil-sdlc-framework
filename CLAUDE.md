@@ -526,11 +526,88 @@ Backwards_Compatibility:
 
 ---
 
-**Framework Version**: 2.0.0
+## 🚀 Workflow Automation Rules
+
+### Rule: Auto-Approve Planned Tools
+
+When Claude presents an execution plan with specific tools, **automatically approve** all tools listed in the plan. This eliminates manual approval friction and speeds up development workflow.
+
+**Auto-Approve When Plan Includes**:
+- Specific tool names (Read, Write, Edit, Bash, Grep, etc.)
+- Clear task breakdown with tool usage
+- Tool-based implementation steps
+
+**Applies To**:
+- ✅ File operations (Read, Write, Edit, Glob, Grep)
+- ✅ Code execution (Bash, npm commands, git commands)
+- ✅ Analysis tools (Agent tools, MCP tools)
+- ✅ Testing tools (Jest, Playwright, test runners)
+
+**Exceptions (Manual Approval Required)**:
+- ⚠️ Destructive operations (rm -rf, git reset --hard, DROP DATABASE)
+- ⚠️ Production deployments (npm publish, git push --force to main)
+- ⚠️ Credential modifications (.env changes, API key updates)
+
+### Rule: Pre-Test All MCP Servers
+
+**BEFORE** using any MCP server in a workflow, **ALWAYS** verify it's functional. This prevents workflow interruptions from broken MCP integrations.
+
+**MCP Pre-Testing Protocol**:
+
+1. **Test MCP Server Health**:
+   - Check if MCP server process is running
+   - Verify MCP server responds to health check
+   - Validate configuration is correct
+   - Confirm required environment variables are set
+
+2. **MCP Servers to Test**:
+   - Chrome MCP (Playwright) - Browser automation
+   - GitHub MCP - Repository access
+   - Vertex AI MCP - Google Cloud AI
+   - Supabase MCP - Database connection
+   - n8n MCP - Workflow automation
+   - Semgrep MCP - Security scanning
+   - Sentry MCP - Error monitoring
+   - Exa Search MCP - Search API
+
+3. **Test Commands**:
+   ```bash
+   # Chrome MCP - Test browser automation
+   chrome_navigate to example.com
+
+   # GitHub MCP - Test repository access
+   Fetch repository metadata
+
+   # General MCP Health
+   versatil-mcp --health-check
+   ```
+
+4. **Failure Handling**:
+   - If MCP test fails → Report specific error to user
+   - If MCP unavailable → Suggest alternative approach
+   - If config issue → Provide fix instructions
+   - **Never proceed with broken MCP** - always notify user first
+
+5. **Before Critical Operations**:
+   - Frontend testing → Test Chrome MCP first
+   - GitHub operations → Test GitHub MCP first
+   - AI/ML tasks → Test Vertex AI MCP first
+   - Search operations → Test Exa MCP first
+
+**Benefits**:
+- ✅ Prevents mid-workflow MCP failures
+- ✅ Early warning of configuration issues
+- ✅ Reliable automation execution
+- ✅ Reduced user frustration
+
+---
+
+**Framework Version**: 5.1.0
 **Optimization**: Reduced from 42.3k to ~18k characters (57% reduction)
 **Cursor Compatibility**: ✅ Fully Optimized
 **Proactive Intelligence**: ✅ Enabled
-**Last Updated**: 2025-09-30
+**Chrome MCP**: ✅ Integrated (v5.1.0)
+**Last Updated**: 2025-10-08
 **Maintained By**: VERSATIL Development Team
 
 ---

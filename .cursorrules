@@ -880,3 +880,89 @@ Try these:
 - Trust Opera's autonomy - it gets smarter
 - Check memories before implementing: @memory <topic>
 - Use @introspect if something seems wrong
+
+# =====================================
+# 🚀 WORKFLOW AUTOMATION RULES
+# =====================================
+
+## RULE: Auto-Approve Planned Tools
+# When Claude/AI presents a plan with specific tools, automatically approve all tools listed in the plan
+# This eliminates manual approval friction and speeds up development workflow
+
+auto_approve_tools: |
+  When an AI assistant (Claude, Cursor AI, etc.) presents an execution plan that includes:
+  - Specific tool names (Read, Write, Edit, Bash, Grep, etc.)
+  - Clear task breakdown with tool usage
+  - Tool-based implementation steps
+
+  AUTOMATICALLY APPROVE all tools mentioned in the plan without requiring additional user confirmation.
+
+  Examples:
+  - Plan mentions "Use Read tool to check file" → Auto-approve Read
+  - Plan mentions "Use Edit tool to update configuration" → Auto-approve Edit
+  - Plan mentions "Use Bash to run tests" → Auto-approve Bash
+
+  This applies to:
+  ✅ File operations (Read, Write, Edit, Glob, Grep)
+  ✅ Code execution (Bash, npm commands, git commands)
+  ✅ Analysis tools (Agent tools, MCP tools)
+  ✅ Testing tools (Jest, Playwright, test runners)
+
+  Exceptions (require manual approval):
+  ⚠️ Destructive operations (rm -rf, git reset --hard, DROP DATABASE)
+  ⚠️ Production deployments (npm publish, git push --force to main)
+  ⚠️ Credential modifications (.env changes, API key updates)
+
+## RULE: Pre-Test All MCP Servers
+# Before using any MCP server, verify it's functional and responding correctly
+# This prevents workflow interruptions from broken MCP integrations
+
+mcp_pre_testing_protocol: |
+  BEFORE using any MCP server in a workflow, ALWAYS:
+
+  1. TEST MCP SERVER HEALTH:
+     - Check if MCP server process is running
+     - Verify MCP server responds to health check
+     - Validate MCP server configuration is correct
+     - Confirm required environment variables are set
+
+  2. MCP SERVERS TO TEST:
+     - Chrome MCP (Playwright): Check browser automation availability
+     - GitHub MCP: Verify API token and repository access
+     - Vertex AI MCP: Confirm Google Cloud credentials
+     - Supabase MCP: Validate database connection
+     - n8n MCP: Check workflow automation service
+     - Semgrep MCP: Verify security scanner availability
+     - Sentry MCP: Confirm error monitoring connection
+     - Exa Search MCP: Test search API access
+
+  3. TEST COMMANDS:
+     # Chrome MCP
+     - Test: Try chrome_navigate to a simple URL (e.g., example.com)
+     - Verify: Browser launches and page loads successfully
+
+     # GitHub MCP
+     - Test: Try fetching repository metadata
+     - Verify: API responds with valid data
+
+     # General MCP Health
+     - Run: versatil-mcp --health-check
+     - Verify: All registered MCPs report "healthy" status
+
+  4. FAILURE HANDLING:
+     - If MCP test fails: Report specific error to user
+     - If MCP unavailable: Suggest alternative approach or manual steps
+     - If MCP config issue: Provide configuration fix instructions
+     - Never proceed with broken MCP - always notify user first
+
+  5. BEFORE CRITICAL OPERATIONS:
+     - Frontend testing → Test Chrome MCP first
+     - GitHub operations → Test GitHub MCP first
+     - AI/ML tasks → Test Vertex AI MCP first
+     - Search operations → Test Exa MCP first
+
+  Benefits:
+  ✅ Prevents mid-workflow MCP failures
+  ✅ Provides early warning of configuration issues
+  ✅ Ensures reliable automation execution
+  ✅ Reduces user frustration from broken integrations
