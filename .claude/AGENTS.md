@@ -99,6 +99,38 @@ Collaboration_Patterns:
   - Partners with Maria-QA for UI testing strategies
   - Aligns with Alex-BA on user experience requirements
   - Reports to Sarah-PM on frontend progress
+
+James_SubAgents:
+  # James has 4 specialized sub-agents for complex frontend work
+
+  1. Autonomous Accessibility Guardian:
+     - File: src/agents/james-frontend/autonomous-accessibility-guardian.ts
+     - Focus: WCAG 2.1 AA/AAA compliance automation
+     - Auto-detects and fixes accessibility violations
+     - Generates ARIA labels, keyboard navigation, screen reader support
+
+  2. Design Implementation Engine:
+     - File: src/agents/james-frontend/design-implementation-engine.ts
+     - Focus: Design system consistency
+     - Converts Figma/Sketch to code
+     - Enforces design tokens and component patterns
+
+  3. Intelligent Performance Optimizer:
+     - File: src/agents/james-frontend/intelligent-performance-optimizer.ts
+     - Focus: Core Web Vitals optimization
+     - Bundle size reduction, code splitting
+     - Image optimization, lazy loading
+     - Real-time performance monitoring
+
+  4. Smart Component Orchestrator:
+     - File: src/agents/james-frontend/smart-component-orchestrator.ts
+     - Focus: Component architecture and state management
+     - Props optimization, component composition
+     - State management patterns (Redux, Context, Zustand)
+     - Component library integration
+
+  Note: These sub-agents activate automatically when James-Frontend
+        detects complex frontend work that requires specialized expertise.
 ```
 
 ---
