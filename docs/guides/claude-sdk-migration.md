@@ -1,45 +1,93 @@
 # Claude SDK Migration Guide
 
-**Migration from `@anthropic-ai/claude-code` to `@anthropic-ai/claude-agent-sdk`**
+**Migration from `claude-code` to `claude-agent-sdk`**
 
 ---
 
 ## Overview
 
-The Claude SDK package has been renamed from `@anthropic-ai/claude-code` to `@anthropic-ai/claude-agent-sdk`. This guide helps you migrate your code to use the new package.
+The Claude SDK has undergone a package rename and version upgrade:
+
+### JavaScript/TypeScript
+- **Old**: `@anthropic-ai/claude-code` (deprecated)
+- **New**: `@anthropic-ai/claude-agent-sdk` (v0.1.10+)
+
+### Python
+- **Old Package**: `claude-code-sdk` (deprecated)
+- **New Package**: `claude-agent-sdk` (v0.1.1+)
+- **Version Change**: v0.0.x → v0.1.0+ (includes class name changes)
+
+This guide helps you migrate your code to use the new packages and APIs.
 
 ---
 
 ## Installation
 
-### Remove Old Package (if installed)
+### JavaScript/TypeScript (Node.js)
+
+#### Remove Old Package (if installed)
 ```bash
 npm uninstall @anthropic-ai/claude-code
 ```
 
-### Install New Package
+#### Install New Package
 ```bash
 npm install @anthropic-ai/claude-agent-sdk
 ```
 
 **Current Version in VERSATIL**: `@anthropic-ai/claude-agent-sdk@0.1.10` ✅
 
+### Python
+
+#### Remove Old Package (if installed)
+```bash
+pip uninstall claude-code-sdk
+```
+
+#### Install New Package
+```bash
+# Activate virtual environment first
+source .venv-python/bin/activate
+
+# Install package
+pip install claude-agent-sdk
+
+# Or from requirements.txt
+pip install -r requirements.txt
+```
+
+**Current Version in VERSATIL**: `claude-agent-sdk==0.1.1` ✅
+
 ---
 
 ## Import Statement Migration
 
-### Before (Old Package)
+### JavaScript/TypeScript
+
+#### Before (Old Package)
 ```typescript
 import { query, tool, createSdkMcpServer } from "@anthropic-ai/claude-code";
 ```
 
-### After (New Package)
+#### After (New Package)
 ```typescript
 import {
   query,
   tool,
   createSdkMcpServer,
 } from "@anthropic-ai/claude-agent-sdk";
+```
+
+### Python
+
+#### Before (Old Package)
+```python
+from claude_code_sdk import query, ClaudeCodeOptions
+```
+
+#### After (New Package)
+```python
+from claude_agent_sdk import query, ClaudeAgentOptions
 ```
 
 ---
@@ -209,6 +257,40 @@ server.start();
 
 ---
 
+### Python Options Migration
+
+**Before:**
+```python
+from claude_code_sdk import query, ClaudeCodeOptions
+
+options = ClaudeCodeOptions(
+    model="claude-sonnet-4-5"
+)
+
+result = await query(
+    prompt="Analyze this code",
+    options=options
+)
+```
+
+**After:**
+```python
+from claude_agent_sdk import query, ClaudeAgentOptions
+
+options = ClaudeAgentOptions(
+    model="claude-sonnet-4-5"
+)
+
+result = await query(
+    prompt="Analyze this code",
+    options=options
+)
+```
+
+*Note: Only the import and class name changed, the API is identical*
+
+---
+
 ## TypeScript Types
 
 All TypeScript types remain the same:
@@ -222,11 +304,83 @@ import type {
 } from "@anthropic-ai/claude-agent-sdk";
 ```
 
+## Python Types
+
+All Python types remain the same:
+
+```python
+from claude_agent_sdk import (
+    ClaudeAgentOptions,
+    QueryResult,
+    ToolDefinition,
+    AgentContext,
+)
+```
+
 ---
 
 ## Breaking Changes
 
-**None!** The migration is a simple package rename with no API changes.
+### Python v0.0.x → v0.1.0+
+
+#### Class Name Change
+- `ClaudeCodeOptions` → `ClaudeAgentOptions`
+
+**Before (v0.0.x):**
+```python
+from claude_agent_sdk import query, ClaudeCodeOptions
+
+options = ClaudeCodeOptions(
+    model="claude-sonnet-4-5",
+    permission_mode="acceptEdits"
+)
+```
+
+**After (v0.1.0+):**
+```python
+from claude_agent_sdk import query, ClaudeAgentOptions
+
+options = ClaudeAgentOptions(
+    model="claude-sonnet-4-5",
+    permission_mode="acceptEdits"
+)
+```
+
+### JavaScript/TypeScript v0.0.x → v0.1.0+
+
+#### System Prompt Behavior Change
+
+**Before (v0.0.x):**
+- Used Claude Code's system prompt by default
+```typescript
+// Automatically used Claude Code preset
+const result = query({ prompt: "Hello" });
+```
+
+**After (v0.1.0+):**
+- Uses **empty system prompt by default**
+- Must explicitly request Claude Code preset:
+
+```typescript
+// To get the old behavior, explicitly request Claude Code's preset:
+const result = query({
+  prompt: "Hello",
+  options: {
+    systemPrompt: { type: "preset", preset: "claude_code" }
+  }
+});
+
+// Or use a custom system prompt:
+const result = query({
+  prompt: "Hello",
+  options: {
+    systemPrompt: "You are a helpful coding assistant"
+  }
+});
+```
+
+**Migration Action Required:**
+If you were relying on Claude Code's default system prompt, you must now explicitly set it using the preset option.
 
 ---
 
