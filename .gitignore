@@ -159,3 +159,4 @@ vulnerability-reports/
 artifacts/
 .github/workflows/artifacts/.versatil/
 versatil/
+.venv-python/
