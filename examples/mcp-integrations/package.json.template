@@ -1,0 +1,13 @@
+{
+  "name": "your-project",
+  "version": "1.0.0",
+  "description": "Add these scripts to your project's package.json",
+  "scripts": {
+    "mcp:health": "node ../../tools/mcp/community-mcp-health-monitor.cjs",
+    "mcp:watch": "node ../../tools/mcp/community-mcp-health-monitor.cjs --watch",
+    "mcp:config": "node ../../tools/mcp/community-mcp-health-monitor.cjs --config mcp-config.json"
+  },
+  "devDependencies": {
+    "Note": "No additional dependencies needed - uses Node.js built-ins"
+  }
+}
