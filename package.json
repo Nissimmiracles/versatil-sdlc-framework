@@ -1,6 +1,6 @@
 {
   "name": "@versatil/sdlc-framework",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "type": "module",
   "description": "🚀 AI-Native SDLC framework with 11-MCP ecosystem, RAG memory, OPERA orchestration, and 6 specialized agents achieving ZERO CONTEXT LOSS. Features complete CI/CD pipeline with 7 GitHub workflows (MCP testing, security scanning, performance benchmarking), 3-phase MCP integration (Core, AI/ML, Automation), intelligent agent orchestration, self-learning capabilities, autonomous execution, 85%+ test coverage, and enterprise security.",
   "main": "dist/index.js",

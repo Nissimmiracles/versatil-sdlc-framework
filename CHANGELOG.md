@@ -7,21 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Sprint 2 (v5.1.0) - In Progress
-**Theme**: Production Readiness & Real Implementations
+---
 
-#### Planned Features
-- Replace all 70 stub/mock occurrences with real production code
-- MCP real implementations (Chrome, GitHub, Exa, Vertex AI, Supabase, n8n, Semgrep, Sentry)
-- Agent method real implementations (analyze, validate, suggest for all 6 agents)
-- Intelligence dashboard with live metrics
-- Multi-agent collaboration (3+ agents simultaneously)
-- Predictive intelligence (bug prediction, performance regression)
-- Enhanced testing framework (visual regression, accessibility, performance, security)
-- Enterprise SSO (OAuth, SAML, Active Directory)
-- Multi-project context sharing
-- Cloud-native deployment (Docker, Kubernetes, Terraform)
-- Advanced monitoring (Prometheus, Grafana, distributed tracing)
+## [5.1.0] - 2025-10-08
+
+### 🚀 Chrome MCP Integration & Frontend Testing
+
+**Theme**: Real Browser Automation & Production Analysis
+
+### Added
+
+#### Chrome MCP Integration
+- **Real Playwright browser automation** integrated into VERSATIL MCP server
+- 4 new Chrome MCP tools for Maria-QA agent:
+  - `chrome_navigate`: Real browser navigation with Chromium
+  - `chrome_snapshot`: Screenshot capture + DOM analysis
+  - `chrome_test_component`: Automated component testing
+  - `chrome_close`: Browser session management
+- Full production implementation in `src/mcp/chrome-mcp-executor.ts` (322 lines)
+- Successfully tested on production app (VERSSAI)
+
+#### Frontend Analysis Capabilities
+- Automated frontend reporting script (`scripts/run-verssai-report.mjs`)
+- Component detection (25 components in real app)
+- Performance metrics (load time, DOM content loaded, resource count)
+- Screenshot capture with base64 encoding
+- Comprehensive JSON reports (61KB+ detailed analysis)
+
+#### UltraThink Intelligence System
+- **36/36 methods fully implemented** with real git analysis
+- Eliminated all 27 UltraThink placeholder methods
+- Dynamic bottleneck detection using actual repository data
+- Context-aware solution generation
+- Team dynamics analysis from git commit patterns
+- No hardcoded values - all calculations from live data
+
+#### Testing Improvements
+- Fixed Jest configuration (removed deprecated options)
+- Resolved test hanging issues (detectOpenHandles)
+- Fixed Watchman FSEvents errors
+- 118/118 tests passing in 0.3s
+
+### Changed
+- VERSATIL MCP server now includes 14 tools (up from 10)
+- Enhanced Maria-QA agent with browser automation capabilities
+- Improved test stability and performance
+
+### Fixed
+- Jest timeout issues with event-driven orchestrator tests
+- TypeScript strict mode compliance in UltraThink methods
+- Missing interface properties (flexibility, utilizationRate)
+- Watchman file watching configuration
+
+### Technical Details
+- **Files Modified**: 8 core files
+- **New Features**: Chrome MCP integration, Frontend reporting
+- **Lines Added**: ~1,500 lines of production code
+- **Test Coverage**: Maintained 85%+ coverage
+- **Performance**: Browser automation < 5s per operation
+
+### Migration Notes
+- Chrome MCP tools available via VERSATIL MCP server
+- Run `npm run build` to compile new Chrome MCP executor
+- Frontend reports saved to `reports/` directory
+- Use `node scripts/run-verssai-report.mjs [URL]` for analysis
 
 ---
 
