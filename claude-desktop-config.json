@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "versatil": {
+      "command": "node",
+      "args": [
+        "/Users/nissimmenashe/VERSATIL SDLC FW/dist/mcp/versatil-mcp-server-v2.js"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "VERSATIL_MCP_MODE": "true",
+        "VERSATIL_LOG_LEVEL": "info"
+      }
+    }
+  }
+}

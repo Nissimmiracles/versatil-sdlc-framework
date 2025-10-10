@@ -1,13 +1,16 @@
 {
   "name": "versatil-sdlc-framework",
-  "version": "1.0.0",
-  "description": "VERSATIL SDLC Framework MCP Server - Complete OPERA methodology with adaptive agents",
+  "version": "6.1.0",
+  "description": "VERSATIL SDLC Framework MCP Server - AI-native development with 6 OPERA agents, adaptive intelligence, and automated quality gates. Local-first architecture with full SDLC orchestration.",
   "author": "VERSATIL Development Team",
   "license": "MIT",
+  "homepage": "https://github.com/MiraclesGIT/versatil-sdlc-framework",
   "repository": {
     "type": "git",
     "url": "https://github.com/MiraclesGIT/versatil-sdlc-framework.git"
   },
+  "privacyPolicy": "https://github.com/MiraclesGIT/versatil-sdlc-framework/blob/main/docs/PRIVACY_POLICY.md",
+  "documentation": "https://github.com/MiraclesGIT/versatil-sdlc-framework/blob/main/docs/MCP_EXAMPLES.md",
   "mcp": {
     "server": {
       "command": "node",
@@ -21,33 +24,296 @@
     "tools": [
       {
         "name": "versatil_activate_agent",
-        "description": "Activate specific OPERA agents (Enhanced Maria, James, Marcus, Architecture Dan, etc.)",
-        "category": "agent-management"
+        "description": "Activate specific OPERA agents (Enhanced Maria, James, Marcus, Sarah-PM, Alex-BA, Dr.AI-ML)",
+        "category": "agent-management",
+        "readOnly": true
       },
       {
-        "name": "versatil_orchestrate_sdlc",
-        "description": "Manage SDLC phases and transitions with 91.3% adaptive flywheel",
-        "category": "workflow-management"
+        "name": "versatil_orchestrate_phase",
+        "description": "Orchestrate SDLC phase transitions with quality gates and validation",
+        "category": "workflow-management",
+        "readOnly": false
       },
       {
-        "name": "versatil_quality_gate",
-        "description": "Execute quality gates and validation checks",
-        "category": "quality-assurance"
+        "name": "versatil_run_quality_gates",
+        "description": "Execute quality gates for current development phase with validation checks",
+        "category": "quality-assurance",
+        "readOnly": true
       },
       {
-        "name": "versatil_framework_status",
-        "description": "Get framework status, health metrics, and agent performance",
-        "category": "monitoring"
+        "name": "versatil_run_tests",
+        "description": "Execute comprehensive testing via Enhanced Maria (unit, e2e, accessibility, etc.)",
+        "category": "quality-assurance",
+        "readOnly": true
+      },
+      {
+        "name": "versatil_analyze_architecture",
+        "description": "Perform architectural analysis and recommendations via Architecture Dan",
+        "category": "code-analysis",
+        "readOnly": true
+      },
+      {
+        "name": "versatil_manage_deployment",
+        "description": "Manage deployment pipeline (deploy, rollback, monitor) via Deployment Orchestrator",
+        "category": "deployment",
+        "readOnly": false,
+        "destructive": true
+      },
+      {
+        "name": "versatil_get_status",
+        "description": "Get comprehensive VERSATIL framework status including agent health and metrics",
+        "category": "monitoring",
+        "readOnly": true
+      },
+      {
+        "name": "versatil_adaptive_insights",
+        "description": "Get adaptive learning insights and AI-powered recommendations based on project patterns",
+        "category": "analytics",
+        "readOnly": true
+      },
+      {
+        "name": "versatil_health_check",
+        "description": "Comprehensive framework health check with agent status and system metrics",
+        "category": "monitoring",
+        "readOnly": true
+      },
+      {
+        "name": "versatil_emergency_protocol",
+        "description": "Trigger emergency response protocol for critical issues (production incidents, security breaches)",
+        "category": "emergency-response",
+        "readOnly": false,
+        "destructive": true
+      },
+      {
+        "name": "opera_set_goal",
+        "description": "Set autonomous development goal for Opera orchestrator to achieve",
+        "category": "autonomous-goals",
+        "readOnly": false
+      },
+      {
+        "name": "opera_get_goals",
+        "description": "Get all active, completed, or failed autonomous development goals",
+        "category": "autonomous-goals",
+        "readOnly": true
+      },
+      {
+        "name": "opera_execute_goal",
+        "description": "Execute a specific autonomous goal with optional dry-run mode",
+        "category": "autonomous-goals",
+        "readOnly": false
+      },
+      {
+        "name": "opera_get_status",
+        "description": "Get Opera orchestrator status, metrics, and active goals",
+        "category": "monitoring",
+        "readOnly": true
+      },
+      {
+        "name": "opera_analyze_project",
+        "description": "Analyze project for improvement opportunities and optimization recommendations",
+        "category": "code-analysis",
+        "readOnly": true
+      },
+      {
+        "name": "opera_health_check",
+        "description": "Perform comprehensive health check on Opera orchestrator and all components",
+        "category": "monitoring",
+        "readOnly": true
+      },
+      {
+        "name": "chrome_navigate",
+        "description": "Navigate to URL using real Chrome browser for E2E testing (Maria-QA)",
+        "category": "browser-automation",
+        "readOnly": true
+      },
+      {
+        "name": "chrome_snapshot",
+        "description": "Capture screenshot and DOM snapshot for visual regression testing (Maria-QA)",
+        "category": "browser-automation",
+        "readOnly": true
+      },
+      {
+        "name": "chrome_test_component",
+        "description": "Execute automated component tests with real browser interaction (Maria-QA)",
+        "category": "browser-automation",
+        "readOnly": true
+      },
+      {
+        "name": "chrome_close",
+        "description": "Close Chrome browser session and cleanup resources (Maria-QA)",
+        "category": "browser-automation",
+        "readOnly": false
+      }
+    ],
+    "resources": [
+      {
+        "name": "agent-status",
+        "uri": "versatil://agent-status/{agentId}",
+        "description": "Real-time status and health information for a specific OPERA agent",
+        "mimeType": "application/json",
+        "dynamic": true
+      },
+      {
+        "name": "quality-metrics",
+        "uri": "versatil://quality-metrics",
+        "description": "Current project quality metrics including test coverage, quality score, and code health",
+        "mimeType": "application/json",
+        "dynamic": false
+      },
+      {
+        "name": "performance-metrics",
+        "uri": "versatil://performance-metrics",
+        "description": "Performance analytics and trends from VERSATIL framework and agents",
+        "mimeType": "application/json",
+        "dynamic": false
+      },
+      {
+        "name": "sdlc-phase",
+        "uri": "versatil://sdlc-phase",
+        "description": "Current SDLC phase, transition history, and flywheel metrics",
+        "mimeType": "application/json",
+        "dynamic": false
+      },
+      {
+        "name": "activity-log",
+        "uri": "versatil://activity-log",
+        "description": "Recent agent activities, actions, and system events",
+        "mimeType": "application/json",
+        "dynamic": false
+      }
+    ],
+    "prompts": [
+      {
+        "name": "analyze-code",
+        "description": "Generate comprehensive code analysis prompts (quality, security, performance, architecture, comprehensive)",
+        "arguments": [
+          {
+            "name": "filePath",
+            "type": "string",
+            "required": true,
+            "description": "Path to the file to analyze"
+          },
+          {
+            "name": "analysisType",
+            "type": "enum",
+            "required": true,
+            "values": ["quality", "security", "performance", "architecture", "comprehensive"],
+            "description": "Type of analysis to perform"
+          }
+        ]
+      },
+      {
+        "name": "refactoring",
+        "description": "Generate code refactoring guidance prompts (extract-method, reduce-complexity, improve-naming, remove-duplication, modernize)",
+        "arguments": [
+          {
+            "name": "filePath",
+            "type": "string",
+            "required": true,
+            "description": "Path to the file to refactor"
+          },
+          {
+            "name": "targetPattern",
+            "type": "enum",
+            "required": true,
+            "values": ["extract-method", "reduce-complexity", "improve-naming", "remove-duplication", "modernize"],
+            "description": "Refactoring pattern to apply"
+          }
+        ]
+      },
+      {
+        "name": "test-generation",
+        "description": "Generate automated test creation prompts (unit, integration, e2e, visual, performance, security)",
+        "arguments": [
+          {
+            "name": "filePath",
+            "type": "string",
+            "required": true,
+            "description": "Path to the file to generate tests for"
+          },
+          {
+            "name": "testType",
+            "type": "enum",
+            "required": true,
+            "values": ["unit", "integration", "e2e", "visual", "performance", "security"],
+            "description": "Type of tests to generate"
+          }
+        ]
+      },
+      {
+        "name": "security-audit",
+        "description": "Generate comprehensive security audit prompts covering OWASP Top 10, authentication, data protection, and infrastructure security",
+        "arguments": [
+          {
+            "name": "component",
+            "type": "string",
+            "required": true,
+            "description": "Component or module to audit (e.g., authentication, API, database)"
+          }
+        ]
+      },
+      {
+        "name": "performance-optimization",
+        "description": "Generate performance optimization recommendation prompts (response-time, throughput, memory, bundle-size, database-queries)",
+        "arguments": [
+          {
+            "name": "component",
+            "type": "string",
+            "required": true,
+            "description": "Component to optimize"
+          },
+          {
+            "name": "metric",
+            "type": "enum",
+            "required": true,
+            "values": ["response-time", "throughput", "memory", "bundle-size", "database-queries"],
+            "description": "Performance metric to optimize"
+          }
+        ]
       }
     ],
     "capabilities": [
-      "Plan-to-Production Workflow",
-      "Cross-Project Intelligence",
-      "Adaptive Agent Behavior",
-      "Real-time Quality Gates",
-      "Emergency Response System",
-      "OPERA Methodology Implementation",
-      "Context Preservation"
+      "20 MCP Tools: Full SDLC automation (agent management, orchestration, testing, deployment, analytics)",
+      "5 MCP Resources: Real-time framework data (agent status, quality metrics, performance, SDLC phase, activity logs)",
+      "5 MCP Prompts: AI-powered development guidance (code analysis, refactoring, testing, security, performance)",
+      "6 specialized OPERA agents (Maria-QA, James-Frontend, Marcus-Backend, Sarah-PM, Alex-BA, Dr.AI-ML)",
+      "Full SDLC orchestration with phase transitions and quality gates",
+      "Autonomous goal management via Opera orchestrator",
+      "Real-time browser automation testing with Chrome MCP",
+      "Adaptive learning insights and pattern recognition",
+      "Emergency response protocols for critical incidents",
+      "Comprehensive testing (unit, e2e, visual, performance, accessibility, security)",
+      "Architecture analysis with SOLID principles validation",
+      "Deployment pipeline management (rolling, blue-green, canary strategies)",
+      "Local-first architecture with privacy-first design",
+      "Cross-project intelligence with RAG memory system",
+      "Real-time quality gates and validation checks",
+      "HTTP/SSE transport for remote MCP server access",
+      "Production-grade error sanitization and security"
+    ],
+    "categories": [
+      "agent-management",
+      "workflow-management",
+      "quality-assurance",
+      "code-analysis",
+      "deployment",
+      "monitoring",
+      "analytics",
+      "emergency-response",
+      "autonomous-goals",
+      "browser-automation"
+    ],
+    "tags": [
+      "sdlc",
+      "opera",
+      "ai-agents",
+      "quality-gates",
+      "testing",
+      "deployment",
+      "architecture",
+      "browser-automation",
+      "emergency-response",
+      "adaptive-learning"
     ],
     "requirements": {
       "node": ">=16.0.0",
