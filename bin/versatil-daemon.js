@@ -41,16 +41,18 @@ class VERSATILDaemon {
     console.log(`   Project: ${projectPath}`);
 
     // Start daemon in background
+    // Use 'ignore' for all stdio to fully detach - daemon writes logs directly to file
     const daemon = spawn(
       process.execPath,
       [join(import.meta.dirname, '../dist/daemon/proactive-daemon.js'), projectPath],
       {
         detached: true,
-        stdio: ['ignore', 'pipe', 'pipe'],
+        stdio: 'ignore', // Fully detach - no stdio connection to parent
         env: {
           ...process.env,
           VERSATIL_PROJECT_PATH: projectPath,
-          VERSATIL_DAEMON_MODE: 'true'
+          VERSATIL_DAEMON_MODE: 'true',
+          VERSATIL_LOG_FILE: LOG_FILE // Pass log file path to daemon
         }
       }
     );
@@ -66,11 +68,7 @@ class VERSATILDaemon {
       version: '1.0.0'
     }, null, 2));
 
-    // Pipe logs to file
-    const logStream = await import('fs').then(fs => fs.createWriteStream(LOG_FILE, { flags: 'a' }));
-    daemon.stdout.pipe(logStream);
-    daemon.stderr.pipe(logStream);
-
+    // Unref immediately - allows parent to exit while child stays alive
     daemon.unref();
 
     console.log('✅ Daemon started successfully');
