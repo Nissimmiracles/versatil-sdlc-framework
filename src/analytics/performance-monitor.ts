@@ -8,6 +8,7 @@
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
+import { homedir } from 'os';
 
 export interface PerformanceMetric {
   id: string;
@@ -70,7 +71,7 @@ export class PerformanceMonitor extends EventEmitter {
 
   constructor() {
     super();
-    this.metricsStorePath = path.join(process.cwd(), '.versatil', 'analytics');
+    this.metricsStorePath = path.join(homedir(), '.versatil', 'analytics');
     this.initializeThresholds();
     this.ensureStorageDirectory();
     this.loadHistoricalData();
