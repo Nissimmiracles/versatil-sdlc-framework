@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "versatil-sdlc": {
+    "claude-opera": {
       "command": "node",
-      "args": ["/Users/nissimmenashe/VERSATIL SDLC FW/dist/mcp/versatil-mcp-server-v2.js", "/Users/nissimmenashe/VERSATIL SDLC FW"],
+      "args": ["/Users/nissimmenashe/VERSATIL SDLC FW/bin/versatil-mcp.js", "/Users/nissimmenashe/VERSATIL SDLC FW"],
       "cwd": "/Users/nissimmenashe/VERSATIL SDLC FW",
       "env": {
         "NODE_ENV": "production",
