@@ -92,6 +92,7 @@ export class SynchronizationDashboard extends EventEmitter {
   private planOrchestrator?: PlanFirstOpera;
   private stackOrchestrator?: StackAwareOrchestrator;
   private githubOrchestrator?: GitHubSyncOrchestrator;
+  // Note: parallelManager kept for monitoring legacy system only (not for execution)
   private parallelManager?: ParallelTaskManager;
 
   private monitoringInterval?: NodeJS.Timeout;

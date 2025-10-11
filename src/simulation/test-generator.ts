@@ -9,7 +9,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { VERSATILLogger } from '../utils/logger.js';
 import { FrameworkPromise, TestableScenario } from './feature-mapper.js';
-import { SimulationScenario, TestCase } from '../agents/simulation-qa.js';
+import { SimulationScenario, TestCase } from '../agents/opera/maria-qa/simulation-qa.js';
 
 export interface GeneratedTestSuite {
   id: string;

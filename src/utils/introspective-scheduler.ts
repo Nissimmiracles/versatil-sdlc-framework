@@ -5,7 +5,7 @@
  * continuous framework monitoring and optimization without user intervention.
  */
 
-import { IntrospectiveAgent } from '../agents/introspective-agent.js';
+import { IntrospectiveAgent } from '../agents/meta/introspective/introspective-agent.js';
 import { VERSATILLogger } from './logger.js';
 import { EventEmitter } from 'events';
 

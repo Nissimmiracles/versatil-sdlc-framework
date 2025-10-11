@@ -4,8 +4,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../agents/base-agent.js';
-import { AgentRegistry } from '../agents/agent-registry.js';
+import { BaseAgent, AgentActivationContext, AgentResponse } from '../agents/core/base-agent.js';
+import { AgentRegistry } from '../agents/core/agent-registry.js';
 import { VERSATILLogger } from '../utils/logger.js';
 import { vectorMemoryStore, RAGQuery } from '../rag/vector-memory-store.js';
 import { OperaOrchestrator, OperaGoal } from '../opera/opera-orchestrator.js';

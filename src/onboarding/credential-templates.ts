@@ -20,7 +20,7 @@ export interface CredentialField {
 export interface ServiceTemplate {
   id: string;
   name: string;
-  category: 'ai' | 'database' | 'testing' | 'monitoring' | 'automation' | 'search' | 'security';
+  category: 'ai' | 'database' | 'testing' | 'monitoring' | 'automation' | 'search' | 'security' | 'design' | 'infrastructure' | 'documentation';
   description: string;
   required: boolean;
   useCase: string;
@@ -31,6 +31,7 @@ export interface ServiceTemplate {
   testConnection?: (credentials: Record<string, string>) => Promise<boolean>;
   fallbackAvailable: boolean;
   fallbackDescription?: string;
+  usedByAgents?: string[]; // NEW: Which OPERA agents use this service
 }
 
 /**
@@ -44,6 +45,7 @@ export const SERVICE_TEMPLATES: Record<string, ServiceTemplate> = {
     description: 'AI-powered code generation using Gemini models',
     required: false,
     useCase: 'Use Gemini for code generation, embeddings, and AI analysis',
+    usedByAgents: ['dr-ai-ml'],
     credentials: [
       {
         key: 'GOOGLE_CLOUD_PROJECT',
@@ -189,6 +191,7 @@ export const SERVICE_TEMPLATES: Record<string, ServiceTemplate> = {
     description: 'GitHub API integration for repository management',
     required: false,
     useCase: 'Create issues, manage PRs, sync code, automated workflows',
+    usedByAgents: ['sarah-pm', 'alex-ba', 'devops-dan'],
     credentials: [
       {
         key: 'GITHUB_TOKEN',
@@ -222,6 +225,7 @@ export const SERVICE_TEMPLATES: Record<string, ServiceTemplate> = {
     description: 'Error monitoring and performance tracking',
     required: false,
     useCase: 'Track errors, analyze stack traces, monitor performance',
+    usedByAgents: ['marcus-backend', 'devops-dan', 'security-sam'],
     credentials: [
       {
         key: 'SENTRY_DSN',
@@ -279,6 +283,7 @@ export const SERVICE_TEMPLATES: Record<string, ServiceTemplate> = {
     description: 'Static code analysis and security scanning',
     required: false,
     useCase: 'Scan code for security vulnerabilities and code quality issues',
+    usedByAgents: ['marcus-backend', 'security-sam'],
     credentials: [
       {
         key: 'SEMGREP_API_KEY',
@@ -406,7 +411,437 @@ export const SERVICE_TEMPLATES: Record<string, ServiceTemplate> = {
     setupGuide: 'https://platform.openai.com/docs/quickstart',
     signupUrl: 'https://platform.openai.com/signup',
     docsUrl: 'https://platform.openai.com/docs',
-    fallbackAvailable: false
+    fallbackAvailable: false,
+    usedByAgents: ['dr-ai-ml']
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // AGENT-SPECIFIC SERVICE INTEGRATIONS
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  'chrome-mcp': {
+    id: 'chrome-mcp',
+    name: 'Chrome/Playwright MCP',
+    category: 'testing',
+    description: 'Browser automation for E2E testing and visual regression',
+    required: false,
+    useCase: 'Automated browser testing, screenshots, accessibility audits (Maria-QA)',
+    credentials: [
+      {
+        key: 'PLAYWRIGHT_BROWSERS_PATH',
+        label: 'Playwright Browsers Path (Optional)',
+        type: 'text',
+        required: false,
+        placeholder: '/path/to/browsers',
+        helpText: 'Custom path for Playwright browsers (optional, auto-detected by default)'
+      },
+      {
+        key: 'CHROME_MCP_ENABLED',
+        label: 'Enable Chrome MCP',
+        type: 'text',
+        required: false,
+        default: 'true',
+        validation: (value) => {
+          if (value !== 'true' && value !== 'false') {
+            return 'Must be "true" or "false"';
+          }
+          return true;
+        },
+        helpText: 'Enable browser automation via Chrome MCP'
+      }
+    ],
+    setupGuide: 'https://playwright.dev/docs/intro',
+    signupUrl: undefined,
+    docsUrl: 'https://playwright.dev/docs/api/class-playwright',
+    fallbackAvailable: true,
+    fallbackDescription: 'Headless browser with manual test execution',
+    usedByAgents: ['maria-qa']
+  },
+
+  'figma': {
+    id: 'figma',
+    name: 'Figma',
+    category: 'design',
+    description: 'Design system integration for UI/UX consistency',
+    required: false,
+    useCase: 'Import designs, extract design tokens, validate UI against mockups (James-Frontend)',
+    credentials: [
+      {
+        key: 'FIGMA_API_TOKEN',
+        label: 'Figma Personal Access Token',
+        type: 'password',
+        required: true,
+        placeholder: 'your_figma_token_starts_with_figd_',
+        validation: (value) => {
+          if (!value) return 'Figma API token is required';
+          if (!value.startsWith('figd_')) {
+            return 'Invalid token format (should start with "figd_")';
+          }
+          return true;
+        },
+        helpText: 'Personal access token from Figma account settings'
+      },
+      {
+        key: 'FIGMA_TEAM_ID',
+        label: 'Figma Team ID (Optional)',
+        type: 'text',
+        required: false,
+        placeholder: '1234567890',
+        helpText: 'Your Figma team ID for team-specific operations'
+      }
+    ],
+    setupGuide: 'https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens',
+    signupUrl: 'https://www.figma.com/signup',
+    docsUrl: 'https://www.figma.com/developers/api',
+    fallbackAvailable: true,
+    fallbackDescription: 'Manual design review and token extraction',
+    usedByAgents: ['james-frontend']
+  },
+
+  'ant-design': {
+    id: 'ant-design',
+    name: 'Ant Design MCP',
+    category: 'design',
+    description: 'Ant Design component library integration',
+    required: false,
+    useCase: 'Component scaffolding, design token sync, theme customization (James-Frontend)',
+    credentials: [
+      {
+        key: 'ANT_DESIGN_TOKEN',
+        label: 'Ant Design Token (Optional)',
+        type: 'password',
+        required: false,
+        placeholder: 'antd_xxxxxxxxxxxxxxxxxxxxxxxxxx',
+        helpText: 'Optional token for premium Ant Design Pro features'
+      }
+    ],
+    setupGuide: 'https://ant.design/docs/react/introduce',
+    signupUrl: undefined,
+    docsUrl: 'https://ant.design/components/overview',
+    fallbackAvailable: true,
+    fallbackDescription: 'Uses public Ant Design components without premium features',
+    usedByAgents: ['james-frontend']
+  },
+
+  'docker-hub': {
+    id: 'docker-hub',
+    name: 'Docker Hub',
+    category: 'infrastructure',
+    description: 'Container registry for Docker images',
+    required: false,
+    useCase: 'Push/pull Docker images, container deployment (Marcus-Backend, DevOps Dan)',
+    credentials: [
+      {
+        key: 'DOCKER_HUB_USERNAME',
+        label: 'Docker Hub Username',
+        type: 'text',
+        required: true,
+        placeholder: 'your-username',
+        validation: (value) => {
+          if (!value) return 'Docker Hub username is required';
+          if (!/^[a-z0-9_-]{4,30}$/.test(value)) {
+            return 'Invalid username format (lowercase, alphanumeric, 4-30 chars)';
+          }
+          return true;
+        },
+        helpText: 'Your Docker Hub username'
+      },
+      {
+        key: 'DOCKER_HUB_TOKEN',
+        label: 'Docker Hub Access Token',
+        type: 'password',
+        required: true,
+        placeholder: 'dckr_pat_xxxxxxxxxxxxxxxxxxxxxxxxxx',
+        validation: (value) => {
+          if (!value) return 'Docker Hub token is required';
+          return true;
+        },
+        helpText: 'Personal access token from Docker Hub → Account Settings → Security'
+      }
+    ],
+    setupGuide: 'https://docs.docker.com/docker-hub/access-tokens/',
+    signupUrl: 'https://hub.docker.com/signup',
+    docsUrl: 'https://docs.docker.com/docker-hub/',
+    fallbackAvailable: false,
+    usedByAgents: ['marcus-backend', 'devops-dan']
+  },
+
+  'jira': {
+    id: 'jira',
+    name: 'Jira',
+    category: 'automation',
+    description: 'Project management and issue tracking',
+    required: false,
+    useCase: 'Create issues, track sprints, manage project workflows (Sarah-PM)',
+    credentials: [
+      {
+        key: 'JIRA_API_TOKEN',
+        label: 'Jira API Token',
+        type: 'password',
+        required: true,
+        placeholder: 'ATATT3xFfGF0xxxxxxxxxxxxxxxxxxxxxxxxx',
+        validation: (value) => {
+          if (!value) return 'Jira API token is required';
+          if (!value.startsWith('ATATT')) {
+            return 'Invalid token format (should start with "ATATT")';
+          }
+          return true;
+        },
+        helpText: 'API token from Jira account settings'
+      },
+      {
+        key: 'JIRA_DOMAIN',
+        label: 'Jira Domain',
+        type: 'text',
+        required: true,
+        placeholder: 'yourcompany.atlassian.net',
+        validation: (value) => {
+          if (!value) return 'Jira domain is required';
+          if (!value.includes('.atlassian.net')) {
+            return 'Must be a valid Jira domain (*.atlassian.net)';
+          }
+          return true;
+        },
+        helpText: 'Your Jira cloud domain (e.g., yourcompany.atlassian.net)'
+      },
+      {
+        key: 'JIRA_EMAIL',
+        label: 'Jira Account Email',
+        type: 'text',
+        required: true,
+        placeholder: 'your-email@company.com',
+        validation: (value) => {
+          if (!value) return 'Email is required';
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            return 'Invalid email format';
+          }
+          return true;
+        },
+        helpText: 'Email associated with your Jira account'
+      }
+    ],
+    setupGuide: 'https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/',
+    signupUrl: 'https://www.atlassian.com/software/jira/free',
+    docsUrl: 'https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/',
+    fallbackAvailable: false,
+    usedByAgents: ['sarah-pm']
+  },
+
+  'linear': {
+    id: 'linear',
+    name: 'Linear',
+    category: 'automation',
+    description: 'Modern issue tracking and project management',
+    required: false,
+    useCase: 'Streamlined issue management, roadmap planning (Sarah-PM)',
+    credentials: [
+      {
+        key: 'LINEAR_API_KEY',
+        label: 'Linear API Key',
+        type: 'password',
+        required: true,
+        placeholder: 'lin_api_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        validation: (value) => {
+          if (!value) return 'Linear API key is required';
+          if (!value.startsWith('lin_api_')) {
+            return 'Invalid key format (should start with "lin_api_")';
+          }
+          return true;
+        },
+        helpText: 'API key from Linear → Settings → API'
+      },
+      {
+        key: 'LINEAR_TEAM_ID',
+        label: 'Linear Team ID (Optional)',
+        type: 'text',
+        required: false,
+        placeholder: 'team-id-here',
+        helpText: 'Specific team ID for team-scoped operations'
+      }
+    ],
+    setupGuide: 'https://developers.linear.app/docs/graphql/working-with-the-graphql-api',
+    signupUrl: 'https://linear.app/signup',
+    docsUrl: 'https://developers.linear.app/',
+    fallbackAvailable: false,
+    usedByAgents: ['sarah-pm']
+  },
+
+  'confluence': {
+    id: 'confluence',
+    name: 'Confluence',
+    category: 'documentation',
+    description: 'Documentation and knowledge management',
+    required: false,
+    useCase: 'Store requirements, create documentation, knowledge sharing (Alex-BA, Sarah-PM)',
+    credentials: [
+      {
+        key: 'CONFLUENCE_API_TOKEN',
+        label: 'Confluence API Token',
+        type: 'password',
+        required: true,
+        placeholder: 'ATATT3xFfGF0xxxxxxxxxxxxxxxxxxxxxxxxx',
+        validation: (value) => {
+          if (!value) return 'Confluence API token is required';
+          if (!value.startsWith('ATATT')) {
+            return 'Invalid token format (should start with "ATATT")';
+          }
+          return true;
+        },
+        helpText: 'API token from Atlassian account settings'
+      },
+      {
+        key: 'CONFLUENCE_DOMAIN',
+        label: 'Confluence Domain',
+        type: 'text',
+        required: true,
+        placeholder: 'yourcompany.atlassian.net/wiki',
+        validation: (value) => {
+          if (!value) return 'Confluence domain is required';
+          if (!value.includes('.atlassian.net')) {
+            return 'Must be a valid Confluence domain (*.atlassian.net)';
+          }
+          return true;
+        },
+        helpText: 'Your Confluence cloud domain'
+      },
+      {
+        key: 'CONFLUENCE_EMAIL',
+        label: 'Confluence Account Email',
+        type: 'text',
+        required: true,
+        placeholder: 'your-email@company.com',
+        validation: (value) => {
+          if (!value) return 'Email is required';
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            return 'Invalid email format';
+          }
+          return true;
+        },
+        helpText: 'Email associated with your Confluence account'
+      }
+    ],
+    setupGuide: 'https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/',
+    signupUrl: 'https://www.atlassian.com/software/confluence/free',
+    docsUrl: 'https://developer.atlassian.com/cloud/confluence/rest/v2/intro/',
+    fallbackAvailable: true,
+    fallbackDescription: 'Markdown files in project repository',
+    usedByAgents: ['alex-ba', 'sarah-pm']
+  },
+
+  'notion': {
+    id: 'notion',
+    name: 'Notion',
+    category: 'documentation',
+    description: 'Collaborative workspace for docs and databases',
+    required: false,
+    useCase: 'Requirements tracking, documentation, team collaboration (Alex-BA)',
+    credentials: [
+      {
+        key: 'NOTION_API_KEY',
+        label: 'Notion Integration Token',
+        type: 'password',
+        required: true,
+        placeholder: 'secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        validation: (value) => {
+          if (!value) return 'Notion API key is required';
+          if (!value.startsWith('secret_')) {
+            return 'Invalid token format (should start with "secret_")';
+          }
+          return true;
+        },
+        helpText: 'Integration token from Notion → Settings → Integrations'
+      },
+      {
+        key: 'NOTION_DATABASE_ID',
+        label: 'Notion Database ID (Optional)',
+        type: 'text',
+        required: false,
+        placeholder: '32-character database ID',
+        validation: (value) => {
+          if (!value) return true; // Optional
+          if (value.length !== 32) {
+            return 'Database ID should be 32 characters';
+          }
+          return true;
+        },
+        helpText: 'Database ID for requirements tracking (optional)'
+      }
+    ],
+    setupGuide: 'https://developers.notion.com/docs/create-a-notion-integration',
+    signupUrl: 'https://www.notion.so/signup',
+    docsUrl: 'https://developers.notion.com/',
+    fallbackAvailable: true,
+    fallbackDescription: 'Local markdown files with YAML frontmatter',
+    usedByAgents: ['alex-ba']
+  },
+
+  'huggingface': {
+    id: 'huggingface',
+    name: 'Hugging Face',
+    category: 'ai',
+    description: 'ML model hub and inference API',
+    required: false,
+    useCase: 'Access pre-trained models, run inference, model fine-tuning (Dr.AI-ML)',
+    credentials: [
+      {
+        key: 'HUGGINGFACE_API_TOKEN',
+        label: 'Hugging Face API Token',
+        type: 'password',
+        required: true,
+        placeholder: 'hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        validation: (value) => {
+          if (!value) return 'Hugging Face token is required';
+          if (!value.startsWith('hf_')) {
+            return 'Invalid token format (should start with "hf_")';
+          }
+          return true;
+        },
+        helpText: 'API token from huggingface.co → Settings → Access Tokens'
+      }
+    ],
+    setupGuide: 'https://huggingface.co/docs/hub/security-tokens',
+    signupUrl: 'https://huggingface.co/join',
+    docsUrl: 'https://huggingface.co/docs/api-inference/index',
+    fallbackAvailable: true,
+    fallbackDescription: 'Local model inference (slower, requires GPU)',
+    usedByAgents: ['dr-ai-ml']
+  },
+
+  'wandb': {
+    id: 'wandb',
+    name: 'Weights & Biases',
+    category: 'monitoring',
+    description: 'ML experiment tracking and model monitoring',
+    required: false,
+    useCase: 'Track ML experiments, visualize metrics, model versioning (Dr.AI-ML)',
+    credentials: [
+      {
+        key: 'WANDB_API_KEY',
+        label: 'W&B API Key',
+        type: 'password',
+        required: true,
+        placeholder: 'local-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        validation: (value) => {
+          if (!value) return 'W&B API key is required';
+          return true;
+        },
+        helpText: 'API key from wandb.ai → Settings → API keys'
+      },
+      {
+        key: 'WANDB_PROJECT',
+        label: 'W&B Project Name (Optional)',
+        type: 'text',
+        required: false,
+        placeholder: 'my-ml-project',
+        helpText: 'Default project for experiment tracking'
+      }
+    ],
+    setupGuide: 'https://docs.wandb.ai/quickstart',
+    signupUrl: 'https://wandb.ai/signup',
+    docsUrl: 'https://docs.wandb.ai/',
+    fallbackAvailable: true,
+    fallbackDescription: 'Local JSON logs and TensorBoard',
+    usedByAgents: ['dr-ai-ml']
   }
 };
 
@@ -452,6 +887,8 @@ export function detectNeededServices(projectAnalysis?: {
   detectedTechnologies?: string[];
   hasTests?: boolean;
   hasBackend?: boolean;
+  hasFrontend?: boolean;
+  hasML?: boolean;
 }): ServiceTemplate[] {
   const needed: ServiceTemplate[] = [];
 
@@ -467,20 +904,87 @@ export function detectNeededServices(projectAnalysis?: {
       t.toLowerCase().includes('ai') ||
       t.toLowerCase().includes('ml') ||
       t.toLowerCase().includes('python')
-    )) {
+    ) || projectAnalysis.hasML) {
       needed.push(SERVICE_TEMPLATES['vertex-ai']);
+      needed.push(SERVICE_TEMPLATES['huggingface']);
+      needed.push(SERVICE_TEMPLATES['wandb']);
     }
 
-    // Sentry for production apps
+    // Frontend integrations
+    if (projectAnalysis.hasFrontend || projectAnalysis.detectedTechnologies?.some(t =>
+      ['react', 'vue', 'angular', 'frontend'].some(fw => t.toLowerCase().includes(fw))
+    )) {
+      needed.push(SERVICE_TEMPLATES['figma']);
+      needed.push(SERVICE_TEMPLATES['ant-design']);
+    }
+
+    // Backend integrations
     if (projectAnalysis.hasBackend) {
       needed.push(SERVICE_TEMPLATES['sentry']);
+      needed.push(SERVICE_TEMPLATES['semgrep']);
+      needed.push(SERVICE_TEMPLATES['docker-hub']);
     }
 
-    // Semgrep for security-conscious projects
-    if (projectAnalysis.hasBackend) {
-      needed.push(SERVICE_TEMPLATES['semgrep']);
+    // Testing integrations
+    if (projectAnalysis.hasTests) {
+      needed.push(SERVICE_TEMPLATES['chrome-mcp']);
     }
   }
 
   return Array.from(new Set(needed)); // Remove duplicates
+}
+
+/**
+ * Agent to service credential mapping
+ */
+export const AGENT_CREDENTIAL_MAP: Record<string, string[]> = {
+  'maria-qa': ['chrome-mcp', 'playwright'],
+  'enhanced-maria': ['chrome-mcp', 'playwright'],
+
+  'james-frontend': ['figma', 'ant-design'],
+  'enhanced-james': ['figma', 'ant-design'],
+
+  'marcus-backend': ['docker-hub', 'sentry', 'semgrep'],
+  'enhanced-marcus': ['docker-hub', 'sentry', 'semgrep'],
+
+  'sarah-pm': ['jira', 'linear', 'github', 'confluence'],
+
+  'alex-ba': ['confluence', 'notion', 'github'],
+
+  'dr-ai-ml': ['vertex-ai', 'openai', 'huggingface', 'wandb'],
+
+  'devops-dan': ['docker-hub', 'github', 'sentry'],
+
+  'security-sam': ['semgrep', 'sentry']
+};
+
+/**
+ * Get services needed by specific agents
+ */
+export function getServicesForAgents(agentIds: string[]): ServiceTemplate[] {
+  const serviceIds = new Set<string>();
+
+  for (const agentId of agentIds) {
+    const services = AGENT_CREDENTIAL_MAP[agentId] || [];
+    services.forEach(id => serviceIds.add(id));
+  }
+
+  return Array.from(serviceIds)
+    .map(id => SERVICE_TEMPLATES[id])
+    .filter((s): s is ServiceTemplate => s !== undefined);
+}
+
+/**
+ * Get agents that use a specific service
+ */
+export function getAgentsUsingService(serviceId: string): string[] {
+  const service = SERVICE_TEMPLATES[serviceId];
+  if (service?.usedByAgents) {
+    return service.usedByAgents;
+  }
+
+  // Fallback: search through AGENT_CREDENTIAL_MAP
+  return Object.entries(AGENT_CREDENTIAL_MAP)
+    .filter(([, services]) => services.includes(serviceId))
+    .map(([agentId]) => agentId);
 }

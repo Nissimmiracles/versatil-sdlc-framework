@@ -1,8 +1,8 @@
-import { RAGEnabledAgent, RAGConfig, AgentRAGContext } from './rag-enabled-agent.js';
-import { AgentResponse, AgentActivationContext } from './base-agent.js';
-import { PatternAnalyzer, AnalysisResult } from '../intelligence/pattern-analyzer.js';
-import { PromptGenerator } from '../intelligence/prompt-generator.js';
-import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
+import { RAGEnabledAgent, RAGConfig, AgentRAGContext } from '../../core/rag-enabled-agent.js';
+import { AgentResponse, AgentActivationContext } from '../../core/base-agent.js';
+import { PatternAnalyzer, AnalysisResult } from '../../../intelligence/pattern-analyzer.js';
+import { PromptGenerator } from '../../../intelligence/prompt-generator.js';
+import { EnhancedVectorMemoryStore } from '../../../rag/enhanced-vector-memory-store.js';
 
 export class EnhancedJames extends RAGEnabledAgent {
   name = 'EnhancedJames';

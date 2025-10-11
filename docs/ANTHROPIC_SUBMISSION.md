@@ -12,10 +12,11 @@
 The VERSATIL SDLC Framework MCP Server is a production-ready, comprehensive implementation of the Model Context Protocol, providing AI-native software development lifecycle orchestration through 6 specialized OPERA agents. This submission package demonstrates full compliance with Anthropic's MCP specification and readiness for inclusion in the official MCP Directory.
 
 **Key Highlights**:
-- ✅ **30 MCP Primitives**: 20 Tools, 5 Resources, 5 Prompts
+- ✅ **31 MCP Primitives**: 21 Tools, 5 Resources, 5 Prompts
 - ✅ **Full Anthropic MCP Spec Compliance**: 100% (All requirements met)
+- ✅ **Automatic Onboarding**: Zero-configuration setup for first-time users
 - ✅ **Production-Ready**: Error sanitization, HTTP transport, comprehensive testing
-- ✅ **Well-Documented**: 16 working examples, troubleshooting guide, testing account
+- ✅ **Well-Documented**: 17 working examples, troubleshooting guide, testing account
 - ✅ **Privacy-First**: Local-first architecture with transparent privacy policy
 - ✅ **Security-Hardened**: Credential sanitization, DNS rebinding protection, CORS
 
@@ -52,7 +53,7 @@ AI-native development with 6 OPERA agents, adaptive intelligence, and automated 
 | Requirement | Status | Evidence |
 |-------------|--------|----------|
 | **1. Latest MCP SDK** | ✅ PASS | @modelcontextprotocol/sdk@1.19.1 |
-| **2. Tools Primitive** | ✅ PASS | 20 tools implemented |
+| **2. Tools Primitive** | ✅ PASS | 21 tools implemented (including versatil_welcome_setup) |
 | **3. Tool Annotations** | ✅ PASS | title, readOnlyHint, destructiveHint on all tools |
 | **4. Resources Primitive** | ✅ PASS | 5 resources (1 dynamic, 4 static) |
 | **5. Prompts Primitive** | ✅ PASS | 5 prompts with comprehensive templates |
@@ -84,9 +85,10 @@ AI-native development with 6 OPERA agents, adaptive intelligence, and automated 
 
 ## 3. MCP Primitives Summary
 
-### 3.1 Tools (20 Total)
+### 3.1 Tools (21 Total)
 
 #### Categories:
+- **Setup & Onboarding** (1): versatil_welcome_setup 🆕
 - **Agent Management** (1): versatil_activate_agent
 - **Workflow Management** (1): versatil_orchestrate_phase
 - **Quality Assurance** (2): versatil_run_quality_gates, versatil_run_tests
@@ -98,7 +100,8 @@ AI-native development with 6 OPERA agents, adaptive intelligence, and automated 
 - **Autonomous Goals** (3): opera_set_goal, opera_get_goals, opera_execute_goal
 - **Browser Automation** (4): chrome_navigate, chrome_snapshot, chrome_test_component, chrome_close
 
-**Destructive Tools**: 2/20 (properly marked with destructiveHint: true)
+**Destructive Tools**: 2/21 (properly marked with destructiveHint: true)
+**New in v6.1.0**: `versatil_welcome_setup` - Automatic onboarding and configuration status for first-time users
 
 ### 3.2 Resources (5 Total)
 

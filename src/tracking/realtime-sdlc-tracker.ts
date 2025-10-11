@@ -7,7 +7,7 @@ import { EventEmitter } from 'events';
 import { VERSATILLogger } from '../utils/logger.js';
 import { SDLCOrchestrator, FlywheelState } from '../flywheel/sdlc-orchestrator.js';
 import { EnhancedOPERACoordinator } from '../opera/enhanced-opera-coordinator.js';
-import { AgentRegistry } from '../agents/agent-registry.js';
+import { AgentRegistry } from '../agents/core/agent-registry.js';
 import { WebSocket, WebSocketServer } from 'ws';
 
 export interface TaskProgress {

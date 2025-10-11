@@ -6,8 +6,8 @@
  * and other cross-file consistency issues.
  */
 
-import { BaseAgent, AgentActivationContext, ValidationResults } from '../agents/base-agent.js';
-import { AgentRegistry } from '../agents/agent-registry.js';
+import { BaseAgent, AgentActivationContext, ValidationResults } from '../agents/core/base-agent.js';
+import { AgentRegistry } from '../agents/core/agent-registry.js';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 

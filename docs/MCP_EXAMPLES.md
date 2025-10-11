@@ -30,6 +30,68 @@ versatil-mcp start
 }
 ```
 
+**First-Time Users**: When you first connect the MCP server to Claude Desktop, it will automatically configure itself. Run the `versatil_welcome_setup` tool to verify your setup and see available features.
+
+---
+
+## Example 0: Welcome & Setup (First-Time Users)
+
+### Use Case
+Check onboarding status, verify configuration, and get setup instructions for VERSATIL MCP.
+
+### MCP Tool Call
+
+```json
+{
+  "tool": "versatil_welcome_setup",
+  "arguments": {
+    "showDetails": true
+  }
+}
+```
+
+### Expected Response
+
+```json
+{
+  "setupComplete": true,
+  "frameworkHome": "/Users/username/.versatil",
+  "instructions": "✅ VERSATIL MCP Server is fully configured!\n\n📁 Configuration location: /Users/username/.versatil\n\n🚀 Getting Started:\n  • All MCP tools are ready to use\n  • Agents will activate automatically based on your requests\n  • Framework works locally without external dependencies\n\n📖 Learn More:\n  • Tool examples: Use any versatil_* tool from Claude\n  • Resources: Access versatil:// URIs for real-time framework data\n  • Prompts: Generate AI-powered code analysis prompts\n\n🔧 Optional Configuration:\n  • Edit preferences: /Users/username/.versatil/preferences.json\n  • Add credentials: /Users/username/.versatil/.env\n  • Install full framework: npm install -g @versatil/sdlc-framework",
+  "details": {
+    "hasPreferences": true,
+    "hasEnvFile": true,
+    "missingComponents": [],
+    "mcpPrimitives": {
+      "tools": 15,
+      "resources": 5,
+      "prompts": 5
+    },
+    "operaAgents": [
+      { "id": "enhanced-maria", "name": "Maria-QA", "specialization": "Quality assurance and testing" },
+      { "id": "enhanced-james", "name": "James-Frontend", "specialization": "UI/UX development" },
+      { "id": "enhanced-marcus", "name": "Marcus-Backend", "specialization": "API and backend development" },
+      { "id": "alex-ba", "name": "Alex-BA", "specialization": "Business analysis and requirements" },
+      { "id": "sarah-pm", "name": "Sarah-PM", "specialization": "Project coordination" },
+      { "id": "dr-ai-ml", "name": "Dr.AI-ML", "specialization": "AI/ML development" }
+    ]
+  }
+}
+```
+
+### Claude Prompt Example
+
+```
+I just installed VERSATIL MCP. Can you run versatil_welcome_setup to show me
+my configuration status and help me get started?
+```
+
+**When to Use**:
+- First-time installation verification
+- Checking if configuration is complete
+- Getting setup instructions
+- Viewing available OPERA agents
+- Confirming MCP primitives count (15 tools, 5 resources, 5 prompts)
+
 ---
 
 ## Example 1: Agent Activation for Code Analysis

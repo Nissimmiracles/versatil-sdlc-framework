@@ -9,7 +9,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { VERSATILLogger } from '../utils/logger.js';
 import { EnhancedOperaOrchestrator } from '../opera/enhanced-opera-orchestrator.js';
-import { AgentRegistry } from '../agents/agent-registry.js';
+import { AgentRegistry } from '../agents/core/agent-registry.js';
 import { vectorMemoryStore } from '../rag/vector-memory-store.js';
 
 export interface StackContext {

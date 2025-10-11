@@ -13,6 +13,7 @@ import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator.js';
 import { VERSATILLogger } from '../utils/logger.js';
 import { PerformanceMonitor } from '../analytics/performance-monitor.js';
 import { chromeMCPExecutor } from './chrome-mcp-executor.js';
+import { getMCPOnboarding } from './mcp-onboarding.js';
 
 export interface VERSATILMCPConfig {
   name: string;
@@ -26,6 +27,7 @@ export interface VERSATILMCPConfig {
 export class VERSATILMCPServerV2 {
   private server: McpServer;
   private config: VERSATILMCPConfig;
+  private onboardingCompleted: boolean = false;
 
   constructor(config: VERSATILMCPConfig) {
     this.config = config;
@@ -33,6 +35,38 @@ export class VERSATILMCPServerV2 {
     this.registerResources();
     this.registerPrompts();
     this.registerTools();
+  }
+
+  /**
+   * Check and run MCP onboarding if needed (first-time setup)
+   */
+  async checkAndRunOnboarding(): Promise<void> {
+    if (this.onboardingCompleted) return;
+
+    try {
+      const mcpOnboarding = getMCPOnboarding();
+      const status = await mcpOnboarding.checkOnboardingStatus();
+
+      if (status.isFirstTime) {
+        this.config.logger.info('First-time MCP installation detected - running automatic onboarding...');
+        const result = await mcpOnboarding.runAutoOnboarding();
+
+        if (result.success) {
+          this.config.logger.info('MCP onboarding completed successfully');
+          this.config.logger.info(`Created files: ${result.createdFiles.join(', ')}`);
+          this.onboardingCompleted = true;
+        } else {
+          this.config.logger.warn('MCP onboarding failed', result.message);
+        }
+      } else {
+        this.config.logger.info('MCP configuration detected - skipping onboarding');
+        this.onboardingCompleted = true;
+      }
+    } catch (error) {
+      this.config.logger.error('Error during MCP onboarding check', error);
+      // Don't fail server startup if onboarding fails
+      this.onboardingCompleted = true;
+    }
   }
 
   /**
@@ -1143,7 +1177,59 @@ Provide query execution plans with optimization strategies.`,
       }
     );
 
-    this.config.logger.info('VERSATIL MCP tools registered successfully', { count: 14 });
+    this.server.tool(
+      'versatil_welcome_setup',
+      'Get onboarding status, setup instructions, and configuration checklist for VERSATIL MCP',
+      {
+        title: 'Welcome & Setup',
+        readOnlyHint: true,
+        destructiveHint: false,
+        showDetails: z.boolean().optional(),
+      },
+      async ({ showDetails = true }) => {
+        const mcpOnboarding = getMCPOnboarding();
+        const status = await mcpOnboarding.checkOnboardingStatus();
+        const instructions = await mcpOnboarding.getSetupInstructions();
+
+        const response: any = {
+          setupComplete: status.setupComplete,
+          frameworkHome: status.frameworkHome,
+          instructions,
+        };
+
+        if (showDetails) {
+          response.details = {
+            hasPreferences: status.hasPreferences,
+            hasEnvFile: status.hasEnvFile,
+            missingComponents: status.missingComponents,
+            mcpPrimitives: {
+              tools: 15,
+              resources: 5,
+              prompts: 5,
+            },
+            operaAgents: [
+              { id: 'enhanced-maria', name: 'Maria-QA', specialization: 'Quality assurance and testing' },
+              { id: 'enhanced-james', name: 'James-Frontend', specialization: 'UI/UX development' },
+              { id: 'enhanced-marcus', name: 'Marcus-Backend', specialization: 'API and backend development' },
+              { id: 'alex-ba', name: 'Alex-BA', specialization: 'Business analysis and requirements' },
+              { id: 'sarah-pm', name: 'Sarah-PM', specialization: 'Project coordination' },
+              { id: 'dr-ai-ml', name: 'Dr.AI-ML', specialization: 'AI/ML development' },
+            ],
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(response, null, 2),
+            },
+          ],
+        };
+      }
+    );
+
+    this.config.logger.info('VERSATIL MCP tools registered successfully', { count: 15 });
   }
 
   /**
@@ -1161,12 +1247,15 @@ Provide query execution plans with optimization strategies.`,
    * Start server with stdio transport (default)
    */
   async start(): Promise<void> {
+    // Check and run onboarding if needed (first-time MCP setup)
+    await this.checkAndRunOnboarding();
+
     const transport = new StdioServerTransport();
     await this.connect(transport);
     this.config.logger.info('VERSATIL MCP Server started with stdio transport', {
       name: this.config.name,
       version: this.config.version,
-      tools: 14,
+      tools: 15,
       resources: 5,
       prompts: 5,
     });

@@ -7,7 +7,7 @@ import express from 'express';
 import { createServer } from 'http';
 // import { Server as SocketServer } from 'socket.io';
 import { SDLCOrchestrator } from './flywheel/sdlc-orchestrator.js';
-import { AgentRegistry } from './agents/agent-registry.js';
+import { AgentRegistry } from './agents/core/agent-registry.js';
 import { VERSATILLogger } from './utils/logger.js';
 import { PerformanceMonitor } from './analytics/performance-monitor.js';
 // import { VERSATILMCPServer } from './mcp/versatil-mcp-server.js';

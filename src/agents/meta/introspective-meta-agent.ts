@@ -3,8 +3,7 @@
  * Has complete visibility into all framework operations and can optimize itself
  */
 
-import { BaseAgent } from '../base-agent.js';
-import { AgentResponse, AgentActivationContext } from '../agent-types.js';
+import { BaseAgent, AgentResponse, AgentActivationContext } from '../core/base-agent.js';
 import { VERSATILLogger } from '../../utils/logger.js';
 import { IsolatedVERSATILOrchestrator } from '../../orchestration/isolated-versatil-orchestrator.js';
 import { AgenticRAGOrchestrator, AgentMemory } from '../../orchestration/agentic-rag-orchestrator.js';

@@ -6,6 +6,8 @@
 import { chromium, Browser, BrowserContext, Page } from 'playwright';
 import type { ChromeMCPConfig, AccessibilityReport, PerformanceMetrics } from './chrome-mcp-config.js';
 import { DEFAULT_CHROME_MCP_CONFIG } from './chrome-mcp-config.js';
+import { getConsoleErrorMonitor, type ConsoleMonitoringResult } from '../agents/opera/maria-qa/console-error-monitor.js';
+import { getNetworkRequestTracker, type NetworkAnalysis } from '../agents/opera/maria-qa/network-request-tracker.js';
 
 export interface MCPExecutionResult {
   success: boolean;
@@ -19,6 +21,8 @@ export class ChromeMCPExecutor {
   private context: BrowserContext | null = null;
   private activeSessions: Map<string, Page> = new Map();
   private config: ChromeMCPConfig;
+  private consoleMonitor = getConsoleErrorMonitor();
+  private networkTracker = getNetworkRequestTracker();
 
   constructor(config: Partial<ChromeMCPConfig> = {}) {
     this.config = { ...DEFAULT_CHROME_MCP_CONFIG, ...config };
@@ -87,6 +91,11 @@ export class ChromeMCPExecutor {
       const page = await this.context.newPage();
       this.activeSessions.set('current', page);
 
+      // Start monitoring
+      console.log(`🔍 Starting console & network monitoring...`);
+      await this.consoleMonitor.startMonitoring(page);
+      await this.networkTracker.startTracking(page);
+
       // Navigate to URL
       console.log(`🌐 Navigating to ${url}`);
       await page.goto(url, {
@@ -153,7 +162,12 @@ export class ChromeMCPExecutor {
         }));
       });
 
+      // Get monitoring results
+      const consoleErrors = await this.consoleMonitor.stopMonitoring();
+      const networkAnalysis = await this.networkTracker.stopTracking();
+
       console.log(`✅ Snapshot captured: ${components.length} components detected`);
+      console.log(`📊 Console errors: ${consoleErrors.totalErrors}, Network requests: ${networkAnalysis.totalRequests}`);
 
       return {
         success: true,
@@ -169,7 +183,25 @@ export class ChromeMCPExecutor {
             accessibility_checkpoints: components.length,
             interaction_points: components.filter(c => c.tag === 'BUTTON').length
           },
-          readiness: 'ready_for_testing'
+          readiness: 'ready_for_testing',
+          monitoring: {
+            console_errors: {
+              total: consoleErrors.totalErrors,
+              critical: consoleErrors.errorsBySeverity.critical,
+              has_react_errors: consoleErrors.hasReactErrors,
+              has_api_errors: consoleErrors.hasAPIErrors,
+              summary: consoleErrors.summary,
+              errors: consoleErrors.errors.slice(0, 5) // First 5 errors
+            },
+            network: {
+              total_requests: networkAnalysis.totalRequests,
+              failed_requests: networkAnalysis.failedRequests.length,
+              slow_requests: networkAnalysis.slowRequests.length,
+              average_response_time: networkAnalysis.performanceMetrics.averageResponseTime.toFixed(2) + 'ms',
+              success_rate: networkAnalysis.performanceMetrics.successRate.toFixed(1) + '%',
+              summary: networkAnalysis.summary
+            }
+          }
         },
         executionTime: Date.now() - startTime
       };

@@ -10,7 +10,7 @@
 import { PatternAnalyzer, AnalysisResult } from './pattern-analyzer.js';
 import { PromptGenerator, PromptContext, GeneratedPrompt } from './prompt-generator.js';
 import { AIIntegration, AnalysisResponse, createFromEnv } from './ai-integration.js';
-import { AgentRegistry } from '../agents/agent-registry.js';
+import { AgentRegistry } from '../agents/core/agent-registry.js';
 import { EnhancedVectorMemoryStore, MemoryDocument, RAGQuery } from '../rag/enhanced-vector-memory-store.js';
 
 export interface FileContext {

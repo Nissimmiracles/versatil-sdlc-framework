@@ -11,16 +11,17 @@
  * - Emergency response capabilities
  */
 
-import { EnhancedMaria } from '../../agents/enhanced-maria.js';
-import { EnhancedJames } from '../../agents/enhanced-james.js';
-import { EnhancedMarcus } from '../../agents/enhanced-marcus.js';
-import { SarahPm } from '../../agents/sarah-pm.js';
-import { AlexBa } from '../../agents/alex-ba.js';
-import { DrAiMl } from '../../agents/dr-ai-ml.js';
+import { EnhancedMaria } from '../../agents/opera/maria-qa/enhanced-maria.js';
+import { EnhancedJames } from '../../agents/opera/james-frontend/enhanced-james.js';
+import { EnhancedMarcus } from '../../agents/opera/marcus-backend/enhanced-marcus.js';
+import { SarahPm } from '../../agents/opera/sarah-pm/sarah-pm.js';
+import { AlexBa } from '../../agents/opera/alex-ba/alex-ba.js';
+import { DrAiMl } from '../../agents/opera/dr-ai-ml/dr-ai-ml.js';
 import { EnhancedVectorMemoryStore } from '../../rag/enhanced-vector-memory-store.js';
-import { ParallelTaskManager, Task, TaskType, Priority, SDLCPhase, CollisionRisk, ResourceType } from '../../orchestration/parallel-task-manager.js';
+import { Task, TaskType, Priority, SDLCPhase, CollisionRisk, ResourceType } from '../../orchestration/parallel-task-manager.js';
+import { executeWithSDK, type SDKExecutionResult } from '../../agents/sdk/versatil-query.js';
 import { AutomatedStressTestGenerator, TestTarget, TargetType } from '../automated-stress-test-generator.js';
-import { AgentActivationContext } from '../../agents/base-agent.js';
+import { AgentActivationContext } from '../../agents/core/base-agent.js';
 
 // ==================== SCENARIO TEST FRAMEWORK ====================
 
@@ -152,7 +153,6 @@ export class MultiAgentScenarioRunner {
   private alex: AlexBa;
   private drAiMl: DrAiMl;
   private vectorStore: EnhancedVectorMemoryStore;
-  private taskManager: ParallelTaskManager;
   private stressTestGenerator: AutomatedStressTestGenerator;
   private traces: AgentTrace[] = [];
   private startTime: number = 0;
@@ -162,11 +162,11 @@ export class MultiAgentScenarioRunner {
     this.maria = new EnhancedMaria(this.vectorStore);
     this.james = new EnhancedJames(this.vectorStore);
     this.marcus = new EnhancedMarcus(this.vectorStore);
-    this.sarah = new SarahPm();
-    this.alex = new AlexBa();
-    this.drAiMl = new DrAiMl();
-    this.taskManager = new ParallelTaskManager();
-    this.stressTestGenerator = new AutomatedStressTestGenerator();
+    this.sarah = new SarahPm(this.vectorStore);
+    this.alex = new AlexBa(this.vectorStore);
+    this.drAiMl = new DrAiMl(this.vectorStore);
+    // Note: ParallelTaskManager removed - using Claude SDK native parallelization
+    this.stressTestGenerator = new AutomatedStressTestGenerator(this.vectorStore);
   }
 
   /**

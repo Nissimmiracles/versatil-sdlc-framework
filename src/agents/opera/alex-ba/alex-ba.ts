@@ -5,10 +5,16 @@
  * RAG-Enhanced: Learns from requirements patterns, user story templates, business rules
  */
 
-import { RAGEnabledAgent, RAGConfig, AgentRAGContext } from './rag-enabled-agent.js';
-import { AgentResponse, AgentActivationContext } from './base-agent.js';
-import { PatternAnalyzer, AnalysisResult } from '../intelligence/pattern-analyzer.js';
-import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
+import { RAGEnabledAgent, RAGConfig, AgentRAGContext } from '../../core/rag-enabled-agent.js';
+import { AgentResponse, AgentActivationContext } from '../../core/base-agent.js';
+import { PatternAnalyzer, AnalysisResult } from '../../../intelligence/pattern-analyzer.js';
+import { EnhancedVectorMemoryStore } from '../../../rag/enhanced-vector-memory-store.js';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export class AlexBa extends RAGEnabledAgent {
   name = 'AlexBa';
@@ -276,5 +282,109 @@ Focus on clear, testable requirements and business value articulation.`;
     }
 
     return handoffs;
+  }
+
+  /**
+   * NEW v6.1: Initialize PRD template
+   */
+  async initializePRD(options: {
+    projectName: string;
+    outputPath?: string;
+  }): Promise<{ success: boolean; filePath?: string; error?: string }> {
+    try {
+      const templatePath = path.join(__dirname, 'templates', 'prd-template.md');
+      const template = await fs.readFile(templatePath, 'utf-8');
+
+      // Replace placeholders
+      const content = template
+        .replace(/\[Project Name\]/g, options.projectName)
+        .replace(/\[YYYY-MM-DD\]/g, new Date().toISOString().split('T')[0]);
+
+      // Determine output path
+      const outputPath = options.outputPath || `./docs/prd/${options.projectName.toLowerCase().replace(/\s+/g, '-')}-prd.md`;
+      const outputDir = path.dirname(outputPath);
+
+      // Ensure directory exists
+      await fs.mkdir(outputDir, { recursive: true });
+
+      // Write file
+      await fs.writeFile(outputPath, content, 'utf-8');
+
+      console.log(`[Alex-BA] PRD template initialized at: ${outputPath}`);
+      return { success: true, filePath: outputPath };
+    } catch (error: any) {
+      console.error('[Alex-BA] Failed to initialize PRD:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * NEW v6.1: Initialize BRD template
+   */
+  async initializeBRD(options: {
+    projectName: string;
+    outputPath?: string;
+  }): Promise<{ success: boolean; filePath?: string; error?: string }> {
+    try {
+      const templatePath = path.join(__dirname, 'templates', 'brd-template.md');
+      const template = await fs.readFile(templatePath, 'utf-8');
+
+      // Replace placeholders
+      const content = template
+        .replace(/\[Project Name\]/g, options.projectName)
+        .replace(/\[YYYY-MM-DD\]/g, new Date().toISOString().split('T')[0]);
+
+      // Determine output path
+      const outputPath = options.outputPath || `./docs/brd/${options.projectName.toLowerCase().replace(/\s+/g, '-')}-brd.md`;
+      const outputDir = path.dirname(outputPath);
+
+      // Ensure directory exists
+      await fs.mkdir(outputDir, { recursive: true });
+
+      // Write file
+      await fs.writeFile(outputPath, content, 'utf-8');
+
+      console.log(`[Alex-BA] BRD template initialized at: ${outputPath}`);
+      return { success: true, filePath: outputPath };
+    } catch (error: any) {
+      console.error('[Alex-BA] Failed to initialize BRD:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * NEW v6.1: Initialize User Story template
+   */
+  async initializeUserStory(options: {
+    storyId: string;
+    epicName?: string;
+    outputPath?: string;
+  }): Promise<{ success: boolean; filePath?: string; error?: string }> {
+    try {
+      const templatePath = path.join(__dirname, 'templates', 'user-story-template.md');
+      const template = await fs.readFile(templatePath, 'utf-8');
+
+      // Replace placeholders
+      const content = template
+        .replace(/US-\[Number\]/g, options.storyId)
+        .replace(/\[Epic Name\/ID\]/g, options.epicName || '[Epic Name]')
+        .replace(/\[YYYY-MM-DD\]/g, new Date().toISOString().split('T')[0]);
+
+      // Determine output path
+      const outputPath = options.outputPath || `./docs/user-stories/${options.storyId.toLowerCase()}.md`;
+      const outputDir = path.dirname(outputPath);
+
+      // Ensure directory exists
+      await fs.mkdir(outputDir, { recursive: true });
+
+      // Write file
+      await fs.writeFile(outputPath, content, 'utf-8');
+
+      console.log(`[Alex-BA] User Story template initialized at: ${outputPath}`);
+      return { success: true, filePath: outputPath };
+    } catch (error: any) {
+      console.error('[Alex-BA] Failed to initialize User Story:', error);
+      return { success: false, error: error.message };
+    }
   }
 }

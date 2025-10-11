@@ -14,7 +14,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { ParallelTaskManager, Task, TaskType, Priority, SDLCPhase, CollisionRisk } from '../orchestration/parallel-task-manager.js';
+import { Task, TaskType, Priority, SDLCPhase, CollisionRisk } from '../orchestration/parallel-task-manager.js';
 import { AutomatedStressTestGenerator, StressTestType, TargetType } from '../testing/automated-stress-test-generator.js';
 import { DailyAuditSystem, AuditType, CheckCategory } from '../audit/daily-audit-system.js';
 
@@ -189,14 +189,14 @@ export enum ConflictStrategy {
 
 export class EnhancedOPERAConfigManager extends EventEmitter {
   private agentConfigs: Map<string, EnhancedAgentConfig> = new Map();
-  private taskManager: ParallelTaskManager;
   private stressTestGenerator: AutomatedStressTestGenerator;
   private auditSystem: DailyAuditSystem;
   private activeAgents: Set<string> = new Set();
 
   constructor() {
     super();
-    this.taskManager = new ParallelTaskManager();
+    // Note: ParallelTaskManager removed - using Claude SDK native parallelization
+    // See src/agents/sdk/versatil-query.ts for SDK-based task execution
     this.stressTestGenerator = new AutomatedStressTestGenerator();
     this.auditSystem = new DailyAuditSystem();
     this.initializeEnhancedConfigs();
@@ -904,10 +904,13 @@ export class EnhancedOPERAConfigManager extends EventEmitter {
    * Setup integration between rules and agent systems
    */
   private setupRuleIntegration(): void {
-    // Rule 1: Parallel Task Execution Integration
-    this.taskManager.on('task:added', (event) => {
-      this.handleRule1Trigger(event);
-    });
+    // Note: ParallelTaskManager removed - using Claude SDK native parallelization
+    // Event-driven integration now handled via SDK execution pipeline
+
+    // Legacy code commented out - replaced by SDK workflow
+    // this.taskManager.on('task:added', (event) => {
+    //   this.handleRule1Trigger(event);
+    // });
 
     // Rule 2: Stress Testing Integration
     this.stressTestGenerator.on('generation:completed', (event) => {

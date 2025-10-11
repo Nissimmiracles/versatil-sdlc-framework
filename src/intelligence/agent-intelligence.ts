@@ -5,7 +5,7 @@
  * to enable continuous improvement based on real user interactions.
  */
 
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../agents/base-agent.js';
+import { BaseAgent, AgentActivationContext, AgentResponse } from '../agents/core/base-agent.js';
 import { usageAnalytics } from './usage-analytics.js';
 import { adaptiveLearning } from './adaptive-learning.js';
 import { VERSATILLogger } from '../utils/logger.js';

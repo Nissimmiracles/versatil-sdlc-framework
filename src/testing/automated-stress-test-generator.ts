@@ -14,7 +14,9 @@
 
 import { EventEmitter } from 'events';
 import { EnvironmentManager } from '../environment/environment-manager.js';
-import { ParallelTaskManager, Task, TaskType, Priority, SDLCPhase, CollisionRisk, ResourceType } from '../orchestration/parallel-task-manager.js';
+import { Task, TaskType, Priority, SDLCPhase, CollisionRisk, ResourceType } from '../orchestration/parallel-task-manager.js';
+import { executeWithSDK, type SDKExecutionResult } from '../agents/sdk/versatil-query.js';
+import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
 
 export interface StressTestConfig {
   id: string;
@@ -299,16 +301,16 @@ export enum EffortLevel {
 
 export class AutomatedStressTestGenerator extends EventEmitter {
   private environmentManager: EnvironmentManager;
-  private taskManager: ParallelTaskManager;
+  private vectorStore?: EnhancedVectorMemoryStore;
   private testConfigs: Map<string, StressTestConfig> = new Map();
   private activeTests: Map<string, StressTestResult> = new Map();
   private testHistory: StressTestResult[] = [];
   private aiPatterns: Map<string, TestPattern> = new Map();
 
-  constructor() {
+  constructor(vectorStore?: EnhancedVectorMemoryStore) {
     super();
     this.environmentManager = new EnvironmentManager();
-    this.taskManager = new ParallelTaskManager();
+    this.vectorStore = vectorStore;
     this.initializeAIPatterns();
     this.startContinuousLearning();
   }
@@ -388,11 +390,20 @@ export class AutomatedStressTestGenerator extends EventEmitter {
         };
       });
 
-      // Execute tests in parallel
-      const taskResults = await this.taskManager.executeParallel(tasks.map(t => t.id));
+      // Execute tests in parallel using Claude SDK
+      const sdkResults = await executeWithSDK({
+        tasks: tasks,
+        ragContext: `Executing ${testIds.length} parallel stress tests with Maria-QA agent`,
+        mcpTools: ['Read', 'Write', 'Bash', 'Chrome', 'Playwright', 'WebFetch'],
+        vectorStore: this.vectorStore,
+        model: 'sonnet'
+      });
+
+      // SDK already returns a Map<string, SDKExecutionResult>
+      const taskResults = sdkResults;
 
       // Process results
-      for (const [taskId, taskExecution] of taskResults) {
+      for (const [taskId, taskExecution] of taskResults.entries()) {
         const testId = taskId.replace('stress_test_', '');
         const config = this.testConfigs.get(testId);
 
@@ -1291,8 +1302,8 @@ export class AutomatedStressTestGenerator extends EventEmitter {
   }
 
   public async cancelTest(testId: string): Promise<void> {
-    const taskId = `stress_test_${testId}`;
-    await this.taskManager.cancelTask(taskId);
+    // Note: Task cancellation now handled via SDK workflow
+    // taskManager.cancelTask removed - SDK manages task lifecycle
 
     const result = this.activeTests.get(testId);
     if (result) {

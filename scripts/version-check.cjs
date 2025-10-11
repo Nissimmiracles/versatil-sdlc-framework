@@ -326,18 +326,42 @@ Usage: node scripts/version-check.js [options]
 
 Options:
   --fix        Automatically fix common issues
+  --json       Output results as JSON
   --help, -h   Show this help
 
 Examples:
   node scripts/version-check.js
   node scripts/version-check.js --fix
+  node scripts/version-check.js --json
 `);
     process.exit(0);
   }
 
   const checker = new VersionChecker();
 
-  if (args.includes('--fix')) {
+  if (args.includes('--json')) {
+    // Run checks silently
+    checker.checkMainPackage();
+    if (checker.mainVersion) {
+      checker.checkCLIPackage();
+      checker.checkSourceFiles();
+      checker.checkDocumentation();
+      checker.checkGitTags();
+      checker.checkDependencies();
+    }
+
+    // Output JSON
+    const result = {
+      success: checker.errors.length === 0,
+      version: checker.mainVersion,
+      errors: checker.errors,
+      warnings: checker.warnings,
+      errorCount: checker.errors.length,
+      warningCount: checker.warnings.length
+    };
+    console.log(JSON.stringify(result, null, 2));
+    process.exit(checker.errors.length === 0 ? 0 : 1);
+  } else if (args.includes('--fix')) {
     checker.checkMainPackage();
     checker.fix();
   } else {

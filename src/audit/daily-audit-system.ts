@@ -15,7 +15,9 @@
 
 import { EventEmitter } from 'events';
 import { EnvironmentManager } from '../environment/environment-manager.js';
-import { ParallelTaskManager, Task, TaskType, Priority, SDLCPhase, CollisionRisk, ResourceType } from '../orchestration/parallel-task-manager.js';
+import { Task, TaskType, Priority, SDLCPhase, CollisionRisk, ResourceType } from '../orchestration/parallel-task-manager.js';
+import { executeWithSDK, type SDKExecutionResult } from '../agents/sdk/versatil-query.js';
+import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
 
 export interface AuditConfig {
   id: string;
@@ -378,17 +380,17 @@ export interface AuditSummary {
 
 export class DailyAuditSystem extends EventEmitter {
   private environmentManager: EnvironmentManager;
-  private taskManager: ParallelTaskManager;
+  private vectorStore?: EnhancedVectorMemoryStore;
   private auditConfigs: Map<string, AuditConfig> = new Map();
   private activeAudits: Map<string, AuditResult> = new Map();
   private auditHistory: AuditResult[] = [];
   private schedules: Map<string, NodeJS.Timeout> = new Map();
   private healthChecks: Map<string, HealthCheck> = new Map();
 
-  constructor() {
+  constructor(vectorStore?: EnhancedVectorMemoryStore) {
     super();
     this.environmentManager = new EnvironmentManager();
-    this.taskManager = new ParallelTaskManager();
+    this.vectorStore = vectorStore;
     this.initializeDefaultChecks();
     this.initializeDefaultAudits();
     this.startScheduler();
@@ -446,8 +448,17 @@ export class DailyAuditSystem extends EventEmitter {
       // Create parallel tasks for all health checks
       const checkTasks = await this.createCheckTasks(config.checks, auditId);
 
-      // Execute checks in parallel
-      const taskResults = await this.taskManager.executeParallel(checkTasks.map(t => t.id));
+      // Execute checks in parallel using Claude SDK
+      const sdkResults = await executeWithSDK({
+        tasks: checkTasks,
+        ragContext: `Executing ${config.type} audit with ${config.checks.length} health checks`,
+        mcpTools: ['Read', 'Bash', 'Grep', 'WebFetch'],
+        vectorStore: this.vectorStore,
+        model: 'sonnet'
+      });
+
+      // Convert SDK results to legacy format for compatibility
+      const taskResults = this.convertSDKToLegacyResults(sdkResults);
 
       // Process check results
       const checkResults = await this.processCheckResults(taskResults, config.checks);
@@ -726,6 +737,24 @@ export class DailyAuditSystem extends EventEmitter {
         },
         weight: 0.9,
         critical: false,
+        enabled: true
+      },
+      {
+        id: 'quality_version_consistency',
+        name: 'Version Consistency',
+        category: CheckCategory.QUALITY,
+        type: CheckType.SCRIPT,
+        target: { type: TargetType.FILE, identifier: 'package.json' },
+        parameters: {
+          command: 'node scripts/version-check.cjs --json 2>&1'
+        },
+        thresholds: {
+          warning: { value: 0 },
+          critical: { value: 0 },
+          operator: ThresholdOperator.GREATER_THAN
+        },
+        weight: 0.8,
+        critical: true,
         enabled: true
       },
 
@@ -1689,6 +1718,26 @@ Checks Passed: ${summary.passedChecks}/${summary.totalChecks}`;
       check.enabled = false;
       this.emit('health_check:disabled', { checkId });
     }
+  }
+
+  /**
+   * Convert SDK execution results to legacy format for backward compatibility
+   * @private
+   */
+  private convertSDKToLegacyResults(sdkResults: Map<string, SDKExecutionResult>): Map<string, any> {
+    const legacyResults = new Map<string, any>();
+
+    sdkResults.forEach((sdkResult, taskId) => {
+      legacyResults.set(taskId, {
+        taskId: sdkResult.taskId,
+        status: sdkResult.status,
+        result: sdkResult.result,
+        error: sdkResult.error,
+        executionTime: sdkResult.executionTime
+      });
+    });
+
+    return legacyResults;
   }
 }
 

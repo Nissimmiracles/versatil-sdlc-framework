@@ -20,12 +20,12 @@
  */
 
 import { EventEmitter } from 'events';
-import { ConflictResolutionEngine } from '../orchestration/conflict-resolution-engine.js';
-import { MCPTaskExecutor } from '../mcp/mcp-task-executor.js';
+import { ConflictResolutionEngine } from '../../orchestration/conflict-resolution-engine.js';
+import { MCPTaskExecutor } from '../../mcp/mcp-task-executor.js';
 import { globalAgentPool, type AgentPool } from './agent-pool.js';
 import type { BaseAgent } from './base-agent.js';
-import type { SubAgent } from '../orchestration/conflict-resolution-engine.js';
-import type { Task } from '../orchestration/epic-workflow-orchestrator.js';
+import type { SubAgent } from '../../orchestration/conflict-resolution-engine.js';
+import type { Task } from '../../orchestration/epic-workflow-orchestrator.js';
 
 export interface SubAgentConfig {
   type: SubAgent['type'];
@@ -294,7 +294,7 @@ export class SubAgentFactory extends EventEmitter {
       const context = this.createAgentContext(subAgent, mcpResult);
 
       // Execute real agent work
-      const result = await agent.execute(context);
+      await agent.activate(context);
 
       console.log(`      ✅ ${type} work complete`);
 
@@ -302,7 +302,8 @@ export class SubAgentFactory extends EventEmitter {
       subAgent.resources.cpuUsage = 30 + Math.random() * 50; // 30-80%
       subAgent.resources.memoryUsage = 20 + Math.random() * 40; // 20-60%
 
-      return result;
+      // executeTask doesn't return a value
+      return;
     } catch (error: any) {
       console.error(`      ❌ ${type} work failed:`, error.message);
       throw error;
@@ -318,6 +319,7 @@ export class SubAgentFactory extends EventEmitter {
 
   /**
    * Create activation context for real agent execution
+   * NEW v6.1: Includes MCP tools inherited from parent
    */
   private createAgentContext(subAgent: SubAgentInstance, mcpResult: any): any {
     const task = subAgent.config.task;
@@ -330,7 +332,7 @@ export class SubAgentFactory extends EventEmitter {
         event: 'task_execution'
       },
       filePath: task.files?.[0] || '',
-      userRequest: `${task.title}: ${task.description}`,
+      userRequest: `${task.name}: ${task.description}`,
       contextClarity: 'clear' as const,
       urgency: this.mapPriorityToUrgency(subAgent.priority),
       taskContext: {
@@ -340,8 +342,60 @@ export class SubAgentFactory extends EventEmitter {
         files: task.files,
         dependencies: task.dependsOn,
         mcpResults: mcpResult
-      }
+      },
+      // NEW v6.1: Inherit MCP tools from parent agent
+      inheritedMCPTools: this.getInheritedMCPTools(subAgent.type, task)
     };
+  }
+
+  /**
+   * NEW v6.1: Get MCP tools that sub-agent should inherit from parent
+   */
+  private getInheritedMCPTools(agentType: SubAgent['type'], task: Task): string[] {
+    const tools: string[] = [];
+
+    // Base tools (all sub-agents get these)
+    tools.push('Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep');
+
+    // Agent-specific MCP tools
+    switch (agentType) {
+      case 'james-frontend':
+      case 'maria-qa':
+        // Frontend and QA agents get browser automation
+        tools.push('Playwright', 'Chrome');
+        break;
+
+      case 'marcus-backend':
+        // Backend agents get GitHub and database tools
+        tools.push('GitHub');
+        break;
+
+      case 'sarah-pm':
+      case 'alex-ba':
+        // PM and BA agents get GitHub for issue/PR management
+        tools.push('GitHub', 'Exa');
+        break;
+
+      case 'dr-ai-ml':
+        // AI/ML agents get Exa for research
+        tools.push('Exa');
+        break;
+    }
+
+    // Task-based tool additions
+    if (task.files) {
+      const hasTestFiles = task.files.some(f => f.includes('test') || f.includes('spec'));
+      if (hasTestFiles && !tools.includes('Playwright')) {
+        tools.push('Playwright');
+      }
+
+      const hasUIFiles = task.files.some(f => f.includes('.tsx') || f.includes('.jsx'));
+      if (hasUIFiles && !tools.includes('Chrome')) {
+        tools.push('Chrome');
+      }
+    }
+
+    return tools;
   }
 
   /**
@@ -398,7 +452,7 @@ export class SubAgentFactory extends EventEmitter {
       const config: SubAgentConfig = {
         type,
         task,
-        epicId: task.epicId,
+        epicId: (task as any).epicId || 'default-epic',
         priority: task.priority
       };
 

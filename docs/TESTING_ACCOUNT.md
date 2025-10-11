@@ -20,7 +20,9 @@ This guide provides test credentials and setup instructions for evaluating the V
 - **npm**: >= 7.0.0
 - **Claude Desktop**: Latest version (for MCP testing)
 
-### Installation
+### Installation Option 1: MCP-Only (Recommended for Testing)
+
+For quick testing with Claude Desktop, use MCP-only installation:
 
 ```bash
 # Clone repository
@@ -32,6 +34,62 @@ npm install
 
 # Build framework
 npm run build
+
+# Add to Claude Desktop config
+# The MCP server will auto-configure on first use
+```
+
+**Configuration for Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "versatil": {
+      "command": "node",
+      "args": ["/absolute/path/to/versatil-sdlc-framework/dist/mcp/versatil-mcp-server-v2.js"],
+      "env": {
+        "NODE_ENV": "production",
+        "VERSATIL_MCP_MODE": "true",
+        "VERSATIL_LOG_LEVEL": "info"
+      }
+    }
+  }
+}
+```
+
+**First-Time Setup**: When you first use the MCP server from Claude, it will:
+- ✅ Automatically create `~/.versatil/` configuration directory
+- ✅ Generate default preferences file
+- ✅ Create environment template (optional - no credentials required)
+- ✅ Show welcome message with setup instructions
+
+**Verify Setup**: After restarting Claude Desktop, ask Claude to run:
+```
+Please run the versatil_welcome_setup tool
+```
+
+This will show your configuration status and confirm everything is working.
+
+### Installation Option 2: Full Framework (For Development)
+
+For full framework features with CLI commands:
+
+```bash
+# Clone repository
+git clone https://github.com/MiraclesGIT/versatil-sdlc-framework.git
+cd versatil-sdlc-framework
+
+# Install dependencies
+npm install
+
+# Build framework
+npm run build
+
+# Install globally (optional)
+npm install -g .
+
+# Run onboarding wizard
+versatil init
 ```
 
 ### Start MCP Server (stdio mode)

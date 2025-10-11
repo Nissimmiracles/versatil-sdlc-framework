@@ -762,13 +762,13 @@ class EmergencyResponseSystem {
     // Import and return the specific agent
     try {
       if (agentName === 'enhanced-maria') {
-        const { EnhancedMaria } = await import('./agents/enhanced-maria.js');
+        const { EnhancedMaria } = await import('./agents/opera/maria-qa/enhanced-maria.js');
         return new EnhancedMaria();
       } else if (agentName === 'enhanced-james') {
-        const { EnhancedJames } = await import('./agents/enhanced-james.js');
+        const { EnhancedJames } = await import('./agents/opera/james-frontend/enhanced-james.js');
         return new EnhancedJames();
       } else if (agentName === 'enhanced-marcus') {
-        const { EnhancedMarcus } = await import('./agents/enhanced-marcus.js');
+        const { EnhancedMarcus } = await import('./agents/opera/marcus-backend/enhanced-marcus.js');
         return new EnhancedMarcus();
       }
       return null;

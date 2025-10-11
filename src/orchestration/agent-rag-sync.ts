@@ -3,8 +3,8 @@
  * Full context intelligence flywheel implementation
  */
 
-import { AgentRegistry } from '../agents/agent-registry.js';
-import { BaseAgent, AgentResponse, AgentActivationContext } from '../agents/base-agent.js';
+import { AgentRegistry } from '../agents/core/agent-registry.js';
+import { BaseAgent, AgentResponse, AgentActivationContext } from '../agents/core/base-agent.js';
 import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
 import { BidirectionalRAGSync } from '../rag/bidirectional-sync.js';
 import { CrossAgentLearning } from '../rag/cross-agent-learning.js';

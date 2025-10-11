@@ -11,13 +11,13 @@
  */
 
 import { BaseAgent } from './base-agent.js';
-import { EnhancedMaria } from './enhanced-maria.js';
-import { EnhancedJames } from './enhanced-james.js';
-import { EnhancedMarcus } from './enhanced-marcus.js';
-import { SarahPm } from './sarah-pm.js';
-import { AlexBa } from './alex-ba.js';
-import { DrAiMl } from './dr-ai-ml.js';
-import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
+import { EnhancedMaria } from '../opera/maria-qa/enhanced-maria.js';
+import { EnhancedJames } from '../opera/james-frontend/enhanced-james.js';
+import { EnhancedMarcus } from '../opera/marcus-backend/enhanced-marcus.js';
+import { SarahPm } from '../opera/sarah-pm/sarah-pm.js';
+import { AlexBa } from '../opera/alex-ba/alex-ba.js';
+import { DrAiMl } from '../opera/dr-ai-ml/dr-ai-ml.js';
+import { EnhancedVectorMemoryStore } from '../../rag/enhanced-vector-memory-store.js';
 import { EventEmitter } from 'events';
 
 export interface AgentPoolConfig {

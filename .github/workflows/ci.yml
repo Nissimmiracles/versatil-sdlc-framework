@@ -40,6 +40,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Version Consistency Check
+        run: node scripts/version-check.cjs
+        continue-on-error: false
+
       - name: Run unit tests
         run: npm run test:unit
 

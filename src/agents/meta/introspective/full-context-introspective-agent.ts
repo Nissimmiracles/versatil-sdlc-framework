@@ -4,10 +4,10 @@
  * Based on context engineering patterns
  */
 
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../base-agent.js';
-import { VERSATILLogger } from '../../utils/logger.js';
-import { vectorMemoryStore } from '../../rag/vector-memory-store.js';
-import { AgentRegistry } from '../agent-registry.js';
+import { BaseAgent, AgentActivationContext, AgentResponse } from '../../core/base-agent.js';
+import { VERSATILLogger } from '../../../utils/logger.js';
+import { vectorMemoryStore } from '../../../rag/vector-memory-store.js';
+import { AgentRegistry } from '../../core/agent-registry.js';
 import * as path from 'path';
 
 export interface SystemContext {

@@ -10,7 +10,7 @@
  */
 
 import { EnhancedVectorMemoryStore } from './enhanced-vector-memory-store.js';
-import { AgentResponse, AgentActivationContext } from '../agents/base-agent.js';
+import { AgentResponse, AgentActivationContext } from '../agents/core/base-agent.js';
 
 export interface WinningPattern {
   id: string;

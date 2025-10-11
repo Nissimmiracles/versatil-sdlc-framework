@@ -19,6 +19,8 @@ import { AutomatedStressTestGenerator, StressTestConfig, TargetType } from '../t
 import { DailyAuditSystem, AuditConfig, AuditType } from '../audit/daily-audit-system.js';
 import { EnhancedOPERAConfigManager, EnhancedAgentConfig } from '../agents/enhanced-opera-config.js';
 import { EnvironmentManager } from '../environment/environment-manager.js';
+import { executeWithSDK, type SDKExecutionResult } from '../agents/sdk/versatil-query.js';
+import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
 
 export interface VersatilConfig {
   id: string;
@@ -198,11 +200,13 @@ export class VersatilOrchestrator extends EventEmitter {
   private auditSystem: DailyAuditSystem;
   private configManager: EnhancedOPERAConfigManager;
   private environmentManager: EnvironmentManager;
+  private vectorStore?: EnhancedVectorMemoryStore;
 
   private metrics: VersatilMetrics;
   private startTime: Date;
   private isRunning: boolean = false;
   private monitoringInterval: NodeJS.Timeout | null = null;
+  private useSDKParallelization: boolean = true; // Toggle for gradual migration
 
   constructor(config?: Partial<VersatilConfig>) {
     super();
@@ -216,6 +220,13 @@ export class VersatilOrchestrator extends EventEmitter {
     this.auditSystem = new DailyAuditSystem();
     this.configManager = new EnhancedOPERAConfigManager();
     this.environmentManager = new EnvironmentManager();
+
+    // Initialize vector store for RAG context in SDK execution
+    try {
+      this.vectorStore = new EnhancedVectorMemoryStore();
+    } catch (error) {
+      console.warn('VectorStore initialization failed, RAG context disabled:', error);
+    }
 
     this.metrics = this.initializeMetrics();
 
@@ -305,39 +316,181 @@ export class VersatilOrchestrator extends EventEmitter {
 
   /**
    * Execute Rule 1: Parallel task execution with collision detection
+   *
+   * NEW: Uses Claude SDK native parallelization when useSDKParallelization=true
+   * LEGACY: Falls back to custom ParallelTaskManager for backward compatibility
    */
   async executeRule1(tasks: Task[]): Promise<Map<string, any>> {
     if (!this.config.rules.rule1_parallel_execution.enabled) {
       throw new Error('Rule 1 (Parallel Execution) is not enabled');
     }
 
-    this.emit('rule1:execution_started', { taskCount: tasks.length });
+    this.emit('rule1:execution_started', {
+      taskCount: tasks.length,
+      executionMethod: this.useSDKParallelization ? 'Claude SDK' : 'ParallelTaskManager'
+    });
 
     try {
-      // Add tasks to the task manager
-      const taskIds: string[] = [];
-      for (const task of tasks) {
-        const taskId = await this.taskManager.addTask(task);
-        taskIds.push(taskId);
-      }
+      let results: Map<string, any>;
 
-      // Execute tasks in parallel with collision detection
-      const results = await this.taskManager.executeParallel(taskIds);
+      if (this.useSDKParallelization) {
+        // NEW APPROACH: Use Claude SDK native parallelization
+        // Benefits:
+        // - Automatic parallel execution by Anthropic
+        // - No manual collision detection needed
+        // - 88% code reduction (879 lines → ~100 lines)
+        // - Native SDK optimization
+
+        const sdkResults = await executeWithSDK({
+          tasks,
+          ragContext: await this.getRAGContext(tasks),
+          mcpTools: this.getMCPToolsForTasks(tasks),
+          vectorStore: this.vectorStore,
+          model: 'sonnet'
+        });
+
+        // Convert SDK results to legacy format for compatibility
+        results = this.convertSDKToLegacyResults(sdkResults);
+
+      } else {
+        // LEGACY APPROACH: Use custom ParallelTaskManager
+        // Kept for backward compatibility and gradual migration
+
+        const taskIds: string[] = [];
+        for (const task of tasks) {
+          const taskId = await this.taskManager.addTask(task);
+          taskIds.push(taskId);
+        }
+
+        results = await this.taskManager.executeParallel(taskIds);
+      }
 
       // Update metrics
       this.metrics.rules.rule1_tasks_executed += tasks.length;
 
       this.emit('rule1:execution_completed', {
         taskCount: tasks.length,
-        successCount: Array.from(results.values()).filter(r => r.status === 'completed').length
+        successCount: Array.from(results.values()).filter(r => r.status === 'completed').length,
+        executionMethod: this.useSDKParallelization ? 'Claude SDK' : 'ParallelTaskManager'
       });
 
       return results;
 
     } catch (error) {
-      this.emit('rule1:execution_failed', { error, taskCount: tasks.length });
+      this.emit('rule1:execution_failed', {
+        error,
+        taskCount: tasks.length,
+        executionMethod: this.useSDKParallelization ? 'Claude SDK' : 'ParallelTaskManager'
+      });
       throw error;
     }
+  }
+
+  /**
+   * Get RAG context for tasks to enable zero context loss
+   */
+  private async getRAGContext(tasks: Task[]): Promise<string> {
+    if (!this.vectorStore) {
+      return '';
+    }
+
+    try {
+      // Build query from task names and types
+      const query = tasks.map(t => `${t.name} ${t.type}`).join(' ');
+
+      // Search vector store for relevant context
+      const results = await this.vectorStore.searchMemories(query, 10);
+
+      if (results.length === 0) {
+        return '';
+      }
+
+      // Format context for SDK
+      let context = '## RAG Context (Zero Context Loss)\n\n';
+      context += 'Relevant patterns and knowledge from past executions:\n\n';
+
+      results.forEach((result, idx) => {
+        context += `### Pattern ${idx + 1} (Similarity: ${(result.similarity * 100).toFixed(1)}%)\n`;
+        context += `${result.content}\n\n`;
+      });
+
+      return context;
+
+    } catch (error) {
+      console.warn('Failed to fetch RAG context:', error);
+      return '';
+    }
+  }
+
+  /**
+   * Get appropriate MCP tools for tasks based on their types
+   */
+  private getMCPToolsForTasks(tasks: Task[]): string[] {
+    const toolsSet = new Set<string>();
+
+    // Base tools always available
+    toolsSet.add('Read');
+    toolsSet.add('Write');
+    toolsSet.add('Edit');
+    toolsSet.add('Bash');
+    toolsSet.add('Glob');
+    toolsSet.add('Grep');
+
+    // Add task-specific tools
+    tasks.forEach(task => {
+      switch (task.type) {
+        case TaskType.TESTING:
+          toolsSet.add('Chrome');
+          toolsSet.add('Playwright');
+          break;
+        case TaskType.DEVELOPMENT:
+          // Base tools sufficient
+          break;
+        case TaskType.DOCUMENTATION:
+          toolsSet.add('WebFetch');
+          break;
+        case TaskType.DEPLOYMENT:
+          toolsSet.add('WebFetch');
+          // AWS MCP would be added here if available
+          break;
+        case TaskType.MONITORING:
+          toolsSet.add('WebFetch');
+          // Sentry MCP would be added here if available
+          break;
+      }
+    });
+
+    return Array.from(toolsSet);
+  }
+
+  /**
+   * Convert SDK execution results to legacy format for backward compatibility
+   */
+  private convertSDKToLegacyResults(sdkResults: Map<string, SDKExecutionResult>): Map<string, any> {
+    const legacyResults = new Map<string, any>();
+
+    sdkResults.forEach((sdkResult, taskId) => {
+      legacyResults.set(taskId, {
+        taskId: sdkResult.taskId,
+        status: sdkResult.status,
+        result: sdkResult.result,
+        error: sdkResult.error,
+        duration: sdkResult.executionTime,
+        timestamp: Date.now(),
+        executionMethod: 'Claude SDK'
+      });
+    });
+
+    return legacyResults;
+  }
+
+  /**
+   * Toggle between SDK and legacy parallelization
+   * Useful for A/B testing and gradual migration
+   */
+  public setSDKParallelization(enabled: boolean): void {
+    this.useSDKParallelization = enabled;
+    this.emit('configuration:sdk_parallelization_toggled', { enabled });
   }
 
   /**

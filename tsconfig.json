@@ -38,6 +38,7 @@
     "dist",
     "tests",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "src/simulation/**/*"
   ]
 }

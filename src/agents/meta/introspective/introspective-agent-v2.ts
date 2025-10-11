@@ -6,9 +6,8 @@
  * any issues that arise.
  */
 
-import { BaseAgent } from '../base-agent.js';
-import { AgentResponse, AgentActivationContext } from '../agent-types.js';
-import { VERSATILLogger } from '../../utils/logger.js';
+import { BaseAgent, AgentResponse, AgentActivationContext } from '../../core/base-agent.js';
+import { VERSATILLogger } from '../../../utils/logger.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { spawn } from 'child_process';

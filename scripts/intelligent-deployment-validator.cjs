@@ -211,6 +211,9 @@ class IntelligentDeploymentValidator {
       }
     }
 
+    // Check version consistency
+    await this.validateVersionConsistency(totalScore);
+
     this.deploymentScore = Math.max(0, totalScore);
 
     console.log(chalk.green(`  ✅ Intelligence analysis complete`));
@@ -319,6 +322,63 @@ class IntelligentDeploymentValidator {
     }
 
     console.log(chalk.gray('\n🎯 Powered by VERSATIL Enhanced OPERA Agents'));
+  }
+
+  async validateVersionConsistency(totalScore) {
+    console.log(chalk.yellow('  🔍 Checking version consistency...'));
+
+    try {
+      const { execSync } = require('child_process');
+
+      // Run version check
+      const result = execSync('node scripts/version-check.cjs --json', {
+        encoding: 'utf8',
+        stdio: 'pipe'
+      });
+
+      const versionData = JSON.parse(result);
+
+      if (!versionData.success) {
+        // Add errors as critical issues
+        versionData.errors.forEach(error => {
+          this.criticalIssues.push({
+            type: 'VERSION_INCONSISTENCY',
+            source: 'Version Consistency Checker',
+            message: error,
+            action: 'Fix version inconsistencies before deployment'
+          });
+          totalScore -= 25;
+        });
+
+        console.log(chalk.red(`  ❌ Version consistency check failed: ${versionData.errors.length} errors`));
+      } else if (versionData.warnings.length > 0) {
+        // Add warnings
+        versionData.warnings.forEach(warning => {
+          this.warnings.push({
+            type: 'VERSION_WARNING',
+            source: 'Version Consistency Checker',
+            message: warning,
+            action: 'Review and update if necessary'
+          });
+          totalScore -= 5;
+        });
+
+        console.log(chalk.yellow(`  ⚠️  Version warnings: ${versionData.warnings.length}`));
+      } else {
+        console.log(chalk.green(`  ✅ Version consistency validated (v${versionData.version})`));
+      }
+    } catch (error) {
+      // If version check script fails to run
+      this.warnings.push({
+        type: 'VERSION_CHECK_FAILED',
+        source: 'Version Consistency Checker',
+        message: 'Could not run version consistency check',
+        action: 'Manually verify version consistency'
+      });
+      console.log(chalk.yellow('  ⚠️  Version check could not be executed'));
+    }
+
+    return totalScore;
   }
 }
 

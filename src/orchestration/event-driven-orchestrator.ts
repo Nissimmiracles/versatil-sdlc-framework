@@ -10,8 +10,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { AgentResponse, AgentActivationContext } from '../agents/base-agent.js';
-import { AgentPool } from '../agents/agent-pool.js';
+import { AgentResponse, AgentActivationContext } from '../agents/core/base-agent.js';
+import { AgentPool } from '../agents/core/agent-pool.js';
 import { VERSATILLogger } from '../utils/logger.js';
 
 const logger = new VERSATILLogger();

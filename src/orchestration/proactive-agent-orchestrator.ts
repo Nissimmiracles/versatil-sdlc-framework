@@ -11,10 +11,12 @@
 import { EventEmitter } from 'events';
 import { watch, FSWatcher } from 'fs';
 import { join, extname, basename } from 'path';
-import { AgentActivationContext, AgentResponse } from '../agents/base-agent.js';
-import { EnhancedMaria } from '../agents/enhanced-maria.js';
-import { EnhancedJames } from '../agents/enhanced-james.js';
-import { EnhancedMarcus } from '../agents/enhanced-marcus.js';
+import { AgentActivationContext, AgentResponse } from '../agents/core/base-agent.js';
+import { EnhancedMaria } from '../agents/opera/maria-qa/enhanced-maria.js';
+import { EnhancedJames } from '../agents/opera/james-frontend/enhanced-james.js';
+import { EnhancedMarcus } from '../agents/opera/marcus-backend/enhanced-marcus.js';
+import { getProactiveCapabilityEnhancer } from './proactive-capability-enhancer.js';
+import type { RequiredCapabilities, EnhancementResult } from './proactive-capability-enhancer.js';
 
 export interface ProactiveAgentConfig {
   enabled: boolean;
@@ -50,6 +52,7 @@ export class ProactiveAgentOrchestrator extends EventEmitter {
   private activeAgents: Map<string, ActiveAgent>;
   private watchers: Map<string, FSWatcher>;
   private agents: Map<string, any>;
+  private capabilityEnhancer: ReturnType<typeof getProactiveCapabilityEnhancer>; // NEW v6.1
 
   constructor(config?: Partial<ProactiveAgentConfig>) {
     super();
@@ -67,9 +70,11 @@ export class ProactiveAgentOrchestrator extends EventEmitter {
     this.activeAgents = new Map();
     this.watchers = new Map();
     this.agents = new Map();
+    this.capabilityEnhancer = getProactiveCapabilityEnhancer(); // NEW v6.1
 
     this.initializeAgents();
     this.initializeTriggers();
+    this.setupCapabilityEnhancerListeners(); // NEW v6.1
   }
 
   /**
@@ -133,6 +138,52 @@ export class ProactiveAgentOrchestrator extends EventEmitter {
         'database_query_optimization'
       ]
     });
+  }
+
+  /**
+   * NEW v6.1: Setup capability enhancer event listeners
+   */
+  private setupCapabilityEnhancerListeners(): void {
+    this.capabilityEnhancer.on('requirements-analyzed', (requirements: RequiredCapabilities) => {
+      console.log(`[ProactiveOrchestrator] Task requirements analyzed: ${requirements.recommendedTools.join(', ')}`);
+    });
+
+    this.capabilityEnhancer.on('gap-detected', (gap) => {
+      console.log(`[ProactiveOrchestrator] Capability gap detected for ${gap.agentType}: ${gap.reason}`);
+    });
+
+    this.capabilityEnhancer.on('agent-enhanced', (result: EnhancementResult & { reason: string }) => {
+      console.log(`[ProactiveOrchestrator] Agent enhanced: ${result.agentType} + [${result.toolsAdded.join(', ')}]`);
+      this.emit('agent-capability-enhanced', result);
+    });
+  }
+
+  /**
+   * NEW v6.1: Proactively enhance agent before activation
+   */
+  private async enhanceAgentForTask(agentId: string, context: AgentActivationContext): Promise<EnhancementResult | null> {
+    // Convert activation context to task format for analysis
+    const mockTask = {
+      id: `task-${Date.now()}`,
+      name: context.userRequest || 'File analysis',
+      description: context.userRequest || '',
+      type: this.inferTaskType(context),
+      priority: context.urgency === 'high' ? 9 : context.urgency === 'medium' ? 5 : 3,
+      files: context.filePath ? [context.filePath] : []
+    };
+
+    return await this.capabilityEnhancer.proactiveEnhancement(agentId, mockTask as any);
+  }
+
+  /**
+   * NEW v6.1: Infer task type from context
+   */
+  private inferTaskType(context: AgentActivationContext): 'development' | 'testing' | 'documentation' | 'deployment' {
+    const filePath = context.filePath || '';
+    if (filePath.includes('test') || filePath.includes('spec')) return 'testing';
+    if (filePath.includes('.md') || filePath.includes('docs')) return 'documentation';
+    if (filePath.includes('deploy') || filePath.includes('ci')) return 'deployment';
+    return 'development';
   }
 
   /**
@@ -291,6 +342,18 @@ export class ProactiveAgentOrchestrator extends EventEmitter {
         backgroundAnalysis: true
       }
     };
+
+    // NEW v6.1: Proactively enhance agent with required capabilities
+    const enhancement = await this.enhanceAgentForTask(agentId, context);
+    if (enhancement?.success) {
+      console.log(`   ✅ Agent ${agentId} enhanced with: ${enhancement.toolsAdded.join(', ')}`);
+      // Add enhancement info to context
+      context.metadata = {
+        ...context.metadata,
+        mcpToolsEnhanced: enhancement.toolsAdded,
+        capabilitiesGranted: enhancement.capabilitiesGranted
+      };
+    }
 
     // Track active agent
     const activeAgent: ActiveAgent = {

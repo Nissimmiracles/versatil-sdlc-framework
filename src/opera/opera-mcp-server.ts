@@ -44,8 +44,11 @@ export class OperaMCPServer {
     //  Tool: Set Autonomous Goal
     this.server.tool(
       'opera_set_goal',
-      'Set an autonomous development goal for Opera to achieve',
+      'Set an autonomous development goal for Opera orchestrator to achieve',
       {
+        title: 'Set Autonomous Goal',
+        readOnlyHint: false,
+        destructiveHint: false,
         type: z.enum(['feature', 'bug_fix', 'optimization', 'refactor', 'security', 'testing']),
         description: z.string(),
         priority: z.enum(['critical', 'high', 'medium', 'low']),
@@ -96,8 +99,11 @@ export class OperaMCPServer {
     // Tool: Get Goals
     this.server.tool(
       'opera_get_goals',
-      'Get all active, completed, or failed goals',
+      'Get all active, completed, or failed autonomous development goals',
       {
+        title: 'Get Goals',
+        readOnlyHint: true,
+        destructiveHint: false,
         status: z.enum(['active', 'completed', 'failed', 'all']).optional(),
         includeHistory: z.boolean().optional(),
       },
@@ -132,8 +138,11 @@ export class OperaMCPServer {
     // Tool: Execute Goal
     this.server.tool(
       'opera_execute_goal',
-      'Execute a specific goal autonomously with optional dry-run',
+      'Execute a specific autonomous goal with optional dry-run mode',
       {
+        title: 'Execute Goal',
+        readOnlyHint: false,
+        destructiveHint: false,
         goalId: z.string(),
         dryRun: z.boolean().optional(),
         approveSteps: z.boolean().optional(),
@@ -168,8 +177,11 @@ export class OperaMCPServer {
     // Tool: Get Opera Status
     this.server.tool(
       'opera_get_status',
-      'Get Opera orchestrator status and metrics',
+      'Get Opera orchestrator status, metrics, and active goals',
       {
+        title: 'Get Opera Status',
+        readOnlyHint: true,
+        destructiveHint: false,
         detailed: z.boolean().optional(),
       },
       async ({ detailed = false }) => {
@@ -200,8 +212,11 @@ export class OperaMCPServer {
     // Tool: Analyze Project
     this.server.tool(
       'opera_analyze_project',
-      'Analyze project for improvement opportunities',
+      'Analyze project for improvement opportunities and optimization recommendations',
       {
+        title: 'Analyze Project',
+        readOnlyHint: true,
+        destructiveHint: false,
         depth: z.enum(['quick', 'standard', 'comprehensive', 'deep']).optional(),
         focus: z.array(z.enum(['performance', 'security', 'quality', 'architecture', 'testing'])).optional(),
       },
@@ -234,8 +249,11 @@ export class OperaMCPServer {
     // Tool: Health Check
     this.server.tool(
       'opera_health_check',
-      'Perform comprehensive health check on Opera orchestrator',
+      'Perform comprehensive health check on Opera orchestrator and all components',
       {
+        title: 'Opera Health Check',
+        readOnlyHint: true,
+        destructiveHint: false,
         comprehensive: z.boolean().optional(),
       },
       async ({ comprehensive = false }) => {

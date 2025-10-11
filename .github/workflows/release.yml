@@ -29,6 +29,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Version Consistency Check
+        run: node scripts/version-check.cjs
+        continue-on-error: false
+
+      - name: Pre-Deployment Validation
+        run: node scripts/intelligent-deployment-validator.cjs
+        continue-on-error: false
+
       - name: Run unit tests
         run: npm run test:unit
         # TODO: Re-enable full test suite after fixing integration test hangs
@@ -100,6 +108,10 @@ jobs:
             LICENSE
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post-Deployment Verification
+        run: node scripts/verify-deployment.cjs
+        continue-on-error: false
 
       - name: Verify release
         run: |

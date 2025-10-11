@@ -1,8 +1,14 @@
-import { RAGEnabledAgent, RAGConfig, AgentRAGContext } from './rag-enabled-agent.js';
-import { AgentResponse, AgentActivationContext } from './base-agent.js';
-import { PatternAnalyzer, AnalysisResult } from '../intelligence/pattern-analyzer.js';
-import { PromptGenerator } from '../intelligence/prompt-generator.js';
-import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
+import { RAGEnabledAgent, RAGConfig, AgentRAGContext } from '../../core/rag-enabled-agent.js';
+import { AgentResponse, AgentActivationContext } from '../../core/base-agent.js';
+import { PatternAnalyzer, AnalysisResult } from '../../../intelligence/pattern-analyzer.js';
+import { PromptGenerator } from '../../../intelligence/prompt-generator.js';
+import { EnhancedVectorMemoryStore } from '../../../rag/enhanced-vector-memory-store.js';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export class EnhancedMarcus extends RAGEnabledAgent {
   name = 'EnhancedMarcus';
@@ -667,5 +673,39 @@ Provide comprehensive backend analysis with historical architecture patterns and
     if (content.includes('hapi')) return 'hapi';
     if (content.includes('nestjs') || content.includes('@nestjs')) return 'nestjs';
     return '';
+  }
+
+  /**
+   * NEW v6.1: Initialize Architecture document template
+   */
+  async initializeArchitecture(options: {
+    projectName: string;
+    outputPath?: string;
+  }): Promise<{ success: boolean; filePath?: string; error?: string }> {
+    try {
+      const templatePath = path.join(__dirname, 'templates', 'architecture-template.md');
+      const template = await fs.readFile(templatePath, 'utf-8');
+
+      // Replace placeholders
+      const content = template
+        .replace(/\[Project Name\]/g, options.projectName)
+        .replace(/\[YYYY-MM-DD\]/g, new Date().toISOString().split('T')[0]);
+
+      // Determine output path
+      const outputPath = options.outputPath || `./docs/architecture/${options.projectName.toLowerCase().replace(/\s+/g, '-')}-architecture.md`;
+      const outputDir = path.dirname(outputPath);
+
+      // Ensure directory exists
+      await fs.mkdir(outputDir, { recursive: true });
+
+      // Write file
+      await fs.writeFile(outputPath, content, 'utf-8');
+
+      console.log(`[Marcus-Backend] Architecture document initialized at: ${outputPath}`);
+      return { success: true, filePath: outputPath };
+    } catch (error: any) {
+      console.error('[Marcus-Backend] Failed to initialize Architecture document:', error);
+      return { success: false, error: error.message };
+    }
   }
 }

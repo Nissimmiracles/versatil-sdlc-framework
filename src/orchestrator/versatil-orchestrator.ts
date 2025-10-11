@@ -2,7 +2,7 @@
  * VERSATIL Main Orchestrator
  */
 
-import { AgentRegistry } from '../agents/agent-registry.js';
+import { AgentRegistry } from '../agents/core/agent-registry.js';
 import { VERSATILLogger } from '../utils/logger.js';
 
 export class VERSATILOrchestrator {

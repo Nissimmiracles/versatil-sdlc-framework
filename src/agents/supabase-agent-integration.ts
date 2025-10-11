@@ -6,10 +6,10 @@
  */
 
 import { SupabaseVectorStore, CodePattern, AgentSolution, AgentInteraction } from '../lib/supabase-vector-store.js';
-import { RAGEnabledAgent, AgentRAGContext } from './rag-enabled-agent.js';
+import { RAGEnabledAgent, AgentRAGContext } from './core/rag-enabled-agent.js';
 import { MemoryDocument } from '../rag/enhanced-vector-memory-store.js';
 import { AnalysisResult } from '../intelligence/pattern-analyzer.js';
-import { AgentActivationContext } from './base-agent.js';
+import { AgentActivationContext } from './core/base-agent.js';
 import { VERSATILLogger } from '../utils/logger.js';
 
 export interface SupabaseRAGConfig {

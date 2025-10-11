@@ -3,10 +3,10 @@
  * Provides client-side integration for MCP tools with VERSATIL agents
  */
 
-import { AgentRegistry } from '../agents/agent-registry.js';
+import { AgentRegistry } from '../agents/core/agent-registry.js';
 import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator.js';
 import { VERSATILLogger } from '../utils/logger.js';
-import type { AgentResponse, AgentActivationContext } from '../agents/base-agent.js';
+import type { AgentResponse, AgentActivationContext } from '../agents/core/base-agent.js';
 
 export interface MCPClientConfig {
   serverPath: string;

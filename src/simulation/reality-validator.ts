@@ -14,7 +14,7 @@ import { promisify } from 'util';
 import { EventEmitter } from 'events';
 import { VERSATILLogger } from '../utils/logger.js';
 import { GeneratedTestSuite } from './test-generator.js';
-import { SimulationScenario, TestCase } from '../agents/simulation-qa.js';
+import { SimulationScenario, TestCase } from '../agents/opera/maria-qa/simulation-qa.js';
 
 const execAsync = promisify(exec);
 

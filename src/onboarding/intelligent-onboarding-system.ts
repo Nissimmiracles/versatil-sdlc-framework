@@ -9,10 +9,12 @@ import { AgenticRAGOrchestrator } from '../orchestration/agentic-rag-orchestrato
 import { ParallelTaskManager } from '../orchestration/parallel-task-manager.js';
 import { DailyAuditSystem } from '../audit/daily-audit-system.js';
 import { CredentialWizard } from './credential-wizard.js';
+import { getServicesForAgents, getAgentsUsingService } from './credential-templates.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import * as readline from 'readline';
 
 const execAsync = promisify(exec);
 
@@ -57,14 +59,43 @@ export interface ProjectAnalysis {
   recommendedAgents: string[];
   recommendedRules: string[];
   estimatedSetupTime: number;
+  hasExistingFramework?: boolean;
+  existingFrameworkVersion?: string;
+  conflictingFiles?: string[];
+  migrationRequired?: boolean;
+}
+
+export interface ExistingInstallation {
+  version: string;
+  installedAt: string;
+  agents: Record<string, any>;
+  rules: Record<string, any>;
+  configPath: string;
+}
+
+export interface ConflictReport {
+  hasConflicts: boolean;
+  existingInstallation: ExistingInstallation | null;
+  conflictingFrameworks: string[];
+  versionMismatch: boolean;
+  corruptedInstallation: boolean;
+  recommendations: ('UPGRADE_REQUIRED' | 'DOWNGRADE_WARNING' | 'REPAIR_INSTALLATION' | 'REVIEW_COEXISTENCE' | 'FRESH_INSTALL')[];
+  missingFiles: string[];
+}
+
+export interface ConflictResolution {
+  strategy: 'PROCEED' | 'UPGRADE' | 'REPAIR' | 'MIGRATE' | 'COEXIST' | 'CANCEL';
+  actions: string[];
+  backupCreated?: boolean;
+  backupPath?: string;
 }
 
 export class IntelligentOnboardingSystem extends EventEmitter {
   private logger: VERSATILLogger;
   private ragOrchestrator?: AgenticRAGOrchestrator;
-  private parallelTaskManager?: ParallelTaskManager;
   private auditSystem?: DailyAuditSystem;
   private projectRoot: string;
+  // Note: parallelTaskManager removed - using Claude SDK native parallelization via VersatilOrchestrator
 
   // Onboarding configuration
   private onboardingSteps: Map<string, OnboardingStep> = new Map();
@@ -90,8 +121,31 @@ export class IntelligentOnboardingSystem extends EventEmitter {
     this.logger.info('Starting intelligent onboarding process');
 
     try {
-      // Step 1: Project analysis
+      // **STEP 0: Detect conflicts FIRST (before any changes)**
+      const conflicts = await this.detectConflicts();
+      const resolution = await this.handleConflicts(conflicts);
+
+      // Handle cancellation
+      if (resolution.strategy === 'CANCEL') {
+        return {
+          success: false,
+          message: 'Installation cancelled by user',
+          errors: ['User chose not to proceed with installation']
+        };
+      }
+
+      // Log resolution actions
+      if (resolution.actions.length > 0) {
+        console.log('\n✅ Conflict resolution completed:');
+        resolution.actions.forEach(action => console.log(`   • ${action}`));
+        console.log('');
+      }
+
+      // Step 1: Project analysis (enhanced with conflict detection)
       const analysis = await this.analyzeProject();
+      analysis.hasExistingFramework = conflicts.existingInstallation !== null;
+      analysis.existingFrameworkVersion = conflicts.existingInstallation?.version;
+      analysis.migrationRequired = resolution.strategy === 'UPGRADE' || resolution.strategy === 'MIGRATE';
       this.projectAnalysis = analysis;
 
       // Step 2: Create or update user profile
@@ -818,7 +872,337 @@ export class IntelligentOnboardingSystem extends EventEmitter {
   }
 
   /**
-   * Setup credentials for external services
+   * Detect existing framework installations and conflicts
+   */
+  private async detectConflicts(): Promise<ConflictReport> {
+    this.logger.info('Detecting existing installations and conflicts');
+
+    const conflicts: ConflictReport = {
+      hasConflicts: false,
+      existingInstallation: null,
+      conflictingFrameworks: [],
+      versionMismatch: false,
+      corruptedInstallation: false,
+      recommendations: [],
+      missingFiles: []
+    };
+
+    try {
+      // Check for existing VERSATIL installation
+      const configPath = path.join(this.projectRoot, '.versatil/config.json');
+      if (await this.fileExists('.versatil/config.json')) {
+        const configContent = await fs.readFile(configPath, 'utf8');
+        const config = JSON.parse(configContent);
+
+        conflicts.existingInstallation = {
+          version: config.version || 'unknown',
+          installedAt: config.initialized_at || 'unknown',
+          agents: config.agents || {},
+          rules: config.rules || {},
+          configPath
+        };
+
+        // Version comparison
+        const currentVersion = '6.1.0'; // Should match package.json
+        if (config.version && config.version !== currentVersion) {
+          conflicts.versionMismatch = true;
+          conflicts.hasConflicts = true;
+
+          // Simple version comparison (for production, use semver library)
+          const [existingMajor, existingMinor] = config.version.split('.').map(Number);
+          const [currentMajor, currentMinor] = currentVersion.split('.').map(Number);
+
+          if (existingMajor < currentMajor || (existingMajor === currentMajor && existingMinor < currentMinor)) {
+            conflicts.recommendations.push('UPGRADE_REQUIRED');
+          } else {
+            conflicts.recommendations.push('DOWNGRADE_WARNING');
+          }
+        }
+
+        // Check for corrupted installation
+        const requiredFiles = [
+          '.versatil/config.json',
+          '.versatil/agents',
+          '.versatil/rules',
+          '.versatil/memory'
+        ];
+
+        for (const file of requiredFiles) {
+          if (!(await this.fileExists(file))) {
+            conflicts.missingFiles.push(file);
+            conflicts.corruptedInstallation = true;
+            conflicts.hasConflicts = true;
+          }
+        }
+
+        if (conflicts.corruptedInstallation) {
+          conflicts.recommendations.push('REPAIR_INSTALLATION');
+        }
+      } else {
+        conflicts.recommendations.push('FRESH_INSTALL');
+      }
+
+      // Check for conflicting frameworks in package.json
+      try {
+        const packageJsonPath = path.join(this.projectRoot, 'package.json');
+        const packageJsonContent = await fs.readFile(packageJsonPath, 'utf8');
+        const packageJson = JSON.parse(packageJsonContent);
+
+        const conflictingFrameworks = [
+          'sdlc-framework-competitor',
+          'other-development-framework',
+          'alternative-sdlc-tool'
+        ];
+
+        const allDeps = {
+          ...packageJson.dependencies,
+          ...packageJson.devDependencies
+        };
+
+        for (const framework of conflictingFrameworks) {
+          if (allDeps[framework]) {
+            conflicts.conflictingFrameworks.push(framework);
+            conflicts.hasConflicts = true;
+            conflicts.recommendations.push('REVIEW_COEXISTENCE');
+          }
+        }
+      } catch (error) {
+        // package.json doesn't exist or is invalid - not a critical error
+        this.logger.debug('Could not read package.json for conflict detection');
+      }
+
+      this.logger.info('Conflict detection complete', {
+        hasConflicts: conflicts.hasConflicts,
+        recommendations: conflicts.recommendations.length
+      });
+
+      return conflicts;
+    } catch (error) {
+      this.logger.error('Conflict detection failed', { error });
+      // Return default no-conflicts result to allow installation to proceed
+      return conflicts;
+    }
+  }
+
+  /**
+   * Handle conflicts based on detected issues
+   */
+  private async handleConflicts(conflicts: ConflictReport): Promise<ConflictResolution> {
+    if (!conflicts.hasConflicts) {
+      return { strategy: 'PROCEED', actions: [] };
+    }
+
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+
+    const ask = (question: string): Promise<string> => {
+      return new Promise(resolve => {
+        rl.question(question, answer => {
+          resolve(answer.trim());
+        });
+      });
+    };
+
+    const askYesNo = async (question: string, defaultYes: boolean = true): Promise<boolean> => {
+      const defaultStr = defaultYes ? 'Y/n' : 'y/N';
+      const answer = await ask(`${question} (${defaultStr}): `);
+      if (!answer) return defaultYes;
+      return answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes';
+    };
+
+    try {
+      // Upgrade scenario
+      if (conflicts.versionMismatch && conflicts.recommendations.includes('UPGRADE_REQUIRED')) {
+        console.log('\n🔄 Existing VERSATIL installation detected');
+        console.log(`   Current version: ${conflicts.existingInstallation?.version}`);
+        console.log(`   New version: 6.1.0\n`);
+
+        const shouldUpgrade = await askYesNo('Would you like to upgrade to the latest version?', true);
+
+        if (shouldUpgrade) {
+          const resolution = await this.performUpgrade(conflicts.existingInstallation!);
+          rl.close();
+          return resolution;
+        } else {
+          rl.close();
+          return { strategy: 'CANCEL', actions: [] };
+        }
+      }
+
+      // Repair scenario
+      if (conflicts.corruptedInstallation) {
+        console.log('\n⚠️  Corrupted VERSATIL installation detected');
+        console.log(`   Missing files: ${conflicts.missingFiles.join(', ')}\n`);
+
+        const shouldRepair = await askYesNo('Would you like to repair the installation?', true);
+
+        if (shouldRepair) {
+          const resolution = await this.performRepair(conflicts.missingFiles);
+          rl.close();
+          return resolution;
+        }
+      }
+
+      // Coexistence scenario
+      if (conflicts.conflictingFrameworks.length > 0) {
+        console.log('\n⚠️  Conflicting frameworks detected:');
+        conflicts.conflictingFrameworks.forEach(f => console.log(`   • ${f}`));
+
+        console.log('\nOptions:');
+        console.log('1. Install VERSATIL alongside existing frameworks');
+        console.log('2. Cancel installation\n');
+
+        const choice = await ask('Your choice (1-2): ');
+
+        if (choice === '1') {
+          rl.close();
+          return { strategy: 'COEXIST', actions: ['Proceeding with coexistence mode'] };
+        } else {
+          rl.close();
+          return { strategy: 'CANCEL', actions: [] };
+        }
+      }
+
+      rl.close();
+      return { strategy: 'PROCEED', actions: [] };
+    } catch (error) {
+      rl.close();
+      this.logger.error('Conflict handling failed', { error });
+      return { strategy: 'CANCEL', actions: [] };
+    }
+  }
+
+  /**
+   * Perform version upgrade with backup
+   */
+  private async performUpgrade(existingInstallation: ExistingInstallation): Promise<ConflictResolution> {
+    const actions: string[] = [];
+
+    try {
+      // Create backup directory
+      const timestamp = Date.now();
+      const backupDir = path.join(this.projectRoot, `.versatil/backups/${timestamp}`);
+      await fs.mkdir(backupDir, { recursive: true });
+
+      // Backup existing config
+      const configBackupPath = path.join(backupDir, 'config.json');
+      await fs.copyFile(existingInstallation.configPath, configBackupPath);
+      actions.push(`Backed up config to ${backupDir}`);
+
+      // Merge configurations
+      const newConfig = await this.mergeConfigs(existingInstallation);
+      await fs.writeFile(
+        existingInstallation.configPath,
+        JSON.stringify(newConfig, null, 2)
+      );
+      actions.push('Merged old and new configurations');
+      actions.push('Preserved user customizations');
+
+      return {
+        strategy: 'UPGRADE',
+        actions,
+        backupCreated: true,
+        backupPath: backupDir
+      };
+    } catch (error) {
+      this.logger.error('Upgrade failed', { error });
+      return {
+        strategy: 'CANCEL',
+        actions: [`Upgrade failed: ${error instanceof Error ? error.message : String(error)}`]
+      };
+    }
+  }
+
+  /**
+   * Repair corrupted installation
+   */
+  private async performRepair(missingFiles: string[]): Promise<ConflictResolution> {
+    const actions: string[] = [];
+
+    try {
+      for (const file of missingFiles) {
+        const fullPath = path.join(this.projectRoot, file);
+
+        // Check if it's a directory or file
+        if (file.endsWith('/') || !file.includes('.')) {
+          await fs.mkdir(fullPath, { recursive: true });
+          actions.push(`Created missing directory: ${file}`);
+        } else {
+          // Create default file based on type
+          if (file.includes('config.json')) {
+            const defaultConfig = {
+              version: '6.1.0',
+              initialized_at: new Date().toISOString(),
+              agents: {},
+              rules: {}
+            };
+            await fs.writeFile(fullPath, JSON.stringify(defaultConfig, null, 2));
+            actions.push(`Recreated config file: ${file}`);
+          }
+        }
+      }
+
+      return { strategy: 'REPAIR', actions };
+    } catch (error) {
+      this.logger.error('Repair failed', { error });
+      return {
+        strategy: 'CANCEL',
+        actions: [`Repair failed: ${error instanceof Error ? error.message : String(error)}`]
+      };
+    }
+  }
+
+  /**
+   * Merge old and new configurations
+   */
+  private async mergeConfigs(oldInstallation: ExistingInstallation): Promise<any> {
+    const defaultConfig = {
+      version: '6.1.0',
+      project: {},
+      agents: {},
+      rules: {
+        parallel_execution: { enabled: false },
+        stress_testing: { enabled: false },
+        daily_audit: { enabled: false }
+      },
+      initialized_at: oldInstallation.installedAt,
+      upgraded_at: new Date().toISOString(),
+      previous_version: oldInstallation.version
+    };
+
+    // Preserve user customizations
+    return {
+      ...defaultConfig,
+      agents: { ...defaultConfig.agents, ...oldInstallation.agents },
+      rules: { ...defaultConfig.rules, ...oldInstallation.rules },
+      project: oldInstallation.agents || {}
+    };
+  }
+
+  /**
+   * Get active agents from configuration
+   */
+  private async getActiveAgents(): Promise<string[]> {
+    try {
+      const configPath = path.join(this.projectRoot, '.versatil/config.json');
+      if (await this.fileExists('.versatil/config.json')) {
+        const config = JSON.parse(await fs.readFile(configPath, 'utf8'));
+        return Object.keys(config.agents || {}).filter(agentId =>
+          config.agents[agentId].enabled !== false
+        );
+      }
+    } catch (error) {
+      this.logger.debug('Could not read active agents from config');
+    }
+
+    // Return recommended agents based on project analysis
+    return this.projectAnalysis?.recommendedAgents || [];
+  }
+
+  /**
+   * Setup credentials for external services with agent awareness
    */
   private async setupCredentials(): Promise<any> {
     this.logger.info('Starting credential setup');
@@ -828,6 +1212,20 @@ export class IntelligentOnboardingSystem extends EventEmitter {
       console.log('\n📦 Step 5: Service Credentials Setup\n');
       console.log('VERSATIL integrates with external services (Supabase, Vertex AI, etc.)');
       console.log('Let\'s configure your API keys and credentials.\n');
+
+      // Get active agents to determine needed services
+      const activeAgents = await this.getActiveAgents();
+
+      if (activeAgents.length > 0) {
+        const neededServices = getServicesForAgents(activeAgents);
+
+        console.log('📊 Based on your active agents, you need:\n');
+        neededServices.forEach(service => {
+          const agents = getAgentsUsingService(service.id);
+          console.log(`  • ${service.name} - Used by: ${agents.join(', ')}`);
+        });
+        console.log('');
+      }
 
       const wizard = new CredentialWizard();
       const result = await wizard.run({ interactive: true });
