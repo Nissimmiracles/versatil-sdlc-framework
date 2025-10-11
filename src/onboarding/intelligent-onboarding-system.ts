@@ -1133,7 +1133,7 @@ export class IntelligentOnboardingSystem extends EventEmitter {
           // Create default file based on type
           if (file.includes('config.json')) {
             const defaultConfig = {
-              version: '6.1.0',
+              version: '1.0.0',
               initialized_at: new Date().toISOString(),
               agents: {},
               rules: {}
@@ -1159,7 +1159,7 @@ export class IntelligentOnboardingSystem extends EventEmitter {
    */
   private async mergeConfigs(oldInstallation: ExistingInstallation): Promise<any> {
     const defaultConfig = {
-      version: '6.1.0',
+      version: '1.0.0',
       project: {},
       agents: {},
       rules: {

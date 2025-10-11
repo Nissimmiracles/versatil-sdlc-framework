@@ -145,7 +145,7 @@ export class VERSATILMCPHTTPServer {
       res.json({
         status: 'healthy',
         service: 'versatil-mcp-server',
-        version: '6.1.0',
+        version: '1.0.0',
         uptime: process.uptime(),
         timestamp: new Date().toISOString(),
       });
@@ -221,7 +221,7 @@ export class VERSATILMCPHTTPServer {
     this.app.get('/info', (req, res) => {
       res.json({
         name: 'VERSATIL SDLC Framework MCP Server',
-        version: '6.1.0',
+        version: '1.0.0',
         transport: 'HTTP/SSE',
         endpoints: {
           sse: '/sse',

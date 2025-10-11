@@ -1,0 +1,31 @@
+
+> @versatil/sdlc-framework@6.1.0 test:coverage
+> node scripts/show-framework-active.cjs && jest --coverage
+
+
+[36m[1m╔═══════════════════════════════════════════════════════════╗[0m
+[36m[1m║  🔄 VERSATIL Framework Active                            ║[0m
+[36m[1m╚═══════════════════════════════════════════════════════════╝[0m
+
+[1mFramework Status:[0m
+  [32m●[0m Orchestrators: [1m8/8 active[0m
+    [32m✓[0m [2mProactiveOrchestrator[0m
+    [32m✓[0m [2micRAGOrchestrator[0m
+    [32m✓[0m [2mPlanFirstOpera[0m
+    [32m✓[0m [2mStackAware[0m
+    [2m... and 4 more[0m
+  🟢 Sync Score: [1m100%[0m
+
+[36m▶[0m [1mrunning...[0m
+
+● Multiple configurations found:
+
+    * /Users/nissimmenashe/VERSATIL SDLC FW/jest.config.js
+    * /Users/nissimmenashe/VERSATIL SDLC FW/jest.config.cjs
+
+  Implicit config resolution does not allow multiple configuration files.
+  Either remove unused config files or select one explicitly with `--config`.
+
+  Configuration Documentation:
+  https://jestjs.io/docs/configuration
+

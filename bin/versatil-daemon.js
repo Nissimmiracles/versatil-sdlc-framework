@@ -63,7 +63,7 @@ class VERSATILDaemon {
       pid: daemon.pid,
       projectPath,
       startTime: Date.now(),
-      version: '4.3.2'
+      version: '1.0.0'
     }, null, 2));
 
     // Pipe logs to file

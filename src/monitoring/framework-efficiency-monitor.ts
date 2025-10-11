@@ -898,7 +898,7 @@ export class FrameworkEfficiencyMonitor extends EventEmitter {
           activation_type: type,
           timestamp: new Date().toISOString(),
           session_id: `session_${Date.now()}`,
-          framework_version: '5.1.0'
+          framework_version: '1.0.0'
         });
       }
     } catch (error) {
@@ -920,7 +920,7 @@ export class FrameworkEfficiencyMonitor extends EventEmitter {
           agent_ids: agentIds,
           results: results || {},
           timestamp: new Date().toISOString(),
-          framework_version: '5.1.0'
+          framework_version: '1.0.0'
         });
       }
     } catch (error) {
@@ -943,7 +943,7 @@ export class FrameworkEfficiencyMonitor extends EventEmitter {
           error_message: error?.message || String(error),
           error_stack: error?.stack,
           timestamp: new Date().toISOString(),
-          framework_version: '5.1.0'
+          framework_version: '1.0.0'
         });
       }
     } catch (error) {

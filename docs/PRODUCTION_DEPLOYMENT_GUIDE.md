@@ -864,7 +864,7 @@ Ensure your application has a health check endpoint:
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
-    version: '6.1.0',
+    version: '1.0.0',
     uptime: process.uptime(),
     timestamp: new Date().toISOString()
   });
