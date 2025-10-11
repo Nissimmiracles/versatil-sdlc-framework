@@ -2,12 +2,13 @@
   "mcpServers": {
     "versatil-sdlc": {
       "command": "node",
-      "args": ["dist/mcp-server.js"],
+      "args": ["/Users/nissimmenashe/VERSATIL SDLC FW/dist/mcp/versatil-mcp-server-v2.js", "/Users/nissimmenashe/VERSATIL SDLC FW"],
       "cwd": "/Users/nissimmenashe/VERSATIL SDLC FW",
       "env": {
         "NODE_ENV": "production",
         "VERSATIL_MCP_MODE": "true",
         "VERSATIL_HOME": "~/.versatil",
+        "VERSATIL_PROJECT_PATH": "/Users/nissimmenashe/VERSATIL SDLC FW",
         "VERSATIL_RULES_ENABLED": "true",
         "RULE_1_PARALLEL_EXECUTION": "true",
         "RULE_2_STRESS_TESTING": "true",

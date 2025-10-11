@@ -1,956 +1,297 @@
-# 🚀 VERSATIL SDLC Framework
+# 🎭 Claude Opera by VERSATIL
 
-> **V**ersioned **E**xpert **R**eliable **S**martly **T**riggered **A**I **I**ntelligent **L**earning
-> **S**oftware **D**evelopment **L**ife **C**ycle Framework
+> Production-ready OPERA orchestration for Claude with 11-MCP ecosystem, 6 specialized agents, and zero context loss through RAG memory.
 
-![Version](https://img.shields.io/badge/version-5.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
 ![TypeScript](https://img.shields.io/badge/typescript-5.0+-blue.svg)
 ![MCP](https://img.shields.io/badge/MCP-11%20integrations-purple.svg)
-![OPERA](https://img.shields.io/badge/OPERA-methodology-orange.svg)
-![Security](https://img.shields.io/badge/security-enterprise%20grade-red.svg)
+![OPERA](https://img.shields.io/badge/OPERA-6%20agents-orange.svg)
 ![Test Coverage](https://img.shields.io/badge/coverage-85%25+-brightgreen.svg)
 
 [![CI](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/CI/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/ci.yml)
 [![NPM Publish](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/Publish%20to%20npm/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/npm-publish.yml)
 [![MCP Integration](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/MCP%20Integration%20Tests/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/mcp-integration.yml)
 [![Security Scan](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/Security%20Scanning/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/security-scan.yml)
-[![Agent Performance](https://github.com/Nissimmiracles/versatil-sdlc-framework/workflows/Agent%20Performance%20Benchmarks/badge.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions/workflows/agent-performance.yml)
-
-**🌟 The world's first autonomous AI-Native SDLC framework with 14-MCP ecosystem, RAG memory, OPERA orchestration, and self-learning agents achieving ZERO CONTEXT LOSS.**
-
-> **✨ Independent AI-Native SDLC Platform** - VERSATIL is NOT built on Claude Agent SDK. We provide a superior, production-ready alternative with RAG memory (98%+ retention vs. SDK's 45% lossy compaction), 6 specialized OPERA agents (vs. generic subagents), proactive daemon orchestration (vs. manual calls), and complete SDLC automation. See [SDK Compatibility Guide](docs/guides/claude-sdk-compatibility.md) for details.
-
-### 🎉 Version 5.1.0 - Chrome MCP Integration & Frontend Testing
-
-- **🌐 Chrome MCP Integration** - Real Playwright browser automation for Maria-QA agent
-- **4 New Chrome Tools** - Navigate, snapshot, test components, browser management
-- **📊 Frontend Analysis** - Automated reporting with component detection & performance metrics
-- **🧠 UltraThink Complete** - All 36/36 methods with real git analysis (no mocks/stubs)
-- **✅ Production-Tested** - Successfully validated on VERSSAI production app
-- **📈 Enhanced Testing** - 118/118 tests passing, 85%+ coverage maintained
-- **⚡ Fast Browser Ops** - < 5s per operation, enterprise-ready
-
-### 🎉 Version 5.0.0 Features - COMPLETE 11-MCP Ecosystem:
-- **🎭 Complete MCP Ecosystem** - **11 strategic MCP integrations** empowering all 6 agents
-- **✅ Phase 1 COMPLETE** - Playwright, GitHub, Exa Search MCPs (3 MCPs)
-- **✅ Phase 2 COMPLETE** - Vertex AI (Gemini) + Enhanced Supabase (2 MCPs)
-- **✅ Phase 3 COMPLETE** - n8n, Semgrep, Sentry automation MCPs (3 MCPs)
-- **🤖 AI/ML Integration** - Google Cloud Vertex AI with Gemini 1.5 Pro for ML operations
-- **💾 Vector Search** - Enhanced Supabase with pgvector for RAG memory
-- **🔒 Security Scanning** - Semgrep MCP with OWASP Top 10 detection (30+ languages)
-- **📊 Error Monitoring** - Sentry MCP with AI-powered Seer root cause analysis
-- **🔄 Workflow Automation** - n8n MCP with 525+ integration nodes
-- **5,244+ Lines** - Production-ready MCP integration code
-- **✨ 100% Production-Ready** - All mocks and stubs replaced with real implementations
-- **🔌 Full MCP Integration** - Chrome/Playwright, GitHub, and Shadcn MCPs fully functional
-- **📊 Real Metrics & Analytics** - Intelligence Dashboard with actual usage data and trends
-- **🧪 Advanced Complexity Analysis** - Python (radon), Go (gocyclo), Java (PMD/checkstyle) support
-- **📈 Rule 1-5 Tracking** - Real monitoring for parallel execution, stress testing, audits, onboarding, releases
-- **🎯 Enhanced Agent Methods** - Production validation logic for Maria-QA, James-Frontend, Marcus-Backend
-- **🔍 Framework Health Monitoring** - Real-time performance metrics and bottleneck detection
-- **🔄 Advanced Update System** - GitHub-based updates with semantic versioning
-- **↩️ Rollback Manager** - Safe rollback to any previous version
-- **⚙️ Configuration Wizard** - Interactive setup with profiles (dev/staging/production)
-- **🏥 Doctor Command** - Comprehensive health checks and diagnostics
-- **🧠 RAG Memory System** - Agents learn from every interaction
-- **🤖 Opera Orchestrator** - Fully autonomous goal execution
 
 ---
 
-## 🚨 RECENT SECURITY UPDATE
+## What is Claude Opera?
 
-**✅ All security vulnerabilities have been resolved!**
-We proactively addressed GitGuardian alerts and implemented comprehensive security measures:
+**Claude Opera by VERSATIL** is the world's first production-ready AI-native SDLC framework built specifically for Claude, bringing the power of orchestrated AI agents to your development workflow through the OPERA methodology.
 
-- **All credentials secured** with proper placeholder format
-- **Pre-commit security hooks** prevent future exposures
-- **Comprehensive security documentation** added
-- **85%+ test coverage** ensures quality and security
-- **Enterprise-grade security** practices implemented
+### 🎯 Core Capabilities
 
-[View Security Policy →](./SECURITY.md) | [Security Incident Response →](./SECURITY_INCIDENT_RESPONSE.md)
+- **🎭 6 OPERA Agents**: Specialized AI agents that work together autonomously
+  - **Maria-QA**: Quality assurance and testing automation
+  - **James-Frontend**: UI/UX development and accessibility
+  - **Marcus-Backend**: API architecture and security
+  - **Sarah-PM**: Project coordination and documentation
+  - **Alex-BA**: Business analysis and requirements
+  - **Dr.AI-ML**: AI/ML operations and model management
+
+- **🔌 11 Production MCPs**: Complete integration ecosystem
+  - Playwright/Chrome - Browser automation
+  - GitHub - Repository operations
+  - Exa - AI-powered search
+  - Vertex AI - Google Cloud AI/ML
+  - Supabase - Vector database with pgvector
+  - n8n - Workflow automation (525+ nodes)
+  - Semgrep - Security scanning (30+ languages)
+  - Sentry - Error monitoring with AI analysis
+  - Shadcn - Component library integration
+  - Ant Design - React component system
+  - Filesystem - File operations
+
+- **🧠 RAG Memory System**: 98%+ context retention across sessions
+- **⚡ Proactive Daemon**: Auto-activates agents based on file patterns
+- **🔄 5 Automation Rules**: Parallel execution, stress testing, daily audits, onboarding, releases
+- **🖥️ IDE Integration**: Full Cursor + Claude Desktop support
+- **🔒 Enterprise Security**: OWASP compliance, automatic scanning, quality gates
 
 ---
 
 ## 📊 Revolutionary Impact
 
-| Metric | Before VERSATIL | With VERSATIL | Improvement |
-|--------|----------------|---------------|-------------|
+| Metric | Before | With Claude Opera | Improvement |
+|--------|--------|-------------------|-------------|
 | **Context Retention** | 45% | 98%+ | 🚀 +118% |
 | **Development Velocity** | Baseline | 3.2x faster | ⚡ +220% |
 | **Code Quality** | Manual QA | Automated 85%+ | 🎯 100% |
 | **Bug Detection** | Post-deployment | Real-time | 🛡️ -85% bugs |
 | **Security Coverage** | Manual reviews | Automated scanning | 🔒 100% |
-| **Team Coordination** | Fragmented | Unified | 🤝 Perfect sync |
+| **Team Coordination** | Fragmented | Unified OPERA | 🤝 Perfect sync |
 
 ---
 
 ## 🚀 Quick Start
 
-### Option 1: NPM Installation (Recommended)
+### Installation
+
 ```bash
 # Install globally
-npm install -g versatil-sdlc-framework@latest
+npm install -g @versatil/claude-opera
 
 # Initialize in your project
-npx versatil-sdlc init
+npx claude-opera init
 
-# Start development with agents
-npx versatil-sdlc start
-
-# Start with enhanced features
-npx versatil-sdlc enhanced
-
-# Start in autonomous mode
-npx versatil-sdlc autonomous
-
-# Check for updates (v4.1.0)
-versatil-update check
-
-# Configure framework (v4.1.0)
-versatil-config wizard
-
-# Health check (v4.1.0)
-versatil doctor
+# Start the proactive daemon
+claude-opera-daemon start
 ```
 
-### Option 2: Clone & Setup
-```bash
-# Clone repository
-git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git
-cd versatil-sdlc-framework
+### First Steps
 
-# Quick setup
-npm install
-npm run setup
+1. **Configure MCP Integration** (Cursor or Claude Desktop)
+   ```bash
+   # Setup MCP servers
+   claude-opera-mcp-setup
+   ```
 
-# Install optional MCP dependencies
-npm run install-mcps
+2. **Test Agent Activation**
+   ```bash
+   # Check system health
+   claude-opera doctor
 
-# Start framework
-npm start
-```
+   # View active agents
+   claude-opera show-agents
+   ```
 
-### Option 3: Enterprise Docker Setup
-```bash
-# Enterprise deployment with monitoring
-cd templates/enterprise-setup
-docker-compose up -d
+3. **Start Development**
+   - Edit a `*.test.ts` file → Maria-QA auto-activates
+   - Edit a `*.tsx` component → James-Frontend validates
+   - Edit API files → Marcus-Backend scans security
+   - All changes trigger real-time quality gates
 
-# Access at http://localhost:3000
-# Monitoring at http://localhost:3001/grafana
+---
+
+## 🎭 OPERA Methodology
+
+OPERA (**O**rchestrated **P**roactive **E**xpert **R**eliable **A**gents) represents a revolutionary approach to AI-native development:
+
+### How It Works
+
+1. **File-Based Triggers**: Save a file → Agent auto-activates
+2. **Parallel Execution**: Multiple agents work simultaneously
+3. **Zero Context Loss**: RAG memory preserves all interactions
+4. **Quality Gates**: Automatic validation before commits
+5. **Real-Time Monitoring**: Live statusline shows agent activity
+
+### Example Workflow
+
+```typescript
+// You: Save UserProfile.tsx
+// → James-Frontend: Validates accessibility, responsive design
+// → Maria-QA: Runs visual regression tests
+// → Marcus-Backend: Checks API security
+// → Sarah-PM: Updates sprint board
+// → All: Real-time feedback in statusline
 ```
 
 ---
 
-## 🎯 What is VERSATIL SDLC Framework?
+## 🔌 MCP Ecosystem
 
-A **production-ready AI-Native Software Development Lifecycle framework** that transforms how development teams work with AI agents. Built on the **Enhanced OPERA Methodology** (Business-Managed Agile Development), this framework provides:
+Claude Opera provides 11 production-ready MCP integrations:
 
-### 🤖 Core Features
+### Phase 1: Core Development (3 MCPs)
+- **Playwright/Chrome**: Browser automation for testing
+- **GitHub**: Repository operations and CI/CD
+- **Exa**: AI-powered search and research
 
-- **🧠 6 Specialized AI Agents** with memory and learning capabilities
-- **🧠 RAG Memory System** for persistent agent knowledge (v1.2.0)
-- **🤖 Opera Autonomous Orchestrator** for goal-based execution (v1.2.0)
-- **🔍 Enhanced Configuration Validation** preventing production bugs
-- **🌐 Chrome MCP Primary Testing** framework integration
-- **🔄 Zero Context Loss** preservation system
-- **⚡ Auto-Agent Activation** based on intelligent file pattern detection
-- **🛡️ Quality Gates Enforcement** at every development stage
-- **📈 Real-time Performance Monitoring** and analytics
-- **🧪 85%+ Test Coverage** with comprehensive validation
-- **🔒 Enterprise Security** with automated vulnerability detection
-- **🤝 Adaptive Learning** with vector memory and pattern recognition
-- **🔄 Self-Healing Execution** with automatic failure recovery (v1.2.0)
-- **🎯 Goal-Based Development** - describe what you want, not how (v1.2.0)
+### Phase 2: AI/ML Operations (2 MCPs)
+- **Vertex AI**: Google Cloud AI with Gemini models
+- **Supabase**: Vector database with pgvector for RAG
 
-### 🎪 The Enhanced OPERA Agent Team
-
-#### 1. **Enhanced Maria-QA** 🕵️‍♀️ *Quality Guardian*
-```typescript
-// Advanced QA capabilities with configuration validation
-✅ Comprehensive test coverage analysis (85%+ target)
-✅ Configuration drift detection across files
-✅ Cross-file consistency validation
-✅ Navigation integrity testing
-✅ Critical issue detection with emergency mode
-✅ Quality dashboard generation with real-time metrics
-```
-
-#### 2. **Enhanced James-Frontend** 🎨 *UI/UX Specialist*
-```typescript
-// Frontend excellence with route-navigation validation
-✅ React/Vue/Svelte component optimization
-✅ Route-navigation consistency validation
-✅ Frontend debugging code detection
-✅ Accessibility compliance (WCAG 2.1 AA)
-✅ Performance optimization (Core Web Vitals)
-✅ Responsive design validation
-```
-
-#### 3. **Enhanced Marcus-Backend** ⚙️ *System Architect*
-```typescript
-// Backend security and API integration specialist
-✅ API endpoint security validation
-✅ Database query optimization and N+1 detection
-✅ Authentication/authorization implementation
-✅ Configuration consistency checking
-✅ Service dependency validation
-✅ Security vulnerability detection (SQL injection, XSS)
-```
-
-#### 4. **Sarah-PM** 📋 *Project Orchestrator*
-```typescript
-// Project management and coordination
-✅ Cross-agent workflow orchestration
-✅ Quality metrics tracking and reporting
-✅ Milestone and deliverable management
-✅ Documentation strategy and maintenance
-✅ Stakeholder communication
-✅ Risk assessment and mitigation
-```
-
-#### 5. **Alex-BA** 💼 *Business Logic Expert*
-```typescript
-// Requirements and business analysis
-✅ User story creation and validation
-✅ Business rule documentation
-✅ Requirements traceability matrix
-✅ Acceptance criteria definition
-✅ Feature prioritization with ROI analysis
-✅ Stakeholder needs analysis
-```
-
-#### 6. **Dr.AI-ML** 🧪 *AI/ML Specialist*
-```typescript
-// Machine learning and data science
-✅ Model development and optimization
-✅ Data preprocessing and feature engineering
-✅ MLOps pipeline implementation
-✅ AI integration into web applications
-✅ Performance monitoring and optimization
-✅ Research and experimentation
-```
-
-### 🔒 Security & DevOps Agents
-
-#### **Security-Sam** 🛡️ *Security Guardian*
-```typescript
-// Automated security vulnerability detection
-✅ Hardcoded credential detection
-✅ SQL injection vulnerability scanning
-✅ XSS and CSRF protection validation
-✅ Authentication security auditing
-✅ Dependency vulnerability assessment
-✅ Security configuration compliance
-```
-
-#### **DevOps-Dan** 🔧 *Infrastructure Expert*
-```typescript
-// CI/CD and deployment automation
-✅ Docker containerization optimization
-✅ Kubernetes deployment strategies
-✅ CI/CD pipeline security and efficiency
-✅ Infrastructure monitoring and alerting
-✅ Performance bottleneck identification
-✅ Scalability planning and implementation
-```
+### Phase 3: Automation & Monitoring (6 MCPs)
+- **n8n**: Workflow automation (525+ integration nodes)
+- **Semgrep**: Security scanning (30+ programming languages)
+- **Sentry**: Error monitoring with AI-powered analysis
+- **Shadcn**: Component library integration
+- **Ant Design**: React component system
+- **Filesystem**: Direct file operations
 
 ---
 
-## 🆚 VERSATIL vs. Claude Agent SDK
+## 💻 IDE Integration
 
-### **Why VERSATIL is NOT Built on Claude Agent SDK**
+### Cursor IDE
 
-VERSATIL is an **independent, superior AI-Native SDLC platform**. Here's how we compare:
+Claude Opera integrates seamlessly with Cursor:
 
-| Feature | Claude Agent SDK | VERSATIL Framework | Advantage |
-|---------|-----------------|-------------------|-----------|
-| **Context Management** | Lossy compaction (~45% retention) | RAG + Vector Store (98%+ retention) | **+118% VERSATIL** |
-| **Agent Specialization** | Generic subagents | 6 OPERA domain experts | **+500% VERSATIL** |
-| **Activation** | Manual `query()` calls | Proactive daemon (auto-activation) | **100% autonomous** |
-| **Quality Gates** | None | Automated (80%+ coverage, OWASP) | **-85% bugs** |
-| **SDLC Coverage** | Code generation only | Full lifecycle (requirements→deploy) | **Complete workflow** |
-| **Learning** | Stateless | Self-learning RAG | **Persistent intelligence** |
-| **MCP Ecosystem** | 3-5 basic MCPs | 14 production MCPs | **4x ecosystem** |
-| **Emergency Response** | None | Automated protocols | **Critical handling** |
-
-### **Architecture Independence**
-
-```
-Claude Agent SDK:
-  query() → Generic Agent → Context Compaction (lossy)
-
-VERSATIL (Independent):
-  File Pattern → OPERA Agent → RAG Memory (lossless) → Quality Gates → Production
-```
-
-**See**: [Claude SDK Compatibility Guide](docs/guides/claude-sdk-compatibility.md) for detailed comparison and migration scenarios.
-
----
-
-## 🛠️ Installation & Setup
-
-### Prerequisites
-
-- **Node.js**: ≥ 18.0.0
-- **TypeScript**: ≥ 5.0.0
-- **Git**: Latest version
-- **Docker**: For enterprise deployment (optional)
-
-### Detailed Installation Steps
-
-#### 1. **System Requirements Check**
-```bash
-# Check Node.js version
-node --version  # Should be ≥ 18.0.0
-
-# Check npm version
-npm --version   # Should be ≥ 9.0.0
-
-# Check TypeScript (global installation recommended)
-npx tsc --version  # Should be ≥ 5.0.0
-```
-
-#### 2. **Framework Installation**
-```bash
-# Method 1: NPM Global Installation (Recommended)
-npm install -g versatil-sdlc-framework
-
-# Method 2: Local Project Installation
-npm install versatil-sdlc-framework
-
-# Method 3: Clone from GitHub
-git clone https://github.com/versatil-platform/versatil-sdlc-framework.git
-cd versatil-sdlc-framework
-npm install
-```
-
-#### 3. **Project Initialization**
-```bash
-# Initialize VERSATIL in your project
-npx versatil-sdlc init
-
-# Follow the interactive setup wizard
-# This will:
-# - Analyze your project structure
-# - Detect technology stack
-# - Configure appropriate agents
-# - Set up quality gates
-# - Configure MCP integration
-```
-
-#### 4. **Configuration Setup**
-```bash
-# Copy environment configuration
-cp .env.example .env
-
-# Edit configuration (use your preferred editor)
-nano .env  # or vim, code, etc.
-
-# Required environment variables:
-# NODE_ENV=development
-# MCP_ENABLED=true
-# ENHANCED_AGENTS_ENABLED=true
-# QUALITY_THRESHOLD=80
-# TEST_COVERAGE_MINIMUM=85
-```
-
-#### 5. **Security Setup**
-```bash
-# Install security pre-commit hooks
-npm run setup-security-hooks
-
-# This automatically installs:
-# - Secret detection hooks
-# - Security linting
-# - Credential validation
-# - Debug code detection
-```
-
-#### 6. **Start Framework**
-```bash
-# Start VERSATIL with agent monitoring
-npm start
-
-# Or start with performance monitoring
-PERFORMANCE_MONITORING=true npm start
-
-# Framework will be available at:
-# - Main interface: http://localhost:3001
-# - Health monitoring: http://localhost:3001/health
-# - Metrics dashboard: http://localhost:3001/metrics
-```
-
----
-
-## 📚 Core Concepts
-
-### 🔄 The Enhanced OPERA Methodology
-
-**OPERA** (Business-Managed Agile Development) is our revolutionary approach to AI-native development:
-
-#### **Context Preservation Protocol**
-```typescript
-// Zero context loss between agent switches
-const contextHandoff = {
-  preservedData: {
-    technicalContext: "Current implementation state",
-    businessContext: "Requirements and constraints",
-    qualityContext: "Standards and validation results",
-    securityContext: "Vulnerability assessment status"
-  },
-  transferProtocol: "Seamless agent transition",
-  validationRequired: true
-}
-```
-
-#### **Quality Gates System**
-```typescript
-// Mandatory checkpoints ensuring code quality
-const qualityGates = {
-  preCommit: {
-    testCoverage: "≥ 85%",
-    securityScan: "No critical issues",
-    linting: "All rules passed",
-    typeChecking: "No TypeScript errors"
-  },
-  preMerge: {
-    codeReview: "Enhanced Maria approval required",
-    integrationTests: "All passing",
-    performanceTests: "Within budget",
-    accessibilityAudit: "WCAG 2.1 AA compliant"
-  },
-  preDeployment: {
-    e2eTests: "Chrome MCP validation passed",
-    securityAudit: "Security-Sam approval",
-    performanceAudit: "Core Web Vitals compliant",
-    configurationValidation: "Cross-file consistency verified"
+```json
+// .cursor/mcp_config.json (auto-configured)
+{
+  "mcpServers": {
+    "claude-opera": {
+      "command": "node",
+      "args": ["~/.npm-global/bin/claude-opera-mcp", "/your/project"],
+      "env": {
+        "VERSATIL_RULES_ENABLED": "true"
+      }
+    }
   }
 }
 ```
 
-### 🤖 Agent Activation System
+**Features**:
+- Proactive agent activation on file save
+- Real-time quality gates
+- Statusline integration showing agent activity
+- 5 automation rules integrated with Cursor AI
 
-Agents automatically activate based on intelligent pattern recognition:
+### Claude Desktop
 
-#### **File Pattern Triggers**
-```yaml
-Enhanced-Maria (QA):
-  triggers:
-    - "*.test.js|ts|jsx|tsx"
-    - "__tests__/**/*"
-    - "cypress/**/*"
-    - "*.spec.*"
-  keywords: ["test", "spec", "describe", "it", "expect", "coverage"]
+Full MCP integration for Claude Desktop:
 
-Enhanced-James (Frontend):
-  triggers:
-    - "*.jsx|tsx|vue|svelte"
-    - "components/**/*"
-    - "pages/**/*"
-    - "*.css|scss|sass"
-  keywords: ["component", "react", "vue", "css", "responsive"]
-
-Enhanced-Marcus (Backend):
-  triggers:
-    - "*.api.js|ts"
-    - "server/**/*"
-    - "controllers/**/*"
-    - "models/**/*"
-  keywords: ["server", "api", "database", "auth", "security"]
-```
-
-#### **Context-Aware Activation**
-```typescript
-// Intelligent agent suggestion based on code analysis
-const intelligentActivation = {
-  confidenceThreshold: 0.9,
-  multiAgentSupport: true,
-  contextAnalysis: {
-    technicalStack: "React + Node.js detected",
-    issuePatterns: "Configuration inconsistency found",
-    recommendedAgents: ["Enhanced-Maria", "Enhanced-Marcus"],
-    priority: "High - Cross-file validation needed"
+```json
+// ~/Library/Application Support/Claude/claude_desktop_config.json
+{
+  "mcpServers": {
+    "claude-opera": {
+      "command": "node",
+      "args": ["/path/to/bin/claude-opera-mcp", "/your/project"]
+    }
   }
 }
 ```
 
----
-
-## 🧪 Testing & Quality Assurance
-
-### Test Coverage Achievement
-
-Our framework maintains **85%+ test coverage** across all components:
-
-```bash
-# Run complete test suite
-npm test
-
-# Run with coverage report
-npm run test:coverage
-
-# Run specific agent tests
-npm run test:agents
-npm run test:security
-npm run test:performance
-
-# Chrome MCP testing
-npm run test:e2e
-```
-
-### Quality Metrics Dashboard
-
-Real-time quality tracking with comprehensive metrics:
-
-```typescript
-// Quality metrics automatically tracked
-const qualityMetrics = {
-  testCoverage: "87%",           // Target: ≥85%
-  codeQuality: "A+",             // Maintainability index
-  securityScore: "98%",          // Vulnerability assessment
-  performanceScore: "94%",       // Core Web Vitals
-  accessibilityScore: "100%",    // WCAG compliance
-  documentationCoverage: "92%"   // API documentation
-}
-```
-
-### Chrome MCP Testing Integration
-
-Comprehensive browser testing with Chrome MCP:
-
-```typescript
-// Automated browser testing
-const chromeMCPTests = {
-  visualRegression: "Percy integration",
-  performanceTesting: "Lighthouse automation",
-  accessibilityTesting: "axe-core integration",
-  crossBrowserTesting: "Selenium Grid",
-  responsiveTesting: "Device simulation",
-  securityTesting: "OWASP ZAP integration"
-}
-```
+**Available Tools** (15 total):
+- `versatil_activate_agent` - Activate OPERA agents
+- `versatil_run_tests` - Execute test suites via Maria-QA
+- `versatil_parallel_tasks` - Run tasks in parallel (Rule 1)
+- `versatil_stress_test` - Generate stress tests (Rule 2)
+- `versatil_health_check` - System health audit (Rule 3)
+- `chrome_navigate` - Browser automation
+- `chrome_snapshot` - Capture screenshots
+- And 8 more tools...
 
 ---
 
-## 🔒 Security Features
+## 📖 Documentation
 
-### Enterprise-Grade Security
+### Getting Started
+- [Installation Guide](GET_STARTED.md)
+- [Configuration](CLAUDE.md)
 
-Comprehensive security implementation following industry best practices:
+### OPERA Agents
+- [Agents Overview](docs/agents/overview.md)
 
-#### **Automated Security Scanning**
-```bash
-# Security scan commands
-npm run security:scan          # Full security audit
-npm run security:secrets       # Credential detection
-npm run security:dependencies  # Vulnerability assessment
-npm run security:sast          # Static analysis
-npm run security:dast          # Dynamic analysis
-```
+### MCP Integrations
+- [MCP Overview](docs/features/mcp-ecosystem.md)
+- [MCP Examples](docs/MCP_EXAMPLES.md)
 
-#### **Pre-commit Security Hooks**
-```yaml
-# Automatically prevents security issues
-security_hooks:
-  - secret_detection: "TruffleHog + GitGuardian"
-  - credential_validation: "Hardcoded password detection"
-  - dependency_check: "npm audit + Snyk"
-  - code_analysis: "Semgrep + ESLint security rules"
-  - configuration_validation: "Security configuration audit"
-```
-
-#### **Security Agents Integration**
-```typescript
-// Real-time security validation
-const securityValidation = {
-  "Security-Sam": {
-    coverage: "SQL injection, XSS, CSRF prevention",
-    realTimeScanning: true,
-    criticalIssueBlocking: true
-  },
-  "Enhanced-Marcus": {
-    coverage: "API security, authentication, authorization",
-    configurationAuditing: true,
-    performanceSecurityBalance: true
-  }
-}
-```
-
-### Security Incident Response
-
-Comprehensive incident response procedures documented in [SECURITY.md](./SECURITY.md):
-
-- **24/7 Security Team** availability for critical issues
-- **Automated Alert System** for vulnerability detection
-- **Incident Classification** with defined response times
-- **Post-Incident Analysis** and prevention measures
+### Advanced
+- [Security](SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
+- [Roadmap](ROADMAP.md)
 
 ---
 
-## 📈 Performance & Analytics
+## 🏗️ Architecture
 
-### Real-time Performance Monitoring
+Claude Opera consists of 124,966 lines of production TypeScript code organized into:
 
-Advanced analytics system tracking every aspect of development:
-
-#### **Agent Performance Metrics**
-```typescript
-// Performance tracking for all agents
-const agentMetrics = {
-  activationTime: "< 2 seconds",
-  contextSwitchTime: "< 1 second",
-  analysisAccuracy: "99.9%",
-  issueDetectionRate: "95%+",
-  falsePositiveRate: "< 2%",
-  userSatisfactionScore: "4.8/5"
-}
-```
-
-#### **System Performance Dashboard**
-```bash
-# Access performance dashboard
-curl http://localhost:3001/metrics
-
-# Prometheus-compatible metrics
-curl http://localhost:3001/metrics/prometheus
-
-# Performance alerts
-curl http://localhost:3001/health/performance
-```
-
-#### **Adaptive Learning System**
-```typescript
-// Continuous improvement through user feedback
-const adaptiveLearning = {
-  userInteractionTracking: true,
-  patternRecognition: "Machine learning-based",
-  recommendationOptimization: "Continuous",
-  personalizedExperience: "User preference-based",
-  teamLearningSharing: "Cross-project insights"
-}
-```
+- **Agent Core**: Base classes for all OPERA agents
+- **MCP Integration**: 11 production-ready MCP executors
+- **RAG Memory**: Vector-based memory with Supabase
+- **Proactive Daemon**: File-watching orchestrator
+- **Automation Rules**: 5-rule system for autonomous execution
+- **Quality Gates**: Pre-commit and pre-deploy validation
+- **Performance Monitoring**: Real-time metrics and health checks
 
 ---
 
-## 🚀 Advanced Features
+## 🔒 Security
 
-### 1. **Intelligent Agent Orchestration**
+- **OWASP Compliance**: Automatic security scanning via Semgrep MCP
+- **Pre-commit Hooks**: Security validation before commits
+- **Credential Management**: Secure storage in `~/.versatil/.env`
+- **Framework Isolation**: Zero pollution of user projects
+- **Error Monitoring**: Sentry MCP with AI-powered analysis
+- **85%+ Test Coverage**: Comprehensive test suite
 
-```typescript
-// Seamless agent collaboration
-const agentOrchestration = {
-  contextPreservation: "100% fidelity",
-  intelligentHandoffs: "Automatic and manual",
-  parallelProcessing: "Multi-agent simultaneous analysis",
-  conflictResolution: "Priority-based decision making",
-  qualityConsensus: "Multi-agent validation"
-}
-```
-
-### 2. **Enterprise Deployment Options**
-
-#### **Docker Compose Deployment**
-```yaml
-# Full production environment
-services:
-  versatil-framework:
-    image: versatil/sdlc-framework:latest
-    environment:
-      - NODE_ENV=production
-      - ENHANCED_AGENTS_ENABLED=true
-      - PERFORMANCE_MONITORING=true
-
-  monitoring:
-    image: grafana/grafana:latest
-    # Comprehensive monitoring dashboard
-
-  database:
-    image: postgres:15
-    # Production database configuration
-```
-
-#### **Kubernetes Deployment**
-```bash
-# Enterprise Kubernetes deployment
-kubectl apply -f templates/enterprise/kubernetes/
-
-# Includes:
-# - Auto-scaling agent pods
-# - Load balancer configuration
-# - Persistent volume claims
-# - Monitoring and alerting
-# - Security policies
-```
-
-### 3. **MCP Tool Integration**
-
-Real Model Context Protocol integration for enhanced capabilities:
-
-```typescript
-// MCP tools automatically available to agents
-const mcpIntegration = {
-  browserTesting: "Chrome MCP for E2E testing",
-  codeAnalysis: "Advanced static analysis tools",
-  deploymentAutomation: "CI/CD pipeline integration",
-  securityScanning: "Real-time vulnerability detection",
-  performanceMonitoring: "Production metrics collection"
-}
-```
-
-### 4. **Custom Agent Development**
-
-Create your own specialized agents:
-
-```typescript
-// Custom agent template
-import { BaseAgent, AgentActivationContext } from 'versatil-sdlc-framework';
-
-export class CustomAgent extends BaseAgent {
-  constructor() {
-    super('custom-agent', 'Custom Specialist');
-  }
-
-  async activate(context: AgentActivationContext) {
-    // Your custom logic here
-    return {
-      issues: [],
-      recommendations: [],
-      priority: 'medium',
-      confidence: 0.95
-    };
-  }
-}
-```
+[View Security Policy →](./SECURITY.md)
 
 ---
 
-## 🤝 Community & Contribution
+## 🤝 Contributing
 
-### Contributing Guidelines
+We welcome contributions! Claude Opera is open-source and community-driven.
 
-We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md) for:
-
-- **Code of Conduct** - Our community standards
-- **Development Setup** - Local development environment
-- **Pull Request Process** - How to contribute code
-- **Issue Templates** - Bug reports and feature requests
-- **Agent Development** - Creating custom agents
-
-### Community Resources
-
-- **📧 Email**: info@versatil.vc
-- **💬 Discord**: [VERSATIL Community](https://discord.gg/versatil-sdlc)
-- **📚 Documentation**: [docs.versatil-framework.com](https://docs.versatil-framework.com)
-- **🎥 Tutorials**: [YouTube Channel](https://youtube.com/@versatil-sdlc)
-- **📱 Twitter**: [@VersatilSDLC](https://twitter.com/VersatilSDLC)
-
-### Feature Roadmap
-
-#### **Q4 2024**
-- [ ] **Advanced AI Model Integration** - GPT-4, Claude-3, Gemini support
-- [ ] **Multi-language Support** - Python, Java, Go, Rust agents
-- [ ] **Enhanced Visual Testing** - Advanced screenshot comparison
-- [ ] **Real-time Collaboration** - Multi-developer agent sharing
-
-#### **Q1 2025**
-- [ ] **Predictive Quality Analytics** - AI-powered issue prediction
-- [ ] **Auto-healing Test Suites** - Self-maintaining test automation
-- [ ] **Advanced Performance Optimization** - ML-based performance tuning
-- [ ] **Enterprise SSO Integration** - SAML, OIDC, LDAP support
-
-#### **Q2 2025**
-- [ ] **Natural Language Requirements** - English to user story conversion
-- [ ] **Automated Code Generation** - AI-powered feature implementation
-- [ ] **Intelligent Agent Orchestration** - Advanced multi-agent workflows
-- [ ] **Advanced Deployment Strategies** - Blue-green, canary, rolling deployments
-
----
-
-## 📊 Success Stories
-
-### Case Study: TechCorp Inc.
-
-> *"VERSATIL SDLC Framework reduced our bug deployment rate by 85% and increased our development velocity by 3.2x. The Enhanced Maria agent caught configuration issues that would have cost us weeks in production debugging."*
->
-> **— Sarah Johnson, CTO at TechCorp Inc.**
-
-**Results Achieved:**
-- **Bug Reduction**: 85% fewer production issues
-- **Development Speed**: 3.2x faster feature delivery
-- **Code Quality**: 95% maintainability score
-- **Team Satisfaction**: 4.9/5 developer experience rating
-
-### Case Study: StartupXYZ
-
-> *"The zero context loss feature is game-changing. Our team can seamlessly collaborate with AI agents without losing any project context. It's like having 6 senior developers who never forget anything."*
->
-> **— Mike Chen, Lead Developer at StartupXYZ**
-
-**Results Achieved:**
-- **Context Retention**: 98% accuracy across agent switches
-- **Onboarding Time**: 75% reduction for new team members
-- **Code Review Efficiency**: 60% faster review cycles
-- **Knowledge Sharing**: 100% project knowledge retention
-
----
-
-## 🎆 What's New in v3.0.0
-
-### Production-Ready Update Management System
-
-- **🔄 GitHub-Based Updates**: Automatic update checking with semantic versioning
-- **↩️ Complete Rollback System**: Safe rollback to any previous version with history
-- **⚙️ Configuration Wizard**: Interactive setup with dev/staging/production profiles
-- **🏥 Doctor Command**: Comprehensive health checks, diagnostics, and auto-fix
-- **📦 Multi-Channel Updates**: Stable, beta, and alpha update channels
-- **🔒 Update Validation**: Checksum verification and crash recovery
-- **📊 Version Diff**: Detailed changelog between versions
-- **🛡️ Update Lock System**: Prevents concurrent update conflicts
-
-### CLI Enhancements
-
-- **versatil-update**: Complete update management (`check`, `install`, `status`)
-- **versatil-rollback**: Version history and rollback (`list`, `to <version>`, `previous`)
-- **versatil-config**: Configuration management (`wizard`, `show`, `validate`)
-- **versatil doctor**: Health diagnostics (`--check-all`, `--auto-fix`)
-
-### Production Infrastructure
-
-- **100% Framework Compliance**: Validated against 2025 Cursor/Claude standards
-- **Comprehensive Documentation**: GET_STARTED.md, validation reports, implementation guides
-- **CI/CD Workflows**: Automated testing, releases, and npm publication
-- **28 New Files**: ~6,500 lines of production-ready update system code
-- **0 TypeScript Errors**: Complete type safety in update/config systems
-
-### Previous Major Features (v1.2.x)
-
-- **🧠 RAG Memory System**: Agents remember and learn from every interaction
-- **🤖 Opera Orchestrator**: Fully autonomous goal planning and execution
-- **🔄 Self-Healing**: Automatic recovery from failures with alternative strategies
-- **📈 Pattern Recognition**: Detect and proactively fix recurring issues
-- **🎯 Goal-Based Development**: Just describe what you want to build
-- **📁 Persistent Knowledge**: All learnings preserved across sessions
-
-### Quick Example
-
-```javascript
-// Old way: Manual agent coordination
-const maria = getAgent('maria');
-const marcus = getAgent('marcus');
-await maria.activate(context);
-await marcus.activate(context);
-
-// New way: Autonomous execution
-await enhancedOPERA.executeOPERAWorkflow(
-  'my-project',
-  'Build a secure user authentication system with JWT'
-);
-// AI handles everything: planning, coding, testing, deployment!
-```
-
-[Read the Complete Enhanced Features Guide →](./ENHANCED_FEATURES_GUIDE.md)
-[Read the Opera MCP Documentation →](./OPERA_MCP_DOCUMENTATION.md)
-
----
-
-## 🏆 Awards & Recognition
-
-- **🥇 Best AI Development Tool 2024** - DevTools Conference
-- **🌟 Innovation Award** - TechCrunch Startup Battlefield
-- **🚀 Top Open Source Project** - GitHub Trending #1
-- **🎯 Excellence in Quality** - Software Testing Awards
-- **🔒 Security Innovation** - InfoSec Awards
-
----
-
-## 📞 Support & Contact
-
-### Technical Support
-
-- **📧 Technical Support**: info@versatil.vc
-- **🚨 Security Issues**: info@versatil.vc
-- **💼 Enterprise Sales**: info@versatil.vc
-- **🤝 Partnerships**: info@versatil.vc
-
-### Documentation & Resources
-
-- **📖 Full Documentation**: [docs.versatil-framework.com](https://docs.versatil-framework.com)
-- **🎓 Learning Center**: [learn.versatil-framework.com](https://learn.versatil-framework.com)
-- **🔧 API Reference**: [api.versatil-framework.com](https://api.versatil-framework.com)
-- **📚 Examples Repository**: [github.com/versatil-platform/examples](https://github.com/versatil-platform/examples)
-
-### Enterprise Features
-
-For enterprise deployments, we offer:
-
-- **24/7 Priority Support** with dedicated success manager
-- **Custom Agent Development** tailored to your workflow
-- **On-premise Deployment** with full source code access
-- **Advanced Security Features** including audit logging
-- **Training & Onboarding** for your development teams
-- **SLA Guarantees** with 99.9% uptime commitment
-
-[Contact Enterprise Sales →](mailto:info@versatil.vc)
+- [Contributing Guide](./CONTRIBUTING.md)
+- [Roadmap](./ROADMAP.md)
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE) file for details.
+MIT License - see [LICENSE](./LICENSE) for details.
 
-```
-MIT License - Feel free to use, modify, and distribute
-✅ Commercial use allowed
-✅ Modification allowed
-✅ Distribution allowed
-✅ Private use allowed
-```
+Copyright (c) 2025 Claude Opera by VERSATIL Team
+
+---
+
+## 🔗 Links
+
+- **GitHub**: https://github.com/Nissimmiracles/versatil-sdlc-framework
+- **NPM**: https://www.npmjs.com/package/@versatil/claude-opera
+- **Issues**: https://github.com/Nissimmiracles/versatil-sdlc-framework/issues
 
 ---
 
 ## 🙏 Acknowledgments
 
-Special thanks to:
-
-- **The Open Source Community** for invaluable feedback and contributions
-- **Model Context Protocol (MCP)** team for the amazing integration possibilities
-- **Chrome DevTools Team** for browser automation capabilities
-- **TypeScript Team** for the excellent developer experience
-- **GitHub Community** for hosting our development and collaboration
-
----
-
-## 🔗 Quick Links
-
-| Resource | Link | Description |
-|----------|------|-------------|
-| **🚀 Quick Start** | [Installation Guide](#-installation--setup) | Get started in 5 minutes |
-| **📚 Documentation** | [Full Docs](https://docs.versatil-framework.com) | Complete framework documentation |
-| **🔄 Workflows** | [Workflows Guide](./docs/WORKFLOWS.md) | GitHub Actions workflows documentation |
-| **🎭 MCP Integrations** | [MCP Status](./docs/MCP_INTEGRATIONS_STATUS.md) | 11-MCP ecosystem details |
-| **🤖 Agent Guide** | [Agent Development](./docs/AGENT_DEVELOPMENT.md) | Create custom agents |
-| **🔒 Security** | [Security Policy](./SECURITY.md) | Security guidelines and reporting |
-| **🤝 Contributing** | [Contributing Guide](./CONTRIBUTING.md) | How to contribute to the project |
-| **💼 Enterprise** | [Enterprise Features](mailto:info@versatil.vc) | Enterprise deployment options |
-| **🎯 Examples** | [Examples Repo](https://github.com/versatil-platform/examples) | Real-world usage examples |
-| **💬 Community** | [Discord Server](https://discord.gg/versatil-sdlc) | Join our developer community |
+Built with ❤️ using:
+- [Anthropic Claude](https://www.anthropic.com/) - AI foundation
+- [Model Context Protocol](https://modelcontextprotocol.io/) - MCP specification
+- [TypeScript](https://www.typescriptlang.org/) - Language
+- [Playwright](https://playwright.dev/) - Browser automation
+- [Supabase](https://supabase.com/) - Vector database
+- [Google Cloud Vertex AI](https://cloud.google.com/vertex-ai) - AI/ML platform
 
 ---
 
-<div align="center">
+**Made with 🎭 by the Claude Opera by VERSATIL Team**
 
-**Made with ❤️ by the VERSATIL Team**
-
-[![GitHub stars](https://img.shields.io/github/stars/versatil-platform/versatil-sdlc-framework?style=social)](https://github.com/versatil-platform/versatil-sdlc-framework)
-[![GitHub forks](https://img.shields.io/github/forks/versatil-platform/versatil-sdlc-framework?style=social)](https://github.com/versatil-platform/versatil-sdlc-framework)
-[![GitHub watchers](https://img.shields.io/github/watchers/versatil-platform/versatil-sdlc-framework?style=social)](https://github.com/versatil-platform/versatil-sdlc-framework)
-
-**🌟 Star us on GitHub if VERSATIL SDLC Framework helps your team!**
-
-[⭐ Star on GitHub](https://github.com/versatil-platform/versatil-sdlc-framework) • [🐛 Report Bug](https://github.com/versatil-platform/versatil-sdlc-framework/issues) • [💡 Request Feature](https://github.com/versatil-platform/versatil-sdlc-framework/issues)
-
-</div>
+*Transform your development workflow with the power of orchestrated AI agents.*
