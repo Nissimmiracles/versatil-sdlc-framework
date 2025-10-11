@@ -12,7 +12,12 @@ export class VERSATILLogger {
 
   info(message: string, context?: any, component?: string): void {
     const logMessage = this.formatMessage('INFO', message, context, component);
-    console.log(logMessage);
+    // In MCP mode, use stderr to avoid interfering with stdio JSON-RPC protocol
+    if (process.env.VERSATIL_MCP_MODE === 'true') {
+      console.error(logMessage);
+    } else {
+      console.log(logMessage);
+    }
   }
 
   error(message: string, context?: any, component?: string): void {
@@ -22,7 +27,12 @@ export class VERSATILLogger {
 
   warn(message: string, context?: any, component?: string): void {
     const logMessage = this.formatMessage('WARN', message, context, component);
-    console.warn(logMessage);
+    // In MCP mode, use stderr to avoid interfering with stdio JSON-RPC protocol
+    if (process.env.VERSATIL_MCP_MODE === 'true') {
+      console.error(logMessage);
+    } else {
+      console.warn(logMessage);
+    }
   }
 
   warning(message: string, context?: any, component?: string): void {
@@ -31,7 +41,12 @@ export class VERSATILLogger {
 
   debug(message: string, context?: any, component?: string): void {
     const logMessage = this.formatMessage('DEBUG', message, context, component);
-    console.log(logMessage);
+    // In MCP mode, use stderr to avoid interfering with stdio JSON-RPC protocol
+    if (process.env.VERSATIL_MCP_MODE === 'true') {
+      console.error(logMessage);
+    } else {
+      console.log(logMessage);
+    }
   }
 
   private formatMessage(level: string, message: string, context?: any, component?: string): string {
