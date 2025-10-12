@@ -1,0 +1,181 @@
+{
+  "name": "versatil-opera-framework",
+  "version": "6.4.0",
+  "description": "Enterprise SDLC Framework with 17 agents (7 core + 10 language-specific), 6 workflow commands, and 11 MCP integrations for production-grade software development",
+  "author": "Nissim Menashe <nissim@versatil.vc>",
+  "homepage": "https://github.com/versatil-sdlc-framework/core",
+  "repository": "github:versatil-sdlc-framework/core",
+  "license": "MIT",
+  "keywords": [
+    "sdlc",
+    "opera",
+    "testing",
+    "qa",
+    "enterprise",
+    "automation",
+    "frontend",
+    "backend",
+    "ai-ml",
+    "project-management",
+    "business-analysis",
+    "quality-assurance",
+    "parallel-execution",
+    "stress-testing",
+    "health-monitoring",
+    "onboarding",
+    "release-automation"
+  ],
+  "components": {
+    "agents": [
+      ".claude/agents/maria-qa.md",
+      ".claude/agents/james-frontend.md",
+      ".claude/agents/marcus-backend.md",
+      ".claude/agents/alex-ba.md",
+      ".claude/agents/sarah-pm.md",
+      ".claude/agents/dr-ai-ml.md",
+      ".claude/agents/feedback-codifier.md",
+      ".claude/agents/sub-agents/marcus-backend/marcus-node-backend.md",
+      ".claude/agents/sub-agents/marcus-backend/marcus-python-backend.md",
+      ".claude/agents/sub-agents/marcus-backend/marcus-rails-backend.md",
+      ".claude/agents/sub-agents/marcus-backend/marcus-go-backend.md",
+      ".claude/agents/sub-agents/marcus-backend/marcus-java-backend.md",
+      ".claude/agents/sub-agents/james-frontend/james-react-frontend.md",
+      ".claude/agents/sub-agents/james-frontend/james-vue-frontend.md",
+      ".claude/agents/sub-agents/james-frontend/james-nextjs-frontend.md",
+      ".claude/agents/sub-agents/james-frontend/james-angular-frontend.md",
+      ".claude/agents/sub-agents/james-frontend/james-svelte-frontend.md"
+    ],
+    "commands": {
+      "agents": [
+        ".claude/commands/maria-qa.md",
+        ".claude/commands/james-frontend.md",
+        ".claude/commands/marcus-backend.md",
+        ".claude/commands/alex-ba.md",
+        ".claude/commands/sarah-pm.md",
+        ".claude/commands/dr-ai-ml.md"
+      ],
+      "workflow": [
+        ".claude/commands/plan.md",
+        ".claude/commands/review.md",
+        ".claude/commands/work.md",
+        ".claude/commands/resolve.md",
+        ".claude/commands/triage.md",
+        ".claude/commands/generate.md"
+      ],
+      "framework": [
+        ".claude/commands/framework/doctor.md",
+        ".claude/commands/framework/validate.md"
+      ],
+      "debug": [
+        ".claude/commands/framework-debug.md"
+      ]
+    }
+  },
+  "mcpServers": [
+    "chrome",
+    "github",
+    "vertex-ai",
+    "supabase",
+    "n8n",
+    "semgrep",
+    "sentry",
+    "exa",
+    "shadcn",
+    "playwright",
+    "filesystem"
+  ],
+  "capabilities": {
+    "agents": {
+      "maria-qa": {
+        "role": "Quality Assurance Lead",
+        "expertise": ["testing", "quality-gates", "bug-detection", "performance", "security"],
+        "triggers": ["*.test.*", "__tests__/**", "test coverage", "quality"]
+      },
+      "james-frontend": {
+        "role": "Frontend UI/UX Architect",
+        "expertise": ["react", "vue", "css", "responsive-design", "accessibility", "performance"],
+        "triggers": ["*.jsx", "*.tsx", "*.vue", "*.css", "components/**"]
+      },
+      "marcus-backend": {
+        "role": "Backend API Architect",
+        "expertise": ["api-design", "database", "security", "scalability", "microservices"],
+        "triggers": ["*.api.*", "routes/**", "controllers/**", "services/**"]
+      },
+      "alex-ba": {
+        "role": "Business Analyst",
+        "expertise": ["requirements", "user-stories", "acceptance-criteria", "stakeholder-management"],
+        "triggers": ["requirements/**", "*.feature", "user stories", "business logic"]
+      },
+      "sarah-pm": {
+        "role": "Project Manager",
+        "expertise": ["sprint-planning", "milestone-tracking", "team-coordination", "reporting"],
+        "triggers": ["*.md", "docs/**", "sprint", "milestone", "roadmap"]
+      },
+      "dr-ai-ml": {
+        "role": "AI/ML Specialist",
+        "expertise": ["machine-learning", "deep-learning", "model-training", "nlp", "computer-vision"],
+        "triggers": ["*.py", "*.ipynb", "models/**", "ml/**", "ai/**"]
+      },
+      "feedback-codifier": {
+        "role": "Continuous Improvement Specialist",
+        "expertise": ["pattern-analysis", "agent-optimization", "knowledge-integration", "quality-metrics"],
+        "triggers": ["user feedback", "false positive", "false negative", "agent improvement"]
+      }
+    },
+    "automation": {
+      "rule1": {
+        "name": "Parallel Task Execution",
+        "description": "Run multiple tasks in parallel with collision detection",
+        "benefit": "+300% development velocity"
+      },
+      "rule2": {
+        "name": "Automated Stress Testing",
+        "description": "Auto-generate and run stress tests on code changes",
+        "benefit": "+89% defect reduction"
+      },
+      "rule3": {
+        "name": "Daily Health Audits",
+        "description": "Comprehensive system health checks",
+        "benefit": "+99.9% system reliability"
+      },
+      "rule4": {
+        "name": "Intelligent Onboarding",
+        "description": "Zero-config project setup and agent configuration",
+        "benefit": "+90% onboarding efficiency"
+      },
+      "rule5": {
+        "name": "Automated Releases",
+        "description": "Bug tracking, version management, automated deployments",
+        "benefit": "+95% release automation"
+      }
+    }
+  },
+  "requirements": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0",
+    "claude-code": ">=1.0.0"
+  },
+  "features": [
+    "17 specialized agents: 7 core OPERA + 10 language-specific sub-agents",
+    "Backend sub-agents: Node.js, Python (FastAPI/Django), Rails, Go, Java (Spring Boot)",
+    "Frontend sub-agents: React, Vue, Next.js, Angular, Svelte",
+    "6 workflow commands: plan, review, work, resolve, triage, generate",
+    "Dual todo system: TodoWrite (in-session) + todos/*.md (persistent)",
+    "Parallel execution with collision detection (Rule 1)",
+    "Git worktree isolation for code reviews",
+    "11 MCP server integrations (Chrome, GitHub, Vertex AI, etc.)",
+    "Quality gates enforcement (80%+ test coverage)",
+    "Multi-agent parallel reviews for 40-60% time savings",
+    "Automatic dependency tracking and resolution",
+    "Cross-session continuity with persistent todo files",
+    "Dynamic command generation for custom workflows",
+    "Production-ready enterprise deployment"
+  ],
+  "documentation": {
+    "readme": "README.md",
+    "agents": ".claude/AGENTS.md",
+    "rules": ".claude/rules/README.md",
+    "configuration": "CLAUDE.md",
+    "changelog": "CHANGELOG.md"
+  }
+}
