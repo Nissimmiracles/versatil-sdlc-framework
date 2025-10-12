@@ -23,13 +23,17 @@
 
 ### 🎯 Core Capabilities
 
-- **🎭 6 OPERA Agents**: Specialized AI agents that work together autonomously
-  - **Maria-QA**: Quality assurance and testing automation
-  - **James-Frontend**: UI/UX development and accessibility
-  - **Marcus-Backend**: API architecture and security
-  - **Sarah-PM**: Project coordination and documentation
-  - **Alex-BA**: Business analysis and requirements
-  - **Dr.AI-ML**: AI/ML operations and model management
+- **🎭 17 OPERA Agents** (v6.4.0): 7 core agents + 10 language-specific sub-agents
+  - **Core Agents**:
+    - **Maria-QA**: Quality assurance and testing automation
+    - **James-Frontend**: UI/UX development and accessibility
+    - **Marcus-Backend**: API architecture and security
+    - **Sarah-PM**: Project coordination and documentation
+    - **Alex-BA**: Business analysis and requirements
+    - **Dr.AI-ML**: AI/ML operations and model management
+    - **Oliver-DevOps**: Infrastructure, CI/CD, and monitoring
+  - **Frontend Sub-Agents** (James): React, Vue, Next.js, Angular, Svelte
+  - **Backend Sub-Agents** (Marcus): Node.js, Python, Rails, Go, Java
 
 - **🔌 11 Production MCPs**: Complete integration ecosystem
   - Playwright/Chrome - Browser automation
@@ -73,12 +77,34 @@
 # Install globally
 npm install -g @versatil/claude-opera
 
-# Initialize in your project
+# Initialize in your project (auto-generates personalized roadmap)
 npx claude-opera init
 
 # Start the proactive daemon
 claude-opera-daemon start
 ```
+
+### 📍 Automatic Roadmap Generation (NEW in v6.4.0)
+
+When you run `claude-opera init`, the framework automatically:
+
+1. **Analyzes your project**: Detects React, Vue, Python, Node.js, etc.
+2. **Recommends agents**: Selects from 17 agents based on your tech stack
+   - React project → James-React sub-agent
+   - Python backend → Marcus-Python sub-agent
+   - ML project → Dr.AI-ML agent
+3. **Generates roadmap**: Creates `docs/VERSATIL_ROADMAP.md` with:
+   - 4-week development plan
+   - Weekly milestones and tasks
+   - Agent recommendations for each phase
+   - Quality gates and success metrics
+   - Technology-specific best practices
+
+**Example**: React + Node.js project automatically gets:
+- James-React for frontend (hooks, performance, components)
+- Marcus-Node for backend (async patterns, Express optimization)
+- Maria-QA for testing (Jest, Playwright, visual regression)
+- Personalized roadmap with React + Node.js best practices
 
 ### First Steps
 
@@ -88,19 +114,25 @@ claude-opera-daemon start
    claude-opera-mcp-setup
    ```
 
-2. **Test Agent Activation**
+2. **Review Your Roadmap** 📍
+   ```bash
+   # Open your personalized development roadmap
+   cat docs/VERSATIL_ROADMAP.md
+   ```
+
+3. **Test Agent Activation**
    ```bash
    # Check system health
    claude-opera doctor
 
-   # View active agents
+   # View active agents (includes sub-agents)
    claude-opera show-agents
    ```
 
-3. **Start Development**
+4. **Start Development**
    - Edit a `*.test.ts` file → Maria-QA auto-activates
-   - Edit a `*.tsx` component → James-Frontend validates
-   - Edit API files → Marcus-Backend scans security
+   - Edit a `*.tsx` component → James-Frontend + James-React validate
+   - Edit API files → Marcus-Backend + Marcus-Node scan security
    - All changes trigger real-time quality gates
 
 ---

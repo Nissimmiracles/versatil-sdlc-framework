@@ -1,8 +1,13 @@
 # 🎯 Claude Opera Onboarding in Cursor IDE
 
-**Claude Opera by VERSATIL v1.0.0**
+**Claude Opera by VERSATIL v6.4.0**
 
 This guide shows you how to complete the onboarding process **inside Cursor IDE** using the AI chat interface.
+
+**NEW in v6.4.0**:
+- 📍 **Automatic Roadmap Generation** - Get a personalized 4-week development plan
+- 🤖 **17 OPERA Agents** - 7 core + 10 language-specific sub-agents (React, Vue, Node.js, Python, etc.)
+- 🎯 **Smart Agent Matching** - Automatically recommends agents based on your tech stack
 
 ---
 
@@ -24,10 +29,28 @@ Can you run the versatil_welcome_setup tool to show me the onboarding and setup 
 
 Claude will:
 - ✅ Check your current setup status
+- ✅ Analyze your project (detect React, Vue, Python, Node.js, etc.)
+- ✅ Generate personalized roadmap (`docs/VERSATIL_ROADMAP.md`)
+- ✅ Recommend specific agents from 17 available (e.g., James-React for React projects)
 - ✅ Show missing components
 - ✅ Provide step-by-step setup instructions
 - ✅ Guide you through credential configuration
 - ✅ Help configure agents for your project
+
+### Step 4: Review Your Roadmap 📍
+
+After onboarding completes, open your personalized roadmap:
+
+```
+cat docs/VERSATIL_ROADMAP.md
+```
+
+This roadmap includes:
+- 4-week development plan
+- Weekly milestones and tasks
+- Recommended agents for each phase
+- Quality gates and success metrics
+- Technology-specific best practices
 
 ---
 
@@ -39,13 +62,32 @@ Claude will:
 - Environment variables setup
 - Project configuration
 
-### 2. Agent Configuration
+### 2. Agent Configuration (17 Agents Total)
+
+**Core Agents** (7):
 - **Maria-QA** - Quality assurance and testing
 - **James-Frontend** - UI/UX development
 - **Marcus-Backend** - API and backend work
 - **Sarah-PM** - Project coordination
 - **Alex-BA** - Requirements analysis
 - **Dr.AI-ML** - Machine learning and AI
+- **Oliver-DevOps** - Infrastructure and CI/CD
+
+**Frontend Sub-Agents** (5):
+- **James-React** - React hooks, performance, component patterns
+- **James-Vue** - Vue Composition API, reactivity
+- **James-NextJS** - Next.js App Router, SSR/SSG
+- **James-Angular** - Angular dependency injection, RxJS
+- **James-Svelte** - Svelte reactivity, stores
+
+**Backend Sub-Agents** (5):
+- **Marcus-Node** - Node.js async patterns, Express/Fastify
+- **Marcus-Python** - Python async/await, Django/Flask
+- **Marcus-Rails** - Rails conventions, ActiveRecord
+- **Marcus-Go** - Go concurrency, goroutines
+- **Marcus-Java** - Java Spring Boot, JPA
+
+**Smart Matching**: The framework automatically recommends which agents to enable based on your detected technologies.
 
 ### 3. MCP Server Setup
 Status of 11 MCP servers:

@@ -1,8 +1,8 @@
 {
   "name": "@versatil/claude-opera",
-  "version": "1.0.0",
+  "version": "6.4.0",
   "type": "module",
-  "description": "🎭 Claude Opera by VERSATIL - Production-ready OPERA orchestration for Claude with 11-MCP ecosystem, 6 specialized agents (Maria-QA, James-Frontend, Marcus-Backend, Sarah-PM, Alex-BA, Dr.AI-ML), RAG memory achieving 98%+ context retention, proactive daemon with file-based triggers, Cursor + Claude Desktop integration, 5 automation rules, and enterprise-grade security. The world's first autonomous AI-native SDLC framework with ZERO CONTEXT LOSS.",
+  "description": "🎭 Claude Opera by VERSATIL v6.4.0 - Production-ready OPERA orchestration with 17 agents (7 core + 10 language-specific sub-agents), automatic roadmap generation, 11-MCP ecosystem, RAG memory achieving 98%+ context retention, proactive daemon with file-based triggers, Cursor + Claude Desktop integration, 5 automation rules, and enterprise-grade security. The world's first autonomous AI-native SDLC framework with ZERO CONTEXT LOSS and intelligent project-aware onboarding.",
   "main": "dist/index.js",
   "bin": {
     "versatil": "./bin/versatil.js",

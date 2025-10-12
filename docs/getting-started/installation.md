@@ -1,6 +1,11 @@
 # 📦 VERSATIL Framework Installation Guide
 
-Complete installation and setup guide for the VERSATIL SDLC Framework.
+Complete installation and setup guide for the VERSATIL SDLC Framework v6.4.0.
+
+**NEW in v6.4.0**:
+- 📍 **Automatic Roadmap Generation** - Get a personalized 4-week development plan
+- 🤖 **17 OPERA Agents** - 7 core + 10 language-specific sub-agents
+- 🎯 **Smart Agent Matching** - Automatically recommends agents for your tech stack
 
 ## 🎯 Prerequisites
 
@@ -76,7 +81,7 @@ After installation, initialize VERSATIL in your project:
 # Navigate to your project
 cd your-project
 
-# Initialize VERSATIL framework
+# Initialize VERSATIL framework (auto-generates roadmap)
 versatil init
 
 # Follow the interactive setup wizard
@@ -84,7 +89,46 @@ versatil init
 ? Framework: (React/Vue/Node.js/Python/Other)
 ? Team size: (Solo/Small/Medium/Large)
 ? MCP tools: (Chrome/Shadcn/GitHub/All)
+
+# 📍 Automatic Roadmap Generation
+# After wizard completes, check your personalized roadmap:
+cat docs/VERSATIL_ROADMAP.md
 ```
+
+### 📍 What Gets Auto-Generated
+
+The `versatil init` command analyzes your project and generates:
+
+1. **Project Analysis Report**
+   - Detected technologies (React, Vue, Python, etc.)
+   - Project complexity (simple/moderate/complex)
+   - Recommended agents for your tech stack
+
+2. **Personalized Roadmap** (`docs/VERSATIL_ROADMAP.md`)
+   - 4-week development plan with weekly milestones
+   - Agent recommendations (core + sub-agents)
+   - Quality gates and success metrics
+   - Technology-specific best practices
+   - Testing strategy
+   - Deployment checklist
+
+3. **Agent Configuration**
+   - Core agents: Maria-QA, James-Frontend, Marcus-Backend, Sarah-PM, Alex-BA, Dr.AI-ML, Oliver-DevOps
+   - Sub-agents based on your stack:
+     - **React project** → James-React
+     - **Vue project** → James-Vue
+     - **Next.js project** → James-NextJS
+     - **Node.js backend** → Marcus-Node
+     - **Python backend** → Marcus-Python
+     - **Rails backend** → Marcus-Rails
+     - **Go backend** → Marcus-Go
+     - **Java backend** → Marcus-Java
+
+**Example Roadmaps by Project Type**:
+- React + Node.js → [templates/roadmaps/react-node-fullstack.md](../../templates/roadmaps/react-node-fullstack.md)
+- Vue + Python → [templates/roadmaps/vue-python-backend.md](../../templates/roadmaps/vue-python-backend.md)
+- Next.js Monorepo → [templates/roadmaps/nextjs-monorepo.md](../../templates/roadmaps/nextjs-monorepo.md)
+- Python ML → [templates/roadmaps/python-ml.md](../../templates/roadmaps/python-ml.md)
 
 ### 2. Framework Structure
 
@@ -100,15 +144,20 @@ your-project/
 │   │   ├── marcus-backend.json  # Backend agent config
 │   │   ├── sarah-pm.json        # PM agent config
 │   │   ├── alex-ba.json         # BA agent config
-│   │   └── dr-ai-ml.json        # ML agent config
+│   │   ├── dr-ai-ml.json        # ML agent config
+│   │   └── oliver-devops.json   # DevOps agent config
 │   └── mcp/                     # MCP tool configurations
 │       ├── chrome-mcp.json      # Chrome MCP settings
 │       ├── shadcn-mcp.json      # Shadcn MCP settings
 │       └── github-mcp.json      # GitHub MCP settings
+├── docs/
+│   └── VERSATIL_ROADMAP.md      # 📍 Your personalized 4-week roadmap (auto-generated)
 ├── .cursorrules                 # Cursor IDE integration
-├── CLAUDE.md                    # OPERA methodology guide
+├── CLAUDE.md                    # OPERA methodology guide (includes roadmap reference)
 └── versatil.log                 # Framework activity log
 ```
+
+**Note**: The `docs/VERSATIL_ROADMAP.md` is automatically generated based on your project's detected technologies and contains a complete 4-week development plan customized for your stack.
 
 ### 3. Environment Variables
 
