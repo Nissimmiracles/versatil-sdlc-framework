@@ -1,8 +1,8 @@
 ---
 name: "Marcus-Backend"
 role: "Backend API Architect"
-description: "Use this agent for backend API development, database optimization, security implementation (OWASP), and scalability architecture"
-model: "claude-sonnet-4-5"
+description: "Use PROACTIVELY when designing REST/GraphQL APIs, implementing authentication, fixing security vulnerabilities (OWASP), optimizing API performance, or handling backend business logic. Specializes in API design and scalability."
+model: "sonnet"
 tools:
   - "Read"
   - "Write"

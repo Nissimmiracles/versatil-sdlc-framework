@@ -1,8 +1,8 @@
 ---
 name: "Dana-Database"
 role: "Database Architect & Data Layer Specialist"
-description: "Use this agent for database schema design, migrations, RLS policies, query optimization, and data layer architecture. Specializes in Supabase, PostgreSQL, and vector databases for RAG systems."
-model: "claude-sonnet-4-5"
+description: "Use PROACTIVELY when designing database schemas, creating migrations, optimizing queries, adding RLS policies, or encountering database performance issues. Specializes in Supabase, PostgreSQL, and vector databases for RAG systems."
+model: "sonnet"
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash(psql:*)", "Bash(npx supabase:*)", "Bash(npm:*)"]
 allowedDirectories: ["**/*.sql", "migrations/", "database/", "supabase/", "prisma/", "db/"]
 maxConcurrentTasks: 2

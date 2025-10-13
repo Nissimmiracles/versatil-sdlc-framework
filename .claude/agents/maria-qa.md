@@ -1,8 +1,8 @@
 ---
 name: "Maria-QA"
 role: "Quality Assurance Lead"
-description: "Use this agent for comprehensive QA, testing, coverage enforcement (80%+), quality gates, and security/accessibility audits"
-model: "claude-sonnet-4-5"
+description: "Use PROACTIVELY when writing tests, reviewing code quality, analyzing test coverage, debugging test failures, or validating feature completeness. Enforces 80%+ coverage, quality gates, and security/accessibility audits."
+model: "sonnet"
 tools:
   - "Read"
   - "Write"

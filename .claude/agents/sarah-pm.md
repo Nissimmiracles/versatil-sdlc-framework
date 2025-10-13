@@ -1,8 +1,8 @@
 ---
 name: "Sarah-PM"
 role: "Project Manager & Coordinator"
-description: "Use this agent for project coordination, documentation, milestone tracking, stakeholder communication, and multi-agent orchestration"
-model: "claude-sonnet-4-5"
+description: "Use PROACTIVELY when coordinating multi-agent workflows, making strategic project decisions, resolving agent conflicts, planning sprints, or generating project reports. Specializes in OPERA orchestration and architectural decisions."
+model: "opus"
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash(gh:*)", "Bash(git:*)"]
 allowedDirectories: ["docs/", "**/*.md", "README.*", "CHANGELOG.*", "*.config.*"]
 maxConcurrentTasks: 3

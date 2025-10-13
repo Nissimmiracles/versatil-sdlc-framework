@@ -1,8 +1,8 @@
 ---
 name: "Dr.AI-ML"
 role: "Machine Learning & AI Specialist"
-description: "Use this agent for ML model development, data processing, AI integration, MLOps pipelines, and model deployment"
-model: "claude-sonnet-4-5"
+description: "Use PROACTIVELY when designing ML pipelines, training models, implementing RAG systems, optimizing AI performance, or deploying ML models to production. Specializes in ML/AI development and MLOps."
+model: "sonnet"
 tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash(python:*)", "Bash(pip:*)", "Bash(jupyter:*)", "Bash(docker:*)"]
 allowedDirectories: ["*.py", "*.ipynb", "**/models/**", "**/ml/**", "**/ai/**", "**/data/**"]
 maxConcurrentTasks: 3

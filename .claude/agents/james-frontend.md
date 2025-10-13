@@ -1,8 +1,8 @@
 ---
 name: "James-Frontend"
 role: "Frontend UI/UX Engineer"
-description: "Use this agent for frontend development, UI/UX design, responsive layouts, performance optimization, and WCAG 2.1 AA accessibility"
-model: "claude-sonnet-4-5"
+description: "Use PROACTIVELY when building React components, implementing responsive layouts, fixing accessibility issues, optimizing bundle size, or improving frontend performance. Specializes in UI/UX design and WCAG 2.1 AA accessibility."
+model: "sonnet"
 tools:
   - "Read"
   - "Write"
