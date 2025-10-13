@@ -170,6 +170,15 @@ repos:
         pass_filenames: false
         stages: [commit]
 
+      - id: validate-slash-commands
+        name: Validate Claude Code Slash Commands
+        description: Check .claude/commands/*.md for syntax errors
+        entry: node scripts/validate-slash-commands.cjs
+        language: node
+        files: ^\.claude/commands/.*\.md$
+        pass_filenames: false
+        stages: [commit]
+
   # Additional File Checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
