@@ -274,10 +274,12 @@ async function checkProactiveSystem() {
     stats.issues.push('Missing proactive agent orchestrator');
   }
 
-  // Calculate accuracy (settings + orchestrator are sufficient, hooks are optional)
+  // Calculate accuracy (settings + orchestrator are sufficient, hooks are optional but boost to 100%)
   if (stats.settings_configured && stats.orchestrator_exists) {
-    stats.accuracy = 95; // Fully functional
-    if (!stats.hook_exists) {
+    if (stats.hook_exists) {
+      stats.accuracy = 100; // Perfect - all components present
+    } else {
+      stats.accuracy = 95; // Fully functional without hook
       // Hook is optional - settings-based activation works without it
       stats.issues.push('Agent coordinator hook missing (optional - settings-based activation working)');
     }
@@ -313,7 +315,8 @@ async function checkRulesEfficiency() {
   if (fs.existsSync(settingsFile)) {
     try {
       const settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8'));
-      const rules = settings.versatil?.rules || {};
+      // Support both "versatil.rules" (flat key) and versatil.rules (nested)
+      const rules = settings['versatil.rules'] || settings.versatil?.rules || {};
 
       rulesStats.rule1_parallel.enabled = rules.rule1_parallel_execution?.enabled === true;
       rulesStats.rule2_stress.enabled = rules.rule2_stress_testing?.enabled === true;

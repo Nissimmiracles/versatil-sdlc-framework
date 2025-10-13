@@ -21,7 +21,7 @@ import { ParallelTaskManager } from '../orchestration/parallel-task-manager.js';
 import { AutomatedStressTestGenerator } from '../testing/automated-stress-test-generator.js';
 import { DailyAuditSystem } from '../audit/daily-audit-system.js';
 import { IntelligentOnboardingSystem } from '../onboarding/intelligent-onboarding-system.js';
-import { BugCollectionReleaseSystem } from '../automation/bug-collection-release-system.js';
+import { BugCollectionReleaseSystem } from '../automation/release-orchestrator.js';
 
 // Story Generation & Requirements (Phase 2A)
 import { StoryGenerator } from '../agents/opera/alex-ba/story-generator.js';

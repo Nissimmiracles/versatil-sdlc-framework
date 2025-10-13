@@ -148,6 +148,39 @@
         "trend_analysis": true,
         "executive_summaries": false
       }
+    },
+    "rule4_onboarding": {
+      "enabled": true,
+      "auto_detection": true,
+      "zero_config": true,
+      "ai_assistance": {
+        "tech_stack_detection": true,
+        "agent_configuration": true,
+        "quality_gate_setup": true,
+        "test_template_generation": true
+      },
+      "migration": {
+        "existing_projects": true,
+        "gradual_adoption": true,
+        "backward_compatibility": true
+      }
+    },
+    "rule5_releases": {
+      "enabled": true,
+      "auto_bug_tracking": true,
+      "version_management": true,
+      "ai_assistance": {
+        "changelog_generation": true,
+        "semantic_versioning": true,
+        "release_notes_drafting": true,
+        "dependency_update_tracking": true
+      },
+      "integration": {
+        "github_issues": true,
+        "coderabbit_quality_gate": true,
+        "automated_testing": true,
+        "ci_cd_pipeline": true
+      }
     }
   },
 

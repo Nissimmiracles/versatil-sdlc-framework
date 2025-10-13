@@ -70,7 +70,7 @@ All 5 automation rules are now **fully integrated and active** in the proactive 
 #### **Rule 5: Automated Release System** 🚀
 - **Status**: ✅ **ACTIVE**
 - **Class**: `BugCollectionReleaseSystem`
-- **Location**: `src/automation/bug-collection-release-system.ts`
+- **Location**: `src/automation/release-orchestrator.ts`
 - **Features**:
   - Automatic bug tracking
   - Version management
