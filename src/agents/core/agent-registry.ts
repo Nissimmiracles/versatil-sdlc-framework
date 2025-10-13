@@ -19,12 +19,38 @@ export class AgentRegistry {
   
   private registerAllAgents(): void {
     // OPERA Agents (6 primary agents)
-    this.agents.set('enhanced-maria', new EnhancedMaria());
-    this.agents.set('enhanced-james', new EnhancedJames());
-    this.agents.set('enhanced-marcus', new EnhancedMarcus());
-    this.agents.set('sarah-pm', new SarahPm());
-    this.agents.set('alex-ba', new AlexBa());
-    this.agents.set('dr-ai-ml', new DrAiMl());
+    const maria = new EnhancedMaria();
+    const james = new EnhancedJames();
+    const marcus = new EnhancedMarcus();
+    const sarah = new SarahPm();
+    const alex = new AlexBa();
+    const drAi = new DrAiMl();
+
+    // Register with legacy IDs
+    this.agents.set('enhanced-maria', maria);
+    this.agents.set('enhanced-james', james);
+    this.agents.set('enhanced-marcus', marcus);
+    this.agents.set('sarah-pm', sarah);
+    this.agents.set('alex-ba', alex);
+    this.agents.set('dr-ai-ml', drAi);
+
+    // Register with modern IDs (aliases to same instances)
+    this.agents.set('maria-qa', maria);
+    this.agents.set('james-frontend', james);
+    this.agents.set('marcus-backend', marcus);
+
+    // Sub-agents are lightweight wrappers - TODO: implement actual sub-agent classes
+    // For now, they delegate to parent agents with specialized context
+    this.agents.set('james-react', james);
+    this.agents.set('james-vue', james);
+    this.agents.set('james-nextjs', james);
+    this.agents.set('james-angular', james);
+    this.agents.set('james-svelte', james);
+    this.agents.set('marcus-node', marcus);
+    this.agents.set('marcus-python', marcus);
+    this.agents.set('marcus-rails', marcus);
+    this.agents.set('marcus-go', marcus);
+    this.agents.set('marcus-java', marcus);
 
     // Meta-Agent (Introspective)
     this.agents.set('introspective-agent', new IntrospectiveAgent());

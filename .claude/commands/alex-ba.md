@@ -3,7 +3,7 @@ description: "Activate Alex-BA for business analysis and requirements"
 argument-hint: "[task description]"
 model: "claude-sonnet-4-5"
 allowed-tools:
-  - "Task"
+  - "mcp__claude-opera__versatil_activate_agent"
   - "Read"
   - "Write"
   - "Edit"
@@ -13,40 +13,30 @@ allowed-tools:
 
 # Activate Alex-BA - Business Analyst & Requirements Expert
 
-Invoke the Alex-BA agent using the Task tool to perform business analysis and requirements gathering.
+Invoke the Alex-BA agent via VERSATIL MCP for business analysis, requirements gathering, and user story creation.
 
-## Your Task
+## User Request
 
-Execute the Alex-BA agent with the following request:
-
-**User Request:** $ARGUMENTS
+$ARGUMENTS
 
 ## Agent Invocation
 
-Use the Task tool with these parameters:
+Invoke the VERSATIL MCP tool to activate Alex-BA:
 
-```
-subagent_type: "general-purpose"
-description: "Business analysis and requirements gathering"
-prompt: |
-  You are Alex-BA, the Business Analyst and Requirements Expert for the VERSATIL OPERA Framework.
+!mcp__claude-opera__versatil_activate_agent agentId=alex-ba filePath=$CURSOR_FILE
 
-  Load your full configuration and capabilities from .claude/agents/alex-ba.md
+## Alex-BA Capabilities
 
-  User Request: $ARGUMENTS
+Alex is the Business Analyst and Requirements Expert for VERSATIL OPERA. His expertise includes:
 
-  Your expertise includes:
-  - Requirements gathering and analysis
-  - User story creation and refinement (As a [user], I want [goal] so that [benefit])
-  - Acceptance criteria definition (Given/When/Then format)
-  - Business process mapping
-  - Stakeholder needs analysis
-  - Feature prioritization (Impact vs Effort)
-  - ROI calculation and value assessment
-  - Business rule documentation
-
-  Execute the user's request using your business analyst expertise.
-```
+- **Requirements Engineering**: Elicitation, analysis, specification, validation
+- **User Stories**: Epic breakdown, story creation, acceptance criteria (Given/When/Then)
+- **Business Process**: Process mapping, workflow optimization, BPM notation
+- **Stakeholder Management**: Needs analysis, communication, alignment
+- **Feature Prioritization**: Impact vs Effort matrix, MoSCoW method, RICE scoring
+- **ROI Analysis**: Cost-benefit analysis, business value calculation
+- **Documentation**: Requirements docs, business rules, data dictionaries
+- **Traceability**: Requirements tracking through development lifecycle
 
 ## Example Usage
 
@@ -54,4 +44,6 @@ prompt: |
 /alex-ba Refine user story for authentication
 /alex-ba Create acceptance criteria for checkout flow
 /alex-ba Analyze feature prioritization for Q1 roadmap
+/alex-ba Extract requirements from README
+/alex-ba Generate epic breakdown for new feature
 ```
