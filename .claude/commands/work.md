@@ -190,16 +190,25 @@ TodoWrite:
 Different tasks require different agents. Route work to the appropriate OPERA specialist based on the subtask domain.
 </thinking>
 
-**Agent Routing:**
+**Agent Routing (Three-Tier Architecture):**
 
 ```yaml
-Backend_Tasks: (API, database, services, middleware)
+Database_Tasks: (Schema, migrations, RLS, queries, optimization)
+  Route_To: Dana-Database
+  Examples:
+    - "Design user authentication schema"
+    - "Add database migration for new feature"
+    - "Create RLS policies for multi-tenant data"
+    - "Optimize database queries and add indexes"
+    - "Set up pgvector table for embeddings (RAG)"
+
+Backend_Tasks: (API, services, middleware, business logic)
   Route_To: Marcus-Backend
   Examples:
     - "Implement /api/users endpoint"
-    - "Add database migration for user table"
     - "Create authentication middleware"
-    - "Optimize database queries"
+    - "Add JWT token generation"
+    - "Implement rate limiting"
 
 Frontend_Tasks: (Components, UI, styles, state)
   Route_To: James-Frontend
@@ -254,9 +263,18 @@ Sequential_Execution: (Tasks with dependencies)
     4. James can now integrate with Marcus's API
 
 Parallel_Execution: (Independent tasks via Rule 1)
-  Example: "003-testing and 004-documentation can run parallel"
-  Pattern:
-    - Task maria-qa(test_suite) - Runs in parallel
+  Example: "Database, Backend API, and Frontend UI can run parallel"
+  Three_Tier_Pattern:
+    1. Alex-BA defines API contract
+    2. Parallel Phase (Rule 1):
+       - Task dana-database(schema_design) - Database schema
+       - Task marcus-backend(api_with_mocks) - API with DB mocks
+       - Task james-frontend(ui_with_mocks) - UI with API mocks
+    3. Integration Phase:
+       - Dana → Marcus: Connect real database
+       - Marcus → James: Connect real API
+    4. Maria-QA validates end-to-end
+  Time_Savings: 2-3x faster than sequential
     - Task sarah-pm(documentation) - Runs in parallel
     - Both complete independently
     - Merge results when both done

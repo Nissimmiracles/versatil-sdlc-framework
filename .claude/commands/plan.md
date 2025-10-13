@@ -29,18 +29,20 @@ Transform feature requests, bugs, or improvements into well-structured implement
 First, understand the project's architecture, patterns, and conventions using parallel OPERA agents for comprehensive analysis.
 </thinking>
 
-Run these agents in parallel:
+Run these agents in parallel for **three-tier analysis**:
 
-- Task alex-ba(feature_description) - Requirements analysis, stakeholder needs
-- Task marcus-backend(feature_description) - Backend architecture research
-- Task james-frontend(feature_description) - Frontend patterns research
+- Task alex-ba(feature_description) - Requirements analysis, API contract definition
+- Task dana-database(feature_description) - Database architecture research, data modeling
+- Task marcus-backend(feature_description) - Backend API patterns research
+- Task james-frontend(feature_description) - Frontend component patterns research
 
 **Research Outputs:**
 
-- [ ] Document all findings with file paths (e.g., `src/services/auth.ts:42`)
+- [ ] Document all findings with file paths (e.g., `src/services/auth.ts:42`, `supabase/migrations/001_users.sql`)
 - [ ] Include external documentation URLs and best practices
 - [ ] Reference similar implementations (e.g., `#123`, `PR #456`)
 - [ ] Note team conventions from CLAUDE.md or docs/
+- [ ] Identify database schema patterns and migration strategies
 
 ### 2. Feature Planning & Task Breakdown
 
@@ -55,13 +57,28 @@ Think like Alex-BA (Business Analyst) - what makes this feature clear and action
 - [ ] Define success metrics
 - [ ] Document edge cases and error scenarios
 
-**Technical Planning (Marcus-Backend + James-Frontend):**
+**Technical Planning (Three-Tier Coordination):**
 
+**Database Layer (Dana-Database):**
+- [ ] Design database schema (tables, relationships, constraints)
+- [ ] Plan migrations strategy (versioning, rollback)
+- [ ] Define RLS policies for multi-tenant data
+- [ ] Identify indexes for query performance
+- [ ] Plan vector storage if RAG/embeddings needed
+
+**API Layer (Marcus-Backend):**
 - [ ] Define API contracts and endpoints
-- [ ] Design data models and database schema
-- [ ] Plan frontend components and state management
+- [ ] Design request/response schemas matching database
+- [ ] Plan authentication/authorization middleware
 - [ ] Identify security considerations (OWASP Top 10)
 - [ ] Estimate performance requirements (< 200ms API response)
+
+**Frontend Layer (James-Frontend):**
+- [ ] Plan UI components and layouts
+- [ ] Design state management strategy
+- [ ] Plan form validation and error handling
+- [ ] Identify accessibility requirements (WCAG 2.1 AA)
+- [ ] Design responsive breakpoints
 
 **Quality Strategy (Maria-QA):**
 

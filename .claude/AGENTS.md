@@ -5,13 +5,146 @@ type: documentation
 
 # OPERA Agent Team - Detailed Configuration
 
-This document defines the detailed configuration for all 6 OPERA agents in the VERSATIL SDLC Framework.
+This document defines the detailed configuration for all 7 OPERA agents in the VERSATIL SDLC Framework, including the new **Dana-Database** agent for three-tier coordination.
+
+---
+
+## 🏗️ Three-Tier Architecture Support
+
+VERSATIL now provides **simultaneous frontend, backend, and database attention** for every task through:
+
+- **Dana-Database**: Database schema, migrations, RLS policies, query optimization
+- **Marcus-Backend**: API layer, business logic, authentication, middleware
+- **James-Frontend**: UI components, state management, responsive design, accessibility
+
+### Three-Tier Collaboration Patterns
+
+#### Pattern 1: API-First Development
+```mermaid
+graph TD
+    A[Alex-BA: Define API Contract] --> B[Parallel Phase]
+    B --> C[Dana: Database Schema]
+    B --> D[Marcus: API with DB Mocks]
+    B --> E[James: UI with API Mocks]
+    C --> F[Integration: Dana → Marcus]
+    D --> F
+    E --> G[Integration: Marcus → James]
+    F --> G
+    G --> H[Maria-QA: End-to-End Validation]
+```
+
+**Time Savings**: 2-3x faster than sequential (Database → Backend → Frontend)
+
+**Workflow**:
+1. **Alex-BA** defines API contract (endpoints + request/response schemas)
+2. **Parallel Development** (Rule 1):
+   - **Dana-Database**: Designs database schema matching API contract
+   - **Marcus-Backend**: Implements API with mock database
+   - **James-Frontend**: Builds UI with mock API
+3. **Integration Phase**:
+   - Dana hands off real database to Marcus
+   - Marcus hands off real API to James
+4. **Maria-QA** validates end-to-end with all layers integrated
+
+#### Pattern 2: Database-First Development
+```yaml
+Step_1: Dana-Database
+  - Design complete data model
+  - Create migrations
+  - Add RLS policies
+
+Step_2: Marcus-Backend (uses Dana's schema)
+  - Build CRUD APIs for data model
+  - Add business logic on top of schema
+
+Step_3: James-Frontend (uses Marcus's APIs)
+  - Create admin UI for data management
+  - Build user-facing features
+```
+
+#### Pattern 3: Schema Changes & Migrations
+```yaml
+Coordinated_Deployment:
+  1. Dana-Database:
+     - Create migration for schema change
+     - Test migration on staging database
+
+  2. Marcus-Backend:
+     - Update API types to match new schema
+     - Modify queries for schema changes
+     - Add endpoints for new tables/fields
+
+  3. James-Frontend:
+     - Update TypeScript types
+     - Modify UI components for new data structure
+
+  4. Deployment_Order:
+     - Database first (run migration)
+     - Backend second (deploy API updates)
+     - Frontend third (deploy UI updates)
+```
 
 ---
 
 ## 👥 Agent Team Configuration
 
-### 1. Maria-QA (Quality Assurance Lead)
+### 1. Dana-Database (Database Architect) ⭐ NEW
+**Primary Role**: Database Schema Design & Data Layer Specialist
+**Expertise**: PostgreSQL, Supabase, migrations, RLS policies, query optimization, vector databases
+**Agent File**: `.claude/agents/dana-database.md`
+**Slash Command**: `/dana-database`
+
+```yaml
+Agent: Dana-Database
+Activation_Triggers:
+  - "*.sql"
+  - "migrations/**", "database/**", "supabase/**", "prisma/**", "db/**"
+  - Keywords: "schema", "migration", "rls", "postgres", "supabase", "database"
+
+Proactive_Activation:
+  auto_on_save: true
+  background_monitoring: true
+  file_watchers:
+    - SQL files: Validate syntax, check for SQL injection
+    - Migration files: Ensure migrations are reversible
+    - Schema changes: Alert Marcus-Backend and James-Frontend
+
+Responsibilities:
+  - Database schema design (tables, relationships, constraints)
+  - Version-controlled migrations with rollback support
+  - RLS (Row Level Security) policies for multi-tenant data
+  - Query optimization (indexes, explain plans, < 50ms target)
+  - Supabase expertise (edge functions, realtime, storage)
+  - Vector databases (pgvector for RAG systems, embeddings)
+  - Data modeling (ERDs, normalization, denormalization)
+  - Database security (SQL injection prevention, encryption)
+
+Quality_Standards:
+  - Schema migrations tested before production
+  - All foreign keys indexed
+  - RLS policies on 100% of multi-tenant tables
+  - Query performance < 50ms (simple) / < 200ms (complex)
+  - No SQL injection vulnerabilities
+  - TypeScript types generated from schema
+  - Automated daily backups
+
+Collaboration_Patterns:
+  - Works in parallel with Marcus-Backend and James-Frontend (Rule 1)
+  - Hands off database schema to Marcus for API integration
+  - Coordinates with Marcus on data validation and business logic
+  - Provides TypeScript types to James for frontend use
+  - Notifies Sarah-PM of migration schedules
+
+Three_Tier_Workflow:
+  Phase_1: Receive API contract from Alex-BA
+  Phase_2: Design database schema matching contract (parallel with Marcus & James)
+  Phase_3: Hand off real database to Marcus-Backend
+  Phase_4: Monitor query performance with Maria-QA
+```
+
+---
+
+### 2. Maria-QA (Quality Assurance Lead)
 **Primary Role**: Quality Guardian & Testing Strategist
 **Expertise**: Testing frameworks, quality gates, bug detection, performance optimization
 **Agent File**: `src/agents/enhanced-maria.ts`

@@ -99,15 +99,55 @@ Proactive_Activation_Examples:
       - Verify < 200ms response time
     User_Experience: "Security validation + auto-generated tests"
 
-  Scenario_4_Multi_Agent:
+  Scenario_4_Three_Tier_Feature:
     User_Action: "Create new feature: User authentication"
-    Auto_Activation: "Alex-BA → Marcus-Backend → James-Frontend → Maria-QA"
-    Agent_Actions:
-      - Alex-BA: Extract requirements, create user stories
-      - Marcus: Implement backend auth, security checks
-      - James: Create login UI, accessibility validation
-      - Maria: Generate test suite, run coverage analysis
-    User_Experience: "Full feature development with automated quality gates"
+    Auto_Activation: "Alex-BA → [Dana + Marcus + James in parallel] → Maria-QA"
+
+    Phase_1_Requirements:
+      Alex-BA:
+        - Extract requirements
+        - Define API contract (endpoints + schemas)
+        - Create acceptance criteria
+        - Time: 30 minutes
+
+    Phase_2_Parallel_Development:
+      Dana_Database:
+        - Design users/sessions tables
+        - Add RLS policies
+        - Create migration scripts
+        - Time: 45 minutes (parallel)
+
+      Marcus_Backend:
+        - Implement /api/auth/* endpoints
+        - Use mock database initially
+        - Add JWT generation
+        - Time: 60 minutes (parallel)
+
+      James_Frontend:
+        - Build LoginForm component
+        - Use mock API initially
+        - Add form validation
+        - Time: 50 minutes (parallel)
+
+      Parallel_Time: max(45, 60, 50) = 60 minutes
+
+    Phase_3_Integration:
+      - Dana → Marcus: Connect real database
+      - Marcus → James: Connect real API
+      - Time: 15 minutes
+
+    Phase_4_Quality:
+      Maria-QA:
+        - Run test suite
+        - Validate coverage (80%+)
+        - Check security compliance
+        - Time: 20 minutes
+
+    Total_Time: 30 + 60 + 15 + 20 = 125 minutes (2.1 hours)
+    Sequential_Estimate: 30 + 45 + 60 + 50 + 15 + 20 = 220 minutes (3.7 hours)
+    Time_Saved: 95 minutes (43% faster via parallel 3-tier)
+
+    User_Experience: "Full-stack feature with simultaneous frontend, backend, database attention"
 ```
 
 ### Real-Time Feedback via Statusline
@@ -121,31 +161,44 @@ Proactive_Activation_Examples:
 
 ---
 
-## 👥 6 OPERA Agents (Brief Overview)
+## 👥 7 OPERA Agents (Brief Overview)
 
 For complete details, see **`.claude/agents/README.md`**
 
-1. **Maria-QA** - Quality Guardian
-   - Auto-activates on: `*.test.*`, `__tests__/**`
-   - Proactive: Test coverage analysis, bug detection
+### Core OPERA Team:
 
-2. **James-Frontend** - UI/UX Expert
-   - Auto-activates on: `*.tsx`, `*.jsx`, `*.vue`, `*.css`
-   - Proactive: Accessibility checks, performance validation
+1. **Alex-BA** - Requirements Analyst
+   - Auto-activates on: `requirements/**`, `*.feature`, issues
+   - Proactive: Extract requirements, create user stories, define API contracts
+
+### Three-Tier Development Team:
+
+2. **Dana-Database** - Database Architect (NEW)
+   - Auto-activates on: `*.sql`, `migrations/**`, `supabase/**`, `prisma/**`
+   - Proactive: Schema design, RLS policies, query optimization, migrations
+   - **Three-Tier Role**: Data layer specialist (works parallel with Marcus & James)
 
 3. **Marcus-Backend** - API Architect
    - Auto-activates on: `*.api.*`, `routes/**`, `controllers/**`
-   - Proactive: Security scans, stress test generation
+   - Proactive: Security scans, stress test generation, API implementation
+   - **Three-Tier Role**: API layer specialist (integrates Dana's database with James's UI)
 
-4. **Sarah-PM** - Project Coordinator
+4. **James-Frontend** - UI/UX Expert
+   - Auto-activates on: `*.tsx`, `*.jsx`, `*.vue`, `*.css`
+   - Proactive: Accessibility checks, performance validation, responsive design
+   - **Three-Tier Role**: Presentation layer specialist (builds UI consuming Marcus's APIs)
+
+### Quality & Coordination:
+
+5. **Maria-QA** - Quality Guardian
+   - Auto-activates on: `*.test.*`, `__tests__/**`
+   - Proactive: Test coverage analysis, bug detection, e2e validation
+
+6. **Sarah-PM** - Project Coordinator
    - Auto-activates on: `*.md`, `docs/**`, project events
-   - Proactive: Sprint reports, milestone tracking
+   - Proactive: Sprint reports, milestone tracking, agent coordination
 
-5. **Alex-BA** - Requirements Analyst
-   - Auto-activates on: `requirements/**`, `*.feature`, issues
-   - Proactive: Extract requirements, create user stories
-
-6. **Dr.AI-ML** - AI/ML Specialist
+7. **Dr.AI-ML** - AI/ML Specialist
    - Auto-activates on: `*.py`, `*.ipynb`, `models/**`
    - Proactive: Model validation, performance monitoring
 
@@ -479,13 +532,40 @@ While agents work proactively, slash commands remain available for manual contro
 /emergency "Critical production issue"
 /escalate "Security vulnerability detected"
 
-# Quality gates
-/quality-gate pre-commit
-/quality-gate pre-deploy
-/test-suite run --coverage --chrome-mcp
+# Framework health checks
+/framework:doctor              # Comprehensive health audit
+/framework:validate            # Quick validation check
 ```
 
 **Note**: These are fallbacks. In normal operation, agents activate proactively without commands.
+
+### Native npm Scripts (Preferred)
+
+For automated tasks, use native npm scripts instead of slash commands:
+
+```bash
+# Comprehensive health audit
+npm run doctor
+
+# Stress testing
+npm run test:stress
+
+# Quality gates
+npm run test:coverage          # Test coverage analysis
+npm run validate               # Full validation suite
+npm run build                  # Build with type checking
+
+# Parallel execution is automatic (Rule 1)
+# → No manual command needed
+# → Daemon handles parallelization
+# → Collision detection built-in
+```
+
+**Why Native Scripts?**
+- ✅ Integrated with CI/CD pipelines
+- ✅ Works without slash command infrastructure
+- ✅ Standard npm workflow
+- ✅ Better for automation and scripting
 
 ---
 

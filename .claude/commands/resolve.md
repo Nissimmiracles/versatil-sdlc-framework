@@ -16,7 +16,13 @@ allowed-tools:
 
 ## Introduction
 
-Resolve multiple todos in parallel using VERSATIL's OPERA agents with intelligent dependency management and collision detection. This command maximizes velocity by executing independent tasks concurrently while respecting dependencies.
+**Clears your todo backlog** using intelligent parallel execution. This command analyzes all pending `todos/*.md` files, builds a dependency graph, and executes independent todos concurrently using **Rule 1 (Parallel Task Manager)** under the hood.
+
+**Key Distinction:**
+- **Rule 1**: Framework-level parallel execution (applies to ANY multi-task operation)
+- **`/resolve`**: Todo-specific workflow that USES Rule 1 for parallel execution + adds dependency analysis, wave planning, and completion reports
+
+Use this command when you have multiple todos ready to work and want maximum velocity.
 
 ## Resolution Target
 
@@ -127,10 +133,10 @@ Total_Time:
   Savings: 40% faster
 ```
 
-### 3. Collision Detection & File Locking
+### 3. Collision Detection (Powered by Rule 1)
 
 <thinking>
-Before parallel execution, detect which files each todo will modify to prevent merge conflicts.
+Rule 1's collision detection automatically prevents merge conflicts by analyzing file overlap between parallel tasks.
 </thinking>
 
 **File Impact Analysis:**
@@ -176,10 +182,10 @@ Revised_Execution_Plan:
     - 005-deployment (Marcus-Backend)
 ```
 
-### 4. Parallel Agent Execution
+### 4. Parallel Agent Execution (Powered by Rule 1)
 
 <thinking>
-Execute independent todos in parallel using Task agent invocations with real-time progress tracking.
+Rule 1 executes independent todos in parallel waves. /resolve adds todo-specific reporting and dependency resolution on top of Rule 1's core parallel execution engine.
 </thinking>
 
 **Wave 1 Execution (Parallel):**
