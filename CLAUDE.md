@@ -447,6 +447,91 @@ Orchestration:
 
 ---
 
+## 🔍 Framework Monitoring
+
+### Real-Time Health Tracking
+
+VERSATIL includes **comprehensive monitoring infrastructure** to track framework health, agent performance, and workflow execution.
+
+**Quick Health Check:**
+```bash
+/monitor              # Quick health check (5 seconds)
+npm run monitor       # Same via npm
+```
+
+**Output:**
+- 🟢 Health score (0-100%)
+- ✅ All 7 agents status
+- ✅ Proactive system accuracy
+- ✅ 5-Rule system efficiency
+- ✅ Framework integrity check
+- ⚠️ Issues + recommendations
+
+**Interactive Dashboard:**
+```bash
+/monitor dashboard    # Launch interactive TUI
+npm run dashboard     # Same via npm
+```
+
+**Features:**
+- Real-time workflow visualization
+- Live agent progress bars
+- Data flow animation
+- Node selection with metrics
+- Keyboard navigation (arrow keys, Tab, Space)
+
+**Monitoring Modes:**
+```bash
+/monitor              # Quick health check
+/monitor dashboard    # Interactive dashboard
+/monitor watch        # Continuous monitoring (every 60s)
+/monitor report       # Generate comprehensive debug report
+/monitor agents       # Show all agent metrics
+/monitor logs         # View recent framework logs
+/monitor stress       # Run stress tests
+/monitor background start  # Start background monitor
+```
+
+**Health Score Interpretation:**
+- 🟢 **90-100%**: Excellent health
+- 🟡 **75-89%**: Good, minor issues
+- 🟠 **50-74%**: Degraded, needs attention
+- 🔴 **<50%**: Critical issues, run `/doctor --fix`
+
+**What's Monitored:**
+- **Agent Health** (30%): All 7 agents operational
+- **Proactive System** (30%): Triggers + orchestration working
+- **Rules Efficiency** (20%): 5 rules enabled and functional
+- **Framework Integrity** (20%): Critical files present
+
+**Production Monitoring:**
+```bash
+# Background monitoring (logs to .versatil/logs/)
+npm run dashboard:background
+
+# View logs
+npm run dashboard:logs
+
+# Stop background monitor
+npm run dashboard:stop
+```
+
+**For troubleshooting:**
+```bash
+# Generate debug report (JSON + Markdown)
+/monitor report
+
+# Auto-fix issues
+/doctor --fix
+
+# Validate isolation
+npm run validate:isolation
+```
+
+**See also:** [Complete Monitoring Guide](docs/guides/monitoring-guide.md)
+
+---
+
 ## 📈 Performance Metrics
 
 ```yaml
@@ -466,6 +551,13 @@ Agent_Performance:
   - Code Quality Score: >= 8.5/10
   - User Satisfaction: >= 4.5/5
   - Proactive Activation Success: >= 90%
+
+Monitoring_Performance:
+  - Health Check Time: < 5 seconds
+  - Dashboard Refresh: 500ms (real-time)
+  - StatusLine Update: 100ms
+  - Background Monitor CPU: < 1%
+  - Background Monitor RAM: < 50MB
 ```
 
 ---
