@@ -1,0 +1,329 @@
+# CRUD Endpoint Template
+# Standard REST API endpoint with database CRUD operations
+
+name: "CRUD Endpoint"
+category: "API Development"
+keywords: ["crud", "api", "rest", "endpoint", "get", "post", "put", "delete", "resource"]
+estimated_effort:
+  hours: 8
+  range: "6-10"
+  confidence: 90
+complexity: "Medium"
+
+description: |
+  Standard CRUD (Create, Read, Update, Delete) REST API endpoint with database
+  operations, validation, error handling, and comprehensive test coverage.
+
+phases:
+  database:
+    estimated_hours: 2
+    tasks:
+      - name: "Create resource table"
+        details: |
+          - id (uuid, primary key, default gen_random_uuid())
+          - [resource-specific fields based on requirements]
+          - created_at (timestamp, default now())
+          - updated_at (timestamp, default now())
+          - created_by (uuid, foreign key to users, nullable)
+          - tenant_id (uuid, nullable) - for multi-tenant apps
+
+      - name: "Add RLS policies"
+        details: |
+          - Users can read records they have access to (role-based or ownership)
+          - Users can create records if authenticated
+          - Users can update their own records
+          - Users can delete their own records
+          - Admins can read/update/delete all records
+
+      - name: "Create indexes"
+        details: |
+          - INDEX on tenant_id (if multi-tenant)
+          - INDEX on created_by (for user-specific queries)
+          - INDEX on created_at (for sorting by date)
+          - Additional indexes based on query patterns
+
+      - name: "Add constraints"
+        details: |
+          - NOT NULL constraints on required fields
+          - UNIQUE constraints on business keys
+          - CHECK constraints for data validation
+          - Foreign key constraints with ON DELETE CASCADE/SET NULL
+
+    lessons_learned:
+      - "Add indexes BEFORE bulk imports (10x faster inserts)"
+      - "Use JSONB for flexible fields (better than EAV pattern)"
+      - "Add updated_at trigger (automatic timestamp updates)"
+
+  api:
+    estimated_hours: 4
+    tasks:
+      - name: "GET /api/[resource]"
+        details: |
+          Query Parameters:
+            - page (default 1)
+            - limit (default 20, max 100)
+            - sort (field:asc|desc)
+            - filter[field] (exact match)
+            - search (full-text search)
+
+          Response:
+            - data: Array<Resource>
+            - pagination: { page, limit, total, total_pages }
+
+          Implementation:
+            - SQL query with WHERE clause for filters
+            - ORDER BY for sorting
+            - LIMIT/OFFSET for pagination
+            - Count total records for pagination metadata
+
+          Performance:
+            - Use indexes for filter fields
+            - Cache frequent queries (Redis, 5 min TTL)
+            - Target: < 100ms (P95)
+
+      - name: "GET /api/[resource]/:id"
+        details: |
+          Path Parameters:
+            - id (uuid)
+
+          Response:
+            - data: Resource
+
+          Errors:
+            - 404 if not found
+            - 403 if no access (RLS policy blocks)
+
+          Implementation:
+            - Single SELECT by primary key
+            - Use prepared statement (SQL injection protection)
+
+          Performance:
+            - Primary key lookup (O(log n))
+            - Target: < 50ms (P95)
+
+      - name: "POST /api/[resource]"
+        details: |
+          Request Body:
+            - [resource-specific fields]
+
+          Response:
+            - data: Created resource (includes generated id)
+            - status: 201 Created
+
+          Validation:
+            - Required fields present
+            - Data types correct
+            - Business rules enforced
+            - Unique constraints checked
+
+          Implementation:
+            - Validate input with schema (Zod, Joi, etc.)
+            - INSERT with RETURNING clause
+            - Set created_by to current user
+            - Set tenant_id if multi-tenant
+
+          Security:
+            - Rate limit: 100 requests/hour per user
+            - Sanitize inputs (prevent XSS)
+            - Check authorization (user has create permission)
+
+      - name: "PUT /api/[resource]/:id"
+        details: |
+          Path Parameters:
+            - id (uuid)
+
+          Request Body:
+            - [resource-specific fields to update]
+
+          Response:
+            - data: Updated resource
+
+          Validation:
+            - Resource exists (404 if not)
+            - User has permission (403 if no access)
+            - Validate update data
+
+          Implementation:
+            - UPDATE with WHERE id = $1
+            - Set updated_at = now()
+            - RETURNING clause for updated record
+
+          Optimistic Locking (optional):
+            - Include version field in table
+            - Check version matches before update
+            - Increment version on update
+            - Return 409 Conflict if version mismatch
+
+      - name: "PATCH /api/[resource]/:id"
+        details: |
+          Similar to PUT but allows partial updates
+          - Only update fields provided in request body
+          - Validate each field independently
+          - Use COALESCE for null handling
+
+      - name: "DELETE /api/[resource]/:id"
+        details: |
+          Path Parameters:
+            - id (uuid)
+
+          Response:
+            - status: 204 No Content (successful deletion)
+
+          Options:
+            - Hard delete: DELETE FROM table
+            - Soft delete: UPDATE set deleted_at = now()
+
+          Implementation:
+            - Check resource exists
+            - Check user has permission
+            - Execute delete/soft-delete
+            - Handle foreign key constraints
+
+          Considerations:
+            - Soft delete preferred (audit trail, recovery)
+            - Hard delete for GDPR compliance (user data)
+
+    error_handling:
+      - "400 Bad Request: Invalid input data"
+      - "401 Unauthorized: Missing or invalid auth token"
+      - "403 Forbidden: User lacks permission"
+      - "404 Not Found: Resource doesn't exist"
+      - "409 Conflict: Unique constraint violation"
+      - "422 Unprocessable Entity: Business rule violation"
+      - "429 Too Many Requests: Rate limit exceeded"
+      - "500 Internal Server Error: Unexpected error (log + generic message)"
+
+    security_checklist:
+      - "✅ OWASP A01: Authorization checks on all endpoints"
+      - "✅ OWASP A03: Parameterized queries (SQL injection protection)"
+      - "✅ OWASP A04: Input validation with schema library"
+      - "✅ OWASP A05: Rate limiting on write endpoints"
+      - "✅ OWASP A07: Strong authentication required"
+
+    performance_requirements:
+      - "GET /api/[resource]: < 100ms (P95)"
+      - "GET /api/[resource]/:id: < 50ms (P95)"
+      - "POST /api/[resource]: < 150ms (P95)"
+      - "PUT /api/[resource]/:id: < 100ms (P95)"
+      - "DELETE /api/[resource]/:id: < 80ms (P95)"
+
+    lessons_learned:
+      - "Use database RETURNING clause (saves extra SELECT)"
+      - "Implement pagination from day 1 (prevents performance issues)"
+      - "Soft delete by default (easier recovery, better audit trail)"
+
+  testing:
+    estimated_hours: 2
+    tasks:
+      - name: "Unit tests"
+        coverage_target: "≥ 80%"
+        test_files:
+          - "[resource]-service.test.ts"
+          - "[resource]-validator.test.ts"
+
+        scenarios:
+          - "Create resource with valid data"
+          - "Validation errors for invalid data"
+          - "Update resource with partial data (PATCH)"
+          - "Delete resource (hard/soft delete)"
+
+      - name: "Integration tests"
+        test_files:
+          - "[resource]-api.integration.test.ts"
+
+        scenarios:
+          - "GET /api/[resource] → returns paginated list"
+          - "GET /api/[resource]/:id → returns single resource"
+          - "POST /api/[resource] → creates new resource"
+          - "PUT /api/[resource]/:id → updates resource"
+          - "DELETE /api/[resource]/:id → deletes resource"
+          - "Error cases (404, 403, 400, 409)"
+
+      - name: "Performance tests"
+        test_files:
+          - "[resource]-performance.test.ts"
+
+        scenarios:
+          - "GET /api/[resource] with 10,000 records (< 100ms)"
+          - "POST /api/[resource] under load (100 req/s, < 150ms P95)"
+          - "Pagination with large offset (test index usage)"
+
+    lessons_learned:
+      - "Test pagination edge cases (page 0, page > total_pages)"
+      - "Test soft delete (should exclude deleted records from GET)"
+      - "Test rate limiting (verify 429 status after limit)"
+
+success_metrics:
+  functionality:
+    - "All CRUD operations working (Create, Read, Update, Delete)"
+    - "Pagination returning correct results"
+    - "Filters and sorting working as expected"
+
+  performance:
+    - "GET endpoint: < 100ms (P95)"
+    - "POST endpoint: < 150ms (P95)"
+    - "No N+1 query problems"
+
+  quality:
+    - "Test coverage: ≥ 80%"
+    - "All error cases handled gracefully"
+    - "Input validation preventing invalid data"
+
+  security:
+    - "Authorization checks on all endpoints"
+    - "SQL injection protection (parameterized queries)"
+    - "Rate limiting preventing abuse"
+
+risks:
+  medium:
+    - risk: "N+1 query problem with related data"
+      mitigation: "Use JOIN queries, load related data eagerly"
+
+    - risk: "Pagination performance with large offsets"
+      mitigation: "Use cursor-based pagination or keyset pagination"
+
+  low:
+    - risk: "Unique constraint violations during concurrent writes"
+      mitigation: "Use database constraints, return 409 Conflict with helpful message"
+
+alternative_approaches:
+  - name: "GraphQL instead of REST"
+    pros: ["Client specifies exactly what fields to return", "Single endpoint", "Type safety"]
+    cons: ["More complex setup", "Harder to cache", "Steeper learning curve"]
+    recommendation: "REST recommended for CRUD - simpler, well-understood"
+
+  - name: "Hard delete instead of soft delete"
+    pros: ["Simpler implementation", "No deleted records cluttering database"]
+    cons: ["No recovery option", "No audit trail", "Breaks referential integrity"]
+    recommendation: "Soft delete recommended - easier recovery, better audit trail"
+
+  - name: "Cursor-based pagination"
+    pros: ["Better performance with large offsets", "No page drift issues"]
+    cons: ["More complex implementation", "Cannot jump to arbitrary page"]
+    recommendation: "Offset pagination fine for < 10,000 records, cursor for larger datasets"
+
+code_examples:
+  - file: "src/api/users.ts"
+    lines: "42-80"
+    description: "Standard CRUD endpoint pattern with validation"
+
+  - file: "src/middleware/pagination.ts"
+    lines: "15-35"
+    description: "Reusable pagination middleware"
+
+  - file: "src/services/crud-service.ts"
+    lines: "20-120"
+    description: "Generic CRUD service with soft delete"
+
+references:
+  documentation:
+    - "https://restfulapi.net/ (REST API best practices)"
+    - "https://jsonapi.org/ (JSON:API specification)"
+
+  similar_implementations:
+    - "Feature #234: Products CRUD (95% similar, took 6 hours)"
+    - "Feature #567: Orders CRUD (90% similar, took 8 hours)"
+
+confidence:
+  score: 90
+  reasoning: "Very common pattern, multiple similar implementations, well-documented best practices"

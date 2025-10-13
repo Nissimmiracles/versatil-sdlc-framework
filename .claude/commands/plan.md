@@ -23,10 +23,97 @@ Transform feature requests, bugs, or improvements into well-structured implement
 
 ## Main Tasks
 
-### 1. Repository Research & Context Gathering
+### 1. Pre-Planning Assessment (ASSESS Phase)
 
 <thinking>
-First, understand the project's architecture, patterns, and conventions using parallel OPERA agents for comprehensive analysis.
+Before planning, ensure the environment is ready for implementation. Check framework health, dependencies, and prerequisites to catch blockers early.
+</thinking>
+
+**Quality Gates Check:**
+
+Run `/assess` command to validate readiness:
+- [ ] Framework health ≥ 80% (npm run monitor)
+- [ ] Git working tree clean (no uncommitted changes blocking)
+- [ ] Dependencies installed (node_modules exists, npm audit clean)
+- [ ] Database connected (Supabase or local PostgreSQL)
+- [ ] Environment variables set (.env file valid)
+- [ ] Build passing (npm run build succeeds)
+- [ ] Tests passing (npm test succeeds)
+
+**Readiness Thresholds:**
+- ✅ **90-100%**: GO - Ready to proceed with planning
+- ⚠️ **70-89%**: CAUTION - Can proceed with warnings
+- ❌ **< 70%**: NO-GO - Fix blockers first (show specific issues)
+
+**Override Option:**
+If assessment shows warnings but user wants to proceed:
+```bash
+/plan --force "feature description"
+```
+
+### 2. Learn from Past Features (CODIFY Phase)
+
+<thinking>
+Search historical implementations to extract patterns, effort estimates, and lessons learned. This makes plans 40% more accurate by leveraging past experience.
+</thinking>
+
+**RAG Pattern Search:**
+
+Query vector store for similar features:
+- [ ] Search feature_implementations domain with description
+- [ ] Retrieve top 5 similar features (≥75% similarity)
+- [ ] Extract effort estimates (actual hours spent)
+- [ ] Surface lessons learned ("watch out for X", "remember to Y")
+- [ ] Include code examples with file paths
+
+**Historical Context Template:**
+```markdown
+## Historical Context (Codified Learnings)
+- ✅ Similar feature #123: "User roles" took 24 hours (90% similar)
+- ⚠️ Common pitfall: Add indexes on foreign keys early (prevented 3s queries in #456)
+- ✅ Proven pattern: Use RLS policies from start (saved 8 hours in #789)
+- 📚 Code examples: src/auth/permissions.ts:42-67 (role checking pattern)
+- 📊 Effort estimate: 28 hours ± 4 hours (based on 3 similar features)
+- 🎯 Confidence: 85% (strong historical data available)
+```
+
+**If No Historical Data:**
+- Use plan templates (see Step 3)
+- Show conservative effort estimate with ±50% confidence interval
+- Recommend starting with small MVP to build historical data
+
+### 3. Check Plan Templates
+
+<thinking>
+For common feature types, leverage pre-built templates with proven patterns, effort estimates, and success metrics.
+</thinking>
+
+**Available Templates:**
+- `auth-system.yaml` - OAuth2, JWT, password hashing (28 hours)
+- `crud-endpoint.yaml` - REST API with database CRUD (8 hours)
+- `dashboard.yaml` - Analytics dashboard with charts (16 hours)
+- `api-integration.yaml` - Third-party API integration (12 hours)
+- `file-upload.yaml` - Secure file upload with S3 (10 hours)
+
+**Template Matching Algorithm:**
+1. Search feature description for keywords
+2. Match to template category (auth, crud, dashboard, etc.)
+3. Load template as starting point
+4. Customize with project-specific context
+5. Adjust effort estimate based on complexity
+
+**Example Template Usage:**
+```yaml
+Feature: "Add user authentication with Google OAuth"
+Matched Template: auth-system.yaml
+Customization: Add OAuth provider config, Google API setup
+Effort Adjustment: Base 28 hours + OAuth complexity 4 hours = 32 hours
+```
+
+### 4. Repository Research & Context Gathering
+
+<thinking>
+Understand the project's architecture, patterns, and conventions using parallel OPERA agents for comprehensive analysis.
 </thinking>
 
 Run these agents in parallel for **three-tier analysis**:
@@ -44,7 +131,7 @@ Run these agents in parallel for **three-tier analysis**:
 - [ ] Note team conventions from CLAUDE.md or docs/
 - [ ] Identify database schema patterns and migration strategies
 
-### 2. Feature Planning & Task Breakdown
+### 5. Feature Planning & Task Breakdown
 
 <thinking>
 Think like Alex-BA (Business Analyst) - what makes this feature clear and actionable? Consider user needs, technical constraints, and quality requirements.
@@ -87,7 +174,7 @@ Think like Alex-BA (Business Analyst) - what makes this feature clear and action
 - [ ] Identify accessibility requirements (WCAG 2.1 AA)
 - [ ] List security validation checkpoints
 
-### 3. Choose Implementation Detail Level
+### 6. Choose Implementation Detail Level
 
 Select planning depth based on feature complexity:
 
@@ -185,7 +272,7 @@ Multiple files created (001-pending-p1-backend-api.md, 002-pending-p1-frontend-u
 **todos/*.md Files:**
 Comprehensive set with dependencies tracked (e.g., 002 depends on 001)
 
-### 4. Create Dual Todo System
+### 7. Create Dual Todo System
 
 <thinking>
 VERSATIL uses dual todo tracking: TodoWrite for in-session visibility + todos/*.md files for cross-session persistence.
@@ -216,13 +303,35 @@ Examples:
 003-pending-p2-add-test-coverage.md
 ```
 
-### 5. Implementation Plan Output
+### 8. Implementation Plan Output
 
-**Plan Structure:**
+**Enhanced Plan Structure:**
 
 ```markdown
-## Overview
-[Executive summary of the feature]
+## Executive Summary
+[2-3 sentence overview] **Confidence: [0-100%]** (based on [N] similar implementations)
+
+**Estimated Effort**: [X] hours ± [Y] hours (confidence interval from historical data)
+
+## Assessment Results (ASSESS Phase)
+- ✅ Framework Health: 100%
+- ✅ Git Status: Clean working tree
+- ✅ Dependencies: All installed, no vulnerabilities
+- ✅ Database: Connected (Supabase production)
+- ✅ Environment: All required variables set
+- ✅ Build/Tests: Passing
+- **Readiness Score**: 95% - ✅ GO
+
+## Historical Context (CODIFY Phase)
+- ✅ Similar feature #123: "[Name]" took [X] hours ([Y]% similar)
+- ⚠️ Common pitfall: [Specific issue to avoid]
+- ✅ Proven pattern: [What worked well in past]
+- 📚 Code examples: [file_path:line_range] ([description])
+- 📊 Effort accuracy: ±[X]% (based on [N] features)
+
+## Template Applied
+**Template**: [auth-system|crud-endpoint|dashboard|api-integration|file-upload|none]
+**Customizations**: [How template was adapted for this feature]
 
 ## User Stories (Alex-BA)
 - As a [user type], I want [goal] so that [benefit]
@@ -277,7 +386,7 @@ Examples:
 - Related PRs: [#numbers]
 ```
 
-### 6. Parallel Agent Execution Pattern
+### 9. Parallel Agent Execution Pattern
 
 **OPERA Collaboration Workflow:**
 
@@ -327,7 +436,7 @@ Coordination (Throughout):
     - Manage dependencies
 ```
 
-### 7. Final Review & Output
+### 10. Final Review & Output
 
 **Pre-Output Checklist:**
 

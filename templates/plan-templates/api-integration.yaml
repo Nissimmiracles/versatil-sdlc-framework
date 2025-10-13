@@ -1,0 +1,361 @@
+# API Integration Template
+# Integration with third-party API services (REST, GraphQL, webhooks)
+
+name: "Third-Party API Integration"
+category: "Integration"
+keywords: ["api", "integration", "webhook", "rest", "graphql", "third-party", "external"]
+estimated_effort:
+  hours: 12
+  range: "8-16"
+  confidence: 75
+complexity: "Large"
+
+description: |
+  Complete integration with external API service including authentication,
+  request/response handling, error recovery, rate limiting, webhooks, and testing.
+
+phases:
+  database:
+    estimated_hours: 2
+    tasks:
+      - name: "Create integration_configs table"
+        details: |
+          - id (uuid, primary key)
+          - tenant_id (uuid, nullable) - multi-tenant support
+          - provider (varchar) - stripe, github, slack, etc.
+          - api_key (text, encrypted) - encrypted credentials
+          - api_secret (text, encrypted, nullable)
+          - webhook_secret (text, encrypted, nullable)
+          - config (jsonb) - provider-specific settings
+          - status (enum) - active, disabled, error
+          - last_synced_at (timestamptz, nullable)
+          - created_at, updated_at (timestamptz)
+
+      - name: "Create integration_events table"
+        details: |
+          Event log for API calls and webhooks:
+          - id (uuid, primary key)
+          - integration_id (uuid, foreign key)
+          - event_type (varchar) - api_call, webhook, sync, error
+          - direction (enum) - inbound, outbound
+          - endpoint (varchar) - API endpoint called
+          - request_data (jsonb) - sanitized request
+          - response_data (jsonb) - sanitized response
+          - status_code (int) - HTTP status
+          - error_message (text, nullable)
+          - duration_ms (int) - request duration
+          - created_at (timestamptz)
+
+      - name: "Create integration_sync_state table"
+        details: |
+          Track sync state for pagination/incremental updates:
+          - id (uuid, primary key)
+          - integration_id (uuid, foreign key)
+          - resource_type (varchar) - users, orders, products, etc.
+          - last_cursor (text, nullable) - pagination cursor
+          - last_sync_at (timestamptz)
+          - next_sync_at (timestamptz) - scheduled next sync
+
+      - name: "Create indexes"
+        details: |
+          - INDEX on integration_events(integration_id, created_at)
+          - INDEX on integration_events(event_type, status_code)
+          - INDEX on integration_sync_state(integration_id, resource_type)
+
+    lessons_learned:
+      - "Encrypt API keys at rest (use database encryption or vault)"
+      - "Log all API calls (debugging, audit trail)"
+      - "Store sync cursors (resume failed syncs, avoid duplicates)"
+
+  api:
+    estimated_hours: 6
+    tasks:
+      - name: "API client class"
+        details: |
+          class ThirdPartyAPIClient {
+            constructor(config: IntegrationConfig)
+
+            Methods:
+              - authenticate() - OAuth, API key, or JWT
+              - request(method, endpoint, data) - wrapper with retries
+              - get(endpoint, params)
+              - post(endpoint, data)
+              - put(endpoint, data)
+              - delete(endpoint)
+              - handleRateLimit() - exponential backoff
+              - refreshToken() - for OAuth
+
+            Error Handling:
+              - Retry on 5xx errors (max 3 retries, exponential backoff)
+              - Handle rate limits (429) - wait and retry
+              - Handle token expiry - refresh and retry
+              - Throw specific errors (AuthError, RateLimitError, etc.)
+
+            Logging:
+              - Log all requests to integration_events table
+              - Sanitize sensitive data (API keys, PII)
+              - Track request duration
+
+          }
+
+      - name: "POST /api/integrations"
+        details: |
+          Request Body:
+            - provider (stripe, github, slack, etc.)
+            - credentials (api_key, api_secret, oauth_token)
+            - config (provider-specific settings)
+
+          Response:
+            - integration: { id, provider, status }
+
+          Actions:
+            - Validate credentials (test API call)
+            - Encrypt credentials before storage
+            - Create webhook subscription if supported
+            - Return webhook URL for user to configure
+
+          Security:
+            - Validate API key format
+            - Test connection before saving
+            - Rate limit: 10 integrations per tenant
+
+      - name: "GET /api/integrations/:id/sync"
+        details: |
+          Trigger manual sync with third-party API
+
+          Response:
+            - status: "syncing" | "completed" | "error"
+            - records_synced: number
+            - next_cursor: string (for pagination)
+
+          Implementation:
+            - Fetch data from third-party API (paginated)
+            - Store last_cursor for next sync
+            - Transform data to internal format
+            - Update local database
+            - Handle rate limits gracefully
+
+          Async Processing:
+            - Queue sync job (BullMQ, Celery, etc.)
+            - Return 202 Accepted immediately
+            - Poll status with GET /api/integrations/:id/sync/status
+
+      - name: "POST /api/webhooks/:provider"
+        details: |
+          Receive webhooks from third-party service
+
+          Headers:
+            - X-Webhook-Signature (verify authenticity)
+
+          Request Body:
+            - provider-specific payload
+
+          Response:
+            - status: 200 OK (acknowledge receipt)
+
+          Actions:
+            - Verify webhook signature (HMAC)
+            - Parse payload (JSON or form-encoded)
+            - Queue webhook processing job
+            - Return 200 immediately (don't block sender)
+
+          Error Handling:
+            - Invalid signature → 401 Unauthorized
+            - Unknown event type → 200 OK (log warning)
+            - Processing error → 200 OK (retry later)
+
+      - name: "GET /api/integrations/:id/logs"
+        details: |
+          Retrieve integration event logs
+
+          Query Parameters:
+            - start_date, end_date
+            - event_type (api_call, webhook, sync, error)
+            - limit (default 50, max 500)
+
+          Response:
+            - logs: Array<IntegrationEvent>
+            - pagination: { total, page, limit }
+
+          Use Case:
+            - Debugging failed API calls
+            - Audit trail
+            - Performance monitoring
+
+    authentication_patterns:
+      - name: "API Key"
+        details: |
+          - Include API key in header (X-API-Key or Authorization: Bearer)
+          - Some APIs use query parameter (not recommended, logged in URLs)
+
+      - name: "OAuth 2.0"
+        details: |
+          - Authorization code flow (redirect user to provider)
+          - Exchange code for access token + refresh token
+          - Store tokens encrypted
+          - Refresh access token when expired (automatic)
+
+      - name: "JWT"
+        details: |
+          - Generate JWT signed with private key
+          - Include JWT in Authorization: Bearer header
+          - Some APIs require custom claims (iss, aud, exp)
+
+    rate_limiting:
+      - "Respect provider rate limits (e.g., 100 req/min)"
+      - "Implement exponential backoff (1s, 2s, 4s, 8s)"
+      - "Use queue for API calls (avoid bursts)"
+      - "Cache frequent GET requests (Redis, 5 min TTL)"
+
+    security_checklist:
+      - "✅ Encrypt API keys/secrets at rest (database encryption)"
+      - "✅ Verify webhook signatures (prevent spoofing)"
+      - "✅ Use HTTPS only (no plaintext credentials)"
+      - "✅ Rotate credentials periodically (90 days)"
+      - "✅ Validate webhook payloads (prevent injection)"
+
+    performance_requirements:
+      - "API client request: < 500ms (excluding third-party latency)"
+      - "Webhook processing: < 100ms (acknowledge receipt quickly)"
+      - "Sync job: < 5 minutes for 1000 records"
+
+    lessons_learned:
+      - "Always verify webhook signatures (prevent fake webhooks)"
+      - "Return 200 OK for webhooks immediately (process async)"
+      - "Implement idempotency (handle duplicate webhooks)"
+
+  testing:
+    estimated_hours: 4
+    tasks:
+      - name: "Unit tests"
+        coverage_target: "≥ 80%"
+        test_files:
+          - "api-client.test.ts"
+          - "webhook-processor.test.ts"
+          - "auth-handler.test.ts"
+
+        scenarios:
+          - "API client retries on 5xx errors (max 3 retries)"
+          - "Rate limit handling (429 → exponential backoff)"
+          - "Token refresh on 401 Unauthorized"
+          - "Webhook signature verification"
+
+      - name: "Integration tests (with mocked API)"
+        test_files:
+          - "integration-api.test.ts"
+
+        Mocking Strategy:
+          - Use msw (Mock Service Worker) or nock
+          - Mock third-party API responses
+          - Simulate rate limits, errors, timeouts
+
+        Scenarios:
+          - "POST /api/integrations → creates integration"
+          - "GET /api/integrations/:id/sync → triggers sync"
+          - "POST /api/webhooks/:provider → processes webhook"
+
+      - name: "E2E tests (with sandbox account)"
+        test_files:
+          - "integration-e2e.test.ts"
+
+        Requirements:
+          - Sandbox/test account with third-party provider
+          - Test API keys (not production)
+
+        Scenarios:
+          - "Complete OAuth flow → store tokens"
+          - "Sync data from API → verify local database"
+          - "Send test webhook → verify processing"
+
+    lessons_learned:
+      - "Use sandbox accounts for testing (never test in production)"
+      - "Mock third-party APIs in unit tests (faster, reliable)"
+      - "Test rate limiting (simulate 429 responses)"
+
+success_metrics:
+  functionality:
+    - "Authentication working (API key, OAuth, JWT)"
+    - "API calls succeeding (GET, POST, PUT, DELETE)"
+    - "Webhooks receiving and processing correctly"
+    - "Sync jobs completing successfully"
+
+  reliability:
+    - "Retry logic handling transient failures"
+    - "Rate limit handling (no failed requests)"
+    - "Webhook signature verification (no spoofing)"
+
+  performance:
+    - "API client: < 500ms (P95, excluding third-party latency)"
+    - "Webhook acknowledgment: < 100ms"
+    - "Sync job: 1000 records in < 5 minutes"
+
+  quality:
+    - "Test coverage: ≥ 80%"
+    - "All error cases handled gracefully"
+    - "Comprehensive logging (audit trail)"
+
+risks:
+  high:
+    - risk: "Third-party API downtime (blocks functionality)"
+      mitigation: "Queue requests, retry failed jobs, show user-friendly error"
+
+    - risk: "Rate limits exceeded (429 errors)"
+      mitigation: "Implement exponential backoff, queue system, respect limits"
+
+  medium:
+    - risk: "Webhook signature verification (security vulnerability)"
+      mitigation: "Always verify signatures, use constant-time comparison"
+
+    - risk: "Token expiry (OAuth access tokens)"
+      mitigation: "Automatic token refresh, store refresh tokens securely"
+
+  low:
+    - risk: "API schema changes (breaking changes)"
+      mitigation: "Version API client, monitor provider changelog, thorough testing"
+
+alternative_approaches:
+  - name: "Use third-party integration library (e.g., Zapier SDK)"
+    pros: ["Faster implementation", "Pre-built connectors", "Less code to maintain"]
+    cons: ["Vendor lock-in", "Less control", "Monthly costs", "Limited customization"]
+    recommendation: "Build custom for core integrations, use library for less critical"
+
+  - name: "Sync vs Real-time (webhooks)"
+    pros_sync: ["Simpler implementation", "No webhook infrastructure"]
+    cons_sync: ["Delayed data", "More API calls (polling)"]
+    pros_realtime: ["Instant updates", "Less API calls"]
+    cons_realtime: ["Complex setup", "Webhook reliability issues"]
+    recommendation: "Use webhooks for critical updates, scheduled sync for bulk data"
+
+  - name: "Store full third-party data vs IDs only"
+    pros_full: ["Faster queries", "Works offline", "No API calls on read"]
+    cons_full: ["Data staleness", "Storage overhead", "Sync complexity"]
+    pros_ids: ["Always fresh data", "Less storage", "Simpler"]
+    cons_ids: ["API calls on every read", "Slower", "Rate limits"]
+    recommendation: "Cache frequently accessed data (5 min TTL), store IDs for less common"
+
+code_examples:
+  - file: "src/integrations/stripe-client.ts"
+    lines: "42-120"
+    description: "Stripe API client with retry logic and rate limiting"
+
+  - file: "src/webhooks/github-webhook.ts"
+    lines: "20-80"
+    description: "GitHub webhook handler with signature verification"
+
+  - file: "src/integrations/oauth-handler.ts"
+    lines: "30-100"
+    description: "OAuth 2.0 flow (authorization code + token refresh)"
+
+references:
+  documentation:
+    - "https://stripe.com/docs/api (Stripe API reference)"
+    - "https://docs.github.com/en/webhooks (GitHub webhooks)"
+    - "https://oauth.net/2/ (OAuth 2.0 specification)"
+
+  similar_implementations:
+    - "Feature #456: Stripe integration (80% similar, took 14 hours)"
+    - "Feature #789: GitHub webhooks (70% similar, took 10 hours)"
+
+confidence:
+  score: 75
+  reasoning: "Complexity varies by provider, some have great docs, others don't. 2 similar implementations."

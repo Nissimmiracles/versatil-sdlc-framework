@@ -1,0 +1,424 @@
+# Analytics Dashboard Template
+# Data visualization dashboard with charts, metrics, and filters
+
+name: "Analytics Dashboard"
+category: "Data Visualization"
+keywords: ["dashboard", "analytics", "charts", "metrics", "visualization", "kpi", "reporting"]
+estimated_effort:
+  hours: 16
+  range: "12-20"
+  confidence: 80
+complexity: "Large"
+
+description: |
+  Interactive analytics dashboard with real-time metrics, data visualizations
+  (charts, graphs, tables), filtering, date range selection, and export capabilities.
+
+phases:
+  database:
+    estimated_hours: 3
+    tasks:
+      - name: "Create metrics/events table"
+        details: |
+          - id (uuid, primary key)
+          - event_type (varchar) - pageview, click, conversion, etc.
+          - user_id (uuid, nullable) - for user-specific metrics
+          - tenant_id (uuid, nullable) - multi-tenant support
+          - timestamp (timestamptz) - event time
+          - properties (jsonb) - flexible event data
+          - created_at (timestamptz, default now())
+
+      - name: "Create aggregated metrics table"
+        details: |
+          Materialized view or table for pre-computed metrics:
+          - date (date)
+          - metric_name (varchar)
+          - metric_value (numeric)
+          - dimensions (jsonb) - breakdown by category, region, etc.
+          - created_at (timestamptz)
+
+      - name: "Create indexes for analytics queries"
+        details: |
+          - INDEX on events(timestamp) - time-range queries
+          - INDEX on events(event_type, timestamp) - filter by event type
+          - INDEX on events(tenant_id, timestamp) - multi-tenant queries
+          - INDEX on events USING GIN (properties jsonb_path_ops) - JSONB queries
+          - INDEX on aggregated_metrics(date, metric_name) - dashboard queries
+
+      - name: "Create database functions"
+        details: |
+          - refresh_materialized_view() - update aggregated metrics
+          - calculate_conversion_rate(start_date, end_date) - KPI calculation
+          - get_top_pages(limit, date_range) - popular pages query
+
+    lessons_learned:
+      - "Use TimescaleDB for time-series data (10x faster queries)"
+      - "Pre-aggregate metrics hourly/daily (don't compute on-demand)"
+      - "Partition by date for faster queries (1 year = 12 partitions)"
+
+  api:
+    estimated_hours: 5
+    tasks:
+      - name: "GET /api/dashboard/metrics"
+        details: |
+          Query Parameters:
+            - start_date (ISO 8601)
+            - end_date (ISO 8601)
+            - metric_names (comma-separated: users,pageviews,revenue)
+            - group_by (hour|day|week|month)
+
+          Response:
+            - metrics: Array<{ name, data: Array<{ date, value }> }>
+            - metadata: { start_date, end_date, group_by }
+
+          Implementation:
+            - Query aggregated_metrics table (fast)
+            - Group by date interval
+            - Return time series data for charts
+
+          Caching:
+            - Cache hourly metrics for 5 minutes
+            - Cache daily metrics for 1 hour
+            - Use Redis for cache storage
+
+          Performance:
+            - Target: < 200ms for 1 year of daily data
+            - Use database indexes on (date, metric_name)
+
+      - name: "GET /api/dashboard/kpis"
+        details: |
+          Query Parameters:
+            - start_date, end_date
+            - compare_to_previous (boolean) - show change vs previous period
+
+          Response:
+            - kpis: Array<{
+                name: string,
+                value: number,
+                change: number (percentage),
+                trend: 'up' | 'down' | 'stable'
+              }>
+
+          KPIs to Calculate:
+            - Total users (count distinct user_id)
+            - Active users (users with events in last 7 days)
+            - Conversion rate (conversions / visitors)
+            - Average session duration
+            - Bounce rate (single-page sessions / total sessions)
+
+          Implementation:
+            - Run parallel queries for each KPI
+            - Compare to previous period (e.g., last month vs previous month)
+            - Calculate percentage change
+
+      - name: "GET /api/dashboard/top-pages"
+        details: |
+          Query Parameters:
+            - start_date, end_date
+            - limit (default 10)
+            - sort_by (pageviews|unique_visitors|avg_time)
+
+          Response:
+            - pages: Array<{
+                path: string,
+                pageviews: number,
+                unique_visitors: number,
+                avg_time_on_page: number
+              }>
+
+          Implementation:
+            - Aggregate events by path
+            - Count pageviews, distinct users
+            - Calculate average time on page
+            - Order by sort_by parameter
+
+      - name: "GET /api/dashboard/funnel"
+        details: |
+          Query Parameters:
+            - start_date, end_date
+            - steps (comma-separated event types: landing,signup,purchase)
+
+          Response:
+            - funnel: Array<{
+                step: string,
+                users: number,
+                conversion_rate: number,
+                drop_off_rate: number
+              }>
+
+          Implementation:
+            - Track users through each step
+            - Calculate conversion rate (step N / step 1)
+            - Calculate drop-off rate (1 - conversion_rate)
+
+      - name: "POST /api/dashboard/export"
+        details: |
+          Request Body:
+            - format (csv|xlsx|pdf)
+            - start_date, end_date
+            - metrics (array of metric names)
+
+          Response:
+            - download_url (temporary signed URL, expires in 1 hour)
+
+          Implementation:
+            - Generate export file asynchronously (job queue)
+            - Upload to S3 or similar
+            - Return signed URL for download
+            - Clean up file after 1 hour
+
+    security_checklist:
+      - "✅ Authorization: Only admins/analysts can access dashboard API"
+      - "✅ Tenant isolation: Filter by tenant_id for multi-tenant apps"
+      - "✅ Rate limiting: 100 requests/minute per user"
+      - "✅ Input validation: Validate date ranges, metric names"
+
+    performance_requirements:
+      - "KPIs endpoint: < 300ms (P95)"
+      - "Metrics endpoint: < 200ms for 1 year of daily data"
+      - "Top pages endpoint: < 150ms"
+      - "Funnel endpoint: < 400ms"
+      - "Dashboard loads in < 2 seconds total"
+
+    lessons_learned:
+      - "Pre-compute metrics (don't query raw events on-demand)"
+      - "Use materialized views + scheduled refresh (every hour)"
+      - "Cache dashboard data (Redis, 5 min TTL)"
+
+  frontend:
+    estimated_hours: 8
+    tasks:
+      - name: "Dashboard layout component"
+        details: |
+          Layout:
+            - Header with date range picker, filters
+            - KPI cards (4-6 cards in grid)
+            - Charts section (2-3 charts)
+            - Data table (top pages, users, etc.)
+
+          State Management:
+            - dateRange (start, end)
+            - selectedMetrics (array)
+            - filters (tenant, category, etc.)
+            - loading states per section
+
+          Responsive:
+            - Mobile: Single column, stacked cards
+            - Tablet: 2 columns
+            - Desktop: 3-4 columns, side-by-side charts
+
+      - name: "KPI cards component"
+        details: |
+          Props:
+            - name (string)
+            - value (number)
+            - change (number, percentage)
+            - trend ('up' | 'down' | 'stable')
+            - loading (boolean)
+
+          Features:
+            - Animated number counter (count up effect)
+            - Trend indicator (arrow up/down, green/red)
+            - Comparison text ("vs last month")
+            - Skeleton loader while fetching
+
+      - name: "Chart components"
+        details: |
+          Chart Library: Recharts, Chart.js, or Victory
+
+          Chart Types:
+            - LineChart (time series metrics)
+            - BarChart (comparisons, top pages)
+            - PieChart (category breakdowns)
+            - AreaChart (cumulative metrics)
+            - FunnelChart (conversion funnel)
+
+          Features:
+            - Responsive sizing
+            - Interactive tooltips
+            - Legend with toggle (show/hide series)
+            - Export as PNG (html2canvas)
+            - Accessibility (ARIA labels, keyboard nav)
+
+      - name: "Date range picker"
+        details: |
+          Presets:
+            - Today
+            - Last 7 days
+            - Last 30 days
+            - Last 90 days
+            - Custom range
+
+          Features:
+            - Calendar popup (react-datepicker or similar)
+            - Validation (start < end, max range 1 year)
+            - Compare to previous period toggle
+            - Keyboard shortcuts (Ctrl+Left/Right for prev/next period)
+
+      - name: "Data table component"
+        details: |
+          Features:
+            - Sortable columns
+            - Pagination (if > 100 rows)
+            - Search/filter
+            - Export to CSV button
+            - Expandable rows (show details)
+
+          Performance:
+            - Virtual scrolling for large datasets (react-window)
+            - Lazy loading (load more on scroll)
+
+      - name: "Filters panel"
+        details: |
+          Filter Types:
+            - Tenant selector (multi-tenant apps)
+            - Category/tag filters
+            - User segment filters (new, returning, etc.)
+            - Device type (mobile, desktop, tablet)
+
+          Features:
+            - Multi-select dropdown
+            - Clear all filters button
+            - Save filter presets (localStorage)
+            - Apply filters button (batch update)
+
+    accessibility_requirements:
+      - "WCAG 2.1 AA compliance"
+      - "Keyboard navigation for all interactive elements"
+      - "ARIA labels for charts (describe data)"
+      - "Color-blind friendly palette (avoid red/green only)"
+      - "Screen reader support for data tables"
+
+    responsive_design:
+      - "Mobile: 320px-767px (single column, simplified charts)"
+      - "Tablet: 768px-1023px (2 column grid)"
+      - "Desktop: 1024px+ (3-4 column grid, full charts)"
+
+    lessons_learned:
+      - "Use skeleton loaders (better UX than spinners)"
+      - "Lazy load charts (only render visible charts)"
+      - "Debounce date range changes (reduce API calls)"
+
+  testing:
+    estimated_hours: 3
+    tasks:
+      - name: "Unit tests"
+        coverage_target: "≥ 80%"
+        test_files:
+          - "dashboard-api.test.ts"
+          - "kpi-calculator.test.ts"
+          - "KPICard.test.tsx"
+          - "DashboardChart.test.tsx"
+
+        scenarios:
+          - "KPI calculation (conversion rate, bounce rate, etc.)"
+          - "Date range validation"
+          - "Chart rendering with mock data"
+          - "Filter state management"
+
+      - name: "Integration tests"
+        test_files:
+          - "dashboard-api.integration.test.ts"
+
+        scenarios:
+          - "GET /api/dashboard/metrics → returns time series data"
+          - "GET /api/dashboard/kpis → returns KPIs with change percentage"
+          - "POST /api/dashboard/export → generates CSV file"
+
+      - name: "E2E tests (Playwright)"
+        test_files:
+          - "dashboard.spec.ts"
+
+        scenarios:
+          - "Load dashboard → KPIs appear → charts render"
+          - "Change date range → data updates"
+          - "Apply filters → charts update"
+          - "Export to CSV → file downloads"
+
+      - name: "Performance tests"
+        scenarios:
+          - "Dashboard loads in < 2 seconds (all data)"
+          - "Date range change updates in < 500ms"
+          - "Charts render 1 year of daily data (< 300ms)"
+
+    lessons_learned:
+      - "Mock chart library in tests (faster tests, no canvas rendering)"
+      - "Test edge cases (no data, single data point, large numbers)"
+      - "Test responsive layout (mobile, tablet, desktop breakpoints)"
+
+success_metrics:
+  user_experience:
+    - "Dashboard loads in < 2 seconds"
+    - "All KPIs visible without scrolling (above the fold)"
+    - "Date range changes update data in < 500ms"
+
+  functionality:
+    - "All KPIs calculating correctly"
+    - "Charts displaying accurate data"
+    - "Filters working as expected"
+    - "Export to CSV generating valid files"
+
+  performance:
+    - "API endpoints: < 300ms (P95)"
+    - "Charts render in < 300ms"
+    - "No layout shift (CLS < 0.1)"
+
+  quality:
+    - "Test coverage: ≥ 80%"
+    - "Accessibility score: ≥ 95 (axe-core)"
+    - "No console errors or warnings"
+
+risks:
+  high:
+    - risk: "Performance with large datasets (millions of events)"
+      mitigation: "Pre-aggregate metrics, use materialized views, partition by date"
+
+  medium:
+    - risk: "Chart library bundle size (slows page load)"
+      mitigation: "Use lightweight library (Recharts ~200KB), code-split charts"
+
+  low:
+    - risk: "Date range validation edge cases"
+      mitigation: "Comprehensive unit tests, max range limit (1 year)"
+
+alternative_approaches:
+  - name: "Real-time dashboard (WebSocket updates)"
+    pros: ["Live data updates", "No page refresh needed", "Better UX for monitoring"]
+    cons: ["More complex implementation", "Higher server load", "Battery drain on mobile"]
+    recommendation: "Not recommended for analytics - data changes slowly, polling every 5 min sufficient"
+
+  - name: "Client-side charting (all data to frontend)"
+    pros: ["Faster interactions (no API calls)", "More flexible filtering"]
+    cons: ["Large data transfer", "Slow initial load", "Memory issues with large datasets"]
+    recommendation: "Server-side aggregation recommended - faster, less data transfer"
+
+  - name: "Third-party analytics (Google Analytics, Mixpanel)"
+    pros: ["No implementation needed", "Battle-tested", "Rich features"]
+    cons: ["Less control", "Privacy concerns", "Vendor lock-in", "Costs scale with usage"]
+    recommendation: "Build custom dashboard for full control, integrate third-party for additional insights"
+
+code_examples:
+  - file: "src/api/dashboard.ts"
+    lines: "42-120"
+    description: "Dashboard metrics API with caching"
+
+  - file: "src/components/KPICard.tsx"
+    lines: "15-60"
+    description: "Reusable KPI card component with trend indicator"
+
+  - file: "src/utils/kpi-calculator.ts"
+    lines: "20-80"
+    description: "KPI calculation functions (conversion rate, bounce rate, etc.)"
+
+references:
+  documentation:
+    - "https://recharts.org/en-US/ (Recharts documentation)"
+    - "https://www.timescale.com/blog/time-series-queries-in-postgresql/ (TimescaleDB for analytics)"
+
+  similar_implementations:
+    - "Feature #345: User analytics dashboard (85% similar, took 14 hours)"
+    - "Feature #678: Sales dashboard (75% similar, took 18 hours)"
+
+confidence:
+  score: 80
+  reasoning: "Common feature, 2 similar implementations, but complexity varies with requirements"

@@ -1,0 +1,405 @@
+# File Upload Template
+# Secure file upload with cloud storage (S3), validation, and processing
+
+name: "File Upload System"
+category: "File Management"
+keywords: ["upload", "file", "s3", "storage", "image", "pdf", "document", "media"]
+estimated_effort:
+  hours: 10
+  range: "8-12"
+  confidence: 85
+complexity: "Medium"
+
+description: |
+  Complete file upload system with cloud storage (AWS S3), file validation,
+  image processing, secure URLs, and progress tracking.
+
+phases:
+  database:
+    estimated_hours: 2
+    tasks:
+      - name: "Create files table"
+        details: |
+          - id (uuid, primary key)
+          - tenant_id (uuid, nullable) - multi-tenant support
+          - uploaded_by (uuid, foreign key to users)
+          - filename (varchar) - original filename
+          - sanitized_filename (varchar) - safe filename
+          - mime_type (varchar) - image/jpeg, application/pdf, etc.
+          - size_bytes (bigint) - file size
+          - storage_provider (varchar) - s3, gcs, azure, local
+          - storage_key (varchar) - S3 key or file path
+          - storage_url (text) - full URL (if public)
+          - thumbnail_url (text, nullable) - for images
+          - checksum (varchar) - SHA256 hash (detect duplicates)
+          - metadata (jsonb) - width, height, duration, etc.
+          - status (enum) - uploading, processing, ready, failed
+          - created_at, updated_at (timestamptz)
+
+      - name: "Create file_access_logs table"
+        details: |
+          Track who accessed files (audit trail):
+          - id (uuid, primary key)
+          - file_id (uuid, foreign key)
+          - user_id (uuid, nullable)
+          - action (enum) - download, view, delete
+          - ip_address (inet)
+          - created_at (timestamptz)
+
+      - name: "Add RLS policies"
+        details: |
+          - Users can upload files (insert)
+          - Users can read their own files
+          - Users can delete their own files
+          - Admins can read/delete all files
+
+      - name: "Create indexes"
+        details: |
+          - INDEX on files(tenant_id, uploaded_by)
+          - INDEX on files(checksum) - detect duplicates
+          - INDEX on files(created_at) - sort by date
+          - INDEX on file_access_logs(file_id, created_at)
+
+    lessons_learned:
+      - "Store checksum (SHA256) to detect duplicate uploads"
+      - "Use UUID for filenames (avoid filename collisions, hide info)"
+      - "Track file status (uploading → processing → ready)"
+
+  api:
+    estimated_hours: 4
+    tasks:
+      - name: "POST /api/files/upload-url"
+        details: |
+          Generate presigned upload URL (direct to S3)
+
+          Request Body:
+            - filename (original filename)
+            - mime_type (image/jpeg, application/pdf, etc.)
+            - size_bytes (file size)
+
+          Response:
+            - upload_url (presigned S3 URL, expires in 5 minutes)
+            - file_id (uuid, for tracking)
+            - fields (for multipart upload)
+
+          Validation:
+            - File size < max_size (e.g., 10 MB for images, 50 MB for PDFs)
+            - MIME type allowed (whitelist, not blacklist)
+            - Filename length < 255 characters
+
+          Security:
+            - Rate limit: 10 uploads/minute per user
+            - Validate MIME type server-side (don't trust client)
+            - Generate presigned URL with short expiry (5 min)
+
+          Implementation:
+            1. Validate request
+            2. Generate UUID for file
+            3. Create S3 presigned URL (PUT method)
+            4. Create file record in database (status=uploading)
+            5. Return presigned URL to client
+
+      - name: "POST /api/files/:id/complete"
+        details: |
+          Notify server that upload completed
+
+          Request Body:
+            - checksum (SHA256, client-side calculated)
+
+          Response:
+            - file: { id, url, thumbnail_url, status }
+
+          Actions:
+            1. Verify file exists in S3
+            2. Verify checksum matches
+            3. Update file status (uploading → processing)
+            4. Queue processing job (thumbnails, optimization)
+            5. Update status (processing → ready)
+
+      - name: "GET /api/files/:id/download-url"
+        details: |
+          Generate presigned download URL
+
+          Response:
+            - download_url (presigned S3 URL, expires in 1 hour)
+
+          Actions:
+            1. Check user has permission (owner or admin)
+            2. Generate presigned URL (GET method)
+            3. Log access (file_access_logs table)
+            4. Return URL
+
+          Security:
+            - Verify user authorization
+            - Short expiry (1 hour)
+            - Log all downloads (audit trail)
+
+      - name: "DELETE /api/files/:id"
+        details: |
+          Delete file from storage + database
+
+          Response:
+            - status: 204 No Content
+
+          Actions:
+            1. Check user has permission (owner or admin)
+            2. Delete from S3 (also delete thumbnail if exists)
+            3. Soft delete in database (set deleted_at)
+            4. Log deletion (file_access_logs)
+
+          Considerations:
+            - Soft delete preferred (recovery, audit trail)
+            - Schedule permanent deletion after 30 days
+            - Check if file referenced elsewhere before deleting
+
+      - name: "POST /api/files/:id/process"
+        details: |
+          Trigger file processing (thumbnails, optimization)
+
+          Processing Tasks:
+            - Images: Generate thumbnails (150x150, 300x300, 800x800)
+            - Images: Optimize file size (lossless compression)
+            - PDFs: Extract text (for search)
+            - Videos: Generate thumbnail (first frame)
+            - Videos: Transcode to web-friendly format (H.264)
+
+          Implementation:
+            - Queue job (BullMQ, Celery, etc.)
+            - Update status (processing → ready or failed)
+            - Store processed files in S3
+            - Update file record with thumbnail URLs
+
+    file_validation:
+      allowed_types:
+        images: ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"]
+        documents: ["application/pdf", "text/plain", "application/msword"]
+        archives: ["application/zip", "application/x-tar", "application/gzip"]
+
+      size_limits:
+        images: "10 MB"
+        documents: "50 MB"
+        archives: "100 MB"
+        videos: "500 MB"
+
+      security_checks:
+        - "Validate MIME type server-side (magic bytes, not extension)"
+        - "Scan for malware (ClamAV or cloud service)"
+        - "Reject executable files (.exe, .sh, .bat)"
+        - "Sanitize filename (remove special characters, limit length)"
+
+    security_checklist:
+      - "✅ OWASP A03: Validate MIME type server-side (prevent arbitrary file upload)"
+      - "✅ OWASP A04: Use presigned URLs (no direct file access)"
+      - "✅ OWASP A05: Short expiry on presigned URLs (5 min upload, 1 hour download)"
+      - "✅ OWASP A07: Check authorization before download"
+      - "✅ Malware scanning (ClamAV or VirusTotal API)"
+
+    performance_requirements:
+      - "Generate presigned URL: < 50ms"
+      - "Upload to S3: depends on file size (not controlled by API)"
+      - "Thumbnail generation: < 2 seconds for images"
+      - "Download URL generation: < 50ms"
+
+    lessons_learned:
+      - "Use presigned URLs (direct upload to S3, no server bottleneck)"
+      - "Validate MIME type server-side (don't trust client)"
+      - "Generate thumbnails asynchronously (don't block upload)"
+
+  frontend:
+    estimated_hours: 4
+    tasks:
+      - name: "FileUpload component"
+        details: |
+          Props:
+            - accept (MIME types: image/*, application/pdf, etc.)
+            - maxSize (in MB)
+            - multiple (boolean, allow multiple files)
+            - onUploadComplete (callback with file URLs)
+
+          Features:
+            - Drag and drop zone
+            - File input button (fallback)
+            - File validation (size, type)
+            - Upload progress bar
+            - Thumbnail preview (for images)
+            - Cancel upload button
+
+          State:
+            - files (array of File objects)
+            - uploadProgress (0-100%)
+            - errors (array of error messages)
+            - uploading (boolean)
+
+      - name: "Upload flow"
+        details: |
+          1. User selects file (input or drag-drop)
+          2. Validate file (size, MIME type, client-side)
+          3. Request presigned URL (POST /api/files/upload-url)
+          4. Upload directly to S3 (PUT to presigned URL)
+          5. Track progress (XMLHttpRequest.upload.onprogress)
+          6. Notify server (POST /api/files/:id/complete)
+          7. Show success message + file URL
+
+      - name: "FileList component"
+        details: |
+          Display uploaded files with actions:
+          - Thumbnail preview (images)
+          - Filename + file size
+          - Download button (GET /api/files/:id/download-url)
+          - Delete button (DELETE /api/files/:id)
+          - Share button (generate shareable link)
+
+          Features:
+            - Grid or list view toggle
+            - Sort by date, name, size
+            - Filter by file type
+            - Bulk actions (delete multiple)
+
+      - name: "Image preview component"
+        details: |
+          Modal or lightbox for viewing images:
+          - Full-size image display
+          - Zoom in/out
+          - Next/previous navigation (if multiple images)
+          - Download original button
+          - Close button (Escape key)
+
+          Accessibility:
+            - Keyboard navigation (arrow keys, Escape)
+            - Focus trap (tab stays within modal)
+            - ARIA labels (role="dialog")
+
+    accessibility_requirements:
+      - "WCAG 2.1 AA compliance"
+      - "Keyboard navigation (Tab, Enter, Escape)"
+      - "ARIA labels (role='button', aria-label='Upload file')"
+      - "Screen reader announcements (upload progress, errors)"
+      - "Color contrast ratio ≥ 4.5:1"
+
+    responsive_design:
+      - "Mobile: Full-width drag-drop zone, large touch targets"
+      - "Tablet: 2 column grid for file list"
+      - "Desktop: 3-4 column grid, side-by-side preview"
+
+    lessons_learned:
+      - "Show upload progress (better UX, especially for large files)"
+      - "Client-side validation (fast feedback, reduce failed uploads)"
+      - "Drag-and-drop (better UX than file input button)"
+
+  testing:
+    estimated_hours: 2
+    tasks:
+      - name: "Unit tests"
+        coverage_target: "≥ 80%"
+        test_files:
+          - "file-upload-service.test.ts"
+          - "file-validator.test.ts"
+          - "FileUpload.test.tsx"
+
+        scenarios:
+          - "File validation (size, MIME type)"
+          - "Presigned URL generation"
+          - "Checksum calculation (SHA256)"
+          - "Thumbnail generation (images)"
+
+      - name: "Integration tests"
+        test_files:
+          - "file-upload-api.test.ts"
+
+        Mocking:
+          - Mock S3 client (aws-sdk-mock or localstack)
+
+        Scenarios:
+          - "POST /api/files/upload-url → returns presigned URL"
+          - "POST /api/files/:id/complete → updates status to ready"
+          - "DELETE /api/files/:id → deletes from S3 and database"
+
+      - name: "E2E tests (Playwright)"
+        test_files:
+          - "file-upload.spec.ts"
+
+        Scenarios:
+          - "Upload image → see preview → download"
+          - "Upload invalid file (too large) → see error"
+          - "Upload PDF → see in file list → delete"
+          - "Drag and drop multiple images → all upload"
+
+    lessons_learned:
+      - "Use localstack for testing S3 (no real AWS account needed)"
+      - "Test file validation (reject invalid types, sizes)"
+      - "Test edge cases (empty file, huge file, special characters in filename)"
+
+success_metrics:
+  user_experience:
+    - "User can upload file in < 10 seconds (for 5 MB file)"
+    - "Progress bar shows upload progress"
+    - "Thumbnail appears immediately after upload"
+
+  functionality:
+    - "All file types uploading correctly"
+    - "Presigned URLs working (direct to S3)"
+    - "Download URLs generating correctly"
+
+  performance:
+    - "Presigned URL generation: < 50ms"
+    - "Thumbnail generation: < 2 seconds"
+    - "No server bottleneck (direct S3 upload)"
+
+  quality:
+    - "Test coverage: ≥ 80%"
+    - "File validation preventing invalid uploads"
+    - "Security scan blocking malware"
+
+risks:
+  medium:
+    - risk: "Malicious file upload (malware, exploits)"
+      mitigation: "Validate MIME type server-side, scan with ClamAV, reject executables"
+
+    - risk: "S3 costs (storage + bandwidth)"
+      mitigation: "Set lifecycle policy (delete after 90 days), use intelligent tiering"
+
+  low:
+    - risk: "Duplicate file uploads"
+      mitigation: "Check checksum before upload, reuse existing file"
+
+alternative_approaches:
+  - name: "Upload via API server (multipart/form-data)"
+    pros: ["Simpler implementation", "More control", "No S3 presigned URLs"]
+    cons: ["Server bottleneck", "Higher bandwidth costs", "Slower for large files"]
+    recommendation: "Not recommended - presigned URLs better for scalability"
+
+  - name: "Store files in database (BYTEA column)"
+    pros: ["Simpler deployment", "Atomic transactions", "No S3 costs"]
+    cons: ["Database bloat", "Slower queries", "Expensive backups", "No CDN"]
+    recommendation: "Not recommended - use S3/cloud storage for files"
+
+  - name: "Client-side image compression"
+    pros: ["Faster uploads", "Lower bandwidth", "Better mobile experience"]
+    cons: ["Quality loss", "Browser compatibility", "Complex implementation"]
+    recommendation: "Recommended for images - use browser-image-compression library"
+
+code_examples:
+  - file: "src/storage/s3-client.ts"
+    lines: "42-80"
+    description: "Generate presigned S3 URLs (upload + download)"
+
+  - file: "src/processing/image-processor.ts"
+    lines: "20-60"
+    description: "Generate thumbnails with Sharp library"
+
+  - file: "src/components/FileUpload.tsx"
+    lines: "30-120"
+    description: "Drag-and-drop file upload component with progress"
+
+references:
+  documentation:
+    - "https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html"
+    - "https://sharp.pixelplumbing.com/ (Sharp image processing)"
+
+  similar_implementations:
+    - "Feature #567: Avatar upload (90% similar, took 8 hours)"
+    - "Feature #890: Document management (75% similar, took 12 hours)"
+
+confidence:
+  score: 85
+  reasoning: "Common feature, 2 similar implementations, well-documented S3 patterns"

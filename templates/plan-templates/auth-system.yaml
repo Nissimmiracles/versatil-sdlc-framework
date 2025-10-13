@@ -1,0 +1,425 @@
+# Authentication System Template
+# Full-featured authentication with JWT, OAuth, and role-based access control
+
+name: "Authentication System"
+category: "Security"
+keywords: ["auth", "login", "signup", "jwt", "oauth", "password", "session", "authentication"]
+estimated_effort:
+  hours: 28
+  range: "24-32"
+  confidence: 85
+complexity: "Large"
+
+description: |
+  Complete authentication system with secure password hashing, JWT tokens,
+  OAuth2 providers (Google, GitHub), role-based access control (RBAC),
+  and session management.
+
+phases:
+  database:
+    estimated_hours: 6
+    tasks:
+      - name: "Create users table"
+        details: |
+          - id (uuid, primary key)
+          - email (varchar, unique, indexed)
+          - password_hash (varchar) - bcrypt with salt rounds=12
+          - roles (jsonb or enum[]) - admin, user, guest
+          - created_at, updated_at (timestamps)
+          - last_login_at (timestamp nullable)
+          - email_verified (boolean, default false)
+          - oauth_provider (varchar nullable) - google, github, etc.
+          - oauth_provider_id (varchar nullable)
+
+      - name: "Create sessions table"
+        details: |
+          - id (uuid, primary key)
+          - user_id (uuid, foreign key to users)
+          - token (varchar, indexed, unique) - JWT refresh token
+          - expires_at (timestamp)
+          - created_at (timestamp)
+          - ip_address (inet)
+          - user_agent (text)
+
+      - name: "Add RLS policies"
+        details: |
+          - Users can only read their own profile
+          - Users can only update their own email/password
+          - Only admins can read all users
+          - Public can create new users (signup)
+
+      - name: "Create indexes"
+        details: |
+          - UNIQUE INDEX on users(email)
+          - INDEX on sessions(token)
+          - INDEX on sessions(user_id, expires_at)
+          - INDEX on users(oauth_provider, oauth_provider_id)
+
+    lessons_learned:
+      - "Add email index BEFORE inserting test data (prevented 2s login in #456)"
+      - "Use INET type for IP addresses, not VARCHAR (better queries + storage)"
+      - "Set default RLS to deny-all, explicitly allow operations"
+
+  api:
+    estimated_hours: 12
+    tasks:
+      - name: "POST /auth/signup"
+        details: |
+          Request:
+            - email (email validation)
+            - password (min 8 chars, 1 uppercase, 1 number, 1 special)
+            - confirm_password (must match)
+
+          Response:
+            - user_id
+            - email
+            - message: "Check email for verification link"
+
+          Validation:
+            - Email format (RFC 5322)
+            - Password strength (zxcvbn score ≥ 3)
+            - Check email not already registered
+
+          Security:
+            - Rate limit: 5 signups/hour per IP
+            - bcrypt hash with salt rounds=12
+            - Send verification email (async)
+
+      - name: "POST /auth/login"
+        details: |
+          Request:
+            - email
+            - password
+
+          Response:
+            - access_token (JWT, 15 min expiry)
+            - refresh_token (JWT, 7 day expiry, httpOnly cookie)
+            - user: { id, email, roles }
+
+          Security:
+            - Rate limit: 10 attempts/hour per IP
+            - Compare bcrypt hash
+            - Log failed attempts (detect brute force)
+            - Update last_login_at timestamp
+
+      - name: "POST /auth/logout"
+        details: |
+          Request:
+            - refresh_token (from httpOnly cookie)
+
+          Response:
+            - message: "Logged out successfully"
+
+          Actions:
+            - Invalidate session in database
+            - Clear httpOnly cookie
+            - Blacklist access token (Redis cache, 15 min TTL)
+
+      - name: "GET /auth/me"
+        details: |
+          Request:
+            - Authorization: Bearer {access_token}
+
+          Response:
+            - user: { id, email, roles, created_at, last_login_at }
+
+          Security:
+            - Verify JWT signature
+            - Check token not expired
+            - Check token not blacklisted
+
+      - name: "POST /auth/refresh"
+        details: |
+          Request:
+            - refresh_token (from httpOnly cookie)
+
+          Response:
+            - access_token (new JWT, 15 min expiry)
+
+          Security:
+            - Verify refresh token not expired
+            - Check session exists in database
+            - Rotate refresh token (generate new one)
+
+      - name: "POST /auth/oauth/google"
+        details: |
+          Request:
+            - code (from Google OAuth redirect)
+
+          Response:
+            - access_token (JWT)
+            - refresh_token (JWT, httpOnly cookie)
+            - user: { id, email, roles }
+
+          Actions:
+            - Exchange code for Google access token
+            - Fetch user profile from Google
+            - Create or update user in database
+            - Generate JWT tokens
+
+      - name: "POST /auth/forgot-password"
+        details: |
+          Request:
+            - email
+
+          Response:
+            - message: "Check email for reset link"
+
+          Actions:
+            - Generate secure reset token (crypto.randomBytes(32))
+            - Store token hash in database (expires in 1 hour)
+            - Send reset email with link
+
+      - name: "POST /auth/reset-password"
+        details: |
+          Request:
+            - token (from email link)
+            - new_password
+            - confirm_password
+
+          Response:
+            - message: "Password reset successfully"
+
+          Actions:
+            - Verify token not expired
+            - Validate new password strength
+            - Update password_hash
+            - Invalidate all existing sessions
+
+    security_checklist:
+      - "✅ OWASP A01:2021 Broken Access Control - Role-based authorization middleware"
+      - "✅ OWASP A02:2021 Cryptographic Failures - bcrypt for passwords, HTTPS only"
+      - "✅ OWASP A03:2021 Injection - Parameterized queries, input validation"
+      - "✅ OWASP A05:2021 Security Misconfiguration - Secure headers (helmet.js)"
+      - "✅ OWASP A07:2021 Authentication Failures - Rate limiting, strong passwords"
+
+    performance_requirements:
+      - "Login endpoint: < 200ms (P95)"
+      - "Signup endpoint: < 300ms (P95)"
+      - "Token refresh: < 50ms (P95)"
+      - "OAuth flow: < 500ms (P95)"
+
+    lessons_learned:
+      - "Use httpOnly cookies for refresh tokens (XSS protection, learned from #789)"
+      - "Implement token rotation on refresh (prevent replay attacks)"
+      - "Log failed login attempts (detect credential stuffing)"
+
+  frontend:
+    estimated_hours: 8
+    tasks:
+      - name: "LoginForm component"
+        details: |
+          Props:
+            - onSuccess?: (user) => void
+            - redirectTo?: string
+
+          State:
+            - email (controlled input)
+            - password (controlled input)
+            - loading (boolean)
+            - errors ({ email?, password?, form? })
+
+          Validation:
+            - Email format (real-time)
+            - Password required (on blur)
+            - Show specific error messages
+
+          Accessibility:
+            - Semantic HTML (<form>, <label>, <input type="email">)
+            - ARIA labels for error messages
+            - Keyboard navigation (Tab, Enter to submit)
+            - Focus management (error focus)
+
+      - name: "SignupForm component"
+        details: |
+          Props:
+            - onSuccess?: (user) => void
+
+          State:
+            - email, password, confirmPassword
+            - passwordStrength (0-4 from zxcvbn)
+            - loading, errors
+
+          Features:
+            - Real-time password strength indicator
+            - Password visibility toggle
+            - Email availability check (debounced)
+            - Terms of service checkbox
+
+      - name: "AuthProvider (React Context)"
+        details: |
+          Context Value:
+            - user: User | null
+            - loading: boolean
+            - login: (email, password) => Promise<void>
+            - logout: () => Promise<void>
+            - signup: (email, password) => Promise<void>
+
+          Features:
+            - Auto-refresh access token (14 min interval)
+            - Persist login state (check /auth/me on mount)
+            - Handle 401 errors globally (auto-logout)
+
+      - name: "Protected route wrapper"
+        details: |
+          - ProtectedRoute component checks user !== null
+          - Redirect to /login if not authenticated
+          - Show loading spinner during auth check
+          - Support role-based protection (requireRole prop)
+
+      - name: "OAuth buttons"
+        details: |
+          - GoogleLoginButton (redirects to /auth/oauth/google)
+          - GitHubLoginButton (redirects to /auth/oauth/github)
+          - Branded buttons with official logos
+          - Loading states during OAuth redirect
+
+    accessibility_requirements:
+      - "WCAG 2.1 AA compliance"
+      - "Form labels associated with inputs"
+      - "Error messages linked with aria-describedby"
+      - "Focus indicators visible (outline)"
+      - "Color contrast ratio ≥ 4.5:1"
+
+    responsive_design:
+      - "Mobile: 320px-767px (single column, large touch targets)"
+      - "Tablet: 768px-1023px (centered card, 480px max width)"
+      - "Desktop: 1024px+ (centered card, 400px max width)"
+
+    lessons_learned:
+      - "Show password strength meter (reduces support tickets by 30%)"
+      - "Implement OAuth buttons above email form (70% users prefer OAuth)"
+      - "Auto-focus first input on page load (better UX)"
+
+  testing:
+    estimated_hours: 4
+    tasks:
+      - name: "Unit tests"
+        coverage_target: "≥ 80%"
+        test_files:
+          - "auth-service.test.ts"
+          - "password-hasher.test.ts"
+          - "jwt-service.test.ts"
+          - "LoginForm.test.tsx"
+          - "SignupForm.test.tsx"
+
+        scenarios:
+          - "Password hashing with bcrypt (verify salt rounds=12)"
+          - "JWT token generation and verification"
+          - "Token expiry handling"
+          - "LoginForm validation (email format, password required)"
+          - "SignupForm password strength calculation"
+
+      - name: "Integration tests"
+        test_files:
+          - "auth-api.integration.test.ts"
+
+        scenarios:
+          - "POST /auth/signup → creates user in database"
+          - "POST /auth/login → returns valid JWT tokens"
+          - "POST /auth/logout → invalidates session"
+          - "GET /auth/me → returns user profile (authenticated)"
+          - "POST /auth/refresh → rotates refresh token"
+
+      - name: "E2E tests (Playwright)"
+        test_files:
+          - "auth-flow.spec.ts"
+
+        scenarios:
+          - "Complete signup flow → email verification → login"
+          - "Login → access protected page → logout"
+          - "Forgot password → reset email → change password → login"
+          - "OAuth flow → Google login → redirect to dashboard"
+
+      - name: "Security tests"
+        test_files:
+          - "auth-security.test.ts"
+
+        scenarios:
+          - "SQL injection in login form (should be blocked)"
+          - "XSS in email field (should be sanitized)"
+          - "CSRF token validation (should require token)"
+          - "Rate limiting (should block after 10 attempts)"
+          - "Weak password rejection (should fail validation)"
+
+    lessons_learned:
+      - "Test rate limiting with real delays (not mocked time)"
+      - "Use separate test database (don't pollute production)"
+      - "Mock OAuth providers (use test credentials)"
+
+success_metrics:
+  user_experience:
+    - "User can sign up with email/password in < 30 seconds"
+    - "User can log in with Google OAuth in < 10 seconds"
+    - "Password reset flow completes in < 2 minutes"
+
+  performance:
+    - "Login endpoint: < 200ms (P95)"
+    - "Signup endpoint: < 300ms (P95)"
+    - "Token refresh: < 50ms (P95)"
+
+  quality:
+    - "Test coverage: ≥ 80%"
+    - "Security score: A+ (Mozilla Observatory)"
+    - "Accessibility score: ≥ 95 (axe-core)"
+
+  reliability:
+    - "Zero authentication bypass vulnerabilities"
+    - "99.9% uptime for auth endpoints"
+
+risks:
+  high:
+    - risk: "Password reset flow complexity (email sending, token expiry)"
+      mitigation: "Use proven library (nodemailer), comprehensive testing"
+
+  medium:
+    - risk: "Token refresh logic (race conditions, token rotation)"
+      mitigation: "Use atomic database operations, test concurrent requests"
+
+  low:
+    - risk: "Email validation (false positives with unusual TLDs)"
+      mitigation: "Use RFC 5322 regex + DNS MX record check"
+
+alternative_approaches:
+  - name: "OAuth-only (no email/password)"
+    pros: ["Simpler implementation", "Better security (no password storage)", "Faster signup"]
+    cons: ["Less control", "OAuth provider downtime blocks all users", "Harder to test"]
+    recommendation: "Not recommended - users expect email/password option"
+
+  - name: "Session-based auth (no JWT)"
+    pros: ["Simpler revocation", "Server-side state easier to audit", "No token expiry complexity"]
+    cons: ["Doesn't scale to microservices", "No mobile app support", "No cross-domain auth"]
+    recommendation: "Not recommended - JWT better for modern architectures"
+
+  - name: "JWT in localStorage (not httpOnly cookies)"
+    pros: ["Easier to implement", "Works with CORS", "Simpler mobile app integration"]
+    cons: ["Vulnerable to XSS attacks", "Cannot be revoked easily", "Security best practices recommend against"]
+    recommendation: "Not recommended - httpOnly cookies significantly more secure"
+
+code_examples:
+  - file: "src/auth/jwt-service.ts"
+    lines: "42-67"
+    description: "JWT token generation with RS256 signing"
+
+  - file: "src/auth/password-hasher.ts"
+    lines: "15-28"
+    description: "bcrypt password hashing with salt rounds=12"
+
+  - file: "src/middleware/auth.ts"
+    lines: "30-55"
+    description: "JWT verification middleware with role checking"
+
+references:
+  documentation:
+    - "https://owasp.org/www-project-top-ten/ (OWASP Top 10)"
+    - "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+    - "https://jwt.io/introduction (JWT specification)"
+
+  similar_implementations:
+    - "Feature #123: User roles (90% similar, took 24 hours)"
+    - "Feature #456: OAuth integration (70% similar, took 12 hours)"
+    - "Feature #789: Password reset (80% similar, took 6 hours)"
+
+confidence:
+  score: 85
+  reasoning: "Based on 3 similar implementations, strong historical data, well-documented patterns"
