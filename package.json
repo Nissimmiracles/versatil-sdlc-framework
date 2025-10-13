@@ -275,6 +275,8 @@
     "npm": ">=9.0.0"
   },
   "files": [
+    ".claude/",
+    ".claude-plugin/",
     "dist/",
     "src/",
     "scripts/",
