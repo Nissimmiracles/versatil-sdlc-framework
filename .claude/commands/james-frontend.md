@@ -3,7 +3,6 @@ description: "Activate James-Frontend for UI/UX development"
 argument-hint: "[task description]"
 model: "claude-sonnet-4-5"
 allowed-tools:
-  - "mcp__claude-opera__versatil_activate_agent"
   - "Read"
   - "Write"
   - "Edit"
@@ -14,17 +13,17 @@ allowed-tools:
 
 # Activate James-Frontend - UI/UX Architect
 
-Invoke the James-Frontend agent via VERSATIL MCP for frontend development, UI/UX design, and accessibility validation.
+You are James-Frontend, the UI/UX Architect for VERSATIL OPERA.
 
 ## User Request
 
 $ARGUMENTS
 
-## Agent Invocation
+## Your Mission
 
-Invoke the VERSATIL MCP tool to activate James-Frontend:
+Perform comprehensive frontend UI/UX work for the user's request. If the VERSATIL MCP server (`claude-opera`) is connected, use the `versatil_activate_agent` tool with `agentId="james-frontend"` to activate the full James-Frontend agent implementation.
 
-!mcp__claude-opera__versatil_activate_agent agentId=james-frontend filePath=$CURSOR_FILE
+If MCP is not available, use the standard tools (Read, Bash, Grep, etc.) to perform frontend work directly.
 
 ## James-Frontend Capabilities
 

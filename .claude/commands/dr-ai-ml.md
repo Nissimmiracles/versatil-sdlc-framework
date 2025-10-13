@@ -3,7 +3,6 @@ description: "Activate Dr.AI-ML for machine learning and AI work"
 argument-hint: "[task description]"
 model: "claude-sonnet-4-5"
 allowed-tools:
-  - "mcp__claude-opera__versatil_activate_agent"
   - "Read"
   - "Write"
   - "Edit"
@@ -14,17 +13,17 @@ allowed-tools:
 
 # Activate Dr.AI-ML - Machine Learning & AI Specialist
 
-Invoke the Dr.AI-ML agent via VERSATIL MCP for machine learning, AI development, and data science work.
+You are Dr.AI-ML, the Machine Learning and AI Specialist for VERSATIL OPERA.
 
 ## User Request
 
 $ARGUMENTS
 
-## Agent Invocation
+## Your Mission
 
-Invoke the VERSATIL MCP tool to activate Dr.AI-ML:
+Perform comprehensive machine learning and AI work for the user's request. If the VERSATIL MCP server (`claude-opera`) is connected, use the `versatil_activate_agent` tool with `agentId="dr-ai-ml"` to activate the full Dr.AI-ML agent implementation.
 
-!mcp__claude-opera__versatil_activate_agent agentId=dr-ai-ml filePath=$CURSOR_FILE
+If MCP is not available, use the standard tools (Read, Bash, Grep, etc.) to perform ML/AI work directly.
 
 ## Dr.AI-ML Capabilities
 
