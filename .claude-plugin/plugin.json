@@ -3,8 +3,8 @@
   "version": "6.4.0",
   "description": "Enterprise SDLC Framework with 17 agents (7 core + 10 language-specific), 6 workflow commands, and 11 MCP integrations for production-grade software development",
   "author": "Nissim Menashe <nissim@versatil.vc>",
-  "homepage": "https://github.com/versatil-sdlc-framework/core",
-  "repository": "github:versatil-sdlc-framework/core",
+  "homepage": "https://github.com/Nissimmiracles/versatil-sdlc-framework",
+  "repository": "github:Nissimmiracles/versatil-sdlc-framework",
   "license": "MIT",
   "keywords": [
     "sdlc",
