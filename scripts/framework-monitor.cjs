@@ -155,7 +155,7 @@ async function runHealthCheck() {
  * Check all OPERA agents
  */
 async function checkAllAgents() {
-  const agents = ['maria-qa', 'james-frontend', 'marcus-backend', 'sarah-pm', 'alex-ba', 'dr-ai-ml'];
+  const agents = ['dana-database', 'maria-qa', 'james-frontend', 'marcus-backend', 'sarah-pm', 'alex-ba', 'dr-ai-ml'];
   const results = {};
 
   for (const agentId of agents) {
@@ -163,6 +163,31 @@ async function checkAllAgents() {
   }
 
   return results;
+}
+
+/**
+ * Find agent source file (supports multiple directory structures)
+ */
+function findAgentSource(agentId) {
+  const agentName = agentId.split('-')[0]; // "maria" from "maria-qa"
+
+  const possiblePaths = [
+    // New structure (opera subdirectory) - PREFERRED
+    path.join(PROJECT_ROOT, 'src', 'agents', 'opera', agentId, `enhanced-${agentName}.ts`),
+    path.join(PROJECT_ROOT, 'src', 'agents', 'opera', agentId, `${agentId}-sdk-agent.ts`),
+    path.join(PROJECT_ROOT, 'src', 'agents', 'opera', agentId, `${agentId}.ts`),
+    path.join(PROJECT_ROOT, 'src', 'agents', 'opera', agentId, `${agentName}-sdk-agent.ts`),
+
+    // Legacy structure (flat directory)
+    path.join(PROJECT_ROOT, 'src', 'agents', `enhanced-${agentName}.ts`),
+    path.join(PROJECT_ROOT, 'src', 'agents', `${agentId}.ts`),
+
+    // SDK agent structure
+    path.join(PROJECT_ROOT, 'src', 'agents', 'sdk', `${agentId}-agent.ts`)
+  ];
+
+  const foundPath = possiblePaths.find(p => fs.existsSync(p));
+  return foundPath || possiblePaths[0]; // Return found path or first (for error reporting)
 }
 
 /**
@@ -174,7 +199,7 @@ async function checkAgent(agentId) {
   const agentConfigJson = path.join(PROJECT_ROOT, '.claude', 'agents', `${agentId}.json`);
   const agentConfig = fs.existsSync(agentConfigMd) ? agentConfigMd : agentConfigJson;
   const agentCommand = path.join(PROJECT_ROOT, '.claude', 'commands', `${agentId}.md`);
-  const agentSrc = path.join(PROJECT_ROOT, 'src', 'agents', `enhanced-${agentId.split('-')[0]}.ts`);
+  const agentSrc = findAgentSource(agentId);
 
   const stats = {
     config_exists: fs.existsSync(agentConfig),
@@ -229,8 +254,10 @@ async function checkProactiveSystem() {
   if (fs.existsSync(settingsFile)) {
     try {
       const settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8'));
-      stats.settings_configured = settings.versatil?.proactive_agents !== undefined;
-      stats.enabled = settings.versatil?.proactive_agents?.enabled === true;
+      // Support both "versatil.proactive_agents" (flat key) and versatil.proactive_agents (nested)
+      const proactiveConfig = settings['versatil.proactive_agents'] || settings.versatil?.proactive_agents;
+      stats.settings_configured = proactiveConfig !== undefined;
+      stats.enabled = proactiveConfig?.enabled === true;
     } catch (error) {
       stats.issues.push('Invalid settings.json');
     }
@@ -240,9 +267,6 @@ async function checkProactiveSystem() {
 
   // Check hook
   stats.hook_exists = fs.existsSync(coordinatorHook);
-  if (!stats.hook_exists) {
-    stats.issues.push('Missing agent coordinator hook');
-  }
 
   // Check orchestrator
   stats.orchestrator_exists = fs.existsSync(orchestrator);
@@ -250,8 +274,25 @@ async function checkProactiveSystem() {
     stats.issues.push('Missing proactive agent orchestrator');
   }
 
-  // Calculate accuracy (estimation)
-  stats.accuracy = (stats.settings_configured && stats.hook_exists && stats.orchestrator_exists) ? 95 : 50;
+  // Calculate accuracy (settings + orchestrator are sufficient, hooks are optional)
+  if (stats.settings_configured && stats.orchestrator_exists) {
+    stats.accuracy = 95; // Fully functional
+    if (!stats.hook_exists) {
+      // Hook is optional - settings-based activation works without it
+      stats.issues.push('Agent coordinator hook missing (optional - settings-based activation working)');
+    }
+  } else if (stats.settings_configured || stats.orchestrator_exists) {
+    stats.accuracy = 70; // Partially functional
+    if (!stats.settings_configured) {
+      stats.issues.push('Missing proactive agent configuration in .cursor/settings.json');
+    }
+    if (!stats.orchestrator_exists) {
+      stats.issues.push('Missing proactive agent orchestrator');
+    }
+  } else {
+    stats.accuracy = 50; // Not functional
+    stats.issues.push('Proactive system not configured');
+  }
 
   return stats;
 }
@@ -355,14 +396,14 @@ async function runQuickStressTests() {
   }
 
   // Test 2: All agents have configurations (support both .json and .md)
-  const agentConfigs = ['maria-qa', 'james-frontend', 'marcus-backend', 'sarah-pm', 'alex-ba', 'dr-ai-ml'];
+  const agentConfigs = ['dana-database', 'maria-qa', 'james-frontend', 'marcus-backend', 'sarah-pm', 'alex-ba', 'dr-ai-ml'];
   const allExist = agentConfigs.every(agent => {
     const mdConfig = path.join(PROJECT_ROOT, '.claude', 'agents', `${agent}.md`);
     const jsonConfig = path.join(PROJECT_ROOT, '.claude', 'agents', `${agent}.json`);
     return fs.existsSync(mdConfig) || fs.existsSync(jsonConfig);
   });
   const test2 = {
-    name: 'All 6 agent configs present',
+    name: 'All 7 agent configs present',
     passed: allExist,
     actual: allExist ? 'All present' : 'Missing',
     expected: 'All present'
@@ -377,7 +418,9 @@ async function runQuickStressTests() {
   if (fs.existsSync(settingsPath)) {
     try {
       const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-      proactiveConfigured = settings.versatil?.proactive_agents !== undefined;
+      // Support both "versatil.proactive_agents" (flat key) and versatil.proactive_agents (nested)
+      const proactiveConfig = settings['versatil.proactive_agents'] || settings.versatil?.proactive_agents;
+      proactiveConfigured = proactiveConfig !== undefined;
     } catch (error) {
       // Ignore
     }
