@@ -20,6 +20,31 @@ allowed-tools:
 
 Systematically execute implementation plans using VERSATIL's OPERA agents with dual todo tracking (TodoWrite + todos/*.md files). This command loads persistent todos, creates session tracking, and executes work with real-time progress visibility.
 
+## Flags
+
+- `--monitor`: Run continuous health monitoring during work (`/assess --continuous`)
+- `--quality-gates`: Pause at each quality gate for validation before continuing
+- `--timeout=Nh`: Maximum execution time (safety, e.g., `--timeout=8h`)
+
+## Usage Examples
+
+```bash
+# Basic work execution
+/work "Feature: User authentication"
+
+# With continuous monitoring (recommended for long work)
+/work --monitor "Feature: User authentication"
+
+# With quality gate pauses (extra safety)
+/work --quality-gates "Feature: Analytics dashboard"
+
+# With timeout protection
+/work --monitor --timeout=8h "Feature: Payment processing"
+
+# All flags combined (maximum safety)
+/work --monitor --quality-gates --timeout=28h "Complete auth system"
+```
+
 ## Work Target
 
 <work_target> #$ARGUMENTS </work_target>

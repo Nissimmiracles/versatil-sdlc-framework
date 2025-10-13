@@ -1,0 +1,590 @@
+# Large Feature Roadmap - Stress Test Template
+# 24-32 hour implementation (complete authentication system)
+
+name: "Large Feature - Complete Authentication System"
+category: "Security"
+complexity: "Large"
+estimated_effort:
+  hours: 28
+  range: "24-32"
+  confidence: 85
+agents_required:
+  - "Dana-Database"
+  - "Marcus-Backend"
+  - "James-Frontend"
+  - "Maria-QA"
+  - "Alex-BA"
+parallel_possible: true
+parallel_waves:
+  - wave: 1
+    agents: ["Alex-BA"]
+    description: "Requirements analysis (sequential)"
+  - wave: 2
+    agents: ["Dana-Database"]
+    description: "Database setup (sequential after Alex-BA)"
+  - wave: 3
+    agents: ["Marcus-Backend", "James-Frontend"]
+    description: "API + UI development (parallel)"
+  - wave: 4
+    agents: ["Maria-QA"]
+    description: "Comprehensive testing (sequential)"
+
+description: |
+  Complete authentication system with JWT tokens, OAuth providers (Google/GitHub),
+  password reset, email verification, role-based access control (RBAC), and
+  comprehensive security hardening. Tests full SDLC workflow with all 5 agents.
+
+roadmap:
+  overview:
+    total_phases: 5
+    total_todos: 22
+    estimated_duration: "28 hours"
+    parallel_execution: "Yes (4 waves)"
+    parallel_speedup: "2.4x (vs 67 hours fully sequential)"
+    critical_path: "Alex-BA → Dana → Marcus → Maria (18 hours)"
+
+  phases:
+    - phase_id: 1
+      name: "Requirements & Business Analysis"
+      assigned_agent: "Alex-BA"
+      estimated_hours: 2
+      dependencies: []
+
+      todos:
+        - id: "001"
+          description: "Define user stories for authentication system"
+          acceptance_criteria:
+            - "As a user, I want to sign up with email/password"
+            - "As a user, I want to login with Google OAuth"
+            - "As a user, I want to reset my password via email"
+            - "As an admin, I want role-based access control"
+            - "All stories have acceptance criteria and success metrics"
+
+        - id: "002"
+          description: "API contract specification (OpenAPI/Swagger)"
+          acceptance_criteria:
+            - "POST /auth/signup, /auth/login, /auth/logout"
+            - "POST /auth/forgot-password, /auth/reset-password"
+            - "GET /auth/me, POST /auth/refresh"
+            - "POST /auth/oauth/google, /auth/oauth/github"
+            - "Request/response schemas defined"
+
+      quality_gates:
+        - name: "Requirements Clarity"
+          type: "manual"
+          check: "All user stories reviewed and approved"
+          blocking: true
+
+        - name: "API Contract"
+          type: "automated"
+          check: "OpenAPI spec validates (swagger-cli validate)"
+          blocking: true
+
+    - phase_id: 2
+      name: "Database Architecture"
+      assigned_agent: "Dana-Database"
+      estimated_hours: 4
+      dependencies: [1]
+
+      todos:
+        - id: "003"
+          description: "Create users table with authentication fields"
+          acceptance_criteria:
+            - "id (uuid), email (unique), password_hash, roles (jsonb)"
+            - "created_at, updated_at, last_login_at timestamps"
+            - "email_verified (boolean), oauth_provider, oauth_provider_id"
+
+        - id: "004"
+          description: "Create sessions table for JWT refresh tokens"
+          acceptance_criteria:
+            - "id, user_id (FK), token, expires_at, created_at"
+            - "ip_address, user_agent for session tracking"
+
+        - id: "005"
+          description: "Create password_reset_tokens table"
+          acceptance_criteria:
+            - "id, user_id (FK), token_hash, expires_at, used_at"
+            - "1 hour expiry, single use enforcement"
+
+        - id: "006"
+          description: "Add RLS policies for multi-tenant security"
+          acceptance_criteria:
+            - "Users can read only their own profile"
+            - "Admins can read all users"
+            - "Public can create users (signup)"
+
+        - id: "007"
+          description: "Create indexes for performance"
+          acceptance_criteria:
+            - "UNIQUE INDEX on users(email)"
+            - "INDEX on sessions(token, expires_at)"
+            - "INDEX on sessions(user_id)"
+            - "INDEX on users(oauth_provider, oauth_provider_id)"
+
+      quality_gates:
+        - name: "Schema Validation"
+          type: "automated"
+          check: "All tables created, constraints valid"
+          blocking: true
+
+        - name: "RLS Policy Test"
+          type: "automated"
+          check: "User A cannot read User B's profile"
+          blocking: true
+
+        - name: "Query Performance"
+          type: "automated"
+          check: "Login query (email lookup) < 10ms"
+          blocking: true
+
+    - phase_id: 3
+      name: "Backend API Implementation"
+      assigned_agent: "Marcus-Backend"
+      estimated_hours: 12
+      dependencies: [2]
+      parallel_with: [4]
+
+      todos:
+        - id: "008"
+          description: "Implement POST /auth/signup endpoint"
+          acceptance_criteria:
+            - "Email validation (RFC 5322)"
+            - "Password strength (zxcvbn score ≥ 3)"
+            - "bcrypt hashing (salt rounds = 12)"
+            - "Send verification email (async)"
+            - "Rate limit: 5 signups/hour per IP"
+
+        - id: "009"
+          description: "Implement POST /auth/login endpoint"
+          acceptance_criteria:
+            - "Email/password validation"
+            - "bcrypt comparison"
+            - "Generate JWT access token (15 min expiry)"
+            - "Generate JWT refresh token (7 day expiry, httpOnly cookie)"
+            - "Update last_login_at timestamp"
+            - "Rate limit: 10 attempts/hour per IP"
+
+        - id: "010"
+          description: "Implement POST /auth/logout endpoint"
+          acceptance_criteria:
+            - "Invalidate session in database"
+            - "Clear httpOnly cookie"
+            - "Blacklist access token (Redis, 15 min TTL)"
+
+        - id: "011"
+          description: "Implement GET /auth/me endpoint"
+          acceptance_criteria:
+            - "Verify JWT signature"
+            - "Check token not expired"
+            - "Check token not blacklisted"
+            - "Return user profile (id, email, roles)"
+
+        - id: "012"
+          description: "Implement POST /auth/refresh endpoint"
+          acceptance_criteria:
+            - "Validate refresh token from cookie"
+            - "Generate new access token"
+            - "Rotate refresh token (security best practice)"
+
+        - id: "013"
+          description: "Implement POST /auth/forgot-password endpoint"
+          acceptance_criteria:
+            - "Generate secure reset token (crypto.randomBytes(32))"
+            - "Store token hash in database (1 hour expiry)"
+            - "Send reset email with link"
+
+        - id: "014"
+          description: "Implement POST /auth/reset-password endpoint"
+          acceptance_criteria:
+            - "Verify token not expired"
+            - "Validate new password strength"
+            - "Update password_hash"
+            - "Invalidate all existing sessions"
+
+        - id: "015"
+          description: "Implement POST /auth/oauth/google endpoint"
+          acceptance_criteria:
+            - "Exchange authorization code for access token"
+            - "Fetch user profile from Google"
+            - "Create or update user in database"
+            - "Generate JWT tokens"
+
+        - id: "016"
+          description: "Implement authentication middleware"
+          acceptance_criteria:
+            - "Verify JWT token"
+            - "Attach user to request object"
+            - "Handle expired tokens gracefully"
+
+        - id: "017"
+          description: "Implement OWASP security hardening"
+          acceptance_criteria:
+            - "Helmet.js for secure headers"
+            - "Rate limiting (express-rate-limit)"
+            - "Input sanitization (xss-clean)"
+            - "SQL injection protection (parameterized queries)"
+
+      quality_gates:
+        - name: "API Response Time"
+          type: "automated"
+          check: "Login endpoint < 200ms (P95)"
+          blocking: true
+
+        - name: "Security Scan"
+          type: "automated"
+          check: "OWASP ZAP scan passes (no high vulnerabilities)"
+          blocking: true
+
+        - name: "Rate Limiting"
+          type: "automated"
+          check: "11th login attempt returns 429 Too Many Requests"
+          blocking: true
+
+    - phase_id: 4
+      name: "Frontend UI Implementation"
+      assigned_agent: "James-Frontend"
+      estimated_hours: 8
+      dependencies: [1]  # Needs requirements, can start with mockups before API ready
+      parallel_with: [3]
+
+      todos:
+        - id: "018"
+          description: "Create LoginForm component"
+          acceptance_criteria:
+            - "Email and password inputs (controlled)"
+            - "Real-time validation feedback"
+            - "Show error messages (401, 429, 500)"
+            - "Loading state during submission"
+            - "WCAG 2.1 AA accessible (form labels, error announcements)"
+
+        - id: "019"
+          description: "Create SignupForm component"
+          acceptance_criteria:
+            - "Email, password, confirm password"
+            - "Password strength indicator (zxcvbn)"
+            - "Terms of service checkbox"
+            - "Email availability check (debounced)"
+
+        - id: "020"
+          description: "Create AuthProvider (React Context)"
+          acceptance_criteria:
+            - "user, loading, login(), logout(), signup() methods"
+            - "Auto-refresh access token (14 min interval)"
+            - "Persist login state (check /auth/me on mount)"
+            - "Handle 401 errors globally (auto-logout)"
+
+        - id: "021"
+          description: "Create ProtectedRoute wrapper"
+          acceptance_criteria:
+            - "Redirect to /login if not authenticated"
+            - "Show loading spinner during auth check"
+            - "Support role-based protection (requireRole prop)"
+
+        - id: "022"
+          description: "Create OAuth login buttons (Google/GitHub)"
+          acceptance_criteria:
+            - "Branded buttons with official logos"
+            - "Redirect to OAuth provider"
+            - "Handle callback with authorization code"
+            - "Loading states during OAuth flow"
+
+      quality_gates:
+        - name: "Accessibility"
+          type: "automated"
+          check: "axe-core score ≥ 95"
+          blocking: true
+
+        - name: "Responsive Design"
+          type: "manual"
+          check: "Mobile (375px), tablet (768px), desktop (1920px)"
+          blocking: true
+
+        - name: "Form Validation"
+          type: "manual"
+          check: "All validation errors user-friendly"
+          blocking: false
+
+    - phase_id: 5
+      name: "Comprehensive Testing & QA"
+      assigned_agent: "Maria-QA"
+      estimated_hours: 4
+      dependencies: [3, 4]
+
+      todos:
+        - id: "023"
+          description: "Unit tests for backend auth service"
+          acceptance_criteria:
+            - "Test password hashing (bcrypt)"
+            - "Test JWT generation and verification"
+            - "Test token expiry handling"
+            - "Coverage ≥ 80%"
+
+        - id: "024"
+          description: "Unit tests for frontend components"
+          acceptance_criteria:
+            - "Test LoginForm validation"
+            - "Test SignupForm password strength"
+            - "Test AuthProvider state management"
+            - "Coverage ≥ 80%"
+
+        - id: "025"
+          description: "Integration tests (API + Database)"
+          acceptance_criteria:
+            - "POST /auth/signup → creates user in database"
+            - "POST /auth/login → returns valid JWT"
+            - "POST /auth/logout → invalidates session"
+
+        - id: "026"
+          description: "E2E tests (Playwright)"
+          acceptance_criteria:
+            - "Complete signup flow (email verification)"
+            - "Login → access protected page → logout"
+            - "Forgot password → reset email → change password"
+            - "OAuth flow (Google login)"
+
+        - id: "027"
+          description: "Security testing"
+          acceptance_criteria:
+            - "SQL injection attempts blocked"
+            - "XSS attempts sanitized"
+            - "CSRF token validation"
+            - "Rate limiting enforced"
+            - "Weak password rejected"
+
+        - id: "028"
+          description: "Performance testing"
+          acceptance_criteria:
+            - "Login endpoint: 100 req/s, < 200ms P95 (autocannon)"
+            - "Signup endpoint: 50 req/s, < 300ms P95"
+            - "Token refresh: 500 req/s, < 50ms P95"
+
+      quality_gates:
+        - name: "Test Coverage"
+          type: "automated"
+          check: "npm run test:coverage ≥ 80%"
+          blocking: true
+
+        - name: "E2E Tests Passing"
+          type: "automated"
+          check: "npx playwright test (all scenarios pass)"
+          blocking: true
+
+        - name: "Security Score"
+          type: "automated"
+          check: "Mozilla Observatory score A+"
+          blocking: true
+
+        - name: "Performance Validation"
+          type: "automated"
+          check: "All API endpoints meet performance targets"
+          blocking: true
+
+success_criteria:
+  functional:
+    - "Users can sign up with email/password"
+    - "Users can log in with Google OAuth"
+    - "Password reset flow works end-to-end"
+    - "Protected routes require authentication"
+    - "JWT tokens refresh automatically"
+
+  security:
+    - "OWASP Top 10 compliance"
+    - "Zero authentication bypass vulnerabilities"
+    - "Rate limiting prevents brute force"
+    - "httpOnly cookies prevent XSS"
+    - "bcrypt prevents password cracking"
+
+  performance:
+    - "Login endpoint < 200ms (P95)"
+    - "Signup endpoint < 300ms (P95)"
+    - "Token refresh < 50ms (P95)"
+    - "OAuth flow < 500ms (P95)"
+
+  quality:
+    - "Test coverage ≥ 80%"
+    - "Accessibility score ≥ 95"
+    - "Security score A+ (Observatory)"
+    - "All E2E tests passing"
+
+  user_experience:
+    - "Sign up in < 30 seconds"
+    - "Log in with Google in < 10 seconds"
+    - "Password reset completes in < 2 minutes"
+
+stress_test_scenarios:
+  - scenario: "Login Storm"
+    description: "1000 concurrent login attempts"
+    expected: "Rate limiting enforced, no crashes, DB handles load"
+    validation: "P95 < 200ms even under load, no 500 errors"
+
+  - scenario: "Token Refresh Avalanche"
+    description: "10,000 token refresh requests simultaneously"
+    expected: "Redis handles load, no race conditions"
+    validation: "All tokens valid, no duplicates issued"
+
+  - scenario: "Signup Abuse"
+    description: "Attacker tries 100 signups with same email"
+    expected: "Rate limiting blocks after 5, unique constraint enforces"
+    validation: "Only 1 user created, all others 429 or 409"
+
+  - scenario: "Password Reset Spam"
+    description: "100 password reset requests for same email"
+    expected: "Rate limiting enforced, only 1 valid token at a time"
+    validation: "Old tokens invalidated when new one issued"
+
+  - scenario: "OAuth Provider Downtime"
+    description: "Google OAuth returns 500 errors"
+    expected: "Graceful error handling, user sees friendly message"
+    validation: "No crashes, fallback to email/password suggested"
+
+  - scenario: "Database Connection Loss"
+    description: "Database disconnects mid-authentication"
+    expected: "Connection pool retries, requests queued or failed gracefully"
+    validation: "No data corruption, clear error messages"
+
+  - scenario: "Long-Running Sessions"
+    description: "User stays logged in for 7 days (refresh token max age)"
+    expected: "Token refreshes seamlessly, no manual re-login"
+    validation: "Access token refreshed 672 times (7 days * 96 refreshes/day)"
+
+agent_coordination:
+  parallel_execution:
+    wave_1:
+      agents: ["Alex-BA"]
+      duration: "2 hours"
+      deliverables:
+        - "User stories with acceptance criteria"
+        - "API contract (OpenAPI spec)"
+
+    wave_2:
+      agents: ["Dana-Database"]
+      duration: "4 hours"
+      dependencies: ["Wave 1 complete (needs API contract)"]
+      deliverables:
+        - "Users, sessions, password_reset_tokens tables"
+        - "RLS policies"
+        - "Performance indexes"
+
+    wave_3:
+      agents: ["Marcus-Backend", "James-Frontend"]
+      duration: "12 hours (parallel)"
+      dependencies: ["Wave 2 complete (Marcus needs DB)"]
+      coordination:
+        - "James starts with mockups (only needs Wave 1 API contract)"
+        - "Marcus implements API endpoints (needs Wave 2 DB)"
+        - "James integrates API when Marcus completes endpoints"
+      deliverables:
+        - "Marcus: 8 API endpoints + middleware + security"
+        - "James: 5 UI components + AuthProvider + OAuth integration"
+
+    wave_4:
+      agents: ["Maria-QA"]
+      duration: "4 hours"
+      dependencies: ["Wave 3 complete"]
+      deliverables:
+        - "Unit tests (80%+ coverage)"
+        - "Integration tests"
+        - "E2E tests (Playwright)"
+        - "Security + Performance validation"
+
+  critical_path:
+    total_duration: "22 hours (vs 28 hours with parallelization)"
+    path: "Alex-BA (2h) → Dana (4h) → Marcus (12h) → Maria (4h)"
+    parallel_savings: "6 hours (James works in parallel with Marcus)"
+
+  handoff_protocol:
+    alex_to_dana:
+      data:
+        - "API contract (endpoint schemas)"
+        - "User stories (data requirements)"
+      validation:
+        - "Dana understands what data to store"
+        - "Schema aligns with API responses"
+
+    alex_to_james:
+      data:
+        - "User stories (UI requirements)"
+        - "API contract (for mockups)"
+      validation:
+        - "James can start UI without waiting for backend"
+
+    dana_to_marcus:
+      data:
+        - "Database schema (tables, columns, types)"
+        - "Query examples (how to fetch users, sessions)"
+      validation:
+        - "Marcus can connect to DB and query successfully"
+
+    marcus_to_james:
+      data:
+        - "API endpoints (deployed to staging)"
+        - "Example responses with real data"
+        - "Error response formats"
+      validation:
+        - "James can integrate API (replace mocks with real calls)"
+
+    both_to_maria:
+      data:
+        - "Deployed application (staging environment)"
+        - "API documentation (Postman collection or OpenAPI)"
+        - "Expected behavior (user stories + acceptance criteria)"
+      validation:
+        - "Maria can access and test everything"
+
+time_tracking:
+  estimated_breakdown:
+    planning: "1 hour"
+    requirements: "2 hours"
+    database: "4 hours"
+    api: "12 hours"
+    frontend: "8 hours"
+    testing: "4 hours"
+    integration_debugging: "1 hour"
+
+  parallel_vs_sequential:
+    sequential_estimate: "32 hours (all phases back-to-back)"
+    parallel_estimate: "24 hours (4 waves with parallelization)"
+    speedup: "1.33x"
+    critical_path: "22 hours (Alex → Dana → Marcus → Maria)"
+
+  actual_tracking:
+    # Filled in after completion
+    actual_planning: null
+    actual_requirements: null
+    actual_database: null
+    actual_api: null
+    actual_frontend: null
+    actual_testing: null
+    actual_integration: null
+    total_actual: null
+
+learnings_to_capture:
+  technical:
+    - "bcrypt salt rounds (12 = 200ms, acceptable?)"
+    - "JWT expiry strategy (15 min access, 7 day refresh)"
+    - "httpOnly cookie effectiveness (prevents XSS)"
+    - "Rate limiting thresholds (5 signup, 10 login per hour)"
+    - "OAuth library choice (passport.js vs custom)"
+
+  process:
+    - "How much time did parallel execution actually save?"
+    - "Where did agent handoffs cause delays?"
+    - "What quality gate was most valuable?"
+    - "What could be further parallelized?"
+
+  improvements:
+    - "What patterns can be extracted for next auth feature?"
+    - "What documentation would speed up future similar work?"
+    - "What testing strategy was most effective?"
+
+next_iteration_expectations:
+  with_learning:
+    estimated_effort: "22 hours (-21%)"
+    confidence: 92
+    improvements:
+      - "Reuse entire auth system structure"
+      - "Copy database schema with minor tweaks"
+      - "Reuse API endpoints (just change branding)"
+      - "Reuse UI components (styled-components for theming)"
+      - "Copy test suites (update assertions only)"
+      - "Compounding effect: Each iteration 40% faster"

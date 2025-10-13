@@ -19,6 +19,28 @@ allowed-tools:
 
 **Philosophy**: "Catch blockers early, not halfway through implementation."
 
+## Flags
+
+- `--continuous`: Run continuous monitoring during implementation (checks every 30 minutes)
+- `--interval=N`: Custom monitoring interval in minutes (default: 30, with `--continuous`)
+- `--alert-threshold=N`: Health threshold for alerts (default: 80%)
+
+## Usage Examples
+
+```bash
+# Single assessment (default)
+/assess "Feature: User authentication"
+
+# Continuous monitoring during 8-hour implementation
+/assess --continuous "Feature: User authentication"
+
+# Custom monitoring interval (every 15 minutes)
+/assess --continuous --interval=15 "Feature: Analytics dashboard"
+
+# Custom alert threshold (warn if health < 90%)
+/assess --continuous --alert-threshold=90 "Feature: Payment processing"
+```
+
 ## Assessment Target
 
 <assessment_target> #$ARGUMENTS </assessment_target>
@@ -595,14 +617,136 @@ npm run monitor
 **Ready to ship**: YES ✅
 ```
 
+### 9. Continuous Monitoring Mode
+
+<thinking>
+For long-running implementations (8-28 hours), run continuous health checks to catch issues during execution, not after.
+</thinking>
+
+**Continuous Mode (--continuous flag):**
+
+When `--continuous` flag is provided:
+- [ ] Run initial assessment (all 8 checks)
+- [ ] Schedule recurring assessments every N minutes (default: 30)
+- [ ] Alert if health drops below threshold (default: 80%)
+- [ ] Track health over time (trend analysis)
+- [ ] Auto-pause work if critical issues detected
+
+**Usage:**
+```bash
+# Start continuous monitoring
+/assess --continuous "Feature: User authentication (28 hours)"
+
+→ Initial assessment: 98% ✅
+→ Monitoring started (checks every 30 minutes)
+→ Will alert if health < 80%
+```
+
+**Monitoring Loop:**
+```yaml
+Continuous Monitoring Active:
+  feature: "User authentication"
+  started: 2025-10-13 10:00:00
+  interval: 30 minutes
+  alert_threshold: 80%
+  checks_completed: 0
+
+Schedule:
+  - Check 1: 10:30 (30 min)
+  - Check 2: 11:00 (1 hour)
+  - Check 3: 11:30 (1.5 hours)
+  - ... (continues until work complete)
+```
+
+**Real-Time Updates:**
+```
+🔄 Continuous Monitoring Active
+
+[10:00] Initial Assessment: 98% ✅
+[10:30] Health Check 1/16: 97% ✅ (framework: 100%, git: clean, tests: passing)
+[11:00] Health Check 2/16: 96% ✅ (minor: 1 dependency outdated)
+[11:30] Health Check 3/16: 94% ✅ (minor: test coverage 78%, target 80%)
+[12:00] Health Check 4/16: 92% ✅ (warning: database latency 150ms)
+[12:30] Health Check 5/16: 88% ⚠️  (CAUTION: test coverage 75%, 3 tests failing)
+[12:35] 🚨 ALERT: Health dropped to 88% (threshold: 80%)
+        Issue: 3 integration tests failing
+        Recommendation: Fix tests before continuing
+        Pausing work... (waiting for fix)
+
+[13:00] Health Check 6/16: 95% ✅ (tests fixed, back on track)
+[13:30] Health Check 7/16: 96% ✅ (all systems normal)
+...
+```
+
+**Alert Triggers:**
+
+Alerts sent when:
+- [ ] Health drops below threshold (default: 80%)
+- [ ] Critical component fails (framework, database, tests)
+- [ ] Significant regression (health drops >10% in one check)
+- [ ] Quality gate failures accumulate
+
+**Auto-Pause Conditions:**
+
+Work automatically paused when:
+- [ ] Health < 70% (critical threshold)
+- [ ] Framework integrity broken
+- [ ] Database connection lost
+- [ ] All tests failing (blocking quality gate)
+
+**Monitoring Report (End of Session):**
+```yaml
+Continuous Monitoring Summary:
+  duration: 28 hours
+  checks_completed: 56 (every 30 minutes)
+  alerts_triggered: 2
+
+  health_trend:
+    initial: 98%
+    minimum: 88% (at 12:30, tests failing)
+    final: 97%
+    average: 95%
+
+  issues_detected:
+    - timestamp: 12:30
+      issue: "3 integration tests failing"
+      severity: medium
+      resolved: 12:50 (20 minutes)
+      impact: "Work paused for 20 minutes"
+
+    - timestamp: 18:45
+      issue: "Database latency 220ms (target: < 100ms)"
+      severity: low
+      resolved: auto (not blocking)
+      impact: "None (continued working)"
+
+  recommendations:
+    - "Address test flakiness (3 failures mid-implementation)"
+    - "Consider local database (reduce latency)"
+    - "Health remained excellent overall (95% avg)"
+```
+
+**Integration with /work:**
+```bash
+# Start work with continuous monitoring
+/work --monitor "Feature: User authentication"
+
+→ Automatically runs /assess --continuous
+→ Monitors health during entire implementation
+→ Alerts on issues in real-time
+```
+
+---
+
 ## Integration with Workflows
 
 **Before `/plan`**: Run `/assess "Feature X"` to ensure readiness
-**Before `/work`**: Run `/assess` to verify environment
+**Before `/work`**: Run `/assess` to verify environment (or `/work --monitor` for continuous)
 **Before `/resolve`**: Run `/assess` to check health
+**During long work**: Use `/assess --continuous` for real-time monitoring
 
 **Compounding Engineering Cycle**:
-1. **ASSESS** ← (Check readiness before starting)
+1. **ASSESS** ← (Check readiness before starting + continuous monitoring during work)
 2. **PLAN** (Create implementation plan)
 3. **DELEGATE** (Execute work)
 4. **CODIFY** (Learn from completion)
@@ -610,6 +754,6 @@ npm run monitor
 ---
 
 **Philosophy**: Compounding Engineering
-**Phase**: ASSESS (verify readiness before work)
+**Phase**: ASSESS (verify readiness before work + monitor during execution)
 **Next Phase**: PLAN (create detailed implementation)
-**Benefit**: Catch blockers early, save 20-30% rework time
+**Benefit**: Catch blockers early (20-30% rework time saved) + detect issues during execution

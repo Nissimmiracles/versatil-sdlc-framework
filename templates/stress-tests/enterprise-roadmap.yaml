@@ -1,0 +1,680 @@
+# Enterprise Roadmap - Stress Test Template
+# 1-2 week implementation (multi-feature release)
+
+name: "Enterprise Roadmap - Multi-Feature Release v1.0"
+category: "Full SDLC"
+complexity: "Extra Large"
+estimated_effort:
+  hours: 80
+  range: "60-100"
+  confidence: 75
+agents_required:
+  - "Alex-BA"
+  - "Dana-Database"
+  - "Marcus-Backend"
+  - "James-Frontend"
+  - "Maria-QA"
+  - "Sarah-PM"
+  - "Dr.AI-ML" # For analytics/ML features
+  - "feedback-codifier" # For continuous improvement
+parallel_possible: true
+parallel_waves:
+  - wave: 1
+    agents: ["Alex-BA", "Sarah-PM"]
+    description: "Requirements + Project planning"
+  - wave: 2
+    agents: ["Dana-Database"]
+    description: "Complete database architecture"
+  - wave: 3
+    agents: ["Marcus-Backend", "James-Frontend", "Dr.AI-ML"]
+    description: "All features in parallel (3 teams)"
+  - wave: 4
+    agents: ["Maria-QA"]
+    description: "Integration testing + Security audit"
+  - wave: 5
+    agents: ["Sarah-PM", "feedback-codifier"]
+    description: "Release coordination + Learning capture"
+
+description: |
+  Complete multi-feature release including authentication, analytics dashboard,
+  and payment processing. Tests full enterprise SDLC with all agents, complete
+  quality gates, and production deployment readiness.
+
+roadmap:
+  overview:
+    total_phases: 7
+    total_features: 3
+    total_todos: 45
+    estimated_duration: "80 hours (2 weeks with 2 devs)"
+    parallel_execution: "Yes (5 waves, 3 parallel feature teams)"
+    parallel_speedup: "3.2x (vs 256 hours fully sequential)"
+    critical_path: "Alex/Sarah (8h) → Dana (12h) → Marcus Auth (12h) → Maria (16h) → Sarah Release (8h) = 56 hours"
+
+  features:
+    - feature_id: "F1"
+      name: "Authentication System"
+      reference_template: "large-feature.yaml"
+      estimated_hours: 28
+      priority: "P0 (Blocker for other features)"
+
+    - feature_id: "F2"
+      name: "Analytics Dashboard"
+      reference_template: "medium-feature.yaml"
+      estimated_hours: 10
+      priority: "P1 (High value)"
+      dependencies: ["F1"] # Needs auth to show user-specific data
+
+    - feature_id: "F3"
+      name: "Payment Processing (Stripe)"
+      reference_template: "api-integration.yaml"
+      estimated_hours: 12
+      priority: "P1 (Revenue critical)"
+      dependencies: ["F1"] # Needs auth for user billing
+
+  phases:
+    - phase_id: 1
+      name: "Requirements & Project Planning"
+      assigned_agents: ["Alex-BA", "Sarah-PM"]
+      estimated_hours: 8
+      dependencies: []
+
+      todos:
+        - id: "001"
+          description: "Define product vision and release goals"
+          assigned_agent: "Sarah-PM"
+          acceptance_criteria:
+            - "Release theme: 'User-centric platform launch'"
+            - "Target users: SaaS startups, 1000-10000 users"
+            - "Success metrics: 100 signups in 1st week, 10 paying customers"
+            - "Timeline: 2 weeks dev + 1 week QA + 1 week staging = 4 weeks total"
+
+        - id: "002"
+          description: "Extract user stories for all 3 features"
+          assigned_agent: "Alex-BA"
+          acceptance_criteria:
+            - "F1 Auth: 5 user stories (signup, login, OAuth, password reset, RBAC)"
+            - "F2 Dashboard: 4 user stories (view metrics, filter by date, export, alerts)"
+            - "F3 Payments: 6 user stories (add card, subscribe, cancel, invoices, webhooks, refunds)"
+            - "All stories have acceptance criteria and DoD"
+
+        - id: "003"
+          description: "Create API contracts for all features"
+          assigned_agent: "Alex-BA"
+          acceptance_criteria:
+            - "OpenAPI 3.0 spec with 25 endpoints"
+            - "Authentication: 8 endpoints"
+            - "Dashboard: 5 endpoints"
+            - "Payments: 12 endpoints"
+            - "Spec validates with swagger-cli"
+
+        - id: "004"
+          description: "Define sprint structure and milestones"
+          assigned_agent: "Sarah-PM"
+          acceptance_criteria:
+            - "Sprint 1 (Week 1): Auth system (F1)"
+            - "Sprint 2 (Week 2): Dashboard + Payments (F2 + F3 parallel)"
+            - "Sprint 3 (Week 3): Integration testing + Bug fixes"
+            - "Sprint 4 (Week 4): Staging deployment + UAT"
+
+      quality_gates:
+        - name: "Requirements Sign-off"
+          type: "manual"
+          check: "All stakeholders approve user stories"
+          blocking: true
+
+        - name: "API Contract Validation"
+          type: "automated"
+          check: "swagger-cli validate api-spec.yaml"
+          blocking: true
+
+    - phase_id: 2
+      name: "Database Architecture (All Features)"
+      assigned_agent: "Dana-Database"
+      estimated_hours: 12
+      dependencies: [1]
+
+      todos:
+        - id: "005"
+          description: "Design complete database schema (all 3 features)"
+          acceptance_criteria:
+            - "Users, sessions, password_resets (F1 Auth)"
+            - "Events, aggregated_metrics, kpi_definitions (F2 Dashboard)"
+            - "Customers, subscriptions, invoices, payments (F3 Payments)"
+            - "ER diagram with relationships"
+
+        - id: "006"
+          description: "Create all tables with migrations (versioned)"
+          acceptance_criteria:
+            - "Migration 001: Users + Sessions"
+            - "Migration 002: Events + Metrics"
+            - "Migration 003: Payments + Subscriptions"
+            - "Rollback scripts for each migration"
+
+        - id: "007"
+          description: "Add comprehensive RLS policies (multi-tenant)"
+          acceptance_criteria:
+            - "Users can only see their own data"
+            - "Admins can see all data"
+            - "Service role bypasses RLS (for background jobs)"
+
+        - id: "008"
+          description: "Create all indexes and optimize queries"
+          acceptance_criteria:
+            - "35 indexes across all tables"
+            - "All queries < 100ms (EXPLAIN ANALYZE)"
+            - "No table scans for common queries"
+
+        - id: "009"
+          description: "Set up database functions and triggers"
+          acceptance_criteria:
+            - "Auto-update updated_at timestamps"
+            - "Cascade deletes for related data"
+            - "Materialized view refresh for dashboard metrics"
+
+      quality_gates:
+        - name: "Schema Validation"
+          type: "automated"
+          check: "All tables created, all constraints valid"
+          blocking: true
+
+        - name: "Migration Safety"
+          type: "automated"
+          check: "Dry-run migrations on staging (no errors)"
+          blocking: true
+
+        - name: "Query Performance"
+          type: "automated"
+          check: "All queries < 100ms on 100K row dataset"
+          blocking: true
+
+    - phase_id: 3
+      name: "Feature 1: Authentication System"
+      assigned_agent: "Marcus-Backend + James-Frontend"
+      estimated_hours: 28
+      dependencies: [2]
+      parallel_with: []  # Must complete first (F2 and F3 depend on it)
+
+      todos:
+        # Reference large-feature.yaml todos 008-022 (auth system)
+        - id: "010-025"
+          description: "Complete auth system implementation"
+          reference: "templates/stress-tests/large-feature.yaml"
+          todo_range: "008-022"
+          acceptance_criteria:
+            - "All 8 API endpoints working"
+            - "All 5 UI components responsive and accessible"
+            - "JWT tokens working (access + refresh)"
+            - "OAuth integration (Google + GitHub)"
+            - "Test coverage ≥ 80%"
+
+      quality_gates:
+        - name: "Auth Security Audit"
+          type: "automated"
+          check: "OWASP ZAP scan (no high vulnerabilities)"
+          blocking: true
+
+        - name: "Performance Validation"
+          type: "automated"
+          check: "Login < 200ms, Signup < 300ms (P95)"
+          blocking: true
+
+    - phase_id: 4
+      name: "Feature 2: Analytics Dashboard (Parallel)"
+      assigned_agent: "Marcus-Backend + James-Frontend"
+      estimated_hours: 10
+      dependencies: [2, 3]  # Needs DB + Auth complete
+      parallel_with: [5]  # Can work in parallel with Payments
+
+      todos:
+        # Reference medium-feature.yaml todos 004-015 (dashboard)
+        - id: "026-035"
+          description: "Complete analytics dashboard implementation"
+          reference: "templates/stress-tests/medium-feature.yaml"
+          todo_range: "004-015"
+          acceptance_criteria:
+            - "3 API endpoints (metrics, KPIs, top pages)"
+            - "Dashboard layout with 4 KPI cards + 3 charts"
+            - "Date range picker with presets"
+            - "Real-time data updates"
+            - "Responsive design (mobile + desktop)"
+
+      quality_gates:
+        - name: "Dashboard Load Time"
+          type: "automated"
+          check: "Full dashboard loads in < 2 seconds"
+          blocking: true
+
+        - name: "Data Accuracy"
+          type: "manual"
+          check: "KPIs match raw data (sample validation)"
+          blocking: true
+
+    - phase_id: 5
+      name: "Feature 3: Payment Processing (Parallel)"
+      assigned_agent: "Marcus-Backend + James-Frontend"
+      estimated_hours: 12
+      dependencies: [2, 3]  # Needs DB + Auth complete
+      parallel_with: [4]  # Can work in parallel with Dashboard
+
+      todos:
+        - id: "036"
+          description: "Stripe API integration (customers, subscriptions)"
+          acceptance_criteria:
+            - "Create customer on signup"
+            - "Sync Stripe customer with local database"
+            - "Handle Stripe webhooks (payment.succeeded, subscription.updated)"
+
+        - id: "037"
+          description: "Subscription management API"
+          acceptance_criteria:
+            - "POST /api/subscriptions (create subscription)"
+            - "GET /api/subscriptions/:id (fetch subscription)"
+            - "DELETE /api/subscriptions/:id (cancel subscription)"
+            - "GET /api/invoices (list customer invoices)"
+
+        - id: "038"
+          description: "Payment UI components"
+          acceptance_criteria:
+            - "Stripe Elements integration (card input)"
+            - "Subscription plan selector (monthly/yearly)"
+            - "Payment history table"
+            - "Invoice download links"
+
+        - id: "039"
+          description: "Webhook processing"
+          acceptance_criteria:
+            - "Verify webhook signature (Stripe SDK)"
+            - "Handle payment.succeeded → update subscription status"
+            - "Handle subscription.canceled → revoke access"
+            - "Queue webhook processing (async)"
+
+      quality_gates:
+        - name: "Stripe Integration Test"
+          type: "automated"
+          check: "Test mode payments succeed, webhooks process"
+          blocking: true
+
+        - name: "PCI Compliance"
+          type: "manual"
+          check: "No card data stored locally (Stripe Elements only)"
+          blocking: true
+
+    - phase_id: 6
+      name: "Integration Testing & Security Audit"
+      assigned_agent: "Maria-QA"
+      estimated_hours: 16
+      dependencies: [3, 4, 5]
+
+      todos:
+        - id: "040"
+          description: "End-to-end user journey testing"
+          acceptance_criteria:
+            - "Signup → Login → View Dashboard → Subscribe → See Premium Features"
+            - "OAuth login → Dashboard → Subscribe"
+            - "Password reset → Login → Dashboard"
+
+        - id: "041"
+          description: "Cross-feature integration tests"
+          acceptance_criteria:
+            - "Auth tokens work for dashboard endpoints"
+            - "Auth tokens work for payment endpoints"
+            - "Dashboard shows user-specific data (RLS validation)"
+            - "Payments update user roles (premium access)"
+
+        - id: "042"
+          description: "Comprehensive security audit"
+          acceptance_criteria:
+            - "OWASP ZAP scan (all features)"
+            - "SQL injection tests (all endpoints)"
+            - "XSS tests (all forms)"
+            - "CSRF token validation"
+            - "Rate limiting validation"
+
+        - id: "043"
+          description: "Performance testing (full system)"
+          acceptance_criteria:
+            - "100 concurrent users: all features responsive"
+            - "API response times: P95 < 300ms"
+            - "Dashboard load: < 2 seconds"
+            - "No memory leaks (24 hour test)"
+
+        - id: "044"
+          description: "Accessibility audit (WCAG 2.1 AA)"
+          acceptance_criteria:
+            - "axe-core scan: score ≥ 95 across all pages"
+            - "Keyboard navigation: all features accessible"
+            - "Screen reader test: NVDA/JAWS compatibility"
+            - "Color contrast: all text ≥ 4.5:1"
+
+      quality_gates:
+        - name: "Integration Test Suite"
+          type: "automated"
+          check: "All 25 integration tests pass"
+          blocking: true
+
+        - name: "Security Score"
+          type: "automated"
+          check: "Mozilla Observatory: A+ score"
+          blocking: true
+
+        - name: "Performance Validation"
+          type: "automated"
+          check: "Load test: 100 users, 0 failures, P95 < 300ms"
+          blocking: true
+
+        - name: "Accessibility Compliance"
+          type: "automated"
+          check: "axe-core: ≥ 95 across all pages"
+          blocking: true
+
+    - phase_id: 7
+      name: "Release Coordination & Learning Capture"
+      assigned_agents: ["Sarah-PM", "feedback-codifier"]
+      estimated_hours: 8
+      dependencies: [6]
+
+      todos:
+        - id: "045"
+          description: "Prepare release documentation"
+          assigned_agent: "Sarah-PM"
+          acceptance_criteria:
+            - "Release notes (user-facing features)"
+            - "Migration guide (if breaking changes)"
+            - "Deployment runbook (step-by-step)"
+            - "Rollback procedure (if issues arise)"
+
+        - id: "046"
+          description: "Staging deployment validation"
+          assigned_agent: "Sarah-PM + Maria-QA"
+          acceptance_criteria:
+            - "Deploy to staging environment"
+            - "Smoke tests: all features working"
+            - "UAT with 5 beta users"
+            - "Performance monitoring (24 hours)"
+
+        - id: "047"
+          description: "Production deployment"
+          assigned_agent: "Sarah-PM"
+          acceptance_criteria:
+            - "Blue-green deployment (zero downtime)"
+            - "Database migrations applied"
+            - "Health checks passing"
+            - "Monitoring dashboards live"
+
+        - id: "048"
+          description: "Capture learnings for Compounding Engineering"
+          assigned_agent: "feedback-codifier"
+          acceptance_criteria:
+            - "Extract patterns from all 3 features"
+            - "Document effort accuracy (estimated vs actual)"
+            - "Identify reusable components/patterns"
+            - "Store learnings in RAG vector database"
+            - "Generate recommendations for next release"
+
+      quality_gates:
+        - name: "Staging Validation"
+          type: "manual"
+          check: "UAT sign-off from 5 beta users"
+          blocking: true
+
+        - name: "Production Health Check"
+          type: "automated"
+          check: "All health endpoints return 200"
+          blocking: true
+
+        - name: "Monitoring Active"
+          type: "automated"
+          check: "Sentry errors < 1%, Uptime ≥ 99.9%"
+          blocking: false
+
+success_criteria:
+  functional:
+    - "All 3 features deployed and working"
+    - "100+ users signed up (authentication)"
+    - "Users viewing analytics dashboard"
+    - "10+ paying customers (payment processing)"
+
+  technical:
+    - "Test coverage ≥ 80% across all features"
+    - "Security score A+ (Mozilla Observatory)"
+    - "Accessibility score ≥ 95 (WCAG 2.1 AA)"
+    - "API performance: P95 < 300ms"
+    - "Zero critical bugs in first week"
+
+  process:
+    - "Released on schedule (4 weeks)"
+    - "All quality gates passed"
+    - "Learnings captured for next release"
+    - "Team velocity tracked (story points)"
+
+  business:
+    - "Product-market fit validated (user feedback)"
+    - "Revenue target met ($1000 MRR in 1 month)"
+    - "User retention ≥ 70% (week 1 to week 4)"
+
+stress_test_scenarios:
+  - scenario: "Launch Day Traffic Spike"
+    description: "1000 simultaneous signups on launch day"
+    expected: "Rate limiting graceful, all signups succeed (queued if needed)"
+    validation: "Database handles load, no 500 errors, signup time < 5s"
+
+  - scenario: "Payment Webhook Storm"
+    description: "100 Stripe webhooks arrive simultaneously"
+    expected: "All queued and processed, no duplicates, no data loss"
+    validation: "All subscriptions updated correctly, no race conditions"
+
+  - scenario: "Dashboard with 1M Events"
+    description: "User has 1 million analytics events"
+    expected: "Dashboard still loads in < 2 seconds (materialized view)"
+    validation: "Query performance unchanged, no memory issues"
+
+  - scenario: "Concurrent Feature Usage"
+    description: "User doing all 3 features simultaneously (auth + dashboard + payment)"
+    expected: "No conflicts, all features responsive"
+    validation: "No database locks, no race conditions"
+
+  - scenario: "Stripe API Downtime"
+    description: "Stripe API returns 500 errors for 10 minutes"
+    expected: "Payment UI shows friendly error, retries queued"
+    validation: "No data corruption, successful retry when Stripe recovers"
+
+  - scenario: "Database Failover"
+    description: "Primary database fails, switch to replica"
+    expected: "Connection pool reconnects, < 5s downtime"
+    validation: "No data loss, all features resume correctly"
+
+agent_coordination:
+  parallel_execution:
+    wave_1:
+      agents: ["Alex-BA", "Sarah-PM"]
+      duration: "8 hours"
+      coordination: "Daily sync on requirements + timeline"
+      deliverables:
+        - "Product vision + release goals"
+        - "15 user stories across 3 features"
+        - "API contract (25 endpoints)"
+        - "Sprint structure (4 sprints)"
+
+    wave_2:
+      agents: ["Dana-Database"]
+      duration: "12 hours"
+      dependencies: ["Wave 1 complete (needs API contracts)"]
+      deliverables:
+        - "Complete database schema (all 3 features)"
+        - "Versioned migrations (rollback-safe)"
+        - "RLS policies (multi-tenant security)"
+        - "35 indexes (query optimization)"
+
+    wave_3_auth:
+      agents: ["Marcus-Backend", "James-Frontend"]
+      duration: "28 hours"
+      dependencies: ["Wave 2 complete (needs database)"]
+      coordination: "Marcus implements API, James builds UI, integrate when API ready"
+      deliverables:
+        - "Authentication system complete (F1)"
+        - "Blocker for F2 and F3 removed"
+
+    wave_3_parallel:
+      agents: ["Marcus-Backend (Dashboard)", "Marcus-Backend (Payments)", "James-Frontend (Dashboard)", "James-Frontend (Payments)"]
+      duration: "12 hours (both features in parallel)"
+      dependencies: ["Wave 3 Auth complete"]
+      coordination: "2 feature teams work independently, daily standups"
+      deliverables:
+        - "Analytics dashboard complete (F2)"
+        - "Payment processing complete (F3)"
+
+    wave_4:
+      agents: ["Maria-QA"]
+      duration: "16 hours"
+      dependencies: ["Wave 3 Parallel complete"]
+      deliverables:
+        - "Integration tests (25 tests)"
+        - "Security audit (OWASP + Observatory)"
+        - "Performance validation (load test)"
+        - "Accessibility audit (WCAG 2.1 AA)"
+
+    wave_5:
+      agents: ["Sarah-PM", "feedback-codifier"]
+      duration: "8 hours"
+      dependencies: ["Wave 4 complete"]
+      coordination: "Sarah deploys, feedback-codifier captures learnings"
+      deliverables:
+        - "Production deployment (blue-green)"
+        - "Release documentation"
+        - "Learnings captured in RAG"
+        - "Recommendations for v2.0"
+
+  total_time:
+    sequential: "92 hours (all waves back-to-back)"
+    parallel: "84 hours (with wave parallelization)"
+    critical_path: "56 hours (Alex/Sarah → Dana → Marcus Auth → Maria → Sarah Release)"
+    calendar_time: "2 weeks with 2 developers (84 dev-hours / 2 devs = 42 hours each, ~ 2 weeks)"
+
+time_tracking:
+  estimated_breakdown:
+    planning: "8 hours (Alex-BA + Sarah-PM)"
+    database: "12 hours (Dana)"
+    feature_1_auth: "28 hours (Marcus + James)"
+    feature_2_dashboard: "10 hours (Marcus + James, parallel)"
+    feature_3_payments: "12 hours (Marcus + James, parallel)"
+    testing: "16 hours (Maria-QA)"
+    release: "8 hours (Sarah-PM + feedback-codifier)"
+    total: "94 hours"
+
+  parallel_optimization:
+    wave_3_auth: "28 hours (sequential, blocking)"
+    wave_3_parallel: "12 hours (F2 + F3 parallel, not 22 hours)"
+    time_saved: "10 hours (22 - 12)"
+    total_with_parallel: "84 hours (94 - 10)"
+
+  actual_tracking:
+    # Filled in after completion
+    actual_planning: null
+    actual_database: null
+    actual_feature_1: null
+    actual_feature_2: null
+    actual_feature_3: null
+    actual_testing: null
+    actual_release: null
+    total_actual: null
+    variance: null
+
+learnings_to_capture:
+  technical:
+    - "Multi-feature database schema design patterns"
+    - "Feature dependency management (F1 blocks F2+F3)"
+    - "Parallel feature development strategies"
+    - "Integration testing across features"
+    - "Production deployment best practices"
+
+  process:
+    - "How effective was parallel execution? (actual speedup vs estimated)"
+    - "Where did agent handoffs cause bottlenecks?"
+    - "What quality gates were most valuable?"
+    - "What would enable better feature parallelization?"
+
+  improvements:
+    - "What patterns can be extracted for v2.0?"
+    - "What feature dependencies could be eliminated?"
+    - "What testing strategy caught most bugs?"
+    - "What documentation would speed up next release?"
+
+next_iteration_expectations:
+  with_learning:
+    estimated_effort: "60 hours (-29%)"
+    confidence: 85
+    improvements:
+      - "Reuse auth system structure"
+      - "Reuse dashboard components"
+      - "Reuse payment integration patterns"
+      - "Copy test suites (80% reusable)"
+      - "Apply learned parallel execution strategies"
+      - "Compounding effect: v2.0 will be 29% faster"
+
+risk_assessment:
+  high_risk:
+    - risk: "Feature dependencies block parallelization (F1 blocks F2+F3)"
+      probability: "certain"
+      impact: "28 hours sequential (no parallel until auth done)"
+      mitigation: "Prioritize F1 completion, use feature flags for early testing"
+
+    - risk: "Integration issues between features"
+      probability: "medium"
+      impact: "1-2 days debugging (8-16 hours)"
+      mitigation: "Daily integration tests, early Maria-QA involvement"
+
+  medium_risk:
+    - risk: "Stripe API changes during development"
+      probability: "low"
+      impact: "4-8 hours rework"
+      mitigation: "Use specific Stripe API version, test webhooks early"
+
+    - risk: "Scope creep (stakeholders add features)"
+      probability: "medium"
+      impact: "+20-40% effort"
+      mitigation: "Lock requirements after Phase 1, defer to v2.0"
+
+  low_risk:
+    - risk: "Team member unavailable (illness, vacation)"
+      probability: "medium"
+      impact: "1-2 days delay"
+      mitigation: "Cross-training, knowledge sharing, documentation"
+
+release_checklist:
+  pre_deployment:
+    - "All 48 todos completed"
+    - "All quality gates passed (13 gates)"
+    - "Security audit: A+ score"
+    - "Performance validation: P95 < 300ms"
+    - "Accessibility: ≥ 95 score"
+    - "Staging UAT: 5 users signed off"
+
+  deployment:
+    - "Blue-green deployment strategy"
+    - "Database migrations applied (rollback-safe)"
+    - "Health checks passing"
+    - "Monitoring dashboards configured"
+    - "Rollback procedure tested"
+
+  post_deployment:
+    - "Smoke tests: all features working"
+    - "Error rate < 1% (Sentry)"
+    - "Uptime ≥ 99.9% (first 24 hours)"
+    - "User feedback collected (surveys)"
+    - "Learnings captured (feedback-codifier)"
+
+compounding_engineering_impact:
+  v1.0_baseline:
+    estimated: "84 hours"
+    actual: null # Fill after completion
+    confidence: "75%"
+
+  v2.0_prediction:
+    estimated: "60 hours (-29%)"
+    confidence: "85% (+10%)"
+    improvements: "Reuse 80% of code, patterns, tests"
+
+  v3.0_prediction:
+    estimated: "42 hours (-50% from v1.0)"
+    confidence: "92% (+17%)"
+    improvements: "Mature patterns, automated tooling, optimized workflows"

@@ -1,0 +1,288 @@
+# Small Feature Roadmap - Stress Test Template
+# 2-4 hour implementation (single CRUD endpoint)
+
+name: "Small Feature - CRUD Endpoint"
+category: "API Development"
+complexity: "Low"
+estimated_effort:
+  hours: 3
+  range: "2-4"
+  confidence: 90
+agents_required:
+  - "Marcus-Backend"
+  - "Maria-QA"
+parallel_possible: false
+
+description: |
+  Single CRUD endpoint implementation with basic database table, REST API,
+  validation, and comprehensive test suite. Perfect for testing basic workflow.
+
+roadmap:
+  overview:
+    total_phases: 3
+    total_todos: 8
+    estimated_duration: "3 hours"
+    parallel_execution: "No (sequential: DB → API → Testing)"
+
+  phases:
+    - phase_id: 1
+      name: "Database Schema"
+      assigned_agent: "Dana-Database"
+      estimated_hours: 0.5
+      dependencies: []
+
+      todos:
+        - id: "001"
+          description: "Create resource table (id, name, description, timestamps)"
+          acceptance_criteria:
+            - "Table created in Supabase/PostgreSQL"
+            - "Primary key (uuid) with auto-generation"
+            - "NOT NULL constraints on required fields"
+            - "Timestamps (created_at, updated_at) with defaults"
+
+        - id: "002"
+          description: "Add database indexes for performance"
+          acceptance_criteria:
+            - "Index on created_at for sorting"
+            - "Index on name for search (if applicable)"
+            - "EXPLAIN query shows index usage"
+
+      quality_gates:
+        - name: "Schema Validation"
+          type: "automated"
+          check: "psql -c '\\d table_name' succeeds"
+          blocking: true
+
+        - name: "Index Verification"
+          type: "automated"
+          check: "psql -c '\\di' shows created indexes"
+          blocking: true
+
+    - phase_id: 2
+      name: "API Implementation"
+      assigned_agent: "Marcus-Backend"
+      estimated_hours: 2
+      dependencies: [1]
+
+      todos:
+        - id: "003"
+          description: "Implement GET /api/resource (list with pagination)"
+          acceptance_criteria:
+            - "Returns array of resources"
+            - "Supports pagination (page, limit)"
+            - "Returns metadata (total, page, limit)"
+            - "Handles empty results gracefully"
+
+        - id: "004"
+          description: "Implement GET /api/resource/:id (single resource)"
+          acceptance_criteria:
+            - "Returns single resource by ID"
+            - "Returns 404 if not found"
+            - "Validates UUID format"
+
+        - id: "005"
+          description: "Implement POST /api/resource (create)"
+          acceptance_criteria:
+            - "Creates new resource"
+            - "Validates required fields"
+            - "Returns created resource with ID"
+            - "Returns 400 on validation errors"
+
+        - id: "006"
+          description: "Implement DELETE /api/resource/:id (soft delete)"
+          acceptance_criteria:
+            - "Soft deletes resource (sets deleted_at)"
+            - "Returns 404 if not found"
+            - "Returns 204 on success"
+
+      quality_gates:
+        - name: "API Response Time"
+          type: "automated"
+          check: "curl -w '%{time_total}' < 0.2s for all endpoints"
+          blocking: true
+          target: "< 200ms (P95)"
+
+        - name: "Input Validation"
+          type: "automated"
+          check: "POST with invalid data returns 400"
+          blocking: true
+
+        - name: "Error Handling"
+          type: "manual"
+          check: "All error responses have proper format"
+          blocking: false
+
+    - phase_id: 3
+      name: "Testing & QA"
+      assigned_agent: "Maria-QA"
+      estimated_hours: 0.5
+      dependencies: [2]
+
+      todos:
+        - id: "007"
+          description: "Write unit tests for API endpoints"
+          acceptance_criteria:
+            - "Test GET /api/resource (success + pagination)"
+            - "Test POST /api/resource (success + validation errors)"
+            - "Test GET /api/resource/:id (success + 404)"
+            - "Test DELETE /api/resource/:id (success + 404)"
+            - "Code coverage ≥ 80%"
+
+        - id: "008"
+          description: "Write integration tests (API + Database)"
+          acceptance_criteria:
+            - "Test complete create → read → delete flow"
+            - "Test pagination with multiple records"
+            - "Test database constraints enforcement"
+
+      quality_gates:
+        - name: "Test Coverage"
+          type: "automated"
+          check: "npm run test:coverage ≥ 80%"
+          blocking: true
+          target: "≥ 80%"
+
+        - name: "All Tests Passing"
+          type: "automated"
+          check: "npm test exits with code 0"
+          blocking: true
+
+success_criteria:
+  functional:
+    - "All 4 CRUD operations working (Create, Read, Delete)"
+    - "Pagination returning correct results"
+    - "404 errors for non-existent resources"
+    - "Validation errors for invalid input"
+
+  performance:
+    - "API response time < 200ms (P95)"
+    - "Database queries using indexes (no table scans)"
+
+  quality:
+    - "Test coverage ≥ 80%"
+    - "All tests passing"
+    - "Code linting passes (no warnings)"
+
+  documentation:
+    - "API endpoints documented (comments or OpenAPI)"
+
+validation_checklist:
+  pre_implementation:
+    - "Framework health ≥ 80%"
+    - "Database connected"
+    - "Test framework configured (Jest/Mocha)"
+
+  during_implementation:
+    - "Each endpoint tested immediately after creation"
+    - "Database indexes verified with EXPLAIN"
+
+  post_implementation:
+    - "All 8 todos completed"
+    - "All 6 quality gates passed"
+    - "No console errors or warnings"
+    - "Clean git commit"
+
+stress_test_scenarios:
+  - scenario: "Rapid Creation"
+    description: "Create 100 resources in quick succession"
+    expected: "No rate limiting errors, all inserts succeed"
+    validation: "Database contains 100 records"
+
+  - scenario: "Pagination Stress"
+    description: "Fetch 10,000 records with pagination (100 per page)"
+    expected: "Consistent response times, no memory leaks"
+    validation: "All pages return correct number of records"
+
+  - scenario: "Invalid Input Handling"
+    description: "Send malformed requests (missing fields, wrong types, SQL injection)"
+    expected: "All rejected with 400, no crashes, no SQL errors"
+    validation: "Server logs show validation errors, not crashes"
+
+  - scenario: "Concurrent Requests"
+    description: "10 simultaneous requests to different endpoints"
+    expected: "No race conditions, all requests succeed"
+    validation: "No database lock errors in logs"
+
+agent_handoff_protocol:
+  dana_to_marcus:
+    data_passed:
+      - "Table schema (table_name, columns, types)"
+      - "Index definitions"
+      - "Foreign key constraints (if any)"
+    validation:
+      - "Marcus can query the table successfully"
+      - "Table structure matches API data models"
+
+  marcus_to_maria:
+    data_passed:
+      - "API endpoints (routes, methods, request/response schemas)"
+      - "Validation rules"
+      - "Error response formats"
+    validation:
+      - "Maria can access all endpoints"
+      - "API returns expected status codes"
+
+time_tracking:
+  estimated_breakdown:
+    planning: "15 minutes"
+    database: "30 minutes"
+    api: "2 hours"
+    testing: "30 minutes"
+    documentation: "15 minutes"
+
+  actual_tracking:
+    # Filled in after completion for learning
+    actual_planning: null
+    actual_database: null
+    actual_api: null
+    actual_testing: null
+    actual_documentation: null
+    total_actual: null
+
+  variance_analysis:
+    # Auto-calculated after completion
+    planning_variance: null
+    database_variance: null
+    api_variance: null
+    testing_variance: null
+    overall_variance: null
+
+learnings_to_capture:
+  technical:
+    - "Database schema patterns that worked well"
+    - "API validation approach (library, custom)"
+    - "Testing strategy (mocking, real DB)"
+
+  process:
+    - "Time spent on debugging vs coding"
+    - "Number of iterations before tests passed"
+    - "Agent handoff smoothness"
+
+  improvements:
+    - "What would speed up next similar feature?"
+    - "What quality gate caught issues early?"
+    - "What was overestimated/underestimated?"
+
+risk_assessment:
+  low_risk:
+    - "Well-understood pattern (CRUD endpoints)"
+    - "Small scope (single resource)"
+    - "Minimal dependencies"
+
+  potential_issues:
+    - issue: "Database connection during tests"
+      probability: "medium"
+      mitigation: "Use test database or mocking library"
+
+    - issue: "Validation library learning curve"
+      probability: "low"
+      mitigation: "Use Zod or Joi (good docs, examples)"
+
+next_iteration_expectations:
+  with_learning:
+    estimated_effort: "2.5 hours (-17%)"
+    confidence: 95
+    improvements:
+      - "Reuse validation schemas from this feature"
+      - "Copy test patterns (faster test writing)"
+      - "Use same API structure (consistent pattern)"

@@ -17,6 +17,28 @@ allowed-tools:
 
 Transform feature requests, bugs, or improvements into well-structured implementation plans using VERSATIL's OPERA agents. This command breaks down work into actionable tasks with dual todo tracking (TodoWrite + todos/*.md files).
 
+## Flags
+
+- `--validate`: Run `/validate-workflow` after planning (5-10 min validation)
+- `--dry-run`: Simulate execution without creating todos or making changes
+- `--template=NAME`: Use specific plan template (auth-system, crud-endpoint, dashboard, etc.)
+
+## Usage Examples
+
+```bash
+# Basic planning (default)
+/plan "Add user authentication"
+
+# Planning with validation (recommended for large features)
+/plan --validate "Add user authentication"
+
+# Dry-run planning (test before committing)
+/plan --dry-run "Add analytics dashboard"
+
+# Use specific template
+/plan --template=auth-system "Implement login system"
+```
+
 ## Feature Description
 
 <feature_description> #$ARGUMENTS </feature_description>

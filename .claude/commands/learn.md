@@ -19,6 +19,28 @@ allowed-tools:
 
 **Philosophy**: "Make the next feature 40% faster by learning from this one."
 
+## Flags
+
+- `--roadmap`: Capture learnings from complete roadmap execution (includes all phases, agent performance, effort accuracy)
+- `--compare=BRANCH`: Compare with another branch to extract differential learnings
+- `--confidence=N`: Set confidence level for patterns (default: 75, range: 0-100)
+
+## Usage Examples
+
+```bash
+# Basic learning (single feature)
+/learn "Feature: User authentication"
+
+# Roadmap learning (after /roadmap-test execution)
+/learn --roadmap "large-feature.yaml completed in 29.9 hours"
+
+# Compare branches to extract patterns
+/learn --compare=main "feature/user-auth"
+
+# High-confidence learning only
+/learn --confidence=85 "Feature: Payment processing"
+```
+
 ## Learning Target
 
 <learning_target> #$ARGUMENTS </learning_target>

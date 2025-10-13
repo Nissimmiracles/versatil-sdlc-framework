@@ -1,0 +1,389 @@
+# Medium Feature Roadmap - Stress Test Template
+# 8-12 hour implementation (analytics dashboard)
+
+name: "Medium Feature - Analytics Dashboard"
+category: "Data Visualization"
+complexity: "Medium"
+estimated_effort:
+  hours: 10
+  range: "8-12"
+  confidence: 80
+agents_required:
+  - "Dana-Database"
+  - "Marcus-Backend"
+  - "James-Frontend"
+  - "Maria-QA"
+parallel_possible: true
+parallel_waves:
+  - wave: 1
+    agents: ["Dana-Database"]
+    description: "Database setup (sequential)"
+  - wave: 2
+    agents: ["Marcus-Backend", "James-Frontend"]
+    description: "API + UI mockups (parallel)"
+  - wave: 3
+    agents: ["Maria-QA"]
+    description: "Integration testing (sequential)"
+
+description: |
+  Analytics dashboard with 3 charts, KPI cards, date range picker, and filters.
+  Tests agent coordination across database, API, and frontend layers.
+
+roadmap:
+  overview:
+    total_phases: 4
+    total_todos: 15
+    estimated_duration: "10 hours"
+    parallel_execution: "Yes (3 waves: DB → API+UI → Testing)"
+    parallel_speedup: "1.8x (vs 18 hours sequential)"
+
+  phases:
+    - phase_id: 1
+      name: "Database & Aggregation"
+      assigned_agent: "Dana-Database"
+      estimated_hours: 3
+      dependencies: []
+
+      todos:
+        - id: "001"
+          description: "Create events table for analytics"
+          acceptance_criteria:
+            - "id, event_type, user_id, timestamp, properties (jsonb)"
+            - "Indexes on (timestamp), (event_type, timestamp)"
+            - "Partitioning by date (optional for large datasets)"
+
+        - id: "002"
+          description: "Create materialized view for aggregated metrics"
+          acceptance_criteria:
+            - "Pre-compute daily metrics (pageviews, users, conversions)"
+            - "Refresh strategy (manual or scheduled)"
+            - "Indexes on (date, metric_name)"
+
+        - id: "003"
+          description: "Create database functions for KPI calculations"
+          acceptance_criteria:
+            - "calculate_conversion_rate(start_date, end_date)"
+            - "get_top_pages(limit, date_range)"
+            - "calculate_bounce_rate(date_range)"
+
+      quality_gates:
+        - name: "Query Performance"
+          type: "automated"
+          check: "EXPLAIN ANALYZE shows < 100ms for 1 year data"
+          blocking: true
+          target: "< 100ms for date range queries"
+
+        - name: "Data Integrity"
+          type: "automated"
+          check: "Materialized view matches raw data (sample validation)"
+          blocking: true
+
+    - phase_id: 2
+      name: "API Endpoints"
+      assigned_agent: "Marcus-Backend"
+      estimated_hours: 4
+      dependencies: [1]
+      parallel_with: [3]  # Can work in parallel with Frontend mockups
+
+      todos:
+        - id: "004"
+          description: "GET /api/dashboard/metrics (time series data)"
+          acceptance_criteria:
+            - "Returns metrics for date range (start_date, end_date)"
+            - "Supports group_by (hour, day, week, month)"
+            - "Caches hourly/daily metrics (Redis, 5 min TTL)"
+
+        - id: "005"
+          description: "GET /api/dashboard/kpis (summary cards)"
+          acceptance_criteria:
+            - "Returns total users, pageviews, conversion rate, bounce rate"
+            - "Includes comparison to previous period (% change)"
+            - "Response time < 300ms"
+
+        - id: "006"
+          description: "GET /api/dashboard/top-pages"
+          acceptance_criteria:
+            - "Returns top 10 pages by pageviews"
+            - "Supports sort_by (pageviews, unique_visitors, avg_time)"
+            - "Includes page path, pageviews, unique_visitors"
+
+      quality_gates:
+        - name: "API Performance"
+          type: "automated"
+          check: "Load test with autocannon (100 req/s, < 300ms P95)"
+          blocking: true
+          target: "< 300ms (P95)"
+
+        - name: "Caching Effectiveness"
+          type: "automated"
+          check: "Second request to same endpoint < 50ms (cached)"
+          blocking: false
+
+    - phase_id: 3
+      name: "Frontend Dashboard"
+      assigned_agent: "James-Frontend"
+      estimated_hours: 5
+      dependencies: []  # Can start with mockups before API ready
+      parallel_with: [2]  # Works in parallel with API development
+
+      todos:
+        - id: "007"
+          description: "Dashboard layout component"
+          acceptance_criteria:
+            - "Header with date range picker"
+            - "KPI cards row (4 cards)"
+            - "Charts section (3 charts: line, bar, pie)"
+            - "Responsive (mobile, tablet, desktop)"
+
+        - id: "008"
+          description: "KPI card component"
+          acceptance_criteria:
+            - "Displays metric name, value, change percentage"
+            - "Trend indicator (up/down arrow, green/red)"
+            - "Loading skeleton"
+
+        - id: "009"
+          description: "Line chart component (time series)"
+          acceptance_criteria:
+            - "Uses Recharts or Chart.js"
+            - "Interactive tooltips"
+            - "Responsive sizing"
+            - "Accessibility (ARIA labels)"
+
+        - id: "010"
+          description: "Date range picker component"
+          acceptance_criteria:
+            - "Presets (Today, Last 7 days, Last 30 days, Custom)"
+            - "Calendar popup (react-datepicker)"
+            - "Validation (start < end, max 1 year)"
+
+        - id: "011"
+          description: "Integrate API data with components"
+          acceptance_criteria:
+            - "Fetch metrics on date range change"
+            - "Loading states during fetch"
+            - "Error handling (show user-friendly message)"
+
+      quality_gates:
+        - name: "Accessibility"
+          type: "automated"
+          check: "axe-core score ≥ 95"
+          blocking: true
+          target: "≥ 95"
+
+        - name: "Responsive Design"
+          type: "manual"
+          check: "Test on mobile (375px), tablet (768px), desktop (1920px)"
+          blocking: true
+
+        - name: "Performance"
+          type: "automated"
+          check: "Lighthouse performance score ≥ 90"
+          blocking: false
+
+    - phase_id: 4
+      name: "Integration Testing"
+      assigned_agent: "Maria-QA"
+      estimated_hours: 2
+      dependencies: [2, 3]
+
+      todos:
+        - id: "012"
+          description: "Unit tests for dashboard components"
+          acceptance_criteria:
+            - "Test KPI card rendering with mock data"
+            - "Test chart rendering (snapshot tests)"
+            - "Test date picker interactions"
+            - "Coverage ≥ 80%"
+
+        - id: "013"
+          description: "Integration tests (API + Database)"
+          acceptance_criteria:
+            - "Test GET /api/dashboard/metrics returns correct data"
+            - "Test caching (first request slow, second fast)"
+            - "Test date range filtering"
+
+        - id: "014"
+          description: "E2E tests (Playwright)"
+          acceptance_criteria:
+            - "Load dashboard → KPIs appear → charts render"
+            - "Change date range → data updates"
+            - "Test responsive layout (mobile + desktop)"
+
+        - id: "015"
+          description: "Performance testing"
+          acceptance_criteria:
+            - "Dashboard loads in < 2 seconds (all data)"
+            - "Date range change updates in < 500ms"
+            - "No memory leaks (monitor for 5 minutes)"
+
+      quality_gates:
+        - name: "Test Coverage"
+          type: "automated"
+          check: "npm run test:coverage ≥ 80%"
+          blocking: true
+
+        - name: "E2E Tests Passing"
+          type: "automated"
+          check: "npx playwright test exits with code 0"
+          blocking: true
+
+        - name: "Performance Validation"
+          type: "automated"
+          check: "Dashboard load time < 2s (Lighthouse CI)"
+          blocking: true
+
+success_criteria:
+  functional:
+    - "Dashboard displays 4 KPIs with trend indicators"
+    - "3 charts render with real data (line, bar, pie)"
+    - "Date range picker updates all metrics"
+    - "Responsive on mobile, tablet, desktop"
+
+  performance:
+    - "Dashboard load time < 2 seconds"
+    - "API endpoints < 300ms (P95)"
+    - "Date range changes update in < 500ms"
+    - "No memory leaks during extended use"
+
+  quality:
+    - "Test coverage ≥ 80%"
+    - "Accessibility score ≥ 95 (axe-core)"
+    - "Lighthouse performance ≥ 90"
+    - "All E2E tests passing"
+
+  user_experience:
+    - "Loading skeletons shown during data fetch"
+    - "Error messages user-friendly"
+    - "No layout shift (CLS < 0.1)"
+
+stress_test_scenarios:
+  - scenario: "Large Date Range"
+    description: "Load dashboard with 1 year of data"
+    expected: "< 2 second load time, no browser freeze"
+    validation: "Lighthouse performance ≥ 85"
+
+  - scenario: "Rapid Date Changes"
+    description: "Change date range 10 times in quick succession"
+    expected: "No race conditions, latest data always shown"
+    validation: "No stale data in UI, loading state correct"
+
+  - scenario: "Concurrent Users"
+    description: "50 users access dashboard simultaneously"
+    expected: "API cache effective, all users get < 300ms responses"
+    validation: "Redis hit rate ≥ 90%"
+
+  - scenario: "Real-time Updates"
+    description: "New events streaming in while dashboard open"
+    expected: "Materialized view refresh doesn't block queries"
+    validation: "No query timeouts, < 100ms even during refresh"
+
+agent_coordination:
+  parallel_execution:
+    wave_1:
+      agents: ["Dana-Database"]
+      duration: "3 hours"
+      deliverables:
+        - "Events table with indexes"
+        - "Materialized view for metrics"
+        - "Database functions for KPIs"
+
+    wave_2:
+      agents: ["Marcus-Backend", "James-Frontend"]
+      duration: "5 hours (parallel)"
+      coordination:
+        - "James starts with mockups (no API dependency)"
+        - "Marcus implements API while James builds UI"
+        - "James integrates API when Marcus completes Phase 2"
+      deliverables:
+        - "Marcus: 3 API endpoints with caching"
+        - "James: Dashboard layout + 5 components"
+
+    wave_3:
+      agents: ["Maria-QA"]
+      duration: "2 hours"
+      dependencies: ["Wave 2 complete"]
+      deliverables:
+        - "Unit tests (80%+ coverage)"
+        - "Integration tests (API + DB)"
+        - "E2E tests (Playwright)"
+        - "Performance validation"
+
+  handoff_protocol:
+    dana_to_marcus:
+      data:
+        - "Database schema (events table, materialized view)"
+        - "Database function signatures (calculate_conversion_rate, etc.)"
+        - "Query performance baselines (EXPLAIN results)"
+      validation:
+        - "Marcus can query events table successfully"
+        - "Materialized view returns expected data"
+
+    marcus_to_james:
+      data:
+        - "API endpoint specifications (routes, request/response schemas)"
+        - "Example responses with real data"
+        - "Error response formats"
+      validation:
+        - "James can fetch metrics from API (even if with mock data initially)"
+        - "API contract matches frontend expectations"
+
+    both_to_maria:
+      data:
+        - "Deployed API (staging environment)"
+        - "Deployed frontend (preview URL)"
+        - "Expected behavior documentation"
+      validation:
+        - "Maria can access both API and UI"
+        - "All acceptance criteria testable"
+
+time_tracking:
+  estimated_breakdown:
+    planning: "30 minutes"
+    database: "3 hours"
+    api: "4 hours"
+    frontend: "5 hours"
+    testing: "2 hours"
+    integration_debugging: "30 minutes"
+
+  parallel_vs_sequential:
+    sequential_estimate: "15 hours (all phases back-to-back)"
+    parallel_estimate: "10 hours (3 waves with parallelization)"
+    speedup: "1.5x"
+
+  actual_tracking:
+    # Filled in after completion
+    actual_planning: null
+    actual_database: null
+    actual_api: null
+    actual_frontend: null
+    actual_testing: null
+    actual_integration: null
+    total_actual: null
+
+learnings_to_capture:
+  technical:
+    - "Materialized view refresh strategy (manual vs scheduled)"
+    - "Caching effectiveness (Redis hit rate)"
+    - "Chart library choice (Recharts vs Chart.js)"
+    - "Database query optimization patterns"
+
+  process:
+    - "Parallel work effectiveness (how much actual time saved?)"
+    - "Agent handoff friction points"
+    - "Quality gate effectiveness (what caught issues?)"
+
+  improvements:
+    - "What would enable better parallelization?"
+    - "Where did sequential dependencies block progress?"
+    - "What testing strategy was most valuable?"
+
+next_iteration_expectations:
+  with_learning:
+    estimated_effort: "8 hours (-20%)"
+    confidence: 90
+    improvements:
+      - "Reuse dashboard layout pattern"
+      - "Copy materialized view approach"
+      - "Use same chart components"
+      - "Apply learned query optimization patterns"
