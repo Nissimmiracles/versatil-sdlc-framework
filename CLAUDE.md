@@ -47,7 +47,7 @@ Allowed_In_Project:
 
 **OPERA** = **B**usiness Analyst + **M**arcus Backend + **A**lex Requirements + **D**evelopment Team
 
-OPERA represents a revolutionary approach to AI-native software development, where specialized agents work in harmony through:
+OPERA represents a revolutionary approach to AI-native software development, where specialized agents work in harmony through **Compounding Engineering** - Every Inc's proven methodology where each unit of work makes subsequent units 40% faster.
 
 ### Core Principles
 1. **Proactive Intelligence** - Agents work automatically via daemon (`versatil-daemon start`)
@@ -57,6 +57,7 @@ OPERA represents a revolutionary approach to AI-native software development, whe
 5. **Quality-First Approach** - Maria-QA reviews all deliverables
 6. **Business Alignment** - Alex-BA ensures requirements traceability
 7. **Continuous Integration** - Real-time collaboration and feedback
+8. **Compounding Engineering** - Each feature improves the next through learning codification
 
 ---
 
@@ -157,6 +158,198 @@ Proactive_Activation_Examples:
 🤖 Maria-QA analyzing... │ ████████░░ 80% coverage │ ⚠️ 2 missing tests
 🤖 James validating UI... │ ✅ Accessible │ ⚠️ Missing aria-label
 🤖 Marcus security scan... │ ✅ OWASP compliant │ ⏱️ 180ms response
+```
+
+---
+
+## 📋 Plan Mode Integration (Cursor 1.7+)
+
+### Complex Task Planning
+
+VERSATIL leverages Cursor 1.7's **Plan Mode** to handle complex multi-step workflows with detailed upfront planning.
+
+**When Plan Mode Activates**:
+- Multi-agent coordination required (3+ agents)
+- Long-horizon tasks (estimated > 30 minutes)
+- Complex refactoring across multiple files
+- Full-stack feature implementation
+- Database migrations with API updates
+
+### Plan Mode Workflow
+
+```yaml
+Plan_Mode_Example: "Implement user authentication system"
+
+Phase_1_Planning:
+  Trigger: User requests complex feature
+  Plan_Mode: Enabled
+  Sarah-PM_Actions:
+    - Break down feature into agent tasks
+    - Estimate duration per task
+    - Identify dependencies
+    - Create structured todo list
+    - Present plan for approval
+
+  Example_Plan:
+    1. Alex-BA: Define requirements (30 min)
+       - User stories
+       - API contract
+       - Acceptance criteria
+
+    2. Parallel Development (60 min):
+       - Dana-Database: Schema design
+       - Marcus-Backend: API with mocks
+       - James-Frontend: UI with mocks
+
+    3. Integration Phase (40 min):
+       - Connect database to API
+       - Connect API to frontend
+       - End-to-end testing
+
+    4. Quality Validation (20 min):
+       - Maria-QA: Test coverage
+       - Security scan
+       - Performance validation
+
+    Total_Estimated: 150 minutes (2.5 hours)
+
+Phase_2_Approval:
+  User_Review: Shows plan in readable format
+  User_Action: Approve / Modify / Cancel
+  If_Approved: Execute with TodoWrite tracking
+
+Phase_3_Execution:
+  Sarah-PM:
+    - Coordinates agent handoffs
+    - Tracks progress in real-time
+    - Updates statusline
+    - Handles errors and blockers
+
+  Real_Time_Updates:
+    - "🤖 Alex-BA: Defining requirements... (30% complete)"
+    - "🤖 Dana + Marcus + James: Parallel development... (60% complete)"
+    - "🤖 Integration in progress... (85% complete)"
+    - "🤖 Maria-QA: Running quality checks... (95% complete)"
+    - "✅ Feature complete! All quality gates passed."
+
+Phase_4_Completion:
+  Maria-QA_Validation:
+    - All tests passing
+    - Coverage >= 80%
+    - Security scan clean
+    - Performance within budget
+
+  Sarah-PM_Report:
+    - Actual vs estimated time
+    - Quality metrics
+    - Lessons learned
+    - Codify to RAG memory
+```
+
+### Plan Mode Benefits
+
+| Benefit | Description | Impact |
+|---------|-------------|--------|
+| **Predictability** | Know exactly what will happen before execution | Reduced surprises |
+| **Transparency** | See full task breakdown upfront | Better decision-making |
+| **Optimization** | Sarah-PM optimizes agent coordination | Faster execution |
+| **Error Prevention** | Catch issues in planning phase | Fewer runtime errors |
+| **Learning** | Plan vs actual comparison improves estimates | Continuous improvement |
+
+### Manual Plan Mode Activation
+
+```bash
+# Activate plan mode for complex tasks
+/plan "Implement user authentication with OAuth"
+
+# Output: Detailed plan with agent breakdown
+📋 PLAN: User Authentication with OAuth
+
+Phase 1: Requirements Analysis (Alex-BA) - 30 min
+  ✓ Define OAuth flow requirements
+  ✓ Create user stories
+  ✓ Document API contract
+
+Phase 2: Database Layer (Dana-Database) - 45 min [PARALLEL]
+  ✓ Design users/oauth_tokens tables
+  ✓ Add RLS policies for multi-tenant
+  ✓ Create migration scripts
+
+Phase 3: API Layer (Marcus-Backend) - 60 min [PARALLEL]
+  ✓ Implement OAuth endpoints
+  ✓ Add token validation
+  ✓ Security patterns (OWASP)
+
+Phase 4: Frontend Layer (James-Frontend) - 50 min [PARALLEL]
+  ✓ OAuth login button component
+  ✓ Token management
+  ✓ Accessibility (WCAG 2.1 AA)
+
+Phase 5: Integration - 40 min
+  ✓ Connect database to API
+  ✓ Connect API to frontend
+  ✓ End-to-end testing
+
+Phase 6: Quality Assurance (Maria-QA) - 20 min
+  ✓ Test coverage validation (80%+)
+  ✓ Security scan
+  ✓ Performance testing
+
+TOTAL ESTIMATED: 2.5 hours
+PARALLEL OPTIMIZATION: Saves 95 minutes vs sequential
+
+Approve plan? [Y/n]
+```
+
+### Plan Mode + TodoWrite Integration
+
+Plan Mode automatically creates TodoWrite tasks for tracking:
+
+```yaml
+Todo_List_Generated:
+  - "Phase 1: Requirements Analysis (Alex-BA)" - pending
+  - "Phase 2: Database Layer (Dana-Database)" - pending
+  - "Phase 3: API Layer (Marcus-Backend)" - pending
+  - "Phase 4: Frontend Layer (James-Frontend)" - pending
+  - "Phase 5: Integration" - pending
+  - "Phase 6: Quality Assurance (Maria-QA)" - pending
+
+During_Execution:
+  - Todos marked as in_progress when agent starts
+  - Todos marked as completed when agent finishes
+  - Real-time statusline updates
+  - Progress percentage tracked
+```
+
+### Disabling Plan Mode
+
+For simple tasks, plan mode is automatically skipped:
+
+```yaml
+Simple_Task_Examples:
+  - "Fix typo in README.md" → Direct execution (no plan needed)
+  - "Add console.log to debug" → Direct execution
+  - "Run tests" → Direct execution
+
+Complex_Task_Examples:
+  - "Refactor authentication system" → Plan mode activated
+  - "Add full-stack feature" → Plan mode activated
+  - "Database migration with API changes" → Plan mode activated
+```
+
+**Configuration**:
+```json
+// .cursor/settings.json
+{
+  "versatil": {
+    "plan_mode": {
+      "enabled": true,
+      "auto_activate_threshold": "complex", // "simple" | "complex" | "always"
+      "show_estimates": true,
+      "require_approval": true
+    }
+  }
+}
 ```
 
 ---
@@ -326,6 +519,345 @@ Example_Scenario:
       - Retrieves from RAG: Similar test patterns from project ✅
       - Generates: Tests matching both preference + project style ✅
 ```
+
+---
+
+## 🪝 Cursor Hooks Integration (v1.7+)
+
+### Lifecycle Hooks for Agent Control
+
+VERSATIL leverages Cursor 1.7's **Hooks** system to observe, control, and extend agent behavior at runtime. Hooks provide automated guardrails and intelligence at every stage of the agent lifecycle.
+
+**Configuration**: `~/.cursor/hooks.json` (automatically created on install)
+
+### Enabled Hooks
+
+```yaml
+Cursor_Hooks:
+  afterFileEdit:
+    Purpose: "Format code, validate isolation, update RAG memory"
+    Actions:
+      - Run prettier/black on edited files
+      - Check for isolation violations (framework files in project)
+      - Update RAG memory with code patterns (async)
+      - Block edits that violate framework-project separation
+    Script: "~/.versatil/hooks/afterFileEdit.sh"
+
+  beforeShellExecution:
+    Purpose: "Security checks, audit logging, prevent destructive operations"
+    Actions:
+      - Block destructive commands (rm -rf, DROP DATABASE, etc.)
+      - Block production deployments without approval
+      - Validate isolation (prevent .versatil/ modification from projects)
+      - Audit all shell commands to log file
+    Script: "~/.versatil/hooks/beforeShellExecution.sh"
+    Safety_Patterns:
+      - "rm -rf" → BLOCKED
+      - "git push --force" → BLOCKED
+      - "npm publish" → BLOCKED (requires manual approval)
+      - "DROP DATABASE" → BLOCKED
+
+  beforeReadFile:
+    Purpose: "Context tracking, access logging, security warnings"
+    Actions:
+      - Track file access for RAG context building
+      - Warn when reading sensitive files (.env, credentials.json)
+      - Log access patterns for agent performance analysis
+      - Update context tracker (async)
+    Script: "~/.versatil/hooks/beforeReadFile.sh"
+
+  beforeSubmitPrompt:
+    Purpose: "Agent activation suggestions, context enrichment"
+    Actions:
+      - Detect agent keywords in prompt
+      - Suggest relevant OPERA agents
+      - Enrich prompt with project context
+      - Provide proactive hints
+    Script: "~/.versatil/hooks/beforeSubmitPrompt.sh"
+    Agent_Detection:
+      - "test|coverage|quality" → Suggest Maria-QA
+      - "component|ui|react" → Suggest James-Frontend
+      - "api|backend|security" → Suggest Marcus-Backend
+      - "schema|migration|sql" → Suggest Dana-Database
+      - "plan|milestone" → Suggest Sarah-PM
+
+  stop:
+    Purpose: "Session cleanup, learning codification, metrics"
+    Actions:
+      - Log session metrics (duration, actions, agent)
+      - Codify learned patterns to RAG memory
+      - Generate session report for Sarah-PM
+      - Update agent performance metrics
+      - Cleanup temporary files
+    Script: "~/.versatil/hooks/stop.sh"
+```
+
+### Hook Benefits
+
+| Hook | Primary Benefit | Impact |
+|------|----------------|--------|
+| afterFileEdit | Automatic formatting + isolation enforcement | 100% compliance |
+| beforeShellExecution | Security guardrails + audit trail | 0 destructive accidents |
+| beforeReadFile | Context tracking + sensitive file warnings | Enhanced RAG accuracy |
+| beforeSubmitPrompt | Proactive agent suggestions | Better agent utilization |
+| stop | Learning codification + metrics | Continuous improvement |
+
+### Logs and Monitoring
+
+```bash
+# View hook execution logs
+tail -f ~/.versatil/logs/hooks.log
+
+# View file access patterns
+tail -f ~/.versatil/logs/file-access.log
+
+# View session metrics
+cat ~/.versatil/logs/session-metrics.log
+
+# Agent performance metrics
+cat ~/.versatil/metrics/agent-Maria-QA.json
+```
+
+### Hook Lifecycle Example
+
+```yaml
+User_Action: "Edit src/api/users.ts"
+
+Hook_Sequence:
+  1. beforeReadFile:
+     - Logs: Reading src/api/users.ts
+     - Tracks: Context for RAG
+     - Returns: Allowed
+
+  2. Agent_Edit: Marcus-Backend modifies file
+
+  3. afterFileEdit:
+     - Runs: prettier --write src/api/users.ts
+     - Validates: No isolation violations ✅
+     - Updates: RAG memory with API pattern (async)
+     - Returns: Allowed with metadata
+
+  4. beforeShellExecution: "npm test"
+     - Logs: Running test command
+     - Validates: Safe command ✅
+     - Returns: Allowed
+
+  5. stop:
+     - Saves: Session metrics to ~/.versatil/metrics/
+     - Codifies: Learned patterns to RAG
+     - Generates: Session report
+     - Cleanup: Temp files removed
+```
+
+### Custom Hook Configuration
+
+Advanced users can extend hooks in `~/.cursor/hooks.json`:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "~/.versatil/hooks/afterFileEdit.sh",
+        "description": "VERSATIL: Format, validate, update RAG"
+      },
+      {
+        "command": "/path/to/custom-hook.sh",
+        "description": "Your custom post-edit logic"
+      }
+    ]
+  },
+  "settings": {
+    "timeout": 5000,
+    "enableLogging": true,
+    "logPath": "~/.versatil/logs/hooks.log"
+  }
+}
+```
+
+**See Also**: [Cursor Hooks Documentation](https://cursor.com/docs/agent/hooks)
+
+---
+
+## 🔄 Compounding Engineering: The EVERY Workflow
+
+### What is Compounding Engineering?
+
+**Compounding Engineering** (pioneered by Every Inc) is a development methodology where each unit of work makes subsequent units **40% faster** through systematic learning and pattern codification.
+
+**Key Insight**: Traditional development treats each feature independently. Compounding Engineering treats each feature as an investment that pays dividends on every future feature.
+
+### The EVERY Workflow (5-Phase Cycle)
+
+VERSATIL implements the complete EVERY workflow through slash commands:
+
+```yaml
+EVERY_Workflow:
+  Phase_1_PLAN:
+    Command: "/plan [feature description]"
+    Purpose: "Research and design with templates + historical context"
+    Agents: Alex-BA, Dana, Marcus, James (parallel research)
+    Output: Detailed plan with effort estimates, risks, alternatives
+    Compounding: Uses templates from past features (40% faster planning)
+
+  Phase_2_ASSESS:
+    Command: "/assess [work target]"
+    Purpose: "Validate readiness before work starts"
+    Checks:
+      - Framework health ≥ 80%
+      - Git status clean
+      - Dependencies installed
+      - Database connected
+      - Environment variables set
+      - Build and tests passing
+    Compounding: Catches blockers early (prevents wasted effort)
+
+  Phase_3_DELEGATE:
+    Command: "/delegate [todos pattern]"
+    Purpose: "Distribute work to optimal agents"
+    Features:
+      - Smart agent selection based on historical performance
+      - Parallel execution with collision detection
+      - Sub-agent spawning for specialization
+      - Real-time load balancing
+    Compounding: Learns best agent assignments over time
+
+  Phase_4_WORK:
+    Command: "/work [work target]"
+    Purpose: "Execute implementation with tracking"
+    Features:
+      - Loads persistent todos (todos/*.md)
+      - Real-time progress tracking (TodoWrite)
+      - Continuous monitoring (--monitor flag)
+      - Quality gate enforcement
+    Compounding: Applies learned patterns automatically
+
+  Phase_5_CODIFY:
+    Command: "/learn [feature branch]"
+    Purpose: "Extract and store patterns for future use"
+    Actions:
+      - Analyze completed work (git diff, tests, docs)
+      - Extract reusable patterns
+      - Update effort estimates (planned vs actual)
+      - Capture lessons learned ("watch out for X")
+      - Update plan templates with real data
+      - Store in RAG memory for retrieval
+    Compounding: Future features benefit from this feature's learnings
+```
+
+### Compounding in Action (Example)
+
+```yaml
+Feature_1_User_Authentication:
+  Week_1: "Implement from scratch"
+  Effort: 28 hours
+  Learnings:
+    - "Use bcrypt with 12 rounds for password hashing"
+    - "JWT expiry should be 24 hours for security"
+    - "Add index on users.email for fast lookups"
+    - "RLS policies prevent unauthorized access"
+
+  After_Feature_1:
+    Run: "/learn feature/auth"
+    Result: "Patterns stored in RAG, template updated with real code examples"
+
+Feature_2_Admin_Authentication:
+  Week_2: "Implement with historical context"
+  Effort: 19 hours (32% faster!)
+  Why_Faster:
+    - Template pre-filled with proven patterns
+    - Code examples from Feature_1 surfaced automatically
+    - No trial-and-error on bcrypt rounds or JWT expiry
+    - Index patterns already known
+
+  Compounding_Effect: 9 hours saved (from learning codification)
+
+Feature_3_OAuth_Integration:
+  Week_3: "Build on existing auth system"
+  Effort: 15 hours (46% faster than baseline!)
+  Why_Faster:
+    - Auth template includes OAuth patterns now
+    - Database schema reusable (just add oauth_providers table)
+    - Frontend components extend existing AuthProvider
+
+  Compounding_Effect: 13 hours saved (cumulative learning)
+```
+
+### Cursor 1.7 Hooks Enhance EVERY Workflow
+
+The Cursor 1.7 hooks system **automatically** integrates with EVERY phases:
+
+| Hook | EVERY Phase | Enhancement |
+|------|-------------|-------------|
+| `beforeSubmitPrompt` | PLAN | Suggests relevant agents based on prompt keywords |
+| `beforeReadFile` | ASSESS | Tracks context for better planning |
+| `beforeShellExecution` | ASSESS | Blocks destructive commands (safety) |
+| `afterFileEdit` | CODIFY | Auto-updates RAG after code changes |
+| `stop` | CODIFY | Saves session metrics, codifies learnings |
+
+**Result**: Compounding happens automatically without manual intervention.
+
+### Measuring Compounding Success
+
+Track compounding effectiveness with these metrics:
+
+```bash
+# View feature velocity over time
+/compounding-report
+
+# Expected Output:
+📊 Compounding Engineering Metrics (Last 30 Days)
+
+Feature Velocity Trend:
+  Week 1: 28 hours/feature (baseline)
+  Week 2: 19 hours/feature (32% faster)
+  Week 3: 15 hours/feature (46% faster)
+  Week 4: 13 hours/feature (54% faster)
+
+Pattern Reuse Rate: 73%
+  - Templates used: 18/20 features
+  - RAG patterns retrieved: 145 times
+  - Code examples referenced: 67 times
+
+Effort Estimate Accuracy: 87% (±20%)
+  - Improving over time (was 65% in Week 1)
+
+RAG Memory Growth:
+  - Patterns stored: 234
+  - Code examples: 156
+  - Lessons learned: 89
+  - Templates updated: 5
+
+Compounding Score: 85/100 ✅
+  → Compounding is working effectively!
+```
+
+### Quick Start with EVERY Workflow
+
+```bash
+# 1. Plan a feature (with templates + historical context)
+/plan "Add user profile page"
+
+# 2. Assess readiness (automated quality gates)
+/assess "Add user profile page"
+
+# 3. Execute work (agents coordinate automatically)
+/work --monitor "Add user profile page"
+
+# 4. Codify learnings (make next feature faster)
+/learn "feature/user-profile"
+
+# Result: Next similar feature will be 40% faster!
+```
+
+**See Also**:
+- [Plan Command Documentation](.claude/commands/plan.md)
+- [Assess Command Documentation](.claude/commands/assess.md)
+- [Delegate Command Documentation](.claude/commands/delegate.md)
+- [Work Command Documentation](.claude/commands/work.md)
+- [Learn Command Documentation](.claude/commands/learn.md)
+- [Compounding Engineering Philosophy](https://every.to/source-code/my-ai-had-already-fixed-the-code-before-i-saw-it)
 
 ---
 
