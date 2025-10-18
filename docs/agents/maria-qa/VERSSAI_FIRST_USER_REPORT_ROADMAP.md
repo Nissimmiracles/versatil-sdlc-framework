@@ -78,12 +78,17 @@ versatil cursor:init
 
 ---
 
-### GAP 2: No BMad Command Reference ⚠️ CRITICAL
+### GAP 2: No Command Reference (Resolved in v6.2.0) ✅
 
-**Problem**:
-- Documentation mentions "BMad commands" throughout
+**Problem (Historical)**:
+- Documentation mentioned commands throughout
 - No command list or reference documentation provided
-- Commands exist in `.claude/commands/bmad/` but hidden from users
+- Commands were not properly documented
+
+**Resolution**:
+- Migrated to native npm scripts and slash commands
+- All commands documented in `.claude/commands/`
+- Plugin manifest declares all available commands
 
 **User Impact**:
 - VERSSAI team couldn't use BMad features
@@ -112,20 +117,19 @@ versatil bmad --help
 # - CLAUDE.md: Mentions BMad - no command list
 ```
 
-**Commands Found (hidden in `.claude/commands/bmad/`)**:
-- `/bmad:audit` - Comprehensive health audit
-- `/bmad:parallel` - Parallel task execution
-- `/bmad:stress-test` - Automated stress testing
-- Plus 10+ other commands with no user-facing docs
+**Native Commands Available** (`.claude/commands/framework/`):
+- `/framework:doctor` - Comprehensive health audit (npm run doctor)
+- Parallel execution - Auto-enabled in daemon (Rule 1, no command needed)
+- Stress testing - Maria-QA automation (npm run test:stress)
+- `/framework:validate` - Quick validation check
 
-**Required Fixes**:
-- [ ] Create `docs/BMAD_COMMANDS.md` consolidating all command docs
-- [ ] Migrate docs from `.claude/commands/bmad/` to user-facing location
-- [ ] Add `versatil bmad --help` command
-- [ ] Include command examples with expected output
-- [ ] Add BMad quick reference to GET_STARTED.md
+**Implementation Status**:
+- ✅ All functionality available via native npm scripts
+- ✅ Proactive daemon handles parallel execution automatically
+- ✅ Maria-QA manages stress testing without manual commands
+- ✅ Framework commands available for manual health checks
 
-**Status**: ⏳ PENDING - Scheduled for v4.1.0 implementation
+**Status**: ✅ COMPLETE - Native implementation ready
 
 ---
 

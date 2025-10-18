@@ -1,7 +1,7 @@
 /**
  * VERSATIL SDLC Framework - Adaptive Learning System Demo
  *
- * This example demonstrates how the Enhanced BMAD agents automatically
+ * This example demonstrates how the Enhanced OPERA agents automatically
  * improve based on user interactions and feedback.
  */
 
@@ -217,7 +217,7 @@ export async function demonstrateAdaptiveLearning() {
 
   console.log('\n🎉 Demo Complete!\n');
   console.log('Key Takeaways:');
-  console.log('✅ Enhanced BMAD agents automatically learn from user interactions');
+  console.log('✅ Enhanced OPERA agents automatically learn from user interactions');
   console.log('✅ System adapts agent behavior based on feedback patterns');
   console.log('✅ False positive reporting improves agent accuracy over time');
   console.log('✅ Real-time intelligence dashboard provides actionable insights');

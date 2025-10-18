@@ -6,11 +6,13 @@
 
 import { SDKAgentAdapter } from '../../sdk/sdk-agent-adapter.js';
 import { EnhancedJames } from './enhanced-james.js';
+import { UXExcellenceReviewer } from './sub-agents/ux-excellence-reviewer.js';
 import type { AgentResponse, AgentActivationContext } from '../../core/base-agent.js';
 import type { EnhancedVectorMemoryStore } from '../../../rag/enhanced-vector-memory-store.js';
 
 export class JamesSDKAgent extends SDKAgentAdapter {
   private legacyAgent: EnhancedJames;
+  private uxReviewer: UXExcellenceReviewer;
 
   constructor(vectorStore?: EnhancedVectorMemoryStore) {
     super({
@@ -21,6 +23,9 @@ export class JamesSDKAgent extends SDKAgentAdapter {
 
     // Keep legacy agent for specialized methods
     this.legacyAgent = new EnhancedJames(vectorStore);
+
+    // Initialize UX Excellence Reviewer sub-agent
+    this.uxReviewer = new UXExcellenceReviewer();
   }
 
   /**
@@ -257,5 +262,83 @@ export class JamesSDKAgent extends SDKAgentAdapter {
       },
       agentId: 'james-frontend'
     });
+  }
+
+  /**
+   * NEW v6.2: Run comprehensive UX review using UX Excellence Reviewer sub-agent
+   *
+   * Auto-triggers on:
+   * - UI component changes (*.tsx, *.jsx, *.vue, *.css)
+   * - Markdown updates (*.md)
+   * - Manual review requests
+   *
+   * @example
+   * const review = await jamesAgent.runUXReview({
+   *   filePaths: ['src/components/LoginForm.tsx', 'src/pages/Dashboard.tsx'],
+   *   fileContents: new Map([
+   *     ['src/components/LoginForm.tsx', loginFormCode],
+   *     ['src/pages/Dashboard.tsx', dashboardCode]
+   *   ]),
+   *   framework: 'react'
+   * });
+   *
+   * console.log(review.overallScore); // 85
+   * console.log(review.criticalIssues); // [...]
+   */
+  async runUXReview(context: {
+    filePaths: string[];
+    fileContents: Map<string, string>;
+    userRole?: 'admin' | 'user' | 'super_admin';
+    deviceSize?: 'mobile' | 'tablet' | 'desktop';
+    framework?: 'react' | 'vue' | 'svelte' | 'angular';
+    designSystem?: any;
+  }): Promise<any> {
+    return await this.uxReviewer.reviewComprehensive(context);
+  }
+
+  /**
+   * NEW v6.2: Generate formatted UX review report
+   *
+   * Creates a comprehensive markdown report with:
+   * - Executive summary
+   * - What's working well
+   * - Critical issues
+   * - Design recommendations
+   * - Implementation roadmap
+   *
+   * @example
+   * const review = await jamesAgent.runUXReview(context);
+   * const report = jamesAgent.generateUXReport(review);
+   * console.log(report); // Markdown formatted report
+   */
+  generateUXReport(reviewResult: any): string {
+    return this.uxReviewer.generateFormattedReport(reviewResult);
+  }
+
+  /**
+   * NEW v6.2: Auto-detect if UX review should be triggered
+   *
+   * Returns true if file changes warrant a UX review:
+   * - UI components (*.tsx, *.jsx, *.vue)
+   * - Stylesheets (*.css, *.scss, *.less)
+   * - Markdown documentation (*.md)
+   * - Design files
+   *
+   * @example
+   * if (jamesAgent.shouldTriggerUXReview(['LoginForm.tsx', 'styles.css'])) {
+   *   const review = await jamesAgent.runUXReview(context);
+   * }
+   */
+  shouldTriggerUXReview(filePaths: string[]): boolean {
+    const uxRelevantExtensions = [
+      '.tsx', '.jsx', '.vue', '.svelte',
+      '.css', '.scss', '.sass', '.less',
+      '.md', '.mdx',
+      '.fig', '.sketch', '.xd'
+    ];
+
+    return filePaths.some(path =>
+      uxRelevantExtensions.some(ext => path.endsWith(ext))
+    );
   }
 }

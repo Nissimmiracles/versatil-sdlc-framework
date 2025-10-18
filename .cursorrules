@@ -37,6 +37,8 @@ FRAMEWORK_STORAGE:
   - "~/.versatil/logs/"           # Framework logs
   - "~/.versatil/config/"         # Framework config
   - "~/.versatil/.env"            # Framework environment
+  - "~/.versatil/memories/"       # Agent memory directories (Memory Tool)
+  - "~/.versatil/docs/"           # Framework documentation (Claude Cookbooks, etc.)
 
 # =====================================
 # ENHANCED BMAD METHODOLOGY - AGENT ACTIVATION
@@ -966,3 +968,55 @@ mcp_pre_testing_protocol: |
   ✅ Provides early warning of configuration issues
   ✅ Ensures reliable automation execution
   ✅ Reduces user frustration from broken integrations
+
+# =====================================
+# 📚 CLAUDE DOCUMENTATION ACCESS
+# =====================================
+
+claude_documentation_access: |
+  When implementing Claude-specific features (Memory Tool, Context Editing, Agent SDK, etc.):
+
+  1. CHECK LOCAL DOCS FIRST:
+     - Claude Cookbooks: ~/.versatil/docs/claude-cookbooks/
+     - Memory Tool cookbook: ~/.versatil/docs/claude-cookbooks/tool_use/memory_cookbook.ipynb
+     - Agent memories: ~/.versatil/memories/[agent-id]/
+     
+  2. USE WEBFETCH FOR LATEST OFFICIAL DOCS:
+     - Memory Tool: https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool
+     - Context Editing: https://docs.claude.com/en/docs/build-with-claude/context-editing
+     - Agent SDK: https://docs.claude.com/en/docs/build-with-claude/agents
+     - API Reference: https://docs.claude.com/en/api
+     
+  3. REFERENCE MEMORY TOOL PATTERNS IN AGENT MEMORIES:
+     - Maria-QA: ~/.versatil/memories/maria-qa/test-patterns.md
+     - James-Frontend: ~/.versatil/memories/james-frontend/component-patterns.md
+     - Marcus-Backend: ~/.versatil/memories/marcus-backend/api-security-patterns.md
+     - Dana-Database: ~/.versatil/memories/dana-database/schema-patterns.md
+     - Alex-BA: ~/.versatil/memories/alex-ba/requirement-templates.md
+     - Sarah-PM: ~/.versatil/memories/sarah-pm/sprint-patterns.md
+     - Dr.AI-ML: ~/.versatil/memories/dr-ai-ml/model-architectures.md
+     
+  4. APPLY LEARNINGS FROM PREVIOUS IMPLEMENTATIONS (RAG):
+     - Query RAG for similar patterns
+     - Reuse successful approaches
+     - Avoid documented pitfalls
+     
+  5. UPDATE LOCAL COOKBOOKS BEFORE NEW FEATURES:
+     ```bash
+     cd ~/.versatil/docs/claude-cookbooks/ && git pull
+     ```
+  
+  Key Resources:
+  - Full documentation: docs/reference/claude-mcp-docs.md
+  - Memory Tool integration: docs/enhancements/MEMORY_TOOL_INTEGRATION.md
+  - Implementation files: src/memory/*, src/agents/sdk/context-aware-agent.ts
+  
+  Workflow:
+  Research (WebFetch) → Reference (Cookbooks) → Implement (with isolation) → Store (Agent memories) → /learn (RAG)
+  
+  Benefits:
+  ✅ Always use latest official documentation
+  ✅ Learn from proven cookbook examples
+  ✅ Apply VERSATIL-specific patterns (isolation, agent memories)
+  ✅ Build compounding knowledge through /learn
+  ✅ Zero context loss with Memory Tool + RAG

@@ -80,7 +80,7 @@ class VersatilApp {
       <div class="versatil-app">
         <header class="app-header">
           <h1>🤖 VERSATIL SDLC Framework</h1>
-          <p class="subtitle">AI-Native Development with BMAD Methodology</p>
+          <p class="subtitle">AI-Native Development with OPERA Methodology</p>
           <div class="status-indicator ${this.state.backendConnected ? 'connected' : 'offline'}">
             ${this.state.backendConnected ? '🟢 Connected' : '🔴 Offline'}
           </div>

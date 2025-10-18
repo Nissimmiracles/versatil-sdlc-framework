@@ -62,7 +62,7 @@ export let reporters: (string | (string | {
     outputName: string;
 })[])[];
 export namespace testEnvironmentOptions {
-    namespace bmad {
+    namespace opera {
         let agent: string;
         let framework: string;
         let version: string;

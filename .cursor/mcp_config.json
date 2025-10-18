@@ -93,6 +93,51 @@
       "env": {
         "MCP_CLAUDE_DEBUG": "false"
       }
+    },
+    "gitmcp": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://gitmcp.io/docs"],
+      "description": "GitMCP for GitHub repository documentation access (Alex-BA, Marcus, James, Dr.AI-ML)"
+    }
+  },
+  "documentation_access": {
+    "claude_cookbooks": {
+      "description": "Claude official cookbooks with Memory Tool, Context Editing, and tool use examples",
+      "access_method": "github MCP server",
+      "repository": "anthropics/claude-cookbooks",
+      "local_clone": "~/.versatil/docs/claude-cookbooks/",
+      "key_resources": {
+        "memory_tool": {
+          "cookbook": "tool_use/memory_cookbook.ipynb",
+          "implementation": "tool_use/memory_tool.py",
+          "tests": "tool_use/tests/test_memory_tool.py",
+          "demo": "tool_use/memory_demo/"
+        },
+        "extended_thinking": {
+          "examples": "extended_thinking/"
+        },
+        "claude_code_sdk": {
+          "examples": "claude_code_sdk/"
+        },
+        "capabilities": {
+          "contextual_embeddings": "capabilities/contextual-embeddings/",
+          "multimodal": "capabilities/"
+        }
+      },
+      "update_command": "cd ~/.versatil/docs/claude-cookbooks/ && git pull",
+      "usage": "Read local files or use GitHub MCP for real-time access"
+    },
+    "claude_official_docs": {
+      "description": "Claude official documentation via WebFetch",
+      "access_method": "WebFetch tool",
+      "base_url": "https://docs.claude.com/en/docs",
+      "key_endpoints": {
+        "memory_tool": "/agents-and-tools/tool-use/memory-tool",
+        "context_editing": "/build-with-claude/context-editing",
+        "agents": "/build-with-claude/agents",
+        "api_reference": "/api"
+      },
+      "usage": "WebFetch('https://docs.claude.com/en/docs/...')"
     }
   },
   "versatil_rule_integration": {

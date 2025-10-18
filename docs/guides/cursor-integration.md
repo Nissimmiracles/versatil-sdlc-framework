@@ -64,6 +64,326 @@ versatil test-activation
 
 ---
 
+## 🎯 Cursor 1.7+ Features (NEW)
+
+### Advanced Agent Lifecycle Control
+
+VERSATIL v6.4.0+ integrates deeply with Cursor 1.7's latest features for enhanced agent orchestration:
+
+#### 1. Cursor Hooks (Agent Lifecycle Events)
+
+**What are Hooks?**
+Hooks are extensible scripts that run at specific points in the agent lifecycle, allowing you to observe, control, and modify agent behavior.
+
+**VERSATIL Hooks Configuration**: `~/.cursor/hooks.json`
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "~/.versatil/hooks/afterFileEdit.sh",
+        "description": "VERSATIL: Format code, validate isolation, update RAG"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "~/.versatil/hooks/beforeShellExecution.sh",
+        "description": "VERSATIL: Security checks, block destructive commands"
+      }
+    ],
+    "beforeReadFile": [
+      {
+        "command": "~/.versatil/hooks/beforeReadFile.sh",
+        "description": "VERSATIL: Context tracking for RAG memory"
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": "~/.versatil/hooks/beforeSubmitPrompt.sh",
+        "description": "VERSATIL: Agent activation suggestions"
+      }
+    ],
+    "stop": [
+      {
+        "command": "~/.versatil/hooks/stop.sh",
+        "description": "VERSATIL: Session cleanup, learning codification"
+      }
+    ]
+  }
+}
+```
+
+**Hook Capabilities**:
+
+| Hook | What It Does | VERSATIL Use Case |
+|------|-------------|-------------------|
+| `afterFileEdit` | Runs after agent edits file | Auto-format with prettier/black, validate framework isolation, update RAG memory |
+| `beforeShellExecution` | Runs before executing commands | Block destructive commands (`rm -rf`, `DROP DATABASE`), audit logging, security checks |
+| `beforeReadFile` | Runs before reading files | Track context for RAG, warn on sensitive files (.env, credentials) |
+| `beforeSubmitPrompt` | Runs before sending prompt | Suggest relevant OPERA agents, enrich context with project info |
+| `stop` | Runs when agent session ends | Save metrics, codify learned patterns to RAG, cleanup temp files |
+
+**Example: Security Guardrails**
+
+```bash
+# beforeShellExecution hook blocks dangerous commands
+User Agent Action: Run `rm -rf node_modules/`
+→ Hook Intercepts: "🚨 BLOCKED: Destructive command detected"
+→ User Prompt: "This command requires explicit approval. Continue? [y/N]"
+```
+
+**Example: Automatic Formatting**
+
+```bash
+# afterFileEdit hook auto-formats code
+Agent Edits: src/api/users.ts
+→ Hook Runs: prettier --write src/api/users.ts
+→ RAG Update: Store API pattern for future reference (async)
+→ Result: ✅ File formatted and pattern learned
+```
+
+**View Hook Logs**:
+```bash
+# Real-time hook execution log
+tail -f ~/.versatil/logs/hooks.log
+
+# Session metrics
+cat ~/.versatil/logs/session-metrics.log
+
+# Agent performance data
+cat ~/.versatil/metrics/agent-Maria-QA.json
+```
+
+#### 2. Plan Mode Integration
+
+**What is Plan Mode?**
+Plan Mode (Cursor 1.7+) allows agents to create detailed execution plans before starting complex tasks, providing transparency and control.
+
+**When VERSATIL Uses Plan Mode**:
+- Multi-agent coordination required (3+ agents)
+- Long-horizon tasks (estimated > 30 minutes)
+- Complex refactoring across multiple files
+- Full-stack feature implementation
+- Database migrations with API changes
+
+**Plan Mode Workflow**:
+
+```yaml
+User Request: "Add user authentication system"
+
+Phase 1: Planning (Sarah-PM coordinates)
+  → Analyze complexity: High (multi-agent, multi-tier)
+  → Activate Plan Mode: ✅
+  → Break down into phases:
+    1. Requirements (Alex-BA) - 30 min
+    2. Parallel Development:
+       - Database schema (Dana-Database) - 45 min
+       - API implementation (Marcus-Backend) - 60 min
+       - UI components (James-Frontend) - 50 min
+    3. Integration - 40 min
+    4. Quality validation (Maria-QA) - 20 min
+  → Total Estimate: 2.5 hours
+  → Present plan to user
+
+Phase 2: User Approval
+  User sees plan in readable format
+  Options: [Approve] [Modify] [Cancel]
+
+Phase 3: Execution with TodoWrite Tracking
+  Each phase becomes a todo item:
+  - "Phase 1: Requirements Analysis (Alex-BA)" - in_progress
+  - "Phase 2: Database Layer (Dana-Database)" - pending
+  - "Phase 3: API Layer (Marcus-Backend)" - pending
+  - "Phase 4: Frontend Layer (James-Frontend)" - pending
+  - "Phase 5: Integration" - pending
+  - "Phase 6: Quality Validation (Maria-QA)" - pending
+
+  Real-time updates in statusline:
+  🤖 Phase 2/6 in progress │ ████░░░░ 40% │ ETA: 1.5 hours
+```
+
+**Manual Plan Mode Activation**:
+
+```bash
+# Activate plan mode for complex tasks
+/plan "Implement OAuth authentication with Google/GitHub"
+
+# Output: Detailed breakdown with time estimates
+📋 PLAN: OAuth Authentication
+
+Phase 1: Requirements (Alex-BA) - 30 min
+  ✓ Define OAuth flow requirements
+  ✓ Document security considerations
+  ✓ Create user stories
+
+Phase 2: Database (Dana-Database) - 45 min [PARALLEL]
+  ✓ Design oauth_providers table
+  ✓ Add RLS policies
+  ✓ Create migration scripts
+
+Phase 3: API (Marcus-Backend) - 60 min [PARALLEL]
+  ✓ Implement OAuth endpoints
+  ✓ Add Google/GitHub integration
+  ✓ Token validation & refresh
+
+Phase 4: UI (James-Frontend) - 50 min [PARALLEL]
+  ✓ OAuth login buttons
+  ✓ Callback handling
+  ✓ Error states & loading
+
+Phase 5: Integration - 40 min
+  ✓ End-to-end OAuth flow testing
+  ✓ Security validation
+
+Phase 6: QA (Maria-QA) - 20 min
+  ✓ Test coverage (80%+)
+  ✓ Security audit
+  ✓ Cross-browser testing
+
+TOTAL: 2.5 hours (parallel optimization saves 95 minutes)
+Approve plan? [Y/n]
+```
+
+**Configure Plan Mode**:
+
+```json
+// .cursor/settings.json
+{
+  "versatil": {
+    "plan_mode": {
+      "enabled": true,
+      "auto_activate_threshold": "complex",  // "simple" | "complex" | "always"
+      "show_estimates": true,
+      "require_approval": true,
+      "parallel_optimization": true
+    }
+  }
+}
+```
+
+#### 3. Cursor Commands (Native Command System)
+
+**What are Cursor Commands?**
+Cursor Commands (v1.2+) are reusable prompts stored in `.cursor/commands/[name].md` that integrate natively with the IDE.
+
+**VERSATIL Command Migration**:
+All OPERA agent commands are now available in Cursor-native format:
+
+```bash
+# Location: .cursor/commands/
+/maria-qa "Review test coverage"
+/james-frontend "Create accessible form component"
+/marcus-backend "Implement OAuth endpoints"
+/dana-database "Design users table schema"
+/plan "Add authentication system"
+/monitor "Check framework health"
+```
+
+**Advantages over Slash Commands**:
+- ✅ Autocomplete in Agent input (press `/` to see all commands)
+- ✅ Team sharing via git (`.cursor/commands/` checked into repo)
+- ✅ Per-command model selection
+- ✅ Better IDE integration
+
+**Create Custom Command**:
+
+```bash
+# Create .cursor/commands/run-linter.md
+---
+description: "Run linter and fix all issues"
+argument-hint: ""
+model: "claude-sonnet-4-5"
+allowed-tools: ["Bash", "Read", "Edit"]
+---
+
+# Run Linter and Auto-Fix
+
+Please run the project linter and fix all issues:
+
+1. Run `npm run lint` to check for issues
+2. Run `npm run lint:fix` to auto-fix
+3. Report any remaining issues that need manual fixes
+```
+
+Then use via: `/run-linter` in Cursor Agent input
+
+#### 4. Agent Autocomplete
+
+**What is Agent Autocomplete?**
+Context-aware suggestions based on recent changes and file patterns (Cursor 1.7+).
+
+**VERSATIL Integration**:
+Agent autocomplete enhances proactive agent suggestions:
+
+```bash
+# Scenario: You just edited LoginForm.tsx
+→ Autocomplete suggests:
+  - "Add tests for LoginForm" (Maria-QA)
+  - "Make LoginForm accessible" (James-Frontend)
+  - "Connect LoginForm to /api/auth/login" (Marcus-Backend)
+
+# Scenario: You just added a new API endpoint
+→ Autocomplete suggests:
+  - "Generate stress tests for new endpoint" (Rule 2)
+  - "Add OpenAPI documentation" (Marcus-Backend)
+  - "Create frontend integration" (James-Frontend)
+```
+
+**Enable in Settings**:
+
+```json
+// .cursor/settings.json
+{
+  "versatil": {
+    "agent_autocomplete": {
+      "enabled": true,
+      "context_window": 10,  // Consider last 10 file edits
+      "suggest_related_tasks": true,
+      "show_in_statusline": true
+    }
+  }
+}
+```
+
+#### 5. MCP Elicitation Support
+
+**What is MCP Elicitation?**
+Cursor 1.7 added support for MCP servers to request structured input from users (part of MCP spec).
+
+**VERSATIL MCP Servers with Elicitation**:
+
+```yaml
+Chrome_MCP:
+  Elicitation_Example:
+    Agent Action: "Run visual regression test"
+    → MCP Requests:
+      - Which browsers? [Chrome, Firefox, Safari]
+      - Which viewports? [Mobile, Tablet, Desktop, All]
+      - Baseline branch? [main, staging, develop]
+    → User Selects: Chrome, All viewports, main branch
+    → Test Runs: With user-specified configuration
+
+GitHub_MCP:
+  Elicitation_Example:
+    Agent Action: "Create pull request"
+    → MCP Requests:
+      - Target branch? [main, develop, staging]
+      - Reviewers? [@alice, @bob, @carol]
+      - Labels? [feature, bugfix, enhancement]
+    → User Selects: develop, @alice, feature
+    → PR Created: With user-specified settings
+```
+
+**Benefits**:
+- ✅ More control over agent actions
+- ✅ Structured input (not freeform text)
+- ✅ Faster than typing full prompts
+- ✅ Reduces ambiguity in agent tasks
+
+---
+
 ## 📍 Automatic Roadmap Generation (NEW in v6.4.0)
 
 When you run `versatil cursor:init`, the framework automatically analyzes your project and generates a personalized development roadmap.

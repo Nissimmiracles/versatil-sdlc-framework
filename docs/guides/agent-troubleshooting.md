@@ -751,9 +751,9 @@ If auto-activation continues to fail, use manual slash commands:
 # Manually activate Marcus-Backend
 /marcus review API security implementation
 
-# Run BMad commands
-/bmad:audit
-/bmad:stress-test api
+# Run framework health checks
+/framework:doctor
+/framework:validate
 ```
 
 ### CLI Commands

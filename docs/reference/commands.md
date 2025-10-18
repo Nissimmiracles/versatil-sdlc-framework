@@ -1065,8 +1065,7 @@ Overall Metrics:
 ```bash
 # Use for:
 - Real-time agent activation (/maria, /james, /marcus)
-- Quality checks during development (/bmad:audit)
-- Stress testing specific endpoints (/bmad:stress-test api)
+- Framework health checks (/framework:doctor, /framework:validate)
 ```
 
 ### Proactive vs Manual Activation

@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * This configuration enables:
  * - Chrome MCP integration for browser testing
- * - BMAD methodology compliance
+ * - OPERA methodology compliance
  * - Enhanced Maria-QA testing capabilities
  * - Visual regression testing
  * - Performance monitoring
@@ -58,7 +58,7 @@ export default defineConfig({
     permissions: ['notifications'],
     colorScheme: 'light',
 
-    // BMAD methodology - Enhanced Maria settings
+    // OPERA methodology - Enhanced Maria settings
     actionTimeout: 10 * 1000,
     navigationTimeout: 30 * 1000,
 
@@ -168,19 +168,18 @@ export default defineConfig({
       ]
     },
 
-    // BMAD Integration Testing - Maria-QA specific
+    // Integration Testing - Maria-QA specific
     {
-      name: 'bmad-integration',
+      name: 'integration',
       use: {
         ...devices['Desktop Chrome'],
-        // Enhanced settings for BMAD methodology
+        // Enhanced settings for integration testing
         actionTimeout: 15 * 1000,
         navigationTimeout: 45 * 1000
       },
       testMatch: [
-        '**/bmad/**/*.{test,spec}.{ts,js}',
-        '**/*.bmad.{ts,js}',
-        '**/integration/**/*.{test,spec}.{ts,js}'
+        '**/integration/**/*.{test,spec}.{ts,js}',
+        '**/e2e/**/*.{test,spec}.{ts,js}'
       ]
     }
   ],
@@ -215,6 +214,6 @@ export default defineConfig({
     agent: 'Maria-QA',
     version: '1.0.0',
     chromeMCP: true,
-    bmadCompliant: true
+    operaCompliant: true
   }
 });

@@ -1,7 +1,7 @@
 {
   "name": "versatil-sdlc-framework",
   "version": "6.1.0",
-  "description": "VERSATIL SDLC Framework MCP Server - AI-native development with 6 OPERA agents, adaptive intelligence, and automated quality gates. Local-first architecture with full SDLC orchestration.",
+  "description": "VERSATIL SDLC Framework MCP Server - AI-native development with 17 OPERA agents (7 core + 10 sub-agents), 12-MCP ecosystem (including GitMCP), adaptive intelligence, and automated quality gates. Local-first architecture with full SDLC orchestration.",
   "author": "VERSATIL Development Team",
   "license": "MIT",
   "homepage": "https://github.com/MiraclesGIT/versatil-sdlc-framework",
@@ -143,6 +143,12 @@
         "description": "Close Chrome browser session and cleanup resources (Maria-QA)",
         "category": "browser-automation",
         "readOnly": false
+      },
+      {
+        "name": "gitmcp_query",
+        "description": "Query GitHub repository documentation via GitMCP (Alex-BA, Marcus, James, Dr.AI-ML)",
+        "category": "documentation",
+        "readOnly": true
       }
     ],
     "resources": [
@@ -273,13 +279,15 @@
       }
     ],
     "capabilities": [
-      "20 MCP Tools: Full SDLC automation (agent management, orchestration, testing, deployment, analytics)",
+      "21 MCP Tools: Full SDLC automation (agent management, orchestration, testing, deployment, analytics, documentation via GitMCP)",
       "5 MCP Resources: Real-time framework data (agent status, quality metrics, performance, SDLC phase, activity logs)",
       "5 MCP Prompts: AI-powered development guidance (code analysis, refactoring, testing, security, performance)",
-      "6 specialized OPERA agents (Maria-QA, James-Frontend, Marcus-Backend, Sarah-PM, Alex-BA, Dr.AI-ML)",
+      "17 specialized OPERA agents (7 core: Maria-QA, James-Frontend, Marcus-Backend, Sarah-PM, Alex-BA, Dr.AI-ML, Oliver-DevOps + 10 language-specific sub-agents)",
+      "12 production MCP integrations (Playwright, GitHub, Exa, GitMCP, Vertex AI, Supabase, n8n, Semgrep, Sentry, Shadcn, Ant Design, Claude Code)",
       "Full SDLC orchestration with phase transitions and quality gates",
       "Autonomous goal management via Opera orchestrator",
       "Real-time browser automation testing with Chrome MCP",
+      "GitHub repository documentation access via GitMCP (zero installation, universal access)",
       "Adaptive learning insights and pattern recognition",
       "Emergency response protocols for critical incidents",
       "Comprehensive testing (unit, e2e, visual, performance, accessibility, security)",
@@ -301,7 +309,8 @@
       "analytics",
       "emergency-response",
       "autonomous-goals",
-      "browser-automation"
+      "browser-automation",
+      "documentation"
     ],
     "tags": [
       "sdlc",
@@ -313,7 +322,10 @@
       "architecture",
       "browser-automation",
       "emergency-response",
-      "adaptive-learning"
+      "adaptive-learning",
+      "documentation",
+      "github",
+      "gitmcp"
     ],
     "requirements": {
       "node": ">=16.0.0",
