@@ -10,6 +10,7 @@ import { DocsSearchError, DocsErrorCodes } from './docs-errors.js';
 import { DocsCache, CacheOptions } from './docs-cache.js';
 import { DocsPerformanceMonitor } from './docs-performance-monitor.js';
 import { DocsMemoryTracker } from './docs-memory-tracker.js';
+import { DocsProgressTracker, ProgressCallback } from './docs-progress-tracker.js';
 
 // Configuration constants
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB default limit
@@ -85,6 +86,7 @@ export class DocsSearchEngine {
   private cache: DocsCache;
   private performanceMonitor: DocsPerformanceMonitor;
   private memoryTracker: DocsMemoryTracker;
+  private progressTracker: DocsProgressTracker;
 
   constructor(
     projectPath: string,
@@ -94,6 +96,7 @@ export class DocsSearchEngine {
       cacheOptions?: CacheOptions;
       enablePerformanceMonitoring?: boolean;
       enableMemoryTracking?: boolean;
+      enableProgressTracking?: boolean;
     } = {}
   ) {
     this.projectPath = projectPath;
@@ -104,13 +107,15 @@ export class DocsSearchEngine {
     this.cache = new DocsCache(options.cacheOptions);
     this.performanceMonitor = new DocsPerformanceMonitor();
     this.memoryTracker = new DocsMemoryTracker();
+    this.progressTracker = new DocsProgressTracker();
   }
 
   /**
    * Build search index from all documentation files
    * @param force - Force rebuild even if index is fresh
+   * @param onProgress - Optional progress callback
    */
-  async buildIndex(force: boolean = false): Promise<void> {
+  async buildIndex(force: boolean = false, onProgress?: ProgressCallback): Promise<void> {
     // Return existing build promise if build is in progress
     if (this.indexBuildPromise) {
       console.log('Index build already in progress, waiting...');
@@ -130,18 +135,54 @@ export class DocsSearchEngine {
 
     // Create build promise to prevent concurrent builds
     this.indexBuildPromise = (async () => {
+      let operationId: string | null = null;
+
       try {
         console.log(`Building documentation index... (force: ${force})`);
         const startTime = Date.now();
 
+        // Start progress tracking
+        operationId = this.progressTracker.startOperation('buildIndex');
+        if (onProgress) {
+          this.progressTracker.subscribe(operationId, onProgress);
+        }
+
         // Clear existing index if rebuilding
         this.documentIndex.clear();
 
+        this.progressTracker.reportProgress(
+          operationId,
+          'initialization',
+          0,
+          100,
+          'Clearing existing index'
+        );
+
         // Find all markdown files in docs directory
         const pattern = path.join(this.docsPath, '**/*.md');
+
+        this.progressTracker.reportProgress(
+          operationId,
+          'discovery',
+          10,
+          100,
+          'Discovering documentation files'
+        );
+
         const files = await glob(pattern, { absolute: true });
 
-        for (const filePath of files) {
+        this.progressTracker.reportProgress(
+          operationId,
+          'discovery',
+          20,
+          100,
+          `Found ${files.length} documentation files`
+        );
+
+        // Process files with progress updates
+        for (let i = 0; i < files.length; i++) {
+          const filePath = files[i];
+
           try {
             const stats = await fs.stat(filePath);
             const content = await fs.readFile(filePath, 'utf-8');
@@ -162,6 +203,19 @@ export class DocsSearchEngine {
             };
 
             this.documentIndex.set(relativePath, metadata);
+
+            // Report progress every 10 files or on last file
+            if (i % 10 === 0 || i === files.length - 1) {
+              const progress = 20 + Math.round((i / files.length) * 70);
+              this.progressTracker.reportProgress(
+                operationId,
+                'indexing',
+                i + 1,
+                files.length,
+                `Indexed ${i + 1}/${files.length} files`,
+                { currentFile: relativePath }
+              );
+            }
           } catch (error) {
             // Skip files that can't be read
             console.error(`Error indexing ${filePath}:`, error);
@@ -171,6 +225,14 @@ export class DocsSearchEngine {
         const duration = Date.now() - startTime;
         console.log(`Documentation index built: ${files.length} files in ${duration}ms`);
 
+        this.progressTracker.reportProgress(
+          operationId,
+          'finalization',
+          95,
+          100,
+          'Collecting metrics'
+        );
+
         // Track performance
         this.performanceMonitor.trackIndexBuild(duration, files.length);
 
@@ -179,9 +241,25 @@ export class DocsSearchEngine {
         const cacheMetrics = this.cache.getMetrics();
         this.memoryTracker.takeSnapshot(indexSize, cacheMetrics.totalSize);
 
+        this.progressTracker.reportProgress(
+          operationId,
+          'complete',
+          100,
+          100,
+          `Index build complete: ${files.length} files indexed`
+        );
+
         this.indexBuilt = true;
         this.lastIndexBuild = now;
+
+        // Complete operation
+        this.progressTracker.completeOperation(operationId);
       } catch (error) {
+        // Mark operation as failed
+        if (operationId) {
+          this.progressTracker.failOperation(operationId, error as Error);
+        }
+
         throw new DocsSearchError(
           `Failed to build documentation index: ${error}`,
           DocsErrorCodes.INDEX_BUILD_FAILED,
@@ -715,5 +793,40 @@ export class DocsSearchEngine {
   getMemoryUsageSummary(): string {
     const usage = this.getMemoryUsage();
     return this.memoryTracker.getMemoryUsageSummary(usage);
+  }
+
+  /**
+   * Get progress tracker for manual operations
+   */
+  getProgressTracker() {
+    return this.progressTracker;
+  }
+
+  /**
+   * Get active operations with progress
+   */
+  getActiveOperations() {
+    return this.progressTracker.getActiveOperations();
+  }
+
+  /**
+   * Get progress for a specific operation
+   */
+  getOperationProgress(operationId: string) {
+    return this.progressTracker.getCurrentProgress(operationId);
+  }
+
+  /**
+   * Subscribe to progress updates for buildIndex
+   */
+  subscribeToProgress(operationId: string, callback: ProgressCallback): void {
+    this.progressTracker.subscribe(operationId, callback);
+  }
+
+  /**
+   * Unsubscribe from progress updates
+   */
+  unsubscribeFromProgress(operationId: string, callback: ProgressCallback): void {
+    this.progressTracker.unsubscribe(operationId, callback);
   }
 }
