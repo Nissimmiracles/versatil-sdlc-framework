@@ -7,6 +7,8 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { glob } from 'glob';
 import { DocsSearchError, DocsErrorCodes } from './docs-errors.js';
+import { DocsCache, CacheOptions } from './docs-cache.js';
+import { DocsPerformanceMonitor } from './docs-performance-monitor.js';
 
 // Configuration constants
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB default limit
@@ -79,12 +81,16 @@ export class DocsSearchEngine {
   private indexBuildPromise: Promise<void> | null = null;
   private maxFileSize: number;
   private indexTTL: number;
+  private cache: DocsCache;
+  private performanceMonitor: DocsPerformanceMonitor;
 
   constructor(
     projectPath: string,
     options: {
       maxFileSize?: number;
       indexTTL?: number;
+      cacheOptions?: CacheOptions;
+      enablePerformanceMonitoring?: boolean;
     } = {}
   ) {
     this.projectPath = projectPath;
@@ -92,6 +98,8 @@ export class DocsSearchEngine {
     this.documentIndex = new Map();
     this.maxFileSize = options.maxFileSize || MAX_FILE_SIZE;
     this.indexTTL = options.indexTTL || INDEX_TTL_MS;
+    this.cache = new DocsCache(options.cacheOptions);
+    this.performanceMonitor = new DocsPerformanceMonitor();
   }
 
   /**
@@ -159,6 +167,9 @@ export class DocsSearchEngine {
         const duration = Date.now() - startTime;
         console.log(`Documentation index built: ${files.length} files in ${duration}ms`);
 
+        // Track performance
+        this.performanceMonitor.trackIndexBuild(duration, files.length);
+
         this.indexBuilt = true;
         this.lastIndexBuild = now;
       } catch (error) {
@@ -212,9 +223,11 @@ export class DocsSearchEngine {
   }
 
   /**
-   * Search documentation with keyword matching
+   * Search documentation with keyword matching (with performance tracking)
    */
   async search(query: string, category?: DocCategory): Promise<SearchResult[]> {
+    const startTime = Date.now();
+
     if (!this.indexBuilt) {
       await this.buildIndex();
     }
@@ -279,14 +292,20 @@ export class DocsSearchEngine {
     // Sort by relevance score (highest first)
     results.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
+    // Track performance (cache hit = false for search queries)
+    const duration = Date.now() - startTime;
+    this.performanceMonitor.trackQuery(query, duration, false, results.length);
+
     // Return top 10 results
     return results.slice(0, 10);
   }
 
   /**
-   * Get complete document content with security validation
+   * Get complete document content with security validation and caching
    */
-  async getDocument(relativePath: string): Promise<string> {
+  async getDocument(relativePath: string, options?: { bypassCache?: boolean }): Promise<string> {
+    const startTime = Date.now();
+
     if (!this.indexBuilt) {
       await this.buildIndex();
     }
@@ -294,7 +313,19 @@ export class DocsSearchEngine {
     // 1. Normalize path to prevent directory traversal
     const normalizedPath = path.normalize(relativePath);
 
-    // 2. Block path traversal patterns
+    // 2. Check cache first (unless bypassed)
+    let cacheHit = false;
+    if (!options?.bypassCache) {
+      const cached = this.cache.get(normalizedPath);
+      if (cached) {
+        cacheHit = true;
+        const duration = Date.now() - startTime;
+        this.performanceMonitor.trackQuery(normalizedPath, duration, true);
+        return cached as string;
+      }
+    }
+
+    // 3. Block path traversal patterns
     if (normalizedPath.includes('..') || normalizedPath.startsWith('/')) {
       throw new DocsSearchError(
         'Path traversal not allowed',
@@ -303,7 +334,7 @@ export class DocsSearchEngine {
       );
     }
 
-    // 3. Get metadata from index
+    // 4. Get metadata from index
     const metadata = this.documentIndex.get(normalizedPath);
     if (!metadata) {
       throw new DocsSearchError(
@@ -313,7 +344,7 @@ export class DocsSearchEngine {
       );
     }
 
-    // 4. Validate file path is within docs directory
+    // 5. Validate file path is within docs directory
     const resolvedPath = path.resolve(metadata.filePath);
     const allowedDocsPath = path.resolve(this.docsPath);
 
@@ -325,7 +356,7 @@ export class DocsSearchEngine {
       );
     }
 
-    // 5. Check file size before reading
+    // 6. Check file size before reading
     if (metadata.size > this.maxFileSize) {
       throw new DocsSearchError(
         `Document too large: ${Math.round(metadata.size / 1024 / 1024)}MB (max ${Math.round(this.maxFileSize / 1024 / 1024)}MB)`,
@@ -334,7 +365,7 @@ export class DocsSearchEngine {
       );
     }
 
-    // 6. Verify file is readable
+    // 7. Verify file is readable
     try {
       await fs.access(resolvedPath, fs.constants.R_OK);
     } catch (error) {
@@ -345,8 +376,17 @@ export class DocsSearchEngine {
       );
     }
 
-    // 7. Read and return file content
-    return await fs.readFile(resolvedPath, 'utf-8');
+    // 8. Read file content
+    const content = await fs.readFile(resolvedPath, 'utf-8');
+
+    // 9. Store in cache
+    this.cache.set(normalizedPath, content);
+
+    // 10. Track performance (cache miss)
+    const duration = Date.now() - startTime;
+    this.performanceMonitor.trackQuery(normalizedPath, duration, false);
+
+    return content;
   }
 
   /**
@@ -544,5 +584,71 @@ export class DocsSearchEngine {
     }
 
     return excerpt;
+  }
+
+  /**
+   * Get cache metrics
+   */
+  getCacheMetrics() {
+    return this.cache.getMetrics();
+  }
+
+  /**
+   * Get ETag for document (for HTTP 304 support)
+   */
+  getDocumentETag(relativePath: string): string | null {
+    const normalizedPath = path.normalize(relativePath);
+    const entry = this.cache.getEntry(normalizedPath);
+    return entry ? entry.etag : null;
+  }
+
+  /**
+   * Check if cached document is still valid
+   */
+  isCacheValid(relativePath: string, ifNoneMatch?: string): boolean {
+    const normalizedPath = path.normalize(relativePath);
+    return this.cache.isCacheValid(normalizedPath, ifNoneMatch);
+  }
+
+  /**
+   * Clear document cache
+   */
+  clearCache(): void {
+    this.cache.clear();
+  }
+
+  /**
+   * Get compression ratio
+   */
+  getCompressionRatio() {
+    return this.cache.getCompressionRatio();
+  }
+
+  /**
+   * Get performance metrics
+   */
+  getPerformanceMetrics() {
+    return this.performanceMonitor.getMetrics();
+  }
+
+  /**
+   * Export performance metrics in Prometheus format
+   */
+  exportPrometheusMetrics(): string {
+    return this.performanceMonitor.exportPrometheus();
+  }
+
+  /**
+   * Get recent queries for monitoring
+   */
+  getRecentQueries(limit?: number) {
+    return this.performanceMonitor.getRecentQueries(limit);
+  }
+
+  /**
+   * Get slowest queries for optimization
+   */
+  getSlowestQueries(limit?: number) {
+    return this.performanceMonitor.getSlowestQueries(limit);
   }
 }
