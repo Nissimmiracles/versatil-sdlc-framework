@@ -226,7 +226,8 @@ export class ThreeTierHandoffBuilder {
       });
     }
 
-    baseBuilder.workItems = workItems;
+    // Work items are part of the context, not a direct property
+    // baseBuilder.workItems = workItems;
 
     // Set expected output
     baseBuilder.setExpectedOutput({

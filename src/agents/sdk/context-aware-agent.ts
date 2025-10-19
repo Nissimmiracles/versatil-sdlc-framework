@@ -37,17 +37,15 @@ export function createContextAwareAgent(
   return {
     ...baseAgent,
 
-    // Enable Claude's context management beta
-    beta: MEMORY_TOOL_CONFIG.beta,
+    // Note: beta flags are configured separately in memory-tool-config
+    // beta: MEMORY_TOOL_CONFIG.beta,
 
     // Add Memory Tool instructions to prompt
-    prompt: enhancePromptWithMemory(agentId, baseAgent.prompt),
+    prompt: enhancePromptWithMemory(agentId, baseAgent.prompt)
 
-    // Configure context editing
-    contextManagement: MEMORY_TOOL_CONFIG.contextManagement,
-
-    // Exclude critical tools from context clearing
-    excludeTools: MEMORY_TOOL_CONFIG.excludeTools
+    // Note: contextManagement and excludeTools are configured separately
+    // contextManagement: MEMORY_TOOL_CONFIG.contextManagement,
+    // excludeTools: MEMORY_TOOL_CONFIG.excludeTools
   };
 }
 

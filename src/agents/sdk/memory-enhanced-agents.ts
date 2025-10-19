@@ -14,7 +14,7 @@ import {
   MARIA_QA_AGENT,
   JAMES_FRONTEND_AGENT,
   MARCUS_BACKEND_AGENT,
-  DANA_DATABASE_AGENT,
+  // DANA_DATABASE_AGENT, // TODO: Add Dana agent definition to agent-definitions.ts
   ALEX_BA_AGENT,
   SARAH_PM_AGENT,
   DR_AI_ML_AGENT
@@ -43,10 +43,11 @@ export const MARCUS_BACKEND_MEMORY_ENHANCED = createContextAwareAgent(
   MARCUS_BACKEND_AGENT
 );
 
-export const DANA_DATABASE_MEMORY_ENHANCED = createContextAwareAgent(
-  'dana-database',
-  DANA_DATABASE_AGENT
-);
+// TODO: Add Dana Database agent when definition is available
+// export const DANA_DATABASE_MEMORY_ENHANCED = createContextAwareAgent(
+//   'dana-database',
+//   DANA_DATABASE_AGENT
+// );
 
 export const ALEX_BA_MEMORY_ENHANCED = createContextAwareAgent(
   'alex-ba',
@@ -70,7 +71,7 @@ export const MEMORY_ENHANCED_AGENTS = {
   'maria-qa': MARIA_QA_MEMORY_ENHANCED,
   'james-frontend': JAMES_FRONTEND_MEMORY_ENHANCED,
   'marcus-backend': MARCUS_BACKEND_MEMORY_ENHANCED,
-  'dana-database': DANA_DATABASE_MEMORY_ENHANCED,
+  // 'dana-database': DANA_DATABASE_MEMORY_ENHANCED, // TODO: Uncomment when Dana definition added
   'alex-ba': ALEX_BA_MEMORY_ENHANCED,
   'sarah-pm': SARAH_PM_MEMORY_ENHANCED,
   'dr-ai-ml': DR_AI_ML_MEMORY_ENHANCED
