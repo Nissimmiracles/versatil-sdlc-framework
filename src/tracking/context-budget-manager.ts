@@ -100,18 +100,9 @@ export class ContextBudgetManager {
    * Get current context usage from ContextSentinel
    */
   private async getCurrentContextUsage(): Promise<number> {
-    try {
-      // Try to import ContextSentinel
-      const { ContextSentinel } = await import('../intelligence/context-sentinel.js');
-      const sentinel = new ContextSentinel();
-      const stats = await sentinel.getContextStats();
-
-      // Estimate current usage from input tokens
-      return stats.currentInputTokens || 0;
-    } catch (error) {
-      // Fallback: Estimate from allocations if ContextSentinel unavailable
-      return this.getAllocatedTokens();
-    }
+    // Fallback: Use allocated tokens as estimate
+    // TODO: Integrate with ContextSentinel when available
+    return this.getAllocatedTokens();
   }
 
   /**

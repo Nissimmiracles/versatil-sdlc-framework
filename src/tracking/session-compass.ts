@@ -309,131 +309,196 @@ export class SessionCompass {
     medium: TaskPriority['tasks'];
     low: TaskPriority['tasks'];
   }> {
-    // TODO: Read from todos/*.md files and prioritize
-    // For now, return mock data
-    const high: TaskPriority['tasks'] = [
-      {
-        id: '1',
-        description: 'Complete Oliver-MCP agent integration',
-        assignedAgent: 'Marcus-Backend',
-        canParallel: true,
-        dependsOn: [],
-        contextNeeded: 8000,
-        eta: '30 minutes'
-      },
-      {
-        id: '2',
-        description: 'Update agent registry',
-        assignedAgent: 'Sarah-PM',
-        canParallel: false,
-        dependsOn: ['1'],
-        contextNeeded: 3000,
-        eta: '15 minutes'
-      }
-    ];
+    try {
+      // Use TodoPipelineVisualizer for real task data
+      const { getTodoPipelineVisualizer } = await import('./todo-pipeline-visualizer.js');
+      const visualizer = getTodoPipelineVisualizer(this.projectPath);
+      const pipeline = await visualizer.analyzePipeline();
 
-    const medium: TaskPriority['tasks'] = [
-      {
-        id: '3',
-        description: 'Write integration tests',
-        assignedAgent: 'Maria-QA',
-        canParallel: true,
-        dependsOn: ['1'],
-        contextNeeded: 5000,
-        eta: '20 minutes'
-      },
-      {
-        id: '4',
-        description: 'Create documentation',
-        assignedAgent: 'Sarah-PM',
-        canParallel: true,
-        dependsOn: ['1'],
-        contextNeeded: 4000,
-        eta: '25 minutes'
-      }
-    ];
+      const convertTask = (task: any): TaskPriority['tasks'][0] => ({
+        id: task.id,
+        description: task.description || task.title,
+        assignedAgent: task.assignedAgent || 'Unknown',
+        canParallel: !task.dependsOn || task.dependsOn.length === 0,
+        dependsOn: task.dependsOn || [],
+        contextNeeded: task.estimatedMinutes ? task.estimatedMinutes * 100 : 5000,
+        eta: task.estimatedMinutes ? `${task.estimatedMinutes} min` : 'Unknown'
+      });
 
-    const low: TaskPriority['tasks'] = [];
+      // Filter pending tasks and group by priority
+      const pendingTasks = pipeline.tasks.filter(t => t.status === 'pending' || t.status === 'in_progress');
 
-    return { high, medium, low };
+      const high = pendingTasks.filter(t => t.priority === 'high').map(convertTask);
+      const medium = pendingTasks.filter(t => t.priority === 'medium').map(convertTask);
+      const low = pendingTasks.filter(t => t.priority === 'low').map(convertTask);
+
+      return { high, medium, low };
+    } catch (error) {
+      // Fallback to empty if no todos found
+      return { high: [], medium: [], low: [] };
+    }
   }
 
   /**
    * Get parallel execution opportunities
    */
   private async getParallelOpportunities(): Promise<ParallelOpportunities> {
-    // TODO: Calculate from task dependencies
-    return {
-      now: ['1'],
-      after: {
-        '1': ['2', '3', '4']
-      },
-      timeSavings: '15 minutes via parallelization'
-    };
+    try {
+      // Use TodoPipelineVisualizer for real parallel analysis
+      const { getTodoPipelineVisualizer } = await import('./todo-pipeline-visualizer.js');
+      const visualizer = getTodoPipelineVisualizer(this.projectPath);
+      const pipeline = await visualizer.analyzePipeline();
+
+      if (pipeline.parallelGroups.length === 0) {
+        return {
+          now: [],
+          after: {},
+          timeSavings: '0 minutes (no parallel opportunities)'
+        };
+      }
+
+      // Calculate time savings from parallelization
+      const timeSavings = this.calculateParallelTimeSavings(pipeline);
+
+      // Build dependency map: { taskId: [dependent tasks that can run after] }
+      const dependencyMap: Record<string, string[]> = {};
+      for (let i = 0; i < pipeline.parallelGroups.length - 1; i++) {
+        const currentGroup = pipeline.parallelGroups[i];
+        const nextGroup = pipeline.parallelGroups[i + 1];
+
+        for (const taskId of currentGroup) {
+          if (!dependencyMap[taskId]) {
+            dependencyMap[taskId] = [];
+          }
+          dependencyMap[taskId].push(...nextGroup);
+        }
+      }
+
+      return {
+        now: pipeline.parallelGroups[0] || [],
+        after: dependencyMap,
+        timeSavings: `${timeSavings} minutes via parallelization`
+      };
+    } catch (error) {
+      return {
+        now: [],
+        after: {},
+        timeSavings: '0 minutes (no todos found)'
+      };
+    }
+  }
+
+  /**
+   * Calculate time savings from parallel execution
+   */
+  private calculateParallelTimeSavings(pipeline: any): number {
+    // Sequential time: sum of all task durations
+    const sequentialTime = pipeline.tasks.reduce(
+      (sum: number, task: any) => sum + (task.estimatedMinutes || 0),
+      0
+    );
+
+    // Parallel time: sum of maximum duration in each parallel group
+    let parallelTime = 0;
+    for (const group of pipeline.parallelGroups) {
+      const groupTasks = pipeline.tasks.filter((t: any) => group.includes(t.id));
+      const maxDuration = Math.max(...groupTasks.map((t: any) => t.estimatedMinutes || 0));
+      parallelTime += maxDuration;
+    }
+
+    return Math.max(0, sequentialTime - parallelTime);
   }
 
   /**
    * Get context budget status
    */
   private async getContextBudget(): Promise<ContextBudgetStatus> {
-    // TODO: Integrate with ContextSentinel for real metrics
-    const MAX_TOKENS = 200000;
-    const SAFE_THRESHOLD = 180000;
-    const currentUsage = 17000; // Mock: would get from ContextSentinel
+    try {
+      // Use ContextBudgetManager for real context tracking
+      const { getContextBudgetManager } = await import('./context-budget-manager.js');
+      const budgetManager = getContextBudgetManager();
+      const budget = await budgetManager.getBudgetStatus();
 
-    const available = SAFE_THRESHOLD - currentUsage;
-    const allocated = 20000; // Mock: sum of task context needs
-    const reserved = 15000;
-    const remaining = available - allocated - reserved;
+      return {
+        available: budget.available,
+        allocated: budget.allocated,
+        reserved: budget.reserved,
+        remaining: budget.remaining,
+        status: budget.status,
+        message: budget.message
+      };
+    } catch (error) {
+      // Fallback to safe defaults if ContextBudgetManager unavailable
+      const MAX_TOKENS = 200000;
+      const SAFE_THRESHOLD = 180000;
+      const reserved = 15000;
 
-    let status: 'healthy' | 'warning' | 'critical' = 'healthy';
-    let message = 'All prioritized tasks fit in context';
-
-    if (remaining < 20000) {
-      status = 'warning';
-      message = 'Context budget tight - consider deferring low-priority tasks';
+      return {
+        available: SAFE_THRESHOLD,
+        allocated: 0,
+        reserved,
+        remaining: SAFE_THRESHOLD - reserved,
+        status: 'healthy',
+        message: 'Context tracking unavailable - using safe defaults'
+      };
     }
-    if (remaining < 10000) {
-      status = 'critical';
-      message = 'Context budget exceeded - must defer some tasks';
-    }
-
-    return {
-      available,
-      allocated,
-      reserved,
-      remaining,
-      status,
-      message
-    };
   }
 
   /**
    * Get three-tier status
    */
   private async getThreeTierStatus(): Promise<ThreeTierStatus> {
-    // TODO: Integrate with ThreeTierStatusTracker
-    return {
-      backend: {
-        progress: 80,
-        completed: 4,
-        total: 5,
-        next: 'Finalize Oliver-MCP API routes',
-        recommendation: 'Add error handling for edge cases'
-      },
-      database: {
-        progress: 100,
-        status: 'All migrations applied, RLS policies active',
-        recommendation: 'Consider adding indexes for MCP queries'
-      },
-      frontend: {
-        progress: 60,
-        completed: 3,
-        total: 5,
-        next: 'Create MCP selection dropdown component',
-        recommendation: 'Implement loading states for async operations'
-      }
-    };
+    try {
+      // Use ThreeTierStatusTracker for real tier analysis
+      const { getThreeTierStatusTracker } = await import('./three-tier-status-tracker.js');
+      const tracker = getThreeTierStatusTracker(this.projectPath);
+      const status = await tracker.getStatus();
+
+      return {
+        backend: {
+          progress: status.backend.progress,
+          completed: status.backend.completed,
+          total: status.backend.total,
+          next: status.backend.next,
+          recommendation: status.backend.recommendation
+        },
+        database: {
+          progress: status.database.progress,
+          status: status.database.next,
+          recommendation: status.database.recommendation
+        },
+        frontend: {
+          progress: status.frontend.progress,
+          completed: status.frontend.completed,
+          total: status.frontend.total,
+          next: status.frontend.next,
+          recommendation: status.frontend.recommendation
+        }
+      };
+    } catch (error) {
+      // Fallback to empty status if tracker unavailable
+      return {
+        backend: {
+          progress: 0,
+          completed: 0,
+          total: 0,
+          next: 'No backend tasks found',
+          recommendation: 'Create todos/*.md files for tracking'
+        },
+        database: {
+          progress: 0,
+          status: 'No database tasks found',
+          recommendation: 'Create todos/*.md files for tracking'
+        },
+        frontend: {
+          progress: 0,
+          completed: 0,
+          total: 0,
+          next: 'No frontend tasks found',
+          recommendation: 'Create todos/*.md files for tracking'
+        }
+      };
+    }
   }
 
   /**

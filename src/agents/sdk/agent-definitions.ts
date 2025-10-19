@@ -1536,7 +1536,7 @@ Remember: You are the AI/ML expert. Build models that are accurate, fast, fair, 
  *
  * Role: Intelligent MCP selection, type classification, and anti-hallucination logic
  * Position in Framework: MCP router for all 17 OPERA agents
- * Auto-activation: **/mcp/**, *.mcp.*, mcp-*.*, requests mentioning MCPs
+ * Auto-activation: mcp directories, mcp-related files, requests mentioning MCPs
  */
 export const OLIVER_MCP_AGENT: AgentDefinition = {
   description: 'MCP Intelligence & Orchestration - Auto-activates on MCP-related files, selects optimal MCP for each task, prevents hallucinations with GitMCP',
