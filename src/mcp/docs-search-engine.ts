@@ -9,6 +9,7 @@ import { glob } from 'glob';
 import { DocsSearchError, DocsErrorCodes } from './docs-errors.js';
 import { DocsCache, CacheOptions } from './docs-cache.js';
 import { DocsPerformanceMonitor } from './docs-performance-monitor.js';
+import { DocsMemoryTracker } from './docs-memory-tracker.js';
 
 // Configuration constants
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB default limit
@@ -83,6 +84,7 @@ export class DocsSearchEngine {
   private indexTTL: number;
   private cache: DocsCache;
   private performanceMonitor: DocsPerformanceMonitor;
+  private memoryTracker: DocsMemoryTracker;
 
   constructor(
     projectPath: string,
@@ -91,6 +93,7 @@ export class DocsSearchEngine {
       indexTTL?: number;
       cacheOptions?: CacheOptions;
       enablePerformanceMonitoring?: boolean;
+      enableMemoryTracking?: boolean;
     } = {}
   ) {
     this.projectPath = projectPath;
@@ -100,6 +103,7 @@ export class DocsSearchEngine {
     this.indexTTL = options.indexTTL || INDEX_TTL_MS;
     this.cache = new DocsCache(options.cacheOptions);
     this.performanceMonitor = new DocsPerformanceMonitor();
+    this.memoryTracker = new DocsMemoryTracker();
   }
 
   /**
@@ -169,6 +173,11 @@ export class DocsSearchEngine {
 
         // Track performance
         this.performanceMonitor.trackIndexBuild(duration, files.length);
+
+        // Take memory snapshot after index build
+        const indexSize = this.estimateIndexSize();
+        const cacheMetrics = this.cache.getMetrics();
+        this.memoryTracker.takeSnapshot(indexSize, cacheMetrics.totalSize);
 
         this.indexBuilt = true;
         this.lastIndexBuild = now;
@@ -650,5 +659,61 @@ export class DocsSearchEngine {
    */
   getSlowestQueries(limit?: number) {
     return this.performanceMonitor.getSlowestQueries(limit);
+  }
+
+  /**
+   * Estimate index size in bytes
+   * @private
+   */
+  private estimateIndexSize(): number {
+    // Each DocumentMetadata entry has:
+    // - filePath: ~100 chars = 200 bytes
+    // - relativePath: ~50 chars = 100 bytes
+    // - title: ~50 chars = 100 bytes
+    // - category: ~20 chars = 40 bytes
+    // - keywords: ~10 keywords × 10 chars = 200 bytes
+    // - size: number = 8 bytes
+    // - lastModified: Date = 8 bytes
+    // Estimated ~656 bytes per entry, round to 700 for overhead
+    return this.documentIndex.size * 700;
+  }
+
+  /**
+   * Get current memory usage
+   */
+  getMemoryUsage() {
+    const indexSize = this.estimateIndexSize();
+    const cacheMetrics = this.cache.getMetrics();
+    return this.memoryTracker.getMemoryUsage(indexSize, cacheMetrics.totalSize);
+  }
+
+  /**
+   * Get memory warnings based on thresholds
+   */
+  getMemoryWarnings() {
+    const usage = this.getMemoryUsage();
+    return this.memoryTracker.getMemoryWarnings(usage);
+  }
+
+  /**
+   * Get memory statistics
+   */
+  getMemoryStats() {
+    return this.memoryTracker.getMemoryStats();
+  }
+
+  /**
+   * Get memory time series data
+   */
+  getMemoryTimeSeries(duration?: number) {
+    return this.memoryTracker.getMemoryTimeSeries(duration);
+  }
+
+  /**
+   * Get formatted memory usage summary
+   */
+  getMemoryUsageSummary(): string {
+    const usage = this.getMemoryUsage();
+    return this.memoryTracker.getMemoryUsageSummary(usage);
   }
 }
