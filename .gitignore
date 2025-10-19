@@ -18,6 +18,9 @@ coverage/
 *.lcov
 .nyc_output
 
+# Jest Cache
+.jest-cache/
+
 # ESLint Cache
 .eslintcache
 
