@@ -162,6 +162,36 @@ export class ContextStatsTracker {
   }
 
   /**
+   * Track a context clear event
+   */
+  async trackContextClear(event: Omit<ContextClearEvent, 'timestamp'> & { timestamp?: string; reason?: 'auto' | 'manual' }): Promise<void> {
+    const clearEvent: ContextClearEvent = {
+      timestamp: event.timestamp ? new Date(event.timestamp) : new Date(),
+      inputTokens: event.inputTokens,
+      toolUsesCleared: event.toolUsesCleared,
+      tokensSaved: event.tokensSaved,
+      triggerType: event.reason === 'auto' ? 'input_tokens' : 'manual',
+      triggerValue: event.inputTokens,
+      agentId: event.agentId
+    };
+
+    this.clearEvents.push(clearEvent);
+
+    // Update current session
+    if (this.currentSession) {
+      this.currentSession.clearEvents++;
+      this.currentSession.tokensSaved += event.tokensSaved;
+    }
+
+    // Persist to disk (keep last 1000 events)
+    if (this.clearEvents.length > 1000) {
+      this.clearEvents = this.clearEvents.slice(-1000);
+    }
+
+    await this.persistClearEvents();
+  }
+
+  /**
    * Track a memory operation
    */
   async trackMemoryOperation(op: Omit<MemoryOperation, 'timestamp'>): Promise<void> {

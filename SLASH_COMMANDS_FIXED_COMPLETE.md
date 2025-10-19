@@ -137,7 +137,7 @@ agentId: z.enum([
 ```
 
 **What Changed**:
-- Added all 7 core OPERA agent modern IDs
+- Added all 8 core OPERA agent modern IDs
 - Added all 10 sub-agent IDs
 - Kept legacy IDs for backwards compatibility
 - Total: **21 agent IDs** (was 8, now 21)

@@ -128,7 +128,7 @@ Example:
 
 ## 🔧 Technical Changes
 
-### Files Modified (27 core files)
+### Files Modified (28 core files)
 - `bin/versatil.js` - Updated help text
 - `CHANGELOG.md` - Updated branding
 - All test files (19 files) - BMAD→OPERA replacements

@@ -12,6 +12,19 @@
 import { EventEmitter } from 'events';
 import { EnvironmentManager } from '../environment/environment-manager.js';
 
+/**
+ * TodoWrite Integration
+ *
+ * Note: TodoWrite is a Claude Code tool (not imported as a module).
+ * It's invoked by Claude directly during parallel task execution to:
+ * 1. Create todos when tasks start
+ * 2. Update progress (0-100%)
+ * 3. Mark todos complete when tasks finish
+ *
+ * This integration emits 'todowrite:*' events that Claude monitors
+ * to keep users informed of parallel task progress.
+ */
+
 export interface Task {
   id: string;
   name: string;
@@ -91,6 +104,7 @@ export interface TaskExecution {
   result?: any;
   error?: Error;
   resourceUsage: ResourceUsage[];
+  todoId?: string; // Link to TodoWrite item
 }
 
 export enum ExecutionStatus {
@@ -150,6 +164,7 @@ export class ParallelTaskManager extends EventEmitter {
   private sdlcState: SDLCPhase = SDLCPhase.PLANNING;
   private maxParallelTasks: number = 10;
   private environmentManager: EnvironmentManager;
+  private todoWriteEnabled: boolean = true; // Feature flag for TodoWrite integration
 
   constructor() {
     super();
@@ -196,6 +211,22 @@ export class ParallelTaskManager extends EventEmitter {
     const executionPlan = await this.createExecutionPlan(taskIds);
     const results = new Map<string, TaskExecution>();
 
+    // Emit TodoWrite event for parallel execution start
+    if (this.todoWriteEnabled) {
+      const taskNames = taskIds
+        .map(id => this.tasks.get(id))
+        .filter(Boolean)
+        .map(t => t!.agentId || 'Agent')
+        .filter((v, i, a) => a.indexOf(v) === i); // unique agents
+
+      this.emit('todowrite:parallel-start', {
+        agents: taskNames,
+        taskCount: taskIds.length,
+        batchCount: executionPlan.batches.length,
+        estimatedTime: executionPlan.totalEstimatedTime
+      });
+    }
+
     // Execute tasks in parallel batches based on dependencies and resource availability
     for (const batch of executionPlan.batches) {
       const batchPromises = batch.map(taskId => this.executeTask(taskId));
@@ -218,6 +249,19 @@ export class ParallelTaskManager extends EventEmitter {
           results.set(taskId, execution);
           this.emit('task:failed', { taskId, error: result.reason });
         }
+      });
+    }
+
+    // Emit TodoWrite event for parallel execution complete
+    if (this.todoWriteEnabled) {
+      const completed = Array.from(results.values()).filter(r => r.status === ExecutionStatus.COMPLETED).length;
+      const failed = Array.from(results.values()).filter(r => r.status === ExecutionStatus.FAILED).length;
+
+      this.emit('todowrite:parallel-complete', {
+        totalTasks: taskIds.length,
+        completed,
+        failed,
+        results
       });
     }
 
@@ -417,6 +461,16 @@ export class ParallelTaskManager extends EventEmitter {
     this.executions.set(taskId, execution);
     this.emit('task:started', { taskId, task });
 
+    // Emit TodoWrite event for task start
+    if (this.todoWriteEnabled) {
+      this.emit('todowrite:task-start', {
+        taskId,
+        taskName: task.name,
+        agentId: task.agentId,
+        estimatedDuration: task.estimatedDuration
+      });
+    }
+
     try {
       // Allocate resources
       await this.allocateResources(task);
@@ -427,7 +481,18 @@ export class ParallelTaskManager extends EventEmitter {
         this.agentWorkload.set(task.agentId, currentLoad + 1);
       }
 
+      // Emit progress update: 20% (allocated resources)
+      execution.progress = 20;
+      if (this.todoWriteEnabled) {
+        this.emit('todowrite:progress-update', { taskId, progress: 20, phase: 'resources-allocated' });
+      }
+
       // Execute task based on type
+      execution.progress = 50;
+      if (this.todoWriteEnabled) {
+        this.emit('todowrite:progress-update', { taskId, progress: 50, phase: 'executing' });
+      }
+
       const result = await this.executeTaskByType(task);
 
       execution.endTime = new Date();
@@ -437,12 +502,34 @@ export class ParallelTaskManager extends EventEmitter {
 
       this.emit('task:completed', { taskId, task, result });
 
+      // Emit TodoWrite event for task completion
+      if (this.todoWriteEnabled) {
+        this.emit('todowrite:task-complete', {
+          taskId,
+          taskName: task.name,
+          agentId: task.agentId,
+          duration: execution.endTime.getTime() - execution.startTime.getTime(),
+          result
+        });
+      }
+
     } catch (error) {
       execution.endTime = new Date();
       execution.status = ExecutionStatus.FAILED;
       execution.error = error as Error;
 
       this.emit('task:failed', { taskId, task, error });
+
+      // Emit TodoWrite event for task failure
+      if (this.todoWriteEnabled) {
+        this.emit('todowrite:task-failed', {
+          taskId,
+          taskName: task.name,
+          agentId: task.agentId,
+          error: (error as Error).message
+        });
+      }
+
       throw error;
 
     } finally {
@@ -873,6 +960,90 @@ export class ParallelTaskManager extends EventEmitter {
       execution.status = ExecutionStatus.RUNNING;
       this.emit('task:resumed', { taskId });
     }
+  }
+
+  /**
+   * Enable/disable TodoWrite integration
+   */
+  public setTodoWriteEnabled(enabled: boolean): void {
+    this.todoWriteEnabled = enabled;
+  }
+
+  /**
+   * Get current progress for all running tasks (for TodoWrite updates)
+   */
+  public getParallelProgress(): Map<string, number> {
+    const progress = new Map<string, number>();
+
+    for (const [taskId, execution] of this.executions) {
+      if (execution.status === ExecutionStatus.RUNNING) {
+        const task = this.tasks.get(taskId);
+        progress.set(task?.agentId || taskId, execution.progress);
+      }
+    }
+
+    return progress;
+  }
+
+  /**
+   * Get summary of parallel execution for TodoWrite display
+   */
+  public getParallelExecutionSummary(): {
+    runningCount: number;
+    completedCount: number;
+    failedCount: number;
+    agents: string[];
+    overallProgress: number;
+  } {
+    const running: string[] = [];
+    const completed: string[] = [];
+    const failed: string[] = [];
+    const agents = new Set<string>();
+    let totalProgress = 0;
+    let count = 0;
+
+    for (const [taskId, execution] of this.executions) {
+      const task = this.tasks.get(taskId);
+      if (task?.agentId) {
+        agents.add(task.agentId);
+      }
+
+      if (execution.status === ExecutionStatus.RUNNING) {
+        running.push(taskId);
+        totalProgress += execution.progress;
+        count++;
+      } else if (execution.status === ExecutionStatus.COMPLETED) {
+        completed.push(taskId);
+      } else if (execution.status === ExecutionStatus.FAILED) {
+        failed.push(taskId);
+      }
+    }
+
+    return {
+      runningCount: running.length,
+      completedCount: completed.length,
+      failedCount: failed.length,
+      agents: Array.from(agents),
+      overallProgress: count > 0 ? Math.round(totalProgress / count) : 0
+    };
+  }
+
+  /**
+   * Format parallel progress for statusline display
+   * Example: "Dana (30%) + Marcus (45%) + James (60%) working in parallel"
+   */
+  public formatParallelProgressForStatusline(): string {
+    const progress = this.getParallelProgress();
+
+    if (progress.size === 0) {
+      return 'No parallel tasks running';
+    }
+
+    const progressStrings = Array.from(progress.entries())
+      .map(([agent, pct]) => `${agent} (${pct}%)`)
+      .join(' + ');
+
+    return `${progressStrings} working in parallel`;
   }
 }
 

@@ -15,7 +15,7 @@ allowed-tools:
 
 ## Introduction
 
-**Quality gates before work starts** to ensure you're set up for success. This implements the "Assess" phase of Every Inc's Compounding Engineering philosophy: verify readiness before executing.
+**Quality gates before work starts** to ensure you're set up for success. This implements the "Assess" phase of VELOCITY workflow's Compounding Engineering approach: verify readiness before executing.
 
 **Philosophy**: "Catch blockers early, not halfway through implementation."
 

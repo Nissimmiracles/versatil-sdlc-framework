@@ -32,7 +32,9 @@ export default defineConfig({
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/playwright-results.json' }],
     ['junit', { outputFile: 'test-results/playwright-junit.xml' }],
-    process.env.CI ? ['github'] : ['list']
+    process.env.CI ? ['github'] : ['list'],
+    // Percy visual regression reporter (only in CI or when PERCY_TOKEN is set)
+    ...(process.env.CI || process.env.PERCY_TOKEN ? [['@percy/playwright']] : [])
   ],
 
   // Global test setup and teardown
@@ -119,17 +121,26 @@ export default defineConfig({
       ]
     },
 
-    // Visual Regression Testing
+    // Visual Regression Testing (Percy)
     {
       name: 'visual-regression',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: { width: 1366, height: 768 }
+        viewport: { width: 1366, height: 768 },
+        // Percy-specific settings
+        contextOptions: {
+          // Reduce flakiness for visual testing
+          reducedMotion: 'reduce',
+          forcedColors: 'none'
+        }
       },
       testMatch: [
         '**/visual/**/*.{test,spec}.{ts,js}',
         '**/*.visual.{ts,js}'
-      ]
+      ],
+      // Run visual tests sequentially to avoid Percy concurrency issues
+      fullyParallel: false,
+      retries: process.env.CI ? 1 : 0 // Fewer retries for visual tests
     },
 
     // Performance Testing

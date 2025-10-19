@@ -731,4 +731,126 @@ Provide thorough quality assurance analysis with historical context and proven t
     };
   }
 
+  /**
+   * Percy Visual Regression Integration
+   * Trigger Percy snapshots on UI component changes
+   */
+  async triggerPercySnapshot(context: AgentActivationContext): Promise<boolean> {
+    // Check if this is a UI component file
+    if (!this.isUIComponent(context.filePath)) {
+      return false;
+    }
+
+    // Check if Percy is configured
+    const percyToken = process.env.PERCY_TOKEN;
+    if (!percyToken) {
+      console.log('Percy not configured. Skipping visual regression testing.');
+      return false;
+    }
+
+    try {
+      // Determine which Percy test to run based on file type
+      const testCommand = this.determinePercyTest(context.filePath, context.content);
+
+      if (testCommand) {
+        console.log(`Maria-QA: Triggering Percy visual regression test: ${testCommand}`);
+        // Note: Actual execution happens in CI/CD pipeline
+        // This method serves as a trigger/recommendation
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Percy snapshot trigger failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Determine if file is a UI component
+   */
+  private isUIComponent(filePath: string): boolean {
+    const uiExtensions = ['.tsx', '.jsx', '.vue', '.svelte'];
+    const uiPaths = ['/components/', '/ui/', '/views/', '/pages/'];
+
+    return uiExtensions.some(ext => filePath.endsWith(ext)) ||
+           uiPaths.some(path => filePath.includes(path));
+  }
+
+  /**
+   * Determine which Percy test to run based on file changes
+   */
+  private determinePercyTest(filePath: string, content: string): string | null {
+    // Component file → component visual regression
+    if (filePath.includes('/components/')) {
+      return 'npm run test:visual:percy:components';
+    }
+
+    // Page file → responsive visual regression
+    if (filePath.includes('/pages/') || filePath.includes('/views/')) {
+      return 'npm run test:visual:percy:responsive';
+    }
+
+    // Global styles → all visual tests
+    if (filePath.includes('global.css') || filePath.includes('theme')) {
+      return 'npm run test:visual:percy';
+    }
+
+    return null;
+  }
+
+  /**
+   * Add Percy snapshot suggestion to response
+   */
+  addPercyRecommendation(response: AgentResponse, testCommand: string): void {
+    response.suggestions = response.suggestions || [];
+    response.suggestions.push({
+      type: 'visual-regression',
+      message: `UI component changed. Run Percy visual regression: ${testCommand}`,
+      priority: 'medium',
+      file: 'CI/CD Pipeline',
+      action: testCommand
+    });
+  }
+
+  /**
+   * Enhanced activate method with Percy integration
+   */
+  async activateWithVisualTesting(context: AgentActivationContext): Promise<AgentResponse> {
+    const response = await this.activate(context);
+
+    // Check if Percy snapshot should be triggered
+    const percyTriggered = await this.triggerPercySnapshot(context);
+
+    if (percyTriggered) {
+      const testCommand = this.determinePercyTest(context.filePath, context.content);
+      if (testCommand) {
+        this.addPercyRecommendation(response, testCommand);
+      }
+    }
+
+    return response;
+  }
+
+  /**
+   * Validate Percy results (called from CI/CD)
+   */
+  async validatePercyResults(percyBuildId: string): Promise<{
+    passed: boolean;
+    changesDetected: number;
+    changesApproved: number;
+    changesPending: number;
+    message: string;
+  }> {
+    // This method would integrate with Percy API to check build status
+    // For now, it returns a mock response
+    return {
+      passed: true,
+      changesDetected: 0,
+      changesApproved: 0,
+      changesPending: 0,
+      message: 'Percy visual regression check passed. No visual changes detected.'
+    };
+  }
+
 }

@@ -1,7 +1,7 @@
 {
   "name": "versatil-opera-framework",
   "version": "6.4.0",
-  "description": "Enterprise SDLC Framework with 17 agents (7 core + 10 language-specific), 6 workflow commands, and 11 MCP integrations for production-grade software development",
+  "description": "Enterprise SDLC Framework with 18 agents (8 core + 10 language-specific), 6 workflow commands, and 11 MCP integrations for production-grade software development",
   "author": "Nissim Menashe <nissim@versatil.vc>",
   "homepage": "https://github.com/Nissimmiracles/versatil-sdlc-framework",
   "repository": "github:Nissimmiracles/versatil-sdlc-framework",
@@ -156,7 +156,7 @@
     "claude-code": ">=1.0.0"
   },
   "features": [
-    "17 specialized agents: 7 core OPERA + 10 language-specific sub-agents",
+    "18 specialized agents: 8 core OPERA + 10 language-specific sub-agents",
     "Backend sub-agents: Node.js, Python (FastAPI/Django), Rails, Go, Java (Spring Boot)",
     "Frontend sub-agents: React, Vue, Next.js, Angular, Svelte",
     "6 workflow commands: plan, review, work, resolve, triage, generate",

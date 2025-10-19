@@ -24,7 +24,7 @@
 **New Content**:
 - Full explanation of roadmap generation process
 - Project analysis examples
-- Agent recommendation examples (17 agents)
+- Agent recommendation examples (18 agents)
 - 4-week roadmap structure example
 - Technology detection logic (React, Vue, Python, Node.js, Go, Rails, etc.)
 - Benefits of auto-generated roadmaps
@@ -36,8 +36,8 @@
 - ✅ Updated version from v1.0.0 to v6.4.0
 - ✅ Added v6.4.0 feature highlights
 - ✅ Added "Step 4: Review Your Roadmap" section
-- ✅ Expanded "Agent Configuration" from 6 to 17 agents
-  - Added 7 core agents
+- ✅ Expanded "Agent Configuration" from 6 to 18 agents
+  - Added 8 core agents
   - Added 5 frontend sub-agents
   - Added 5 backend sub-agents
 - ✅ Added "Smart Matching" explanation
@@ -45,7 +45,7 @@
 
 **New Content**:
 - Roadmap review instructions for Cursor chat
-- Complete agent breakdown (17 agents)
+- Complete agent breakdown (18 agents)
 - Technology-based agent recommendations
 
 ---
@@ -88,7 +88,7 @@ your-project/
 └── .versatil-project.json    ← Project config
 ```
 
-### 2. Smart Agent Matching (17 Agents)
+### 2. Smart Agent Matching (18 agents)
 
 **Core Agents** (7):
 - Maria-QA, James-Frontend, Marcus-Backend, Sarah-PM, Alex-BA, Dr.AI-ML, Oliver-DevOps
@@ -191,7 +191,7 @@ versatil cursor:init
 
 4. **[README.md](../README.md)** (Updated in v6.4.0 release)
    - Quick start with roadmap
-   - 17 agents overview
+   - 18 agents overview
    - Installation examples
 
 ---
@@ -339,7 +339,7 @@ versatil roadmap --status
 
 ### Core Documentation
 - [Installation Guide](getting-started/installation.md) - Updated for v6.4.0
-- [Agent Reference](../.claude/AGENTS.md) - All 17 agents
+- [Agent Reference](../.claude/AGENTS.md) - All 18 agents
 - [5-Rule System](../.claude/rules/README.md) - Automation rules
 - [CLAUDE.md](../CLAUDE.md) - OPERA methodology
 

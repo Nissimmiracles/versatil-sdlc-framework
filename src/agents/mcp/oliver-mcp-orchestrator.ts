@@ -5,36 +5,55 @@
  *
  * Responsibilities:
  * 1. Classify MCPs as Integration, Documentation, or Hybrid
- * 2. Select optimal MCP for each task
- * 3. Detect when GitMCP should be used for zero hallucinations
- * 4. Maintain MCP capability registry
- * 5. Optimize MCP routing for all 17 OPERA agents
+ * 2. Select optimal MCP for each task using advanced selection engine
+ * 3. Detect when GitMCP should be used for zero hallucinations (Claude cutoff: Jan 2025)
+ * 4. Generate precise GitMCP queries (framework + topic → repo + path)
+ * 5. Maintain MCP capability registry
+ * 6. Optimize MCP routing for all 8 OPERA agents
+ *
+ * Architecture:
+ * - MCP Selection Engine: Task type → optimal MCP with confidence scoring
+ * - Anti-Hallucination Detector: Knowledge freshness checking (Jan 2025 cutoff)
+ * - GitMCP Query Generator: Framework + topic → GitHub repo + docs path
+ * - Main Orchestrator: Integrates all components, routes tasks to MCPs
  *
  * Usage:
  * ```typescript
  * const oliver = new OliverMCPAgent(logger);
  * await oliver.activate(context);
  *
- * // Intelligent MCP selection
- * const recommendation = await oliver.selectMCPForTask({
- *   type: 'research',
- *   description: 'Find FastAPI OAuth patterns',
- *   agentId: 'marcus-backend'
+ * // Intelligent MCP selection (uses advanced selection engine)
+ * const recommendation = await oliver.routeTask({
+ *   name: 'research-fastapi-oauth',
+ *   description: 'Find FastAPI OAuth2 patterns',
+ *   agentId: 'marcus-backend',
+ *   type: 'research'
  * });
- * // → Recommends: GitMCP("tiangolo/fastapi")
+ * // → {
+ * //     recommendedMCP: 'gitmcp',
+ * //     confidence: 95,
+ * //     reasoning: 'High hallucination risk (Jan 2025 cutoff). GitMCP provides real-time FastAPI docs.',
+ * //     execution: { repository: 'tiangolo/fastapi', path: 'docs/tutorial/security/oauth2-jwt' }
+ * //   }
  *
- * // Anti-hallucination detection
- * const antiHallucination = await oliver.shouldUseGitMCP({
- *   framework: 'FastAPI',
- *   topic: 'OAuth2',
- *   agentKnowledge: new Date('2024-01-01')
- * });
- * // → Recommends: Query gitmcp.io/tiangolo/fastapi for latest docs
+ * // Anti-hallucination detection (with 30+ framework knowledge base)
+ * const antiHallucination = await oliver.detectHallucinationRisk(
+ *   'How do I implement OAuth2 in FastAPI?'
+ * );
+ * // → {
+ * //     level: 'high',
+ * //     score: 85,
+ * //     reasoning: 'Framework: FastAPI (high release frequency, Jan 2025 cutoff)',
+ * //     recommendation: { action: 'use-gitmcp', repository: 'tiangolo/fastapi', ... }
+ * //   }
  * ```
  */
 
 import { BaseAgent, AgentResponse, AgentActivationContext } from '../core/base-agent.js';
 import { VERSATILLogger } from '../../utils/logger.js';
+import { MCPSelectionEngine, MCPSelectionResult } from './mcp-selection-engine.js';
+import { AntiHallucinationDetector, HallucinationRisk } from './anti-hallucination-detector.js';
+import { GitMCPQueryGenerator, GitMCPQuery, QueryContext } from './gitmcp-query-generator.js';
 
 // ============================================================================
 // Types & Interfaces
@@ -83,6 +102,43 @@ export interface GitMCPRecommendation {
   reasoning: string;
   confidence: number;
   hallucination_risk: 'low' | 'medium' | 'high';
+}
+
+/**
+ * Main routing request interface (uses advanced selection engine)
+ */
+export interface MCPRoutingRequest {
+  name: string;               // Task identifier
+  description: string;        // Natural language description
+  agentId?: string;          // Requesting agent (optional)
+  type?: string;             // Task type hint (optional)
+  filePatterns?: string[];   // Files involved (optional)
+  keywords?: string[];       // Extracted keywords (optional)
+}
+
+/**
+ * Complete routing result with execution plan
+ */
+export interface MCPRoutingResult {
+  recommendedMCP: string;     // Primary MCP to use
+  confidence: number;         // 0-100 confidence score
+  reasoning: string;          // Why this MCP was selected
+  alternatives: string[];     // Alternative MCPs (fallback options)
+
+  hallucinationRisk?: HallucinationRisk;  // If GitMCP recommended
+  gitMCPQuery?: GitMCPQuery;              // GitMCP query details
+
+  execution: {
+    mcpName: string;
+    parameters: Record<string, any>;
+    expectedDuration?: string;  // e.g., "30 seconds"
+  };
+
+  metadata: {
+    selectionEngine: MCPSelectionResult;
+    timestamp: string;
+    agentId?: string;
+  };
 }
 
 // ============================================================================
@@ -229,9 +285,23 @@ export class OliverMCPAgent extends BaseAgent {
   private mcpRegistry: Map<string, MCPDefinition> = new Map();
   private usageStats: Map<string, number> = new Map();
 
+  // Advanced components (Gap Analysis Task 1.1)
+  private selectionEngine: MCPSelectionEngine;
+  private hallucinationDetector: AntiHallucinationDetector;
+  private queryGenerator: GitMCPQueryGenerator;
+
   constructor(private logger: VERSATILLogger) {
     super();
     this.initializeRegistry();
+
+    // Initialize advanced components
+    this.selectionEngine = new MCPSelectionEngine();
+    this.hallucinationDetector = new AntiHallucinationDetector();
+    this.queryGenerator = new GitMCPQueryGenerator();
+
+    this.logger.info('Oliver-MCP advanced components initialized', {
+      components: ['MCPSelectionEngine', 'AntiHallucinationDetector', 'GitMCPQueryGenerator']
+    }, 'OliverMCP');
   }
 
   /**
@@ -288,11 +358,213 @@ export class OliverMCPAgent extends BaseAgent {
   }
 
   // ============================================================================
-  // Core Intelligence Methods
+  // Core Intelligence Methods (Advanced Integration - Gap Analysis Task 1.1)
   // ============================================================================
 
   /**
-   * Select optimal MCP for a given task
+   * MAIN ROUTING METHOD: Route task to optimal MCP with anti-hallucination logic
+   *
+   * This is the primary entry point that integrates:
+   * 1. MCP Selection Engine (task → optimal MCP)
+   * 2. Anti-Hallucination Detector (knowledge freshness check)
+   * 3. GitMCP Query Generator (framework + topic → repo + path)
+   *
+   * @param request - Task routing request
+   * @returns Complete routing result with execution plan
+   */
+  async routeTask(request: MCPRoutingRequest): Promise<MCPRoutingResult> {
+    this.logger.info('🔨 Routing task to optimal MCP', {
+      task: request.name,
+      description: request.description
+    }, 'OliverMCP');
+
+    // STEP 1: Detect hallucination risk in the query
+    const hallucinationRisk = await this.hallucinationDetector.detectHallucinationRisk(
+      `${request.name} ${request.description}`
+    );
+
+    this.logger.info('📊 Hallucination risk detected', {
+      level: hallucinationRisk.level,
+      score: hallucinationRisk.score,
+      reasoning: hallucinationRisk.reasoning
+    }, 'OliverMCP');
+
+    // STEP 2: Select optimal MCP based on task type
+    const mcpSelection = await this.selectionEngine.selectMCP({
+      id: `task-${Date.now()}`,
+      name: request.name,
+      description: request.description,
+      files: request.filePatterns || [],
+      keywords: request.keywords || []
+    });
+
+    this.logger.info('🎯 MCP selected by engine', {
+      primary: mcpSelection.primary.mcpName,
+      confidence: mcpSelection.primary.confidence,
+      reasoning: mcpSelection.primary.reasoning
+    }, 'OliverMCP');
+
+    // STEP 3: Override with GitMCP if high hallucination risk
+    let finalRecommendation = mcpSelection.primary.mcpName;
+    let gitMCPQuery: GitMCPQuery | undefined;
+
+    if (hallucinationRisk.level === 'high' &&
+        hallucinationRisk.recommendation?.action === 'use-gitmcp') {
+
+      finalRecommendation = 'gitmcp';
+
+      // Extract framework and topic from recommendation (gitMCPQuery is the string URL)
+      // Parse it to extract framework information
+      const frameworks = ['FastAPI', 'React', 'Django', 'NextJS', 'Vue', 'Angular'];
+      const detectedFramework = frameworks.find(fw =>
+        request.description.toLowerCase().includes(fw.toLowerCase())
+      ) || 'unknown';
+
+      const topicKeywords = request.keywords?.filter(k =>
+        !frameworks.some(fw => fw.toLowerCase() === k.toLowerCase())
+      ) || [];
+      const detectedTopic = topicKeywords.join(' ') || 'documentation';
+
+      gitMCPQuery = await this.queryGenerator.generateQuery({
+        framework: detectedFramework,
+        topic: detectedTopic,
+        keywords: request.keywords || [],
+        intent: 'learn' // Default to learning intent for research tasks
+      });
+
+      this.logger.info('⚠️  Overriding with GitMCP due to high hallucination risk', {
+        framework: detectedFramework,
+        topic: detectedTopic,
+        repository: gitMCPQuery.repository,
+        path: gitMCPQuery.path,
+        confidence: gitMCPQuery.confidence
+      }, 'OliverMCP');
+    }
+
+    // STEP 4: Build execution plan
+    const execution = this.buildExecutionPlan(finalRecommendation, request, gitMCPQuery);
+
+    // Track usage
+    this.trackMCPUsage(finalRecommendation);
+
+    // STEP 5: Return comprehensive routing result
+    const result: MCPRoutingResult = {
+      recommendedMCP: finalRecommendation,
+      confidence: gitMCPQuery ? gitMCPQuery.confidence : mcpSelection.primary.confidence,
+      reasoning: gitMCPQuery
+        ? `${hallucinationRisk.reasoning}. ${gitMCPQuery.reasoning}`
+        : mcpSelection.primary.reasoning,
+      alternatives: mcpSelection.alternatives.map(a => a.mcpName),
+
+      hallucinationRisk: hallucinationRisk.level !== 'low' ? hallucinationRisk : undefined,
+      gitMCPQuery,
+
+      execution,
+
+      metadata: {
+        selectionEngine: mcpSelection,
+        timestamp: new Date().toISOString(),
+        agentId: request.agentId
+      }
+    };
+
+    this.logger.info('✅ Task routing complete', {
+      recommendedMCP: result.recommendedMCP,
+      confidence: result.confidence,
+      hasGitMCPQuery: !!gitMCPQuery
+    }, 'OliverMCP');
+
+    return result;
+  }
+
+  /**
+   * Build execution plan for selected MCP
+   */
+  private buildExecutionPlan(
+    mcpName: string,
+    request: MCPRoutingRequest,
+    gitMCPQuery?: GitMCPQuery
+  ): MCPRoutingResult['execution'] {
+    const parameters: Record<string, any> = {};
+
+    // Build MCP-specific parameters
+    switch (mcpName) {
+      case 'gitmcp':
+        if (gitMCPQuery) {
+          parameters.repository = gitMCPQuery.repository;
+          parameters.path = gitMCPQuery.path;
+          parameters.fileType = gitMCPQuery.fileType;
+          parameters.query = this.queryGenerator.formatAsURL(gitMCPQuery);
+        }
+        break;
+
+      case 'playwright':
+        parameters.browserType = 'chromium';
+        parameters.headless = true;
+        break;
+
+      case 'github':
+        // Extract repo from description if present
+        const repoMatch = request.description.match(/([a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+)/);
+        if (repoMatch) {
+          parameters.repository = repoMatch[1];
+        }
+        break;
+
+      case 'exa':
+        parameters.query = request.description;
+        parameters.numResults = 10;
+        break;
+
+      // Add more MCP-specific parameters as needed
+    }
+
+    return {
+      mcpName,
+      parameters,
+      expectedDuration: this.estimateDuration(mcpName)
+    };
+  }
+
+  /**
+   * Estimate execution duration for MCP
+   */
+  private estimateDuration(mcpName: string): string {
+    const durations: Record<string, string> = {
+      'gitmcp': '5-10 seconds',
+      'exa': '10-15 seconds',
+      'playwright': '30-60 seconds',
+      'github': '5-10 seconds',
+      'vertex-ai': '60-120 seconds',
+      'supabase': '1-5 seconds',
+      'semgrep': '30-90 seconds',
+      'sentry': '5-10 seconds'
+    };
+
+    return durations[mcpName] || '10-30 seconds';
+  }
+
+  /**
+   * Wrapper for anti-hallucination detection (public API)
+   */
+  async detectHallucinationRisk(query: string): Promise<HallucinationRisk> {
+    return this.hallucinationDetector.detectHallucinationRisk(query);
+  }
+
+  /**
+   * Wrapper for GitMCP query generation (public API)
+   */
+  async generateGitMCPQuery(context: QueryContext): Promise<GitMCPQuery> {
+    return this.queryGenerator.generateQuery(context);
+  }
+
+  // ============================================================================
+  // Legacy Methods (Maintained for Backwards Compatibility)
+  // ============================================================================
+
+  /**
+   * @deprecated Use routeTask() instead for advanced routing with anti-hallucination
+   * Select optimal MCP for a given task (legacy method)
    */
   async selectMCPForTask(task: TaskContext): Promise<MCPRecommendation> {
     this.logger.info('Selecting MCP for task', { task }, 'OliverMCP');
@@ -551,3 +823,175 @@ export class OliverMCPAgent extends BaseAgent {
     return suggestions;
   }
 }
+
+// ============================================================================
+// Singleton Export for Framework Use
+// ============================================================================
+
+/**
+ * Singleton instance of Oliver-MCP for framework-wide use
+ *
+ * Usage in other agents:
+ * ```typescript
+ * import { oliverMCP } from './agents/mcp/oliver-mcp-orchestrator.js';
+ *
+ * // Route task with anti-hallucination
+ * const routing = await oliverMCP.routeTask({
+ *   name: 'research-fastapi-oauth',
+ *   description: 'Find FastAPI OAuth2 implementation patterns',
+ *   agentId: 'marcus-backend',
+ *   keywords: ['fastapi', 'oauth2', 'authentication']
+ * });
+ *
+ * // Use recommended MCP
+ * if (routing.recommendedMCP === 'gitmcp' && routing.gitMCPQuery) {
+ *   const query = routing.gitMCPQuery;
+ *   // Execute: gitmcp query tiangolo/fastapi docs/tutorial/security/oauth2-jwt
+ * }
+ * ```
+ */
+export const oliverMCP = new OliverMCPAgent(new VERSATILLogger('OliverMCP'));
+
+// ============================================================================
+// Usage Examples
+// ============================================================================
+
+/**
+ * Example 1: Research Task with Anti-Hallucination
+ *
+ * ```typescript
+ * const result = await oliverMCP.routeTask({
+ *   name: 'research-react-server-components',
+ *   description: 'How do React Server Components work?',
+ *   agentId: 'james-frontend',
+ *   keywords: ['react', 'server components', 'rsc']
+ * });
+ *
+ * // Expected Result:
+ * // {
+ * //   recommendedMCP: 'gitmcp',
+ * //   confidence: 90,
+ * //   reasoning: 'High hallucination risk (Jan 2025 cutoff). GitMCP provides real-time React docs.',
+ * //   gitMCPQuery: {
+ * //     repository: 'facebook/react',
+ * //     path: 'docs/server-components.md',
+ * //     confidence: 90
+ * //   },
+ * //   execution: {
+ * //     mcpName: 'gitmcp',
+ * //     parameters: {
+ * //       repository: 'facebook/react',
+ * //       path: 'docs/server-components.md',
+ * //       query: 'gitmcp://facebook/react/docs/server-components.md'
+ * //     }
+ * //   }
+ * // }
+ * ```
+ */
+
+/**
+ * Example 2: Testing Task
+ *
+ * ```typescript
+ * const result = await oliverMCP.routeTask({
+ *   name: 'e2e-test-checkout-flow',
+ *   description: 'Test checkout flow with real browser',
+ *   agentId: 'maria-qa',
+ *   filePatterns: ['checkout.spec.ts'],
+ *   keywords: ['test', 'e2e', 'checkout']
+ * });
+ *
+ * // Expected Result:
+ * // {
+ * //   recommendedMCP: 'playwright',
+ * //   confidence: 95,
+ * //   reasoning: 'Testing tasks with browser automation → Playwright',
+ * //   execution: {
+ * //     mcpName: 'playwright',
+ * //     parameters: {
+ * //       browserType: 'chromium',
+ * //       headless: true
+ * //     },
+ * //     expectedDuration: '30-60 seconds'
+ * //   }
+ * // }
+ * ```
+ */
+
+/**
+ * Example 3: Integration Task
+ *
+ * ```typescript
+ * const result = await oliverMCP.routeTask({
+ *   name: 'create-github-issue',
+ *   description: 'Create GitHub issue for bug report in tiangolo/fastapi',
+ *   agentId: 'sarah-pm',
+ *   keywords: ['github', 'issue', 'bug']
+ * });
+ *
+ * // Expected Result:
+ * // {
+ * //   recommendedMCP: 'github',
+ * //   confidence: 95,
+ * //   reasoning: 'GitHub operations require GitHub MCP integration',
+ * //   execution: {
+ * //     mcpName: 'github',
+ * //     parameters: {
+ * //       repository: 'tiangolo/fastapi'
+ * //     },
+ * //     expectedDuration: '5-10 seconds'
+ * //   }
+ * // }
+ * ```
+ */
+
+/**
+ * Example 4: Direct Anti-Hallucination Check
+ *
+ * ```typescript
+ * const risk = await oliverMCP.detectHallucinationRisk(
+ *   'How do I implement OAuth2 in FastAPI with SQLAlchemy?'
+ * );
+ *
+ * // Expected Result:
+ * // {
+ * //   level: 'high',
+ * //   score: 85,
+ * //   reasoning: 'Detected frameworks: FastAPI (high release frequency, Jan 2025 cutoff)',
+ * //   recommendation: {
+ * //     action: 'use-gitmcp',
+ * //     framework: 'FastAPI',
+ * //     topic: 'OAuth2',
+ * //     confidence: 90,
+ * //     repository: 'tiangolo/fastapi',
+ * //     path: 'docs/tutorial/security/oauth2-jwt'
+ * //   }
+ * // }
+ * ```
+ */
+
+/**
+ * Example 5: Direct GitMCP Query Generation
+ *
+ * ```typescript
+ * const query = await oliverMCP.generateGitMCPQuery({
+ *   framework: 'NextJS',
+ *   topic: 'server components',
+ *   keywords: ['nextjs', 'server', 'components'],
+ *   intent: 'learn'
+ * });
+ *
+ * // Expected Result:
+ * // {
+ * //   repository: 'vercel/next.js',
+ * //   path: 'docs/server-components',
+ * //   fileType: 'docs',
+ * //   confidence: 85,
+ * //   reasoning: 'Framework NextJS identified, topic "server components" mapped to docs path',
+ * //   alternatives: [
+ * //     { repository: 'vercel/next.js', path: 'README.md', ... },
+ * //     { repository: 'vercel/next.js', path: 'examples', ... }
+ * //   ]
+ * // }
+ * ```
+ */

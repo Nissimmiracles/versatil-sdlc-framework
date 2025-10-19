@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# VERSATIL Framework - Pre-Commit Coverage Enforcement
+# Ensures 80%+ test coverage before allowing commits
+
+echo "🔍 Running test coverage check..."
+
+# Run tests with coverage
+npm run test:coverage
+
+# Check if tests passed
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed. Commit blocked."
+  exit 1
+fi
+
+# Check coverage threshold
+node scripts/check-coverage-threshold.cjs
+
+# Check threshold result
+if [ $? -ne 0 ]; then
+  echo "❌ Coverage below threshold. Commit blocked."
+  exit 1
+fi
+
+echo "✅ All quality gates passed. Proceeding with commit..."
+exit 0

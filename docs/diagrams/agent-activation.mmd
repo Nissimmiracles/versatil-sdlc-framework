@@ -1,0 +1,52 @@
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#e8f5e9','primaryTextColor':'#1b5e20','primaryBorderColor':'#4caf50','lineColor':'#4caf50','secondaryColor':'#fff3e0','tertiaryColor':'#e3f2fd'}}}%%
+flowchart TD
+    Start(["👤 You edit:<br/><b>src/components/Button.tsx</b>"]) --> Save["💾 File Save Event"]
+
+    Save --> Hook["🪝 Cursor Hook:<br/><b>afterFileEdit</b><br/>⏱️ <50ms"]
+
+    Hook --> Pattern["🔍 Pattern Match:<br/><b>*.tsx</b> detected<br/>⏱️ <500ms"]
+
+    Pattern --> Agent["🤖 Agent Activation:<br/><b>James-Frontend</b><br/>⏱️ <2s"]
+
+    Agent --> Tech{"🔬 Tech Detection"}
+
+    Tech -->|"React patterns"| SubReact["🎨 Sub-Agent:<br/><b>James-React</b>"]
+    Tech -->|"Vue patterns"| SubVue["🎨 Sub-Agent:<br/><b>James-Vue</b>"]
+    Tech -->|"Angular patterns"| SubAngular["🎨 Sub-Agent:<br/><b>James-Angular</b>"]
+
+    SubReact --> RAG["💾 Search RAG:<br/>Similar Button components<br/>⏱️ <800ms"]
+    SubVue --> RAG
+    SubAngular --> RAG
+
+    RAG --> Checks["✅ Quality Checks"]
+
+    Checks --> C1["🔍 Accessibility<br/>(WCAG 2.1 AA)"]
+    Checks --> C2["📱 Responsive Design<br/>(Mobile, Tablet, Desktop)"]
+    Checks --> C3["⚡ Performance<br/>(Bundle size, rendering)"]
+
+    C1 --> Status["📊 Update Statusline:<br/><b>🤖 James-React: Button validation</b><br/>⏱️ <100ms"]
+    C2 --> Status
+    C3 --> Status
+
+    Status --> Result
+
+    Result{{"🎯 Result"}}
+
+    Result -->|"All checks pass"| Pass["✅ <b>92% accessible</b><br/>✅ <b>Responsive</b><br/>✅ <b>Optimized</b><br/><br/>Total: <2 seconds"]
+    Result -->|"Issues found"| Warn["⚠️ <b>Missing aria-label</b><br/>⚠️ <b>No mobile breakpoint</b><br/><br/>Inline suggestions provided<br/>Total: <2 seconds"]
+
+    classDef user fill:#e0e0e0,stroke:#616161,stroke-width:2px
+    classDef hook fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    classDef agent fill:#e8f5e9,stroke:#4caf50,stroke-width:3px
+    classDef subagent fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
+    classDef check fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    classDef success fill:#c8e6c9,stroke:#2e7d32,stroke-width:3px
+    classDef warning fill:#fff9c4,stroke:#f57f17,stroke-width:3px
+
+    class Start,Save user
+    class Hook,Pattern hook
+    class Agent,Tech agent
+    class SubReact,SubVue,SubAngular subagent
+    class RAG,Checks,C1,C2,C3,Status check
+    class Pass success
+    class Warn warning

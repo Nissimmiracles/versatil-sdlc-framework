@@ -1,0 +1,50 @@
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#e8f5e9','primaryTextColor':'#1b5e20','primaryBorderColor':'#4caf50','lineColor':'#4caf50','secondaryColor':'#fff3e0','tertiaryColor':'#e3f2fd'}}}%%
+graph LR
+    User["👤 User Request:<br/>'Add user authentication'"] --> Step1
+
+    Step1["<b>STEP 1: PLAN</b><br/>📋 Alex-BA<br/>━━━━━━━━<br/>• Extract requirements<br/>• Search RAG for similar features<br/>• Define API contract<br/>• Load auth-system template<br/>⏱️ 30 minutes"]
+
+    Step2["<b>STEP 2: ASSESS</b><br/>✅ Sarah-PM<br/>━━━━━━━━<br/>• Framework health ≥ 80%<br/>• Git status clean<br/>• Dependencies installed<br/>• Database connected<br/>⏱️ 5 minutes"]
+
+    Step3["<b>STEP 3: WORK</b><br/>🚀 Three-Tier Parallel<br/>━━━━━━━━"]
+
+    subgraph Parallel["Parallel Execution (60 min max)"]
+        Dana["🗄️ <b>Dana-Database</b><br/>• Users table<br/>• Sessions table<br/>• RLS policies<br/>⏱️ 45 min"]
+        Marcus["⚙️ <b>Marcus-Backend</b><br/>• /auth/signup<br/>• /auth/login<br/>• JWT tokens<br/>⏱️ 60 min"]
+        James["🎨 <b>James-Frontend</b><br/>• LoginForm<br/>• AuthProvider<br/>• Validation<br/>⏱️ 50 min"]
+    end
+
+    Step4["<b>STEP 4: CODIFY</b><br/>💾 RAG Update<br/>━━━━━━━━<br/>• Extract auth patterns<br/>• Store JWT examples<br/>• Update effort estimates<br/>• Document lessons<br/>⏱️ 10 minutes"]
+
+    Quality["🧪 <b>Maria-QA</b><br/>━━━━━━━━<br/>• Unit tests<br/>• Integration tests<br/>• Security scan<br/>• 80%+ coverage<br/>⏱️ 20 minutes"]
+
+    Result[["✅ <b>Feature Complete</b><br/>Total: 125 minutes<br/>(vs 220 sequential)<br/>━━━━━━━━<br/>Next similar feature:<br/><b>40% faster!</b>"]]
+
+    Step1 --> Step2
+    Step2 --> Step3
+    Step3 --> Dana
+    Step3 --> Marcus
+    Step3 --> James
+    Dana --> Quality
+    Marcus --> Quality
+    James --> Quality
+    Quality --> Step4
+    Step4 --> Result
+
+    classDef user fill:#e0e0e0,stroke:#616161,stroke-width:2px,color:#000
+    classDef plan fill:#e3f2fd,stroke:#2196f3,stroke-width:3px,color:#000
+    classDef assess fill:#fff3e0,stroke:#ff9800,stroke-width:3px,color:#000
+    classDef work fill:#e8f5e9,stroke:#4caf50,stroke-width:3px,color:#000
+    classDef agent fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000
+    classDef quality fill:#ffccbc,stroke:#ff5722,stroke-width:2px,color:#000
+    classDef codify fill:#fce4ec,stroke:#e91e63,stroke-width:3px,color:#000
+    classDef result fill:#c8e6c9,stroke:#2e7d32,stroke-width:4px,color:#000
+
+    class User user
+    class Step1 plan
+    class Step2 assess
+    class Step3 work
+    class Dana,Marcus,James agent
+    class Quality quality
+    class Step4 codify
+    class Result result

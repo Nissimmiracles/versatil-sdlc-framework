@@ -1,0 +1,213 @@
+# VERSATIL SDLC Framework - Percy Visual Regression Testing Configuration
+# https://www.percy.io/docs/reference/config
+
+version: 2
+
+# Snapshot configuration
+snapshot:
+  # Responsive breakpoints for visual testing
+  widths:
+    - 320   # Mobile (small)
+    - 375   # Mobile (iPhone)
+    - 768   # Tablet
+    - 1024  # Desktop (small)
+    - 1366  # Desktop (medium)
+    - 1920  # Desktop (large)
+
+  # Minimum height for snapshots
+  min-height: 1024
+
+  # Enable JavaScript execution
+  enable-javascript: true
+
+  # Percy-specific CSS to hide dynamic content
+  percy-css: |
+    /* Hide dynamic timestamps */
+    [data-testid="timestamp"],
+    .timestamp,
+    .datetime {
+      visibility: hidden !important;
+    }
+
+    /* Hide animations to prevent flakiness */
+    *, *::before, *::after {
+      animation-delay: 0s !important;
+      animation-duration: 0s !important;
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+    }
+
+    /* Hide video elements */
+    video {
+      visibility: hidden !important;
+    }
+
+    /* Hide loading spinners */
+    .spinner,
+    .loading,
+    [data-testid="loading"] {
+      visibility: hidden !important;
+    }
+
+# Static assets discovery
+static:
+  # Include static assets for accurate rendering
+  include:
+    - "**/*.css"
+    - "**/*.js"
+    - "**/*.png"
+    - "**/*.jpg"
+    - "**/*.jpeg"
+    - "**/*.gif"
+    - "**/*.svg"
+    - "**/*.woff"
+    - "**/*.woff2"
+
+  # Exclude unnecessary files
+  exclude:
+    - "**/node_modules/**"
+    - "**/test-results/**"
+    - "**/dist/**"
+    - "**/.git/**"
+    - "**/coverage/**"
+
+# Discovery configuration
+discovery:
+  # Network idle timeout (ms)
+  network-idle-timeout: 750
+
+  # Allow list for external resources
+  allowed-hostnames:
+    - "*.googleapis.com"
+    - "*.gstatic.com"
+    - "fonts.googleapis.com"
+    - "fonts.gstatic.com"
+    - "cdnjs.cloudflare.com"
+    - "cdn.jsdelivr.net"
+
+  # Disable cache for consistent snapshots
+  disable-cache: true
+
+# Ignore regions (dynamic content that changes frequently)
+ignore-regions:
+  # Example: Ignore header timestamps
+  - ".header-timestamp"
+  - "[data-percy-ignore]"
+
+# Comparison settings
+comparison:
+  # Threshold for visual differences (0.0 - 1.0)
+  # 0.0 = exact match, 1.0 = any difference accepted
+  threshold: 0.01
+
+  # Enable anti-aliasing comparison
+  anti-aliasing: true
+
+  # Enable color contrast improvements
+  improve-contrast: true
+
+# Browser settings
+browser:
+  # Default browser for snapshots
+  default: chromium
+
+  # Additional browser engines (if needed)
+  # engines:
+  #   - chromium
+  #   - firefox
+  #   - webkit
+
+# Retry configuration
+retry:
+  # Max retries for failed snapshots
+  max-retries: 2
+
+  # Retry delay (ms)
+  retry-delay: 1000
+
+# Debugging
+debug:
+  # Enable debug mode (set via PERCY_DEBUG env var)
+  enabled: false
+
+  # Log level: debug, info, warn, error
+  log-level: info
+
+# CI/CD configuration
+ci:
+  # Parallel execution configuration
+  parallel:
+    # Enable parallel test execution
+    enabled: true
+
+    # Total number of parallel nodes
+    total: -1  # Auto-detect from CI environment
+
+  # Build timeout (minutes)
+  timeout: 30
+
+  # Branch configuration
+  branch:
+    # Patterns for branches to capture snapshots
+    patterns:
+      - main
+      - master
+      - develop
+      - "feature/**"
+      - "fix/**"
+      - "release/**"
+
+  # Pull request configuration
+  pull-request:
+    # Auto-approve minor changes
+    auto-approve-threshold: 0.0
+
+# Snapshot naming
+naming:
+  # Include browser in snapshot name
+  include-browser: true
+
+  # Include width in snapshot name
+  include-width: true
+
+  # Custom suffix (optional)
+  # suffix: "-maria-qa"
+
+# Performance optimization
+performance:
+  # Lazy load images
+  lazy-load: true
+
+  # Max concurrent requests
+  max-concurrent: 5
+
+  # Request timeout (ms)
+  request-timeout: 30000
+
+# Accessibility integration
+accessibility:
+  # Enable accessibility checks with Percy snapshots
+  enabled: true
+
+  # WCAG compliance level (A, AA, AAA)
+  level: AA
+
+  # Include accessibility violations in reports
+  include-violations: true
+
+# Example usage patterns:
+# 1. Run Percy with Playwright: npx percy exec -- npx playwright test
+# 2. Run specific test: npx percy exec -- npx playwright test tests/visual/
+# 3. Run with debug: PERCY_DEBUG=1 npx percy exec -- npx playwright test
+# 4. Dry run (no snapshots): npx percy exec --dry-run -- npx playwright test
+
+# Environment variables required:
+# - PERCY_TOKEN: Percy project token (get from percy.io)
+# - PERCY_BRANCH: Git branch name (auto-detected in CI)
+# - PERCY_PARALLEL_TOTAL: Number of parallel nodes (optional)
+# - PERCY_PARALLEL_NONCE: Unique build ID for parallel runs (optional)
+
+# See also:
+# - Percy documentation: https://www.percy.io/docs
+# - Playwright integration: https://www.percy.io/docs/end-to-end/playwright
+# - CI/CD setup: https://www.percy.io/docs/continuous-integration

@@ -11,7 +11,7 @@
 1. [System Architecture Overview](#system-architecture-overview)
 2. [Automatic vs Manual Features](#automatic-vs-manual-features)
 3. [Claude vs Cursor vs VERSATIL Integration](#claude-vs-cursor-vs-versatil-integration)
-4. [EVERY Workflow (Compounding Engineering)](#every-workflow-compounding-engineering)
+4. [VELOCITY Workflow (Compounding Engineering)](#every-workflow-compounding-engineering)
 5. [Agent Activation Flow](#agent-activation-flow)
 6. [Real-Time Data Flow](#real-time-data-flow)
 7. [Three-Tier Parallel Architecture](#three-tier-parallel-architecture)
@@ -296,7 +296,7 @@ graph TB
     subgraph "Integration Points"
         I1[Hooks → Proactive Orchestrator]
         I2[Commands → OPERA Agents]
-        I3[Plan Mode → EVERY Workflow]
+        I3[Plan Mode → VELOCITY Workflow]
         I4[Claude Memory + RAG]
         I5[MCP Protocol → 11 Services]
         I6[Agent SDK → Sub-Agents]
@@ -373,7 +373,7 @@ graph TB
 
 ---
 
-## EVERY Workflow (Compounding Engineering)
+## VELOCITY Workflow (Compounding Engineering)
 
 ```mermaid
 graph TD
@@ -483,7 +483,7 @@ graph TD
     class Phase5,P5_1,P5_2,P5_3,P5_4,P5_RAG,P5_Out,Compound codify
 ```
 
-### EVERY Workflow Automation Points
+### VELOCITY Workflow Automation Points
 
 | Phase | Command | Automatic Components | Manual Components |
 |-------|---------|---------------------|-------------------|
@@ -999,7 +999,7 @@ This visual architecture document provides:
 1. ✅ **System Architecture Overview** - Complete component diagram with layers
 2. ✅ **Automatic vs Manual Features** - 30+ features categorized with visual legend
 3. ✅ **Claude vs Cursor vs VERSATIL** - Integration ownership matrix with 25+ components
-4. ✅ **EVERY Workflow** - Complete 5-phase compounding engineering flow
+4. ✅ **VELOCITY Workflow** - Complete 5-phase compounding engineering flow
 5. ✅ **Agent Activation Flow** - File pattern → agent → sub-agent → quality gates
 6. ✅ **Real-Time Data Flow** - Sequence diagram with performance metrics
 7. ✅ **Three-Tier Parallel** - Time savings visualization (43% faster)

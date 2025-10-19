@@ -4,7 +4,7 @@ Complete installation and setup guide for the VERSATIL SDLC Framework v6.4.0.
 
 **NEW in v6.4.0**:
 - 📍 **Automatic Roadmap Generation** - Get a personalized 4-week development plan
-- 🤖 **17 OPERA Agents** - 7 core + 10 language-specific sub-agents
+- 🤖 **18 OPERA agents** - 8 core + 10 language-specific sub-agents
 - 🎯 **Smart Agent Matching** - Automatically recommends agents for your tech stack
 
 ## 🎯 Prerequisites

@@ -1,0 +1,24 @@
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ffccbc','primaryTextColor':'#8b0000','primaryBorderColor':'#ff5722','lineColor':'#4caf50','secondaryColor':'#c8e6c9','tertiaryColor':'#e8f5e9'}}}%%
+gantt
+    title Time Savings: Sequential vs Parallel Three-Tier Development
+    dateFormat  HH:mm
+    axisFormat %H:%M
+
+    section Without VERSATIL (Sequential)
+    Alex-BA: Requirements Analysis            :done, s1, 00:00, 30m
+    Dana-Database: Schema Design              :done, s2, 00:30, 45m
+    Marcus-Backend: API Implementation        :done, s3, 01:15, 60m
+    James-Frontend: UI Development            :done, s4, 02:15, 50m
+    Integration Phase                         :done, s5, 03:05, 15m
+    Maria-QA: Testing & Validation            :done, s6, 03:20, 20m
+
+    section With VERSATIL (Parallel)
+    Alex-BA: Requirements Analysis            :done, p1, 00:00, 30m
+    Dana-Database: Schema (Parallel)          :done, p2, 00:30, 45m
+    Marcus-Backend: API (Parallel with Dana)  :done, p3, 00:30, 60m
+    James-Frontend: UI (Parallel with Dana)   :done, p4, 00:30, 50m
+    Integration: Connect Layers               :done, p5, 01:30, 15m
+    Maria-QA: Final Validation                :done, p6, 01:45, 20m
+
+    section Time Saved
+    95 Minutes Saved (43% Faster)             :milestone, m1, 02:05, 0m

@@ -279,7 +279,7 @@ versatil_get_agent_docs({ agentId: "marcus-python" })
   "success": true,
   "workflows": [
     {
-      "title": "EVERY Workflow - Compounding Engineering",
+      "title": "VELOCITY Workflow - Compounding Engineering",
       "path": "workflows/every-workflow.md",
       "keywords": ["plan", "assess", "delegate", "work", "codify"]
     },
@@ -298,7 +298,7 @@ versatil_get_agent_docs({ agentId: "marcus-python" })
 // Get Three-Tier workflow guide
 versatil_get_workflow_guide({ workflowType: "three-tier" })
 
-// Get EVERY workflow guide
+// Get VELOCITY workflow guide
 versatil_get_workflow_guide({ workflowType: "every" })
 
 // List all workflows

@@ -8,7 +8,7 @@
 
 ## 🎯 Executive Summary
 
-VERSATIL OPERA v6.4.0 delivers **10 language-specific sub-agents** organized under core OPERA agents Marcus-Backend and James-Frontend. This release **143% increases agent count** (7 → 17 agents) while maintaining the hierarchical architecture that differentiates VERSATIL from flat-list competitors.
+VERSATIL OPERA v6.4.0 delivers **10 language-specific sub-agents** organized under core OPERA agents Marcus-Backend and James-Frontend. This release **143% increases agent count** (7 → 18 agents) while maintaining the hierarchical architecture that differentiates VERSATIL from flat-list competitors.
 
 **Key Achievement**: First phased rollout milestone complete - 10 high-impact language specialists shipped in Week 1.
 
@@ -18,7 +18,7 @@ VERSATIL OPERA v6.4.0 delivers **10 language-specific sub-agents** organized und
 
 ### Agent Count Expansion
 - **Before (v6.3.0)**: 7 agents (6 OPERA + Feedback-Codifier)
-- **After (v6.4.0)**: 17 agents (7 core + 10 sub-agents)
+- **After (v6.4.0)**: 18 agents (8 core + 10 sub-agents)
 - **Growth**: +143% (10 new agents)
 
 ### Content Volume
@@ -28,8 +28,8 @@ VERSATIL OPERA v6.4.0 delivers **10 language-specific sub-agents** organized und
 
 ### Competitive Position
 - **Seth Hobson**: 84 agents (flat list, no specialization hierarchy)
-- **VERSATIL v6.4.0**: 17 agents (hierarchical, organized by domain)
-- **Gap Closed**: From 7 → 17 agents (77-agent gap reduced to 67)
+- **VERSATIL v6.4.0**: 18 agents (hierarchical, organized by domain)
+- **Gap Closed**: From 7 → 18 agents (77-agent gap reduced to 67)
 
 ---
 
@@ -234,7 +234,7 @@ Each sub-agent includes:
 ```json
 {
   "version": "6.4.0",
-  "description": "Enterprise SDLC Framework with 17 agents (7 core + 10 language-specific)",
+  "description": "Enterprise SDLC Framework with 18 agents (8 core + 10 language-specific)",
   "components": {
     "agents": [
       ".claude/agents/maria-qa.md",
@@ -257,7 +257,7 @@ Each sub-agent includes:
     ]
   },
   "features": [
-    "17 specialized agents: 7 core OPERA + 10 language-specific sub-agents",
+    "18 specialized agents: 8 core OPERA + 10 language-specific sub-agents",
     "Backend sub-agents: Node.js, Python (FastAPI/Django), Rails, Go, Java (Spring Boot)",
     "Frontend sub-agents: React, Vue, Next.js, Angular, Svelte"
   ]

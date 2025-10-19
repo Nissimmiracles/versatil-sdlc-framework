@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "description": "VERSATIL SDLC Framework - Cursor Hooks Configuration",
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "~/.versatil/hooks/afterFileEdit.sh",
+        "description": "VERSATIL: Format, validate isolation, update RAG, trigger stress tests (Rule 2)",
+        "timeout": 125000
+      }
+    ],
+    "beforeReadFile": [
+      {
+        "command": "~/.versatil/hooks/beforeReadFile.sh",
+        "description": "VERSATIL: Context tracking, access logging, security warnings",
+        "timeout": 5000
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "~/.versatil/hooks/beforeShellExecution.sh",
+        "description": "VERSATIL: Security checks, audit logging, prevent destructive operations",
+        "timeout": 5000
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": "~/.versatil/hooks/beforeSubmitPrompt.sh",
+        "description": "VERSATIL: Agent activation suggestions, context enrichment",
+        "timeout": 5000
+      }
+    ],
+    "stop": [
+      {
+        "command": "~/.versatil/hooks/stop.sh",
+        "description": "VERSATIL: Session cleanup, learning codification, metrics",
+        "timeout": 30000
+      }
+    ]
+  },
+  "settings": {
+    "enableLogging": true,
+    "logPath": "~/.versatil/logs/hooks.log",
+    "statusPath": "~/.versatil/status/",
+    "maxLogSize": 10485760,
+    "stressTestConfig": {
+      "enabled": true,
+      "blockOnFailure": false,
+      "timeout": 120000,
+      "apiFilePatterns": [
+        "*.api.*",
+        "*/routes/*",
+        "*/controllers/*",
+        "*/api/*"
+      ]
+    }
+  }
+}

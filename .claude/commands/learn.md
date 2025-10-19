@@ -15,7 +15,7 @@ allowed-tools:
 
 ## Introduction
 
-**Codify learnings** from completed features, bugs, or improvements into the RAG system for future use. This implements the "Codify" phase of Every Inc's Compounding Engineering philosophy: each unit of work makes subsequent units easier.
+**Codify learnings** from completed features, bugs, or improvements into the RAG system for future use. This implements the "Codify" phase of VELOCITY workflow's Compounding Engineering approach: each unit of work makes subsequent units easier.
 
 **Philosophy**: "Make the next feature 40% faster by learning from this one."
 

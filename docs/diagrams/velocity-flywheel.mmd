@@ -1,0 +1,45 @@
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#e8f5e9','primaryTextColor':'#1b5e20','primaryBorderColor':'#4caf50','lineColor':'#4caf50','secondaryColor':'#fff3e0','tertiaryColor':'#e3f2fd'}}}%%
+graph TB
+    Start([User Request:<br/>"Add Authentication"]) --> Phase1
+
+    subgraph Flywheel["🔄 VELOCITY Workflow Flywheel (Compounding Engineering)"]
+        direction TB
+
+        Phase1["<b>1. PLAN</b><br/>📋 Research with RAG Memory<br/>Load similar features<br/>Use proven templates"]
+        Phase2["<b>2. ASSESS</b><br/>✅ Validate Readiness<br/>Check dependencies<br/>Verify environment"]
+        Phase3["<b>3. WORK</b><br/>🚀 Execute with Patterns<br/>3-tier parallel<br/>Apply learned best practices"]
+        Phase4["<b>4. CODIFY</b><br/>💾 Store to RAG Memory<br/>Extract patterns<br/>Update estimates"]
+
+        Phase1 --> Phase2
+        Phase2 --> Phase3
+        Phase3 --> Phase4
+        Phase4 -.->|"Next feature<br/>40% faster"| Phase1
+    end
+
+    Phase4 --> Feature1
+
+    subgraph Compounding["⚡ Compounding Effect Over Time"]
+        direction LR
+        Feature1["Feature 1:<br/>Authentication<br/>⏱️ 125 min"]
+        Feature2["Feature 2:<br/>Admin Auth<br/>⏱️ 75 min<br/>🎯 40% faster"]
+        Feature3["Feature 3:<br/>OAuth<br/>⏱️ 65 min<br/>🎯 48% faster"]
+
+        Feature1 -->|"Patterns<br/>stored in RAG"| Feature2
+        Feature2 -->|"More patterns<br/>+ refined estimates"| Feature3
+    end
+
+    Feature3 --> Result[["<b>Continuous Improvement</b><br/>Each feature benefits<br/>from all previous work<br/>✨ Exponential velocity gains"]]
+
+    classDef plan fill:#e3f2fd,stroke:#2196f3,stroke-width:3px,color:#000
+    classDef assess fill:#fff3e0,stroke:#ff9800,stroke-width:3px,color:#000
+    classDef work fill:#e8f5e9,stroke:#4caf50,stroke-width:3px,color:#000
+    classDef codify fill:#fce4ec,stroke:#e91e63,stroke-width:3px,color:#000
+    classDef feature fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,color:#000
+    classDef result fill:#c8e6c9,stroke:#2e7d32,stroke-width:4px,color:#000
+
+    class Phase1 plan
+    class Phase2 assess
+    class Phase3 work
+    class Phase4 codify
+    class Feature1,Feature2,Feature3 feature
+    class Result result

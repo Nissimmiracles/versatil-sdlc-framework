@@ -531,7 +531,7 @@ Research of the Claude Code plugin ecosystem reveals **5 major marketplaces** wi
 ### Immediate Priorities (Week 1-2)
 
 **Priority 1: Close Agent Count Gap**
-- **Target**: Add 35 sub-agents (7 core + 35 sub = 42 total)
+- **Target**: Add 24 additional sub-agents (8 core + 10 existing sub + 24 new sub = 42 total)
 - **Approach**: Language-specific sub-agents under OPERA structure
 - **Rationale**: Must be competitive on agent count to attract users
 

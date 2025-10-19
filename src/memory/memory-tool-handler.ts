@@ -12,8 +12,8 @@
  * Reference: https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool
  */
 
-import fs from 'fs-extra';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import {
   MEMORY_TOOL_CONFIG,
   AGENT_MEMORY_TEMPLATES,

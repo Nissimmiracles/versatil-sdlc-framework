@@ -5,13 +5,15 @@
  * Integrates with ContextSentinel for real-time token tracking
  *
  * Features:
- * - Real-time token usage monitoring
+ * - Real-time token usage monitoring via ContextSentinel
  * - Smart task deferral when approaching limits
  * - Context allocation prediction
  * - Priority-based task scheduling
  *
  * Part of VERSATIL Pulse System (Phase 2: Session Opening Hook)
  */
+
+import { ContextSentinel } from '../agents/monitoring/context-sentinel.js';
 
 export interface ContextBudget {
   available: number;    // Total context window size (e.g., 200000)
@@ -57,6 +59,15 @@ export class ContextBudgetManager {
   private allocations: Map<string, ContextAllocation> = new Map();
   private deferredTasks: Set<string> = new Set();
 
+  // ContextSentinel integration for real-time tracking
+  private contextSentinel: ContextSentinel;
+
+  constructor() {
+    this.contextSentinel = new ContextSentinel();
+    // Start monitoring context in background
+    this.contextSentinel.startMonitoring();
+  }
+
   /**
    * Get current context budget status
    */
@@ -100,9 +111,15 @@ export class ContextBudgetManager {
    * Get current context usage from ContextSentinel
    */
   private async getCurrentContextUsage(): Promise<number> {
-    // Fallback: Use allocated tokens as estimate
-    // TODO: Integrate with ContextSentinel when available
-    return this.getAllocatedTokens();
+    try {
+      // Get real-time usage from ContextSentinel
+      const dashboard = await this.contextSentinel.runContextCheck();
+      return dashboard.usage.totalTokens;
+    } catch (error) {
+      // Fallback: Use allocated tokens as estimate if sentinel unavailable
+      console.warn('[ContextBudgetManager] ContextSentinel unavailable, using allocation estimate');
+      return this.getAllocatedTokens();
+    }
   }
 
   /**
@@ -269,6 +286,14 @@ export class ContextBudgetManager {
   clear(): void {
     this.allocations.clear();
     this.deferredTasks.clear();
+  }
+
+  /**
+   * Stop context monitoring and cleanup resources
+   */
+  destroy(): void {
+    this.contextSentinel.stopMonitoring();
+    this.clear();
   }
 
   /**

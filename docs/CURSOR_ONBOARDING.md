@@ -6,7 +6,7 @@ This guide shows you how to complete the onboarding process **inside Cursor IDE*
 
 **NEW in v6.4.0**:
 - 📍 **Automatic Roadmap Generation** - Get a personalized 4-week development plan
-- 🤖 **17 OPERA Agents** - 7 core + 10 language-specific sub-agents (React, Vue, Node.js, Python, etc.)
+- 🤖 **18 OPERA agents** - 8 core + 10 language-specific sub-agents (React, Vue, Node.js, Python, etc.)
 - 🎯 **Smart Agent Matching** - Automatically recommends agents based on your tech stack
 
 ---
@@ -62,7 +62,7 @@ This roadmap includes:
 - Environment variables setup
 - Project configuration
 
-### 2. Agent Configuration (17 Agents Total)
+### 2. Agent Configuration (18 agents Total)
 
 **Core Agents** (7):
 - **Maria-QA** - Quality assurance and testing

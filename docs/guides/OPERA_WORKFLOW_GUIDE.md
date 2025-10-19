@@ -745,11 +745,11 @@ Time Saved: 95 minutes (41% faster with parallel execution)
 
 ---
 
-### 3. EVERY Workflow (Compounding Engineering)
+### 3. VELOCITY Workflow (Compounding Engineering)
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  EVERY Workflow: Plan → Assess → Delegate → Work → Codify       │
+│  VELOCITY Workflow: Plan → Assess → Delegate → Work → Codify       │
 └──────────────────────────────────────────────────────────────────┘
 
 User: "Implement OAuth authentication"
@@ -1355,7 +1355,7 @@ npm run mcp:health           # MCP health check
 
 - Read: `/help quick-start` for 5-minute guide
 - View: `/help agents` for all 18 agents
-- Learn: `/help workflows` for EVERY workflow
+- Learn: `/help workflows` for VELOCITY workflow
 - Troubleshoot: `/help troubleshooting` for issues
 
 ---

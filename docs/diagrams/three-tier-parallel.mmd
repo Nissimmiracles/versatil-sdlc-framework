@@ -1,0 +1,70 @@
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#e8f5e9','primaryTextColor':'#1b5e20','primaryBorderColor':'#4caf50','lineColor':'#4caf50','secondaryColor':'#fff3e0','tertiaryColor':'#e3f2fd'}}}%%
+sequenceDiagram
+    autonumber
+    participant User
+    participant Alex as 📋 Alex-BA<br/>(Requirements)
+    participant Dana as 🗄️ Dana-Database<br/>(Data Layer)
+    participant Marcus as ⚙️ Marcus-Backend<br/>(API Layer)
+    participant James as 🎨 James-Frontend<br/>(UI Layer)
+    participant Maria as 🧪 Maria-QA<br/>(Quality)
+
+    User->>Alex: "Add user authentication"
+
+    Note over Alex: Phase 1: Requirements (30 min)
+    Alex->>Alex: Extract requirements
+    Alex->>Alex: Define API contract
+    Alex->>Alex: Create acceptance criteria
+
+    Alex->>Dana: User stories + DB requirements
+    Alex->>Marcus: User stories + API contract
+    Alex->>James: User stories + UI requirements
+
+    Note over Dana,James: Phase 2: Parallel Development (60 min max)
+
+    par Dana builds data layer (45 min)
+        Dana->>Dana: Design users table
+        Dana->>Dana: Design sessions table
+        Dana->>Dana: Add RLS policies
+        Dana->>Dana: Create migration scripts
+        Dana->>Dana: Use REAL database
+    and Marcus builds API (60 min)
+        Marcus->>Marcus: Implement /auth/signup
+        Marcus->>Marcus: Implement /auth/login
+        Marcus->>Marcus: Generate JWT tokens
+        Marcus->>Marcus: Use MOCK database (placeholder)
+    and James builds UI (50 min)
+        James->>James: Build LoginForm component
+        James->>James: Build SignupForm component
+        James->>James: Add form validation
+        James->>James: Use MOCK API (placeholder)
+    end
+
+    Note over Dana,James: Phase 3: Integration (15 min)
+
+    Dana->>Marcus: ✅ Database ready
+    Marcus->>Marcus: Replace mock DB with real DB
+    Marcus->>James: ✅ API ready
+    James->>James: Replace mock API with real API
+
+    Note over Marcus,James: Phase 4: Quality Assurance (20 min)
+
+    Marcus->>Maria: API tests needed
+    James->>Maria: UI tests needed
+    Dana->>Maria: DB tests needed
+
+    Maria->>Maria: Run unit tests
+    Maria->>Maria: Run integration tests
+    Maria->>Maria: Run E2E tests
+    Maria->>Maria: Security scan (OWASP)
+    Maria->>Maria: Validate 80%+ coverage
+
+    alt Coverage < 80%
+        Maria->>Marcus: ⚠️ Add missing tests
+        Maria->>James: ⚠️ Add missing tests
+        Marcus->>Maria: Tests added
+        James->>Maria: Tests added
+    end
+
+    Maria->>User: ✅ Feature complete (125 min total)
+
+    Note over User,Maria: Time Saved: 95 minutes (43%)<br/>Sequential would take: 220 minutes<br/>Parallel execution: 125 minutes

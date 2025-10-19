@@ -291,6 +291,31 @@
           "data_quality_check",
           "training_optimization_suggestions"
         ]
+      },
+      "dana-database": {
+        "file_patterns": ["*.sql", "**/migrations/**", "**/prisma/**", "**/supabase/**", "schema.prisma"],
+        "code_patterns": ["CREATE TABLE", "ALTER TABLE", "RLS", "POLICY", "ENABLE ROW LEVEL SECURITY"],
+        "keywords": ["database", "migration", "schema", "rls", "policy", "query", "index"],
+        "auto_run_on_save": true,
+        "background_analysis": true,
+        "proactive_actions": [
+          "schema_validation",
+          "rls_policy_check",
+          "migration_safety_check",
+          "query_optimization_suggestions"
+        ]
+      },
+      "oliver-mcp": {
+        "file_patterns": ["**/mcp/**", "*.mcp.*", "*mcp*.ts", "*mcp*.js", "**/mcp_config.json"],
+        "code_patterns": ["mcpServers", "MCP", "@modelcontextprotocol", "playwright", "supabase"],
+        "keywords": ["mcp", "server", "integration", "playwright", "github", "anti-hallucination"],
+        "auto_run_on_save": false,
+        "background_analysis": false,
+        "proactive_actions": [
+          "mcp_selection_suggestions",
+          "anti_hallucination_detection",
+          "mcp_health_check"
+        ]
       }
     },
 

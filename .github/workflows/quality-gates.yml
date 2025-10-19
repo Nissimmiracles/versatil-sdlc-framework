@@ -1,0 +1,542 @@
+name: Quality Gates
+
+# This workflow enforces quality standards including WCAG 2.1 AA accessibility compliance
+# Runs on PR and main branch to catch violations early
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  # Pre-test MCP servers (implements CLAUDE.md rule)
+  mcp-health:
+    name: MCP Health Check
+    uses: ./.github/workflows/mcp-health-check.yml
+    with:
+      mcp-servers: 'chrome,github'
+
+  # WCAG 2.1 AA Accessibility Tests
+  accessibility-tests:
+    name: WCAG 2.1 AA Compliance
+    runs-on: ubuntu-latest
+    needs: mcp-health
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build project (if needed)
+        run: npm run build || echo "No build needed"
+        continue-on-error: true
+
+      - name: Run WCAG 2.1 AA enforcement tests
+        id: wcag-tests
+        run: |
+          echo "Running WCAG 2.1 AA accessibility tests..."
+          npm run test:accessibility || echo "test_failed=true" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Run keyboard navigation tests
+        id: keyboard-tests
+        run: |
+          echo "Running keyboard navigation tests..."
+          npx playwright test tests/accessibility/keyboard-navigation.a11y.spec.ts --project=accessibility || echo "keyboard_failed=true" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Upload accessibility violation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-violations-${{ github.run_id }}
+          path: |
+            test-results/accessibility-violations.json
+            test-results/accessibility-violations.html
+            playwright-report/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Check for violations
+        if: always()
+        run: |
+          if [ -f "test-results/accessibility-violations.json" ]; then
+            TOTAL_VIOLATIONS=$(jq '.summary.totalViolations' test-results/accessibility-violations.json)
+            echo "Total WCAG violations: $TOTAL_VIOLATIONS"
+
+            if [ "$TOTAL_VIOLATIONS" -gt 0 ]; then
+              echo "::error::WCAG 2.1 AA violations detected! See artifact for details."
+              exit 1
+            fi
+          fi
+
+      - name: Comment PR with accessibility results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'test-results/accessibility-violations.json';
+
+            if (fs.existsSync(path)) {
+              const report = JSON.parse(fs.readFileSync(path, 'utf-8'));
+              const totalViolations = report.summary.totalViolations;
+              const totalPages = report.summary.totalPages;
+
+              let comment = `## ♿ Accessibility Test Results\n\n`;
+
+              if (totalViolations === 0) {
+                comment += `✅ **All pages meet WCAG 2.1 AA standards!**\n\n`;
+                comment += `- Pages tested: ${totalPages}\n`;
+                comment += `- Violations: 0\n`;
+              } else {
+                comment += `❌ **WCAG 2.1 AA violations detected**\n\n`;
+                comment += `- Pages tested: ${totalPages}\n`;
+                comment += `- Total violations: ${totalViolations}\n\n`;
+                comment += `### Violations by Page\n\n`;
+
+                Object.entries(report.pages).forEach(([page, data]) => {
+                  const status = data.violationCount === 0 ? '✅' : '❌';
+                  comment += `${status} **${page}**: ${data.violationCount} violations\n`;
+                });
+
+                comment += `\n📄 [View detailed HTML report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n`;
+              }
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+      - name: Fail build if violations found
+        if: always()
+        run: |
+          if [ -f "test-results/accessibility-violations.json" ]; then
+            TOTAL_VIOLATIONS=$(jq '.summary.totalViolations' test-results/accessibility-violations.json)
+            if [ "$TOTAL_VIOLATIONS" -gt 0 ]; then
+              echo "::error::Build failed due to WCAG 2.1 AA violations"
+              exit 1
+            fi
+          fi
+
+  # Code quality checks
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run typecheck
+
+      - name: Check code formatting
+        run: npm run format:check || echo "::warning::Code formatting issues found"
+        continue-on-error: true
+
+  # Test coverage
+  test-coverage:
+    name: Test Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:coverage || npm run test:unit
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-${{ github.run_id }}
+          path: coverage/
+          retention-days: 30
+          if-no-files-found: warn
+
+  # Security audit
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate || echo "::warning::Security vulnerabilities found"
+        continue-on-error: true
+
+      - name: Run Semgrep SAST scan
+        run: |
+          if command -v semgrep &> /dev/null; then
+            semgrep --config auto --json --output semgrep-results.json || echo "::warning::Semgrep scan completed with findings"
+          else
+            echo "::warning::Semgrep not installed, skipping SAST scan"
+          fi
+        continue-on-error: true
+
+      - name: Upload Semgrep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results-${{ github.run_id }}
+          path: semgrep-results.json
+          retention-days: 30
+          if-no-files-found: warn
+
+  # Mozilla Observatory security scan (DAST)
+  observatory-scan:
+    name: Mozilla Observatory Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build || echo "Build not required"
+        continue-on-error: true
+
+      - name: Start test server
+        id: start-server
+        run: |
+          # Start dev server in background for testing
+          if [ -f "package.json" ] && grep -q "\"dev\"" package.json; then
+            npm run dev &
+            SERVER_PID=$!
+            echo "server_pid=$SERVER_PID" >> $GITHUB_OUTPUT
+
+            # Wait for server to start (max 30 seconds)
+            for i in {1..30}; do
+              if curl -s http://localhost:3000 > /dev/null 2>&1; then
+                echo "Server started successfully"
+                break
+              fi
+              sleep 1
+            done
+          else
+            echo "::warning::No dev server script found, skipping Observatory scan"
+            exit 0
+          fi
+        continue-on-error: true
+
+      - name: Run Mozilla Observatory security scan
+        id: observatory-scan
+        if: steps.start-server.outputs.server_pid
+        run: |
+          echo "Running Observatory security scan on http://localhost:3000..."
+          node scripts/security-scan.cjs scan http://localhost:3000 > observatory-output.txt || true
+
+          # Extract grade and score
+          GRADE=$(grep "Grade:" observatory-output.txt | awk '{print $2}')
+          SCORE=$(grep "Score:" observatory-output.txt | awk '{print $2}' | cut -d'/' -f1)
+
+          echo "grade=$GRADE" >> $GITHUB_OUTPUT
+          echo "score=$SCORE" >> $GITHUB_OUTPUT
+
+          echo "Observatory Grade: $GRADE"
+          echo "Observatory Score: $SCORE"
+
+          cat observatory-output.txt
+        continue-on-error: true
+
+      - name: Generate security report
+        if: steps.start-server.outputs.server_pid
+        run: |
+          node scripts/security-scan.cjs report http://localhost:3000 || true
+        continue-on-error: true
+
+      - name: Stop test server
+        if: always() && steps.start-server.outputs.server_pid
+        run: |
+          SERVER_PID=${{ steps.start-server.outputs.server_pid }}
+          if [ -n "$SERVER_PID" ]; then
+            kill $SERVER_PID || true
+          fi
+
+      - name: Upload Observatory reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: observatory-reports-${{ github.run_id }}
+          path: |
+            ~/.versatil/security-reports/
+            observatory-output.txt
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Check security grade threshold
+        if: steps.observatory-scan.outputs.grade
+        run: |
+          GRADE="${{ steps.observatory-scan.outputs.grade }}"
+
+          # Passing grades: A+, A, A-
+          if [[ "$GRADE" =~ ^A ]]; then
+            echo "✅ Security grade $GRADE meets minimum threshold (A required)"
+            exit 0
+          else
+            echo "::error::❌ Security grade $GRADE below minimum threshold (A required)"
+            echo "::error::Deployment blocked until security issues are resolved"
+            exit 1
+          fi
+        continue-on-error: false
+
+      - name: Comment PR with Observatory results
+        if: github.event_name == 'pull_request' && steps.observatory-scan.outputs.grade
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const grade = '${{ steps.observatory-scan.outputs.grade }}';
+            const score = '${{ steps.observatory-scan.outputs.score }}';
+            const pass = grade.startsWith('A');
+
+            const gradeEmoji = grade === 'A+' ? '🏆' : grade.startsWith('A') ? '🎖️' : grade.startsWith('B') ? '🥈' : '⚠️';
+            const statusEmoji = pass ? '✅' : '❌';
+
+            let comment = `## 🔒 Mozilla Observatory Security Scan\n\n`;
+            comment += `${statusEmoji} **Grade: ${grade}** ${gradeEmoji} | **Score: ${score}/100**\n\n`;
+
+            if (pass) {
+              comment += `✅ **Security posture meets requirements**\n\n`;
+              comment += `- Minimum grade: A ✅\n`;
+              comment += `- Ready for deployment\n`;
+            } else {
+              comment += `❌ **Security grade below minimum threshold**\n\n`;
+              comment += `- Minimum grade required: A\n`;
+              comment += `- Current grade: ${grade}\n`;
+              comment += `- **Deployment blocked** until security issues are resolved\n\n`;
+              comment += `### Next Steps\n`;
+              comment += `1. Run: \`node scripts/security-scan.cjs report http://localhost:3000\`\n`;
+              comment += `2. Review security report for specific vulnerabilities\n`;
+              comment += `3. Fix critical and high priority issues\n`;
+              comment += `4. Re-run security scan\n`;
+            }
+
+            comment += `\n📄 [View detailed security report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  # Performance tests
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: mcp-health
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run performance tests
+        run: npx playwright test --project=performance || echo "::warning::Performance tests not configured"
+        continue-on-error: true
+
+      - name: Upload performance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report-${{ github.run_id }}
+          path: test-results/
+          retention-days: 30
+          if-no-files-found: warn
+
+  # Visual regression tests with Percy
+  visual-regression:
+    name: Visual Regression Tests (Percy)
+    runs-on: ubuntu-latest
+    needs: mcp-health
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Percy visual regression tests
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+          PERCY_BRANCH: ${{ github.head_ref || github.ref_name }}
+          PERCY_PULL_REQUEST: ${{ github.event.pull_request.number }}
+          PERCY_PARALLEL_TOTAL: -1  # Auto-detect
+          PERCY_PARALLEL_NONCE: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          if [ -z "$PERCY_TOKEN" ]; then
+            echo "::warning::PERCY_TOKEN not set. Running visual tests without Percy."
+            npx playwright test --project=visual-regression
+          else
+            echo "Running Percy visual regression tests..."
+            npm run test:visual:percy
+          fi
+        continue-on-error: true
+
+      - name: Upload Percy build link
+        if: env.PERCY_TOKEN != ''
+        run: |
+          echo "Percy build: https://percy.io/${{ github.repository }}/builds" >> $GITHUB_STEP_SUMMARY
+          echo "Check Percy dashboard for visual diff results." >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload visual regression reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-report-${{ github.run_id }}
+          path: |
+            test-results/
+            playwright-report/
+            .percy/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Comment PR with Percy results
+        if: github.event_name == 'pull_request' && env.PERCY_TOKEN != ''
+        uses: actions/github-script@v7
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+        with:
+          script: |
+            const percyBuildUrl = `https://percy.io/${{ github.repository }}/builds`;
+            const comment = `## 📸 Percy Visual Regression Results\n\n` +
+              `Visual snapshots have been captured for this PR.\n\n` +
+              `🔍 **[View Percy Build](${percyBuildUrl})**\n\n` +
+              `Percy will automatically detect visual changes and flag any regressions.\n` +
+              `Review the snapshots on Percy dashboard before merging.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  # Final quality gate check
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [accessibility-tests, code-quality, test-coverage, security-audit, observatory-scan]
+    if: always()
+
+    steps:
+      - name: Check all jobs status
+        run: |
+          echo "Accessibility tests: ${{ needs.accessibility-tests.result }}"
+          echo "Code quality: ${{ needs.code-quality.result }}"
+          echo "Test coverage: ${{ needs.test-coverage.result }}"
+          echo "Security audit: ${{ needs.security-audit.result }}"
+          echo "Observatory scan: ${{ needs.observatory-scan.result }}"
+
+          if [ "${{ needs.accessibility-tests.result }}" != "success" ]; then
+            echo "::error::Quality gate failed: Accessibility tests failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.code-quality.result }}" != "success" ]; then
+            echo "::error::Quality gate failed: Code quality checks failed"
+            exit 1
+          fi
+
+          # Observatory scan is optional (only runs on PRs)
+          if [ "${{ needs.observatory-scan.result }}" == "failure" ]; then
+            echo "::error::Quality gate failed: Observatory security scan failed (Grade < A)"
+            exit 1
+          fi
+
+          echo "✅ Quality gate passed!"
+
+      - name: Post quality gate summary
+        if: always()
+        run: |
+          echo "## Quality Gate Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Accessibility | ${{ needs.accessibility-tests.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Quality | ${{ needs.code-quality.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Coverage | ${{ needs.test-coverage.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Audit (SAST) | ${{ needs.security-audit.result == 'success' && '✅' || '❌' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Observatory Scan (DAST) | ${{ needs.observatory-scan.result == 'success' && '✅' || (needs.observatory-scan.result == 'skipped' && '⏭️' || '❌') }} |" >> $GITHUB_STEP_SUMMARY

@@ -14,8 +14,8 @@
  * - https://docs.claude.com/en/docs/build-with-claude/context-editing
  */
 
-import path from 'path';
-import os from 'os';
+import * as path from 'path';
+import * as os from 'os';
 
 export interface MemoryToolConfig {
   /** Beta flag for Context Management features */
@@ -91,7 +91,8 @@ export type AgentId =
   | 'dana-database'
   | 'alex-ba'
   | 'sarah-pm'
-  | 'dr-ai-ml';
+  | 'dr-ai-ml'
+  | 'oliver-mcp';
 
 /**
  * Default Memory Tool configuration for VERSATIL
@@ -177,7 +178,8 @@ export const MEMORY_TOOL_CONFIG: MemoryToolConfig = {
     'dana-database': 'dana-database/',
     'alex-ba': 'alex-ba/',
     'sarah-pm': 'sarah-pm/',
-    'dr-ai-ml': 'dr-ai-ml/'
+    'dr-ai-ml': 'dr-ai-ml/',
+    'oliver-mcp': 'oliver-mcp/'
   },
 
   // Memory retention and cleanup policy
@@ -1328,6 +1330,88 @@ def predict(input_data):
 - [ ] Rollback plan ready
 `
     }
+  ],
+
+  // Oliver-MCP - MCP Intelligence & Orchestration Agent
+  'oliver-mcp': [
+    {
+      filename: 'mcp-selection-patterns.md',
+      description: 'MCP selection patterns and decision trees',
+      initialContent: `# Oliver-MCP Selection Patterns
+
+## MCP Selection Decision Trees
+
+### Pattern: Research Task
+When an agent needs documentation or code examples:
+1. Check if framework/library is mentioned → Use GitMCP
+2. Check if recent information needed → Use Exa Search
+3. Check if official docs available → Use WebFetch
+
+### Pattern: Integration Task
+When an agent needs to perform actions:
+1. Browser automation → Playwright MCP
+2. Database operations → Supabase MCP
+3. Error tracking → Sentry MCP
+4. GitHub operations → GitHub MCP
+
+### Pattern: Anti-Hallucination Detection
+Watch for these signals:
+- Framework-specific questions (FastAPI, React, Next.js, etc.)
+- "How do I..." questions about libraries
+- Code examples requests
+- "Latest API" mentions
+
+→ Recommend GitMCP to query official repositories
+
+## MCP Selection History
+Track which MCPs worked best for which tasks:
+- [Date] - [Agent] - [Task] - [MCP Used] - [Success: Yes/No]
+`
+    },
+    {
+      filename: 'anti-hallucination-patterns.md',
+      description: 'Anti-hallucination detection patterns via GitMCP',
+      initialContent: `# Anti-Hallucination Patterns
+
+## GitMCP Usage Patterns
+
+### Pattern: Framework Documentation
+Instead of relying on LLM knowledge (may be outdated):
+\`\`\`
+User: "How to implement OAuth2 in FastAPI?"
+
+❌ BAD: Use LLM knowledge (may be outdated)
+✅ GOOD: GitMCP query to tiangolo/fastapi repo
+  - Path: docs/tutorial/security/oauth2.md
+  - Result: Always current, official patterns
+\`\`\`
+
+### Pattern: Code Examples
+\`\`\`
+Agent: Marcus-Backend needs OAuth2 example
+
+❌ BAD: Generate from memory (hallucination risk)
+✅ GOOD: GitMCP(tiangolo/fastapi, search: "oauth2 example")
+  - Returns: Real code from FastAPI repo
+  - Guarantee: No hallucinations
+\`\`\`
+
+### Pattern: Best Practices
+\`\`\`
+Agent: James-Frontend asks about React hooks patterns
+
+❌ BAD: Use outdated React 16 knowledge
+✅ GOOD: GitMCP(facebook/react, path: docs/hooks-reference.md)
+  - Returns: Latest React 18 patterns
+  - Benefit: Always current
+\`\`\`
+
+## Success Metrics
+- Hallucination prevention rate: 99%+
+- Time saved vs manual research: 80%
+- Agent satisfaction: High
+`
+    }
   ]
 };
 
@@ -1351,4 +1435,20 @@ export function getAgentMemoryPath(agentId: AgentId): string {
  */
 export function getMemoryFilePath(agentId: AgentId, filename: string): string {
   return path.join(getAgentMemoryPath(agentId), filename);
+}
+
+/**
+ * Get all agent IDs
+ */
+export function getAllAgentIds(): AgentId[] {
+  return [
+    'maria-qa',
+    'james-frontend',
+    'marcus-backend',
+    'dana-database',
+    'alex-ba',
+    'sarah-pm',
+    'dr-ai-ml',
+    'oliver-mcp'
+  ];
 }

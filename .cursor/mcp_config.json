@@ -12,7 +12,9 @@
         "VERSATIL_RULES_ENABLED": "true",
         "RULE_1_PARALLEL_EXECUTION": "true",
         "RULE_2_STRESS_TESTING": "true",
-        "RULE_3_DAILY_AUDIT": "true"
+        "RULE_3_DAILY_AUDIT": "true",
+        "RULE_4_ONBOARDING": "true",
+        "RULE_5_RELEASES": "true"
       }
     },
     "playwright": {
@@ -22,6 +24,15 @@
         "PLAYWRIGHT_BROWSERS_PATH": "~/.cache/ms-playwright"
       },
       "description": "Official Microsoft Playwright MCP for browser automation (Maria-QA, James-Frontend)"
+    },
+    "playwright-stealth": {
+      "command": "node",
+      "args": ["/Users/nissimmenashe/VERSATIL SDLC FW/bin/versatil-mcp.js"],
+      "env": {
+        "VERSATIL_STEALTH_MODE": "true",
+        "VERSATIL_RATE_LIMIT": "2000"
+      },
+      "description": "Playwright Stealth for bot detection bypass + design scraping (James-Frontend, Maria-QA). 92% effectiveness, ethical rate limiting, legal scraping only."
     },
     "github": {
       "command": "npx",

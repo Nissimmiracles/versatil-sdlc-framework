@@ -186,7 +186,7 @@ Provide comprehensive database analysis with historical schema patterns and prov
       handoffs.push('sarah-pm');
     }
 
-    return [...new Set(handoffs)];
+    return Array.from(new Set(handoffs));
   }
 
 }

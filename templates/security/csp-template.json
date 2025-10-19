@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "Content Security Policy Template",
+  "description": "Recommended CSP configurations for different use cases",
+  "templates": {
+    "strict": {
+      "description": "Strictest CSP - Maximum security, requires nonces/hashes for inline scripts",
+      "policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content",
+      "use_cases": ["Static sites", "High-security applications", "Banking/Finance"],
+      "requirements": [
+        "Remove all inline scripts",
+        "Use nonces or hashes for any inline code",
+        "Host all resources on same origin",
+        "No third-party scripts without explicit allowlisting"
+      ]
+    },
+    "recommended": {
+      "description": "Recommended CSP - Good balance of security and usability",
+      "policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests",
+      "use_cases": ["Most web applications", "E-commerce", "SaaS platforms"],
+      "requirements": [
+        "Minimize inline scripts/styles",
+        "Use CSP-compatible libraries",
+        "Whitelist trusted CDNs",
+        "Enable upgrade-insecure-requests"
+      ]
+    },
+    "report-only": {
+      "description": "Report-Only mode - Test CSP without blocking resources",
+      "policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; report-uri /csp-report",
+      "use_cases": ["Initial CSP deployment", "Testing phase", "Migration"],
+      "requirements": [
+        "Set up /csp-report endpoint to collect violations",
+        "Analyze reports to identify violations",
+        "Gradually tighten policy based on reports",
+        "Switch to enforcement mode when violations are minimal"
+      ],
+      "header_name": "Content-Security-Policy-Report-Only"
+    },
+    "spa": {
+      "description": "Single Page Application CSP",
+      "policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.example.com; frame-ancestors 'none'; base-uri 'self'; upgrade-insecure-requests",
+      "use_cases": ["React apps", "Vue apps", "Angular apps", "Next.js apps"],
+      "requirements": [
+        "Allow API domain in connect-src",
+        "Use build-time CSP injection for nonces (if possible)",
+        "Consider using Trusted Types",
+        "Review third-party integrations (analytics, etc.)"
+      ]
+    },
+    "with-cdn": {
+      "description": "CSP with CDN resources",
+      "policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests",
+      "use_cases": ["Apps using external CSS/JS libraries", "Google Fonts", "Analytics"],
+      "requirements": [
+        "Only whitelist trusted CDNs",
+        "Use SRI (Subresource Integrity) for CDN resources",
+        "Monitor CDN uptime and security",
+        "Have fallback for CDN failures"
+      ]
+    },
+    "nonce-based": {
+      "description": "Nonce-based CSP - Most secure for dynamic content",
+      "policy": "default-src 'self'; script-src 'self' 'nonce-{RANDOM}'; style-src 'self' 'nonce-{RANDOM}'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests",
+      "use_cases": ["Server-rendered apps", "Next.js", "Django", "Rails"],
+      "requirements": [
+        "Generate unique nonce per request",
+        "Add nonce to all inline <script> and <style> tags",
+        "Never reuse nonces",
+        "Store nonces securely (not in cookies)"
+      ],
+      "implementation": {
+        "express": "const nonce = crypto.randomBytes(16).toString('base64'); res.locals.nonce = nonce; res.setHeader('Content-Security-Policy', `script-src 'self' 'nonce-${nonce}'`);",
+        "next.js": "export async function middleware(request) { const nonce = Buffer.from(crypto.randomUUID()).toString('base64'); const cspHeader = `script-src 'self' 'nonce-${nonce}'`; const requestHeaders = new Headers(request.headers); requestHeaders.set('x-nonce', nonce); requestHeaders.set('Content-Security-Policy', cspHeader); return NextResponse.next({ request: { headers: requestHeaders } }); }"
+      }
+    }
+  },
+  "directives": {
+    "default-src": {
+      "description": "Fallback for other directives",
+      "recommended": "'self'",
+      "examples": ["'self'", "'none'"]
+    },
+    "script-src": {
+      "description": "Valid sources for JavaScript",
+      "recommended": "'self' 'unsafe-inline' (or use nonces)",
+      "examples": ["'self'", "'unsafe-inline'", "'nonce-{RANDOM}'", "https://cdn.example.com"],
+      "security_notes": "Avoid 'unsafe-inline' and 'unsafe-eval' if possible. Use nonces or hashes instead."
+    },
+    "style-src": {
+      "description": "Valid sources for CSS",
+      "recommended": "'self' 'unsafe-inline'",
+      "examples": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"]
+    },
+    "img-src": {
+      "description": "Valid sources for images",
+      "recommended": "'self' data: https:",
+      "examples": ["'self'", "data:", "https:", "https://images.example.com"]
+    },
+    "font-src": {
+      "description": "Valid sources for fonts",
+      "recommended": "'self' data:",
+      "examples": ["'self'", "data:", "https://fonts.gstatic.com"]
+    },
+    "connect-src": {
+      "description": "Valid sources for fetch, XMLHttpRequest, WebSocket",
+      "recommended": "'self'",
+      "examples": ["'self'", "https://api.example.com", "wss://websocket.example.com"]
+    },
+    "frame-ancestors": {
+      "description": "Valid parents that may embed using <iframe>",
+      "recommended": "'none' or 'self'",
+      "examples": ["'none'", "'self'", "https://trusted.example.com"],
+      "security_notes": "Use 'none' to prevent clickjacking. Replaces X-Frame-Options."
+    },
+    "base-uri": {
+      "description": "Valid sources for <base> element",
+      "recommended": "'self'",
+      "examples": ["'self'", "'none'"]
+    },
+    "form-action": {
+      "description": "Valid targets for form submissions",
+      "recommended": "'self'",
+      "examples": ["'self'", "https://api.example.com"]
+    },
+    "upgrade-insecure-requests": {
+      "description": "Instructs browser to upgrade HTTP to HTTPS",
+      "recommended": "Always include for HTTPS sites",
+      "value": "Directive (no value needed)"
+    },
+    "block-all-mixed-content": {
+      "description": "Prevents loading any HTTP resources on HTTPS pages",
+      "recommended": "Include for strict security",
+      "value": "Directive (no value needed)"
+    },
+    "require-trusted-types-for": {
+      "description": "Enforces Trusted Types for DOM XSS prevention",
+      "recommended": "'script' (experimental but powerful)",
+      "examples": ["'script'"],
+      "security_notes": "Requires Trusted Types API support. Prevents DOM XSS attacks."
+    }
+  },
+  "migration_guide": {
+    "step1": {
+      "title": "Start with Report-Only mode",
+      "action": "Deploy Content-Security-Policy-Report-Only header",
+      "policy": "Use 'report-only' template",
+      "duration": "1-2 weeks"
+    },
+    "step2": {
+      "title": "Analyze violations",
+      "action": "Set up /csp-report endpoint and analyze reported violations",
+      "tools": ["report-uri.com", "Sentry CSP reporting", "Custom logging"],
+      "duration": "Ongoing"
+    },
+    "step3": {
+      "title": "Tighten policy",
+      "action": "Remove unsafe-inline, unsafe-eval based on reports",
+      "policy": "Gradually move towards 'recommended' or 'strict' template",
+      "duration": "2-4 weeks"
+    },
+    "step4": {
+      "title": "Enforce CSP",
+      "action": "Switch from Report-Only to enforcement mode",
+      "policy": "Use Content-Security-Policy header (not Report-Only)",
+      "verification": "Monitor for broken functionality"
+    },
+    "step5": {
+      "title": "Optimize for A+ grade",
+      "action": "Implement nonces or hashes, enable Trusted Types",
+      "policy": "Use 'nonce-based' template",
+      "target": "Observatory grade A+"
+    }
+  },
+  "testing_tools": [
+    {
+      "name": "CSP Evaluator",
+      "url": "https://csp-evaluator.withgoogle.com/",
+      "description": "Evaluate CSP for common bypasses and weaknesses"
+    },
+    {
+      "name": "Mozilla Observatory",
+      "url": "https://observatory.mozilla.org/",
+      "description": "Comprehensive security scan including CSP analysis"
+    },
+    {
+      "name": "SecurityHeaders.com",
+      "url": "https://securityheaders.com/",
+      "description": "Quick security header analysis"
+    },
+    {
+      "name": "Report URI",
+      "url": "https://report-uri.com/",
+      "description": "CSP violation reporting and monitoring service"
+    }
+  ],
+  "common_issues": {
+    "inline_scripts": {
+      "problem": "Inline <script> tags blocked by CSP",
+      "solutions": [
+        "Move scripts to external .js files",
+        "Use nonces: <script nonce='RANDOM'>",
+        "Use hashes: 'sha256-{hash_of_script}'"
+      ]
+    },
+    "eval_usage": {
+      "problem": "eval() and new Function() blocked",
+      "solutions": [
+        "Refactor code to avoid eval()",
+        "Use JSON.parse() instead of eval() for JSON",
+        "Replace template strings with safe alternatives"
+      ]
+    },
+    "third_party_scripts": {
+      "problem": "Analytics, ads, or widgets blocked",
+      "solutions": [
+        "Whitelist specific CDN domains",
+        "Use SRI (Subresource Integrity) for third-party scripts",
+        "Consider privacy-friendly alternatives (Plausible, Fathom)"
+      ]
+    },
+    "google_analytics": {
+      "problem": "Google Analytics blocked by strict CSP",
+      "solutions": [
+        "Add 'https://www.google-analytics.com' to script-src and connect-src",
+        "Or use privacy-friendly alternative (Plausible, Fathom, Simple Analytics)",
+        "Consider server-side analytics"
+      ]
+    }
+  }
+}

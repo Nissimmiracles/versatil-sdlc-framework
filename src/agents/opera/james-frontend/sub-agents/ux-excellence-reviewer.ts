@@ -336,33 +336,54 @@ export class UXExcellenceReviewer extends EventEmitter {
   }
 
   /**
-   * Review visual consistency
+   * Review visual consistency (uses dedicated checker)
    */
   async reviewVisualConsistency(context: UXReviewContext): Promise<VisualConsistencyAnalysis> {
-    const tableViews = await this.analyzeTableViews(context);
-    const actionButtons = await this.analyzeActionButtons(context);
-    const formElements = await this.analyzeFormElements(context);
-    const spacing = await this.analyzeSpacing(context);
-    const typography = await this.analyzeTypography(context);
-    const colorUsage = await this.analyzeColorUsage(context);
+    const { VisualConsistencyChecker } = require('../ux-review/visual-consistency-checker');
+    const checker = new VisualConsistencyChecker(context.designSystem);
 
-    const score = this.calculateAverageScore([
-      tableViews.score,
-      actionButtons.score,
-      formElements.score,
-      spacing.score,
-      typography.score,
-      colorUsage.score
-    ]);
+    const checkContext = {
+      filePaths: context.filePaths,
+      fileContents: context.fileContents,
+      designTokens: context.designSystem,
+      framework: context.framework
+    };
 
+    const report = await checker.check(checkContext);
+
+    // Convert report format to match expected interface
     return {
-      score,
-      tableViews,
-      actionButtons,
-      formElements,
-      spacing,
-      typography,
-      colorUsage
+      score: report.overallScore,
+      tableViews: {
+        score: report.componentAnalysis.tables.score,
+        issues: report.componentAnalysis.tables.issues.map(i => i.description),
+        recommendations: report.componentAnalysis.tables.recommendations
+      },
+      actionButtons: {
+        score: report.componentAnalysis.buttons.score,
+        issues: report.componentAnalysis.buttons.issues.map(i => i.description),
+        recommendations: report.componentAnalysis.buttons.recommendations
+      },
+      formElements: {
+        score: report.componentAnalysis.forms.score,
+        issues: report.componentAnalysis.forms.issues.map(i => i.description),
+        recommendations: report.componentAnalysis.forms.recommendations
+      },
+      spacing: {
+        score: report.componentAnalysis.spacing.score,
+        issues: report.componentAnalysis.spacing.violations.map(v => `${v.file}: ${v.property} uses ${v.value}, nearest token: ${v.nearestTokenValue}`),
+        recommendations: report.componentAnalysis.spacing.recommendations
+      },
+      typography: {
+        score: report.componentAnalysis.typography.score,
+        issues: report.componentAnalysis.typography.violations.map(v => `${v.file}: ${v.property} uses ${v.value}`),
+        recommendations: report.componentAnalysis.typography.recommendations
+      },
+      colorUsage: {
+        score: report.componentAnalysis.colors.score,
+        issues: report.componentAnalysis.colors.violations.map(v => `${v.file}: hardcoded color ${v.value}`),
+        recommendations: report.componentAnalysis.colors.recommendations
+      }
     };
   }
 
@@ -398,42 +419,60 @@ export class UXExcellenceReviewer extends EventEmitter {
   }
 
   /**
-   * Analyze markdown rendering
+   * Analyze markdown rendering (uses dedicated analyzer)
    */
   async analyzeMarkdownRendering(context: UXReviewContext): Promise<MarkdownAnalysisResult> {
-    const markdownFiles = this.filterMarkdownFiles(context);
+    const { MarkdownAnalyzer } = require('../ux-review/markdown-analyzer');
+    const analyzer = new MarkdownAnalyzer();
 
-    if (markdownFiles.length === 0) {
-      return this.emptyMarkdownAnalysis();
-    }
+    const markdownContext = {
+      filePaths: context.filePaths,
+      fileContents: context.fileContents
+    };
 
-    const headingHierarchy = await this.checkHeadingHierarchy(markdownFiles, context);
-    const listFormatting = await this.checkListFormatting(markdownFiles, context);
-    const codeBlocks = await this.checkCodeBlocks(markdownFiles, context);
-    const tables = await this.checkTables(markdownFiles, context);
-    const links = await this.checkLinks(markdownFiles, context);
-    const images = await this.checkImages(markdownFiles, context);
-    const blockquotes = await this.checkBlockquotes(markdownFiles, context);
+    const analysis = await analyzer.analyze(markdownContext);
 
-    const score = this.calculateAverageScore([
-      headingHierarchy.score,
-      listFormatting.score,
-      codeBlocks.score,
-      tables.score,
-      links.score,
-      images.score,
-      blockquotes.score
-    ]);
-
+    // Map to expected interface format
     return {
-      score,
-      headingHierarchy,
-      listFormatting,
-      codeBlocks,
-      tables,
-      links,
-      images,
-      blockquotes
+      score: analysis.overallScore,
+      headingHierarchy: {
+        score: analysis.headingHierarchy.score,
+        issues: analysis.headingHierarchy.violations.map(v => v.description),
+        structure: analysis.headingHierarchy.structure.map(s => `H${s.level}: ${s.text}`).join(' → ')
+      },
+      listFormatting: {
+        score: analysis.listFormatting.score,
+        issues: analysis.listFormatting.violations.map(v => v.description),
+        consistency: analysis.listFormatting.consistency
+      },
+      codeBlocks: {
+        score: analysis.codeBlocks.score,
+        syntaxHighlighting: analysis.codeBlocks.syntaxHighlighting.percentageWithLanguage >= 80,
+        copyButton: false, // Not analyzed by markdown analyzer
+        overflow: 'scroll'
+      },
+      tables: {
+        score: analysis.tables.score,
+        borders: true,
+        padding: true,
+        responsive: analysis.tables.violations.length === 0
+      },
+      links: {
+        score: analysis.links.score,
+        internalExternal: true,
+        brokenLinks: analysis.links.brokenLinks.map(l => l.url)
+      },
+      images: {
+        score: analysis.images.score,
+        altText: analysis.images.withAltText > 0,
+        lazyLoading: false, // Not analyzed
+        captions: false // Not analyzed
+      },
+      blockquotes: {
+        score: 90,
+        visuallyDistinct: true,
+        appropriate: true
+      }
     };
   }
 
@@ -454,98 +493,24 @@ export class UXExcellenceReviewer extends EventEmitter {
    * Generate formatted report
    */
   generateFormattedReport(result: UXReviewResult): string {
-    return `
-# 🎨 UX Excellence Review Report
+    // Use the dedicated report generator for comprehensive reports
+    const { UXReportGenerator } = require('../ux-review/ux-report-generator');
+    const reportGenerator = new UXReportGenerator();
 
-## 🎯 Executive Summary
-**Overall UX Score**: ${result.overallScore}/100 ${this.getScoreEmoji(result.overallScore)}
+    const reportData = {
+      timestamp: new Date(),
+      overallScore: result.overallScore,
+      criticalIssues: result.criticalIssues,
+      recommendations: result.recommendations,
+      whatWorksWell: result.whatWorksWell
+    };
 
-${result.overallScore >= 90 ? '✅ Excellent UX - Minor refinements only' :
-  result.overallScore >= 70 ? '⚠️ Good UX - Some improvements needed' :
-  result.overallScore >= 50 ? '🔴 Fair UX - Significant improvements required' :
-  '🚨 Poor UX - Critical issues must be addressed'}
-
-**Critical Issues Found**: ${result.criticalIssues.length}
-**Recommendations**: ${result.recommendations.length}
-
----
-
-## ✅ What's Working Well
-
-${result.whatWorksWell.map(item => `- ✅ ${item}`).join('\n')}
-
----
-
-## 🔴 Critical Issues
-
-${result.criticalIssues.map((issue, idx) => `
-### ${idx + 1}. ${issue.title} (${issue.severity.toUpperCase()})
-
-**Category**: ${issue.category}
-**Impact**: ${issue.impact}
-**Affected Users**: ${issue.affectedUserRoles.join(', ')}
-
-**Current State**: ${issue.currentState}
-
-**Recommended Solution**: ${issue.recommendedSolution}
-
-${issue.file ? `**File**: ${issue.file}${issue.line ? `:${issue.line}` : ''}` : ''}
-
----
-`).join('\n')}
-
-## 🎨 Design Recommendations
-
-### Immediate Improvements (Quick Wins)
-${this.formatRecommendations(result.recommendations.filter(r => r.type === 'immediate'))}
-
-### Systematic Enhancements
-${this.formatRecommendations(result.recommendations.filter(r => r.type === 'systematic'))}
-
-### Enhancement Opportunities
-${this.formatRecommendations(result.recommendations.filter(r => r.type === 'enhancement'))}
-
----
-
-## 🚀 Implementation Roadmap
-
-### Priority 1: Critical Fixes (Do First)
-${result.priorityRoadmap.priority1.map(item => `
-- **${item.title}**
-  - ${item.description}
-  - Estimated time: ${item.estimatedTime}
-  ${item.dependencies.length > 0 ? `- Dependencies: ${item.dependencies.join(', ')}` : ''}
-`).join('\n')}
-
-### Priority 2: Consistency Improvements
-${result.priorityRoadmap.priority2.map(item => `
-- **${item.title}**
-  - ${item.description}
-  - Estimated time: ${item.estimatedTime}
-`).join('\n')}
-
-### Priority 3: Enhancement Opportunities
-${result.priorityRoadmap.priority3.map(item => `
-- **${item.title}**
-  - ${item.description}
-  - Estimated time: ${item.estimatedTime}
-`).join('\n')}
-
----
-
-## ✅ Quality Assurance Checklist
-
-- [ ] All user roles considered
-- [ ] Mobile experience evaluated
-- [ ] Accessibility requirements met (WCAG 2.1 AA)
-- [ ] Recommendations are actionable
-- [ ] Solutions maintain simplicity
-- [ ] Holistic improvements proposed
-
----
-
-*Generated by UX Excellence Reviewer - ${new Date().toISOString()}*
-`;
+    return reportGenerator.generateReport(reportData, {
+      format: 'markdown',
+      includeCodeExamples: true,
+      includeMetrics: true,
+      groupByCategory: true
+    });
   }
 
   // ==========================================================================

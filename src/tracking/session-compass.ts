@@ -328,9 +328,37 @@ export class SessionCompass {
       // Filter pending tasks and group by priority
       const pendingTasks = pipeline.tasks.filter(t => t.status === 'pending' || t.status === 'in_progress');
 
-      const high = pendingTasks.filter(t => t.priority === 'high').map(convertTask);
-      const medium = pendingTasks.filter(t => t.priority === 'medium').map(convertTask);
-      const low = pendingTasks.filter(t => t.priority === 'low').map(convertTask);
+      let high = pendingTasks.filter(t => t.priority === 'high').map(convertTask);
+      let medium = pendingTasks.filter(t => t.priority === 'medium').map(convertTask);
+      let low = pendingTasks.filter(t => t.priority === 'low').map(convertTask);
+
+      // Get context budget status
+      const { getContextBudgetManager } = await import('./context-budget-manager.js');
+      const budgetManager = getContextBudgetManager();
+      const budget = await budgetManager.getBudgetStatus();
+
+      // If context is critical (>85%), automatically defer low-priority tasks
+      if (budget.status === 'critical') {
+        // Move all low-priority tasks to deferred list
+        console.log(`[SessionCompass] Context critical (${budget.usagePercent}%) - deferring ${low.length} low-priority tasks`);
+        low = [];
+
+        // If still critical after deferring low tasks, defer medium tasks too
+        if (budget.usagePercent > 90) {
+          console.log(`[SessionCompass] Context very critical (${budget.usagePercent}%) - deferring ${medium.length} medium-priority tasks`);
+          medium = [];
+        }
+      }
+
+      // If context is warning (>80%), prioritize smaller tasks first
+      if (budget.status === 'warning' || budget.status === 'critical') {
+        // Sort each priority group by context needed (smaller tasks first)
+        high = high.sort((a, b) => a.contextNeeded - b.contextNeeded);
+        medium = medium.sort((a, b) => a.contextNeeded - b.contextNeeded);
+        low = low.sort((a, b) => a.contextNeeded - b.contextNeeded);
+
+        console.log(`[SessionCompass] Context ${budget.status} (${budget.usagePercent}%) - prioritizing smaller tasks`);
+      }
 
       return { high, medium, low };
     } catch (error) {
@@ -564,16 +592,37 @@ ${c.bold}📋 Main Plan Summary:${c.reset}
   ETA: ${data.mainPlan.totalETA}
 
 ${c.bold}🔢 Task Prioritization (Next Actions):${c.reset}
-
-  ${c.green}HIGH PRIORITY (Do First):${c.reset}
 `;
 
-    for (const task of data.taskPriority.high) {
-      const parallel = task.canParallel ? 'Yes' : task.dependsOn.length > 0 ? `NO (depends on #${task.dependsOn.join(', #')})` : 'Yes';
-      output += `  ${task.id}. [P1] ${task.description} (${task.assignedAgent})\n`;
-      output += `     → Parallel OK: ${parallel}\n`;
-      output += `     → Context needed: ~${task.contextNeeded.toLocaleString()} tokens\n`;
-      output += `     → ETA: ${task.eta}\n\n`;
+    // Show context budget warning if tasks are being deferred
+    if (data.contextBudget.status === 'critical') {
+      output += `
+  ${c.yellow}⚠️ CONTEXT BUDGET CRITICAL (${Math.round((data.contextBudget.remaining / data.contextBudget.available) * 100)}% remaining)${c.reset}
+  Low-priority tasks automatically deferred to preserve context.
+  Complete high-priority tasks first to free up context budget.
+
+`;
+    } else if (data.contextBudget.status === 'warning') {
+      output += `
+  ${c.yellow}⚠️ CONTEXT BUDGET WARNING (${Math.round((data.contextBudget.remaining / data.contextBudget.available) * 100)}% remaining)${c.reset}
+  Smaller tasks prioritized first to optimize context usage.
+
+`;
+    }
+
+    output += `  ${c.green}HIGH PRIORITY (Do First):${c.reset}
+`;
+
+    if (data.taskPriority.high.length === 0) {
+      output += `    (No high-priority tasks)\n\n`;
+    } else {
+      for (const task of data.taskPriority.high) {
+        const parallel = task.canParallel ? 'Yes' : task.dependsOn.length > 0 ? `NO (depends on #${task.dependsOn.join(', #')})` : 'Yes';
+        output += `  ${task.id}. [P1] ${task.description} (${task.assignedAgent})\n`;
+        output += `     → Parallel OK: ${parallel}\n`;
+        output += `     → Context needed: ~${task.contextNeeded.toLocaleString()} tokens\n`;
+        output += `     → ETA: ${task.eta}\n\n`;
+      }
     }
 
     if (data.taskPriority.medium.length > 0) {
@@ -584,6 +633,21 @@ ${c.bold}🔢 Task Prioritization (Next Actions):${c.reset}
         output += `     → Context needed: ~${task.contextNeeded.toLocaleString()} tokens\n`;
         output += `     → ETA: ${task.eta}\n\n`;
       }
+    } else if (data.contextBudget.status === 'critical' || data.contextBudget.status === 'warning') {
+      output += `  ${c.yellow}MEDIUM PRIORITY:${c.reset} (Deferred due to context budget)\n\n`;
+    }
+
+    if (data.taskPriority.low.length > 0) {
+      output += `  ${c.gray}LOW PRIORITY (Do Later):${c.reset}\n`;
+      for (const task of data.taskPriority.low.slice(0, 3)) {
+        output += `  ${task.id}. [P3] ${task.description} (${task.assignedAgent})\n`;
+      }
+      if (data.taskPriority.low.length > 3) {
+        output += `  ... and ${data.taskPriority.low.length - 3} more low-priority tasks\n`;
+      }
+      output += '\n';
+    } else if (data.contextBudget.status === 'critical') {
+      output += `  ${c.gray}LOW PRIORITY:${c.reset} (All deferred due to context budget)\n\n`;
     }
 
     output += `${c.bold}⚡ Parallel Execution Opportunities:${c.reset}

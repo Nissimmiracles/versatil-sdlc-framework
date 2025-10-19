@@ -15,7 +15,7 @@ allowed-tools:
 
 ## Introduction
 
-**Smart distribution of work** to the optimal OPERA agents with automatic coordination, dependency management, and parallel execution. This implements the "Delegate" phase of Every Inc's Compounding Engineering philosophy.
+**Smart distribution of work** to the optimal OPERA agents with automatic coordination, dependency management, and parallel execution. This implements the "Delegate" phase of VELOCITY workflow's Compounding Engineering approach.
 
 **Philosophy**: "Route work to the best specialist, execute in parallel when possible."
 

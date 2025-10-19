@@ -6,7 +6,7 @@ This guide provides everything you need to use VERSATIL with Cursor IDE, includi
 
 **NEW in v6.4.0**:
 - 📍 **Automatic Roadmap Generation** - Get a personalized 4-week development plan during installation
-- 🤖 **17 OPERA Agents** - 7 core agents + 10 language-specific sub-agents
+- 🤖 **18 OPERA agents** - 8 core agents + 10 language-specific sub-agents
 - 🎯 **Smart Agent Matching** - Automatically recommends agents based on your tech stack
 
 ---
@@ -1336,7 +1336,7 @@ versatil agents --stats
 6. **Read Advanced Docs**
    - [Installation Guide](../getting-started/installation.md) - Updated for v6.4.0
    - [Roadmap Templates](../../templates/roadmaps/) - Example roadmaps by project type
-   - [Agent Reference](../../.claude/AGENTS.md) - All 17 agents documented
+   - [Agent Reference](../../.claude/AGENTS.md) - All 18 agents documented
    - [5-Rule System](../../.claude/rules/README.md) - Automation rules
    - [Quality Gates Guide](QUALITY_GATES.md) - Quality enforcement
 
@@ -1363,7 +1363,7 @@ versatil agents --stats
 
 **What's New in v6.4.0**:
 - 📍 Automatic roadmap generation during installation
-- 🤖 17 OPERA agents (7 core + 10 language-specific sub-agents)
+- 🤖 18 OPERA agents (8 core + 10 language-specific sub-agents)
 - 🎯 Smart agent matching based on detected technologies
 - ⚡ 83% faster setup (30 min → 5 min)
 

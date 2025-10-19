@@ -17,7 +17,7 @@ VERSATIL now automatically generates personalized 4-week development roadmaps du
 
 #### Roadmap Generation Features
 - ✅ **Project Analysis Engine**: Automatically detects technologies (React, Vue, Python, Node.js, Go, Rails, Java)
-- ✅ **Smart Agent Matching**: Recommends specific agents from 17 available (7 core + 10 sub-agents)
+- ✅ **Smart Agent Matching**: Recommends specific agents from 18 available (8 core + 10 sub-agents)
 - ✅ **Personalized Roadmaps**: Generates custom 4-week plans with weekly milestones, tasks, and quality gates
 - ✅ **Technology-Specific Templates**: Pre-built roadmaps for React+Node.js, Vue+Python, Next.js, Python ML
 - ✅ **Quality Strategy**: Includes testing approach, performance standards, security compliance

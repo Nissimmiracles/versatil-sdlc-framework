@@ -1,7 +1,7 @@
 {
   "name": "versatil-sdlc-framework",
   "version": "6.1.0",
-  "description": "VERSATIL SDLC Framework MCP Server - AI-native development with 17 OPERA agents (7 core + 10 sub-agents), 12-MCP ecosystem (including GitMCP), adaptive intelligence, and automated quality gates. Local-first architecture with full SDLC orchestration.",
+  "description": "VERSATIL SDLC Framework MCP Server - AI-native development with 18 OPERA agents (8 core + 10 sub-agents), 12-MCP ecosystem (including GitMCP), adaptive intelligence, and automated quality gates. Local-first architecture with full SDLC orchestration.",
   "author": "VERSATIL Development Team",
   "license": "MIT",
   "homepage": "https://github.com/MiraclesGIT/versatil-sdlc-framework",
@@ -282,7 +282,7 @@
       "21 MCP Tools: Full SDLC automation (agent management, orchestration, testing, deployment, analytics, documentation via GitMCP)",
       "5 MCP Resources: Real-time framework data (agent status, quality metrics, performance, SDLC phase, activity logs)",
       "5 MCP Prompts: AI-powered development guidance (code analysis, refactoring, testing, security, performance)",
-      "17 specialized OPERA agents (7 core: Maria-QA, James-Frontend, Marcus-Backend, Sarah-PM, Alex-BA, Dr.AI-ML, Oliver-DevOps + 10 language-specific sub-agents)",
+      "17 specialized OPERA agents (8 core + 10 language-specific sub-agents)",
       "12 production MCP integrations (Playwright, GitHub, Exa, GitMCP, Vertex AI, Supabase, n8n, Semgrep, Sentry, Shadcn, Ant Design, Claude Code)",
       "Full SDLC orchestration with phase transitions and quality gates",
       "Autonomous goal management via Opera orchestrator",

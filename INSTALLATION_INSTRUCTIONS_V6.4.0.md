@@ -170,7 +170,7 @@ ls -la /path/to/versatil/docs/CURSOR_INSTALLATION_UPDATE_V6.4.0.md
 
 ### Automatic Roadmap Generation
 - ✅ Project analysis engine (detects React, Vue, Python, Node.js, Go, Rails, Java)
-- ✅ Smart agent matching from 17 agents
+- ✅ Smart agent matching from 18 agents
 - ✅ Personalized 4-week development plans
 - ✅ 4 project-specific templates (1,550+ lines)
 - ✅ Quality gates and success metrics
