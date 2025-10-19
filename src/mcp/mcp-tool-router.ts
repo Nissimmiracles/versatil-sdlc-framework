@@ -34,6 +34,7 @@ import { EventEmitter } from 'events';
 import { PlaywrightMCPExecutor } from './playwright-mcp-executor.js';
 import { getGitHubMCPClient } from './github-mcp-client.js';
 import { getExaSearchMCPClient } from './exa-search-mcp-client.js';
+import { getGitMCPExecutor } from './gitmcp-executor.js';
 import type { MCPExecutionResult } from './playwright-mcp-executor.js';
 
 export interface ToolCallRequest {
@@ -68,6 +69,7 @@ export class MCPToolRouter extends EventEmitter {
   private chromeMCP: any; // Will be lazy-loaded
   private githubMCP: ReturnType<typeof getGitHubMCPClient>;
   private exaMCP: ReturnType<typeof getExaSearchMCPClient>;
+  private gitMCP: ReturnType<typeof getGitMCPExecutor>;
   private shadcnMCP: any; // Will be lazy-loaded
 
   // Statistics
@@ -91,6 +93,7 @@ export class MCPToolRouter extends EventEmitter {
     this.playwrightMCP = new PlaywrightMCPExecutor();
     this.githubMCP = getGitHubMCPClient();
     this.exaMCP = getExaSearchMCPClient();
+    this.gitMCP = getGitMCPExecutor();
   }
 
   /**
@@ -100,10 +103,11 @@ export class MCPToolRouter extends EventEmitter {
     console.log('[MCPToolRouter] Initializing MCP tool router...');
 
     try {
-      // Initialize GitHub and Exa MCPs
+      // Initialize GitHub, Exa, and GitMCP
       await Promise.all([
         this.githubMCP.initialize(),
-        this.exaMCP.initialize()
+        this.exaMCP.initialize(),
+        this.gitMCP.initialize()
       ]);
 
       // Chrome MCP and Shadcn MCP are lazy-loaded on first use
@@ -147,6 +151,11 @@ export class MCPToolRouter extends EventEmitter {
         case 'exa':
         case 'exasearch':
           result = await this.handleExaSearchCall(request);
+          break;
+
+        case 'gitmcp':
+        case 'git':
+          result = await this.handleGitMCPCall(request);
           break;
 
         case 'shadcn':
@@ -332,6 +341,48 @@ export class MCPToolRouter extends EventEmitter {
   }
 
   /**
+   * Handle GitMCP calls
+   */
+  private async handleGitMCPCall(request: ToolCallRequest): Promise<any> {
+    const { action, params } = request;
+
+    switch (action) {
+      case 'query_repo':
+      case 'query_repository':
+        return await this.gitMCP.queryRepository({
+          owner: params.owner,
+          repo: params.repo,
+          path: params.path
+        });
+
+      case 'search_framework_docs':
+      case 'search_docs':
+        return await this.gitMCP.searchFrameworkDocs(
+          params.framework,
+          params.topic
+        );
+
+      case 'get_examples':
+      case 'get_code_examples':
+        const docsResult = await this.gitMCP.searchFrameworkDocs(
+          params.framework,
+          params.topic
+        );
+        return {
+          success: true,
+          data: {
+            examples: docsResult.examples,
+            framework: params.framework,
+            topic: params.topic
+          }
+        };
+
+      default:
+        throw new Error(`Unknown GitMCP action: ${action}`);
+    }
+  }
+
+  /**
    * Handle Shadcn MCP calls
    */
   private async handleShadcnCall(request: ToolCallRequest): Promise<any> {
@@ -410,7 +461,7 @@ export class MCPToolRouter extends EventEmitter {
    * Get available MCP tools
    */
   getAvailableTools(): string[] {
-    return ['Playwright', 'Chrome', 'GitHub', 'Exa', 'Shadcn'];
+    return ['Playwright', 'Chrome', 'GitHub', 'Exa', 'GitMCP', 'Shadcn'];
   }
 
   /**
@@ -428,7 +479,8 @@ export class MCPToolRouter extends EventEmitter {
 
     await Promise.all([
       this.githubMCP.destroy(),
-      this.exaMCP.destroy()
+      this.exaMCP.destroy(),
+      this.gitMCP.destroy()
     ]);
 
     this.removeAllListeners();

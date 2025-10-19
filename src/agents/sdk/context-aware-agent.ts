@@ -188,13 +188,13 @@ Agent: Maria-QA
    memory str_replace maria-qa/test-patterns.md
    "## Notes"
    "### Pattern: Async Hooks Testing
-   \\`\\`\\`typescript
+   (triple backtick)typescript
    test('async hook updates state', async () => {
      const { result, waitForNextUpdate } = renderHook(() => useAsyncData());
      await waitForNextUpdate();
      expect(result.current.data).toBeDefined();
    });
-   \\`\\`\\`
+   (triple backtick)
 
    ## Notes"
 \`\`\`
