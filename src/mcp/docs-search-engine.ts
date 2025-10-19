@@ -11,6 +11,8 @@ import { DocsCache, CacheOptions } from './docs-cache.js';
 import { DocsPerformanceMonitor } from './docs-performance-monitor.js';
 import { DocsMemoryTracker } from './docs-memory-tracker.js';
 import { DocsProgressTracker, ProgressCallback } from './docs-progress-tracker.js';
+import { StreamManager, ResultStream, StreamOptions } from './docs-streaming.js';
+import { SuggestionsEngine, Suggestion, SuggestionOptions } from './docs-suggestions.js';
 
 // Configuration constants
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB default limit
@@ -87,6 +89,8 @@ export class DocsSearchEngine {
   private performanceMonitor: DocsPerformanceMonitor;
   private memoryTracker: DocsMemoryTracker;
   private progressTracker: DocsProgressTracker;
+  private streamManager: StreamManager;
+  private suggestionsEngine: SuggestionsEngine;
 
   constructor(
     projectPath: string,
@@ -97,6 +101,8 @@ export class DocsSearchEngine {
       enablePerformanceMonitoring?: boolean;
       enableMemoryTracking?: boolean;
       enableProgressTracking?: boolean;
+      enableStreaming?: boolean;
+      enableSuggestions?: boolean;
     } = {}
   ) {
     this.projectPath = projectPath;
@@ -108,6 +114,8 @@ export class DocsSearchEngine {
     this.performanceMonitor = new DocsPerformanceMonitor();
     this.memoryTracker = new DocsMemoryTracker();
     this.progressTracker = new DocsProgressTracker();
+    this.streamManager = new StreamManager();
+    this.suggestionsEngine = new SuggestionsEngine();
   }
 
   /**
@@ -203,6 +211,14 @@ export class DocsSearchEngine {
             };
 
             this.documentIndex.set(relativePath, metadata);
+
+            // Index terms for suggestions
+            keywords.forEach(keyword => {
+              this.suggestionsEngine.indexTerm(keyword, keywords.filter(k => k !== keyword));
+            });
+            if (title) {
+              this.suggestionsEngine.indexTerm(title, keywords);
+            }
 
             // Report progress every 10 files or on last file
             if (i % 10 === 0 || i === files.length - 1) {
@@ -385,6 +401,53 @@ export class DocsSearchEngine {
 
     // Return top 10 results
     return results.slice(0, 10);
+  }
+
+  /**
+   * Search with streaming results (incremental delivery)
+   * @returns Stream ID and stream object for consuming results
+   */
+  async searchStreaming(
+    query: string,
+    category?: DocCategory,
+    options?: StreamOptions
+  ): Promise<{ streamId: string; stream: ResultStream<SearchResult> }> {
+    // Perform search to get all results
+    const allResults = await this.search(query, category);
+
+    // Create stream
+    const streamId = this.streamManager.generateStreamId();
+    const stream = this.streamManager.createStream(streamId, allResults, options);
+
+    return { streamId, stream };
+  }
+
+  /**
+   * Get stream by ID
+   */
+  getStream(streamId: string): ResultStream<SearchResult> | undefined {
+    return this.streamManager.getStream<SearchResult>(streamId);
+  }
+
+  /**
+   * Remove completed stream
+   */
+  removeStream(streamId: string): void {
+    this.streamManager.removeStream(streamId);
+  }
+
+  /**
+   * Cleanup completed streams
+   */
+  cleanupStreams(): void {
+    this.streamManager.cleanup();
+  }
+
+  /**
+   * Get streaming statistics
+   */
+  getStreamingStatistics() {
+    return this.streamManager.getStatistics();
   }
 
   /**
@@ -828,5 +891,26 @@ export class DocsSearchEngine {
    */
   unsubscribeFromProgress(operationId: string, callback: ProgressCallback): void {
     this.progressTracker.unsubscribe(operationId, callback);
+  }
+
+  /**
+   * Get search suggestions for a query
+   */
+  getSuggestions(query: string, options?: SuggestionOptions): Suggestion[] {
+    return this.suggestionsEngine.getSuggestions(query, options);
+  }
+
+  /**
+   * Get suggestions engine for direct access
+   */
+  getSuggestionsEngine(): SuggestionsEngine {
+    return this.suggestionsEngine;
+  }
+
+  /**
+   * Get suggestion statistics
+   */
+  getSuggestionStatistics() {
+    return this.suggestionsEngine.getStatistics();
   }
 }
