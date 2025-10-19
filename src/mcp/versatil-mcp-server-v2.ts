@@ -14,6 +14,8 @@ import { VERSATILLogger } from '../utils/logger.js';
 import { PerformanceMonitor } from '../analytics/performance-monitor.js';
 import { chromeMCPExecutor } from './chrome-mcp-executor.js';
 import { getMCPOnboarding } from './mcp-onboarding.js';
+import { DocsSearchEngine, DocCategory } from './docs-search-engine.js';
+import { DocsFormatter } from './docs-formatter.js';
 
 export interface VERSATILMCPConfig {
   name: string;
@@ -28,10 +30,12 @@ export class VERSATILMCPServerV2 {
   private server: McpServer;
   private config: VERSATILMCPConfig;
   private onboardingCompleted: boolean = false;
+  private docsSearchEngine: DocsSearchEngine;
 
   constructor(config: VERSATILMCPConfig) {
     this.config = config;
     this.server = new McpServer({ name: config.name, version: config.version });
+    this.docsSearchEngine = new DocsSearchEngine((config.orchestrator as any).projectPath || process.cwd());
     this.registerResources();
     this.registerPrompts();
     this.registerTools();
@@ -313,6 +317,75 @@ export class VERSATILMCPServerV2 {
           contents: [{
             uri: uri.href,
             text: JSON.stringify(activities, null, 2),
+            mimeType: 'application/json',
+          }],
+        };
+      }
+    );
+
+    // Resource 6: Documentation Index (Static)
+    this.server.resource(
+      'docs-index',
+      'versatil://docs-index',
+      {
+        title: 'Documentation Index',
+        description: 'Complete index of VERSATIL framework documentation organized by category',
+        mimeType: 'application/json',
+      },
+      async (uri) => {
+        // Build index on first access
+        if (!(this.docsSearchEngine as any).indexBuilt) {
+          await this.docsSearchEngine.buildIndex();
+        }
+
+        const allDocs = await this.docsSearchEngine.getIndex();
+
+        // Organize by category
+        const categorized: Record<string, any[]> = {
+          agents: [],
+          workflows: [],
+          rules: [],
+          mcp: [],
+          guides: [],
+          troubleshooting: [],
+          'quick-reference': [],
+          architecture: [],
+          testing: [],
+          security: [],
+          completion: [],
+        };
+
+        allDocs.forEach(doc => {
+          if (categorized[doc.category]) {
+            categorized[doc.category].push({
+              title: doc.title,
+              path: doc.relativePath,
+              keywords: doc.keywords.slice(0, 5), // Top 5 keywords
+              size: `${Math.round(doc.size / 1024)}KB`,
+              lastModified: doc.lastModified.toISOString(),
+            });
+          }
+        });
+
+        // Calculate statistics
+        const stats = {
+          totalDocuments: allDocs.length,
+          totalSizeKB: Math.round(allDocs.reduce((sum, doc) => sum + doc.size, 0) / 1024),
+          byCategory: Object.entries(categorized).map(([category, docs]) => ({
+            category,
+            count: docs.length,
+          })),
+          lastIndexed: new Date().toISOString(),
+        };
+
+        return {
+          contents: [{
+            uri: uri.href,
+            text: JSON.stringify({
+              stats,
+              documents: categorized,
+              usage: 'Use versatil_search_docs tool to search, versatil_get_agent_docs for agents, versatil_get_workflow_guide for workflows',
+            }, null, 2),
             mimeType: 'application/json',
           }],
         };
@@ -1246,7 +1319,466 @@ Provide query execution plans with optimization strategies.`,
       }
     );
 
-    this.config.logger.info('VERSATIL MCP tools registered successfully', { count: 15 });
+    // Documentation Tools
+    this.server.tool(
+      'versatil_search_docs',
+      'Search VERSATIL framework documentation with keyword and category filtering',
+      {
+        title: 'Search Documentation',
+        readOnlyHint: true,
+        destructiveHint: false,
+        query: z.string().describe('Search query (keywords, agent names, topics)'),
+        category: z.enum(['agents', 'workflows', 'rules', 'mcp', 'guides', 'troubleshooting', 'quick-reference', 'architecture', 'testing', 'security', 'completion', 'all']).optional(),
+      },
+      async ({ query, category }) => {
+        // Build index on first use
+        if (!(this.docsSearchEngine as any).indexBuilt) {
+          await this.docsSearchEngine.buildIndex();
+        }
+
+        const results = await this.docsSearchEngine.search(query, category as DocCategory);
+        const formatted = DocsFormatter.formatSearchResults(results);
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: formatted,
+            },
+          ],
+        };
+      }
+    );
+
+    this.server.tool(
+      'versatil_get_agent_docs',
+      'Get complete documentation for a specific OPERA agent with capabilities and examples',
+      {
+        title: 'Get Agent Documentation',
+        readOnlyHint: true,
+        destructiveHint: false,
+        agentId: z.enum([
+          'maria-qa', 'james-frontend', 'marcus-backend', 'alex-ba', 'sarah-pm', 'dr-ai-ml', 'oliver-mcp', 'dana-database',
+          'james-react', 'james-vue', 'james-nextjs', 'james-angular', 'james-svelte',
+          'marcus-node', 'marcus-python', 'marcus-rails', 'marcus-go', 'marcus-java'
+        ]).describe('Agent ID to retrieve documentation for'),
+      },
+      async ({ agentId }) => {
+        // Build index on first use
+        if (!(this.docsSearchEngine as any).indexBuilt) {
+          await this.docsSearchEngine.buildIndex();
+        }
+
+        try {
+          // Search for agent documentation
+          const results = await this.docsSearchEngine.search(agentId, 'agents' as DocCategory);
+
+          if (results.length === 0) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    success: false,
+                    error: `No documentation found for agent ${agentId}`,
+                    suggestion: 'Try searching with versatil_search_docs instead'
+                  }, null, 2),
+                },
+              ],
+            };
+          }
+
+          // Get full document content
+          const docContent = await this.docsSearchEngine.getDocument(results[0].document.relativePath);
+
+          // Format as structured agent doc
+          const agentDoc = DocsFormatter.formatAgentDocs(agentId, docContent);
+          const formattedContent = DocsFormatter.formatForMCP(docContent);
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: true,
+                  agentId,
+                  structured: agentDoc,
+                  fullDocumentation: formattedContent,
+                }, null, 2),
+              },
+            ],
+          };
+        } catch (error: any) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: false,
+                  error: error.message,
+                }, null, 2),
+              },
+            ],
+          };
+        }
+      }
+    );
+
+    this.server.tool(
+      'versatil_get_workflow_guide',
+      'Get workflow documentation (EVERY, Three-Tier, Instinctive, Compounding)',
+      {
+        title: 'Get Workflow Guide',
+        readOnlyHint: true,
+        destructiveHint: false,
+        workflowType: z.enum(['every', 'three-tier', 'instinctive', 'compounding', 'all']).describe('Workflow type to retrieve'),
+      },
+      async ({ workflowType }) => {
+        // Build index on first use
+        if (!(this.docsSearchEngine as any).indexBuilt) {
+          await this.docsSearchEngine.buildIndex();
+        }
+
+        try {
+          if (workflowType === 'all') {
+            // Return all workflow guides
+            const workflows = await this.docsSearchEngine.getDocumentsByCategory('workflows' as DocCategory);
+            const workflowList = workflows.map(w => ({
+              title: w.title,
+              path: w.relativePath,
+              keywords: w.keywords,
+            }));
+
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    success: true,
+                    workflows: workflowList,
+                    count: workflowList.length,
+                  }, null, 2),
+                },
+              ],
+            };
+          }
+
+          // Search for specific workflow
+          const results = await this.docsSearchEngine.search(workflowType, 'workflows' as DocCategory);
+
+          if (results.length === 0) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    success: false,
+                    error: `No documentation found for workflow type ${workflowType}`,
+                  }, null, 2),
+                },
+              ],
+            };
+          }
+
+          // Get full document content
+          const docContent = await this.docsSearchEngine.getDocument(results[0].document.relativePath);
+
+          // Format as structured workflow doc
+          const workflowDoc = DocsFormatter.formatWorkflowDocs(workflowType, docContent);
+          const formattedContent = DocsFormatter.formatForMCP(docContent);
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: true,
+                  workflowType,
+                  structured: workflowDoc,
+                  fullDocumentation: formattedContent,
+                }, null, 2),
+              },
+            ],
+          };
+        } catch (error: any) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: false,
+                  error: error.message,
+                }, null, 2),
+              },
+            ],
+          };
+        }
+      }
+    );
+
+    this.server.tool(
+      'versatil_get_quick_reference',
+      'Get quick reference guides and cheat sheets for VERSATIL framework',
+      {
+        title: 'Get Quick Reference',
+        readOnlyHint: true,
+        destructiveHint: false,
+        topic: z.string().optional().describe('Specific topic (leave empty for all quick references)'),
+      },
+      async ({ topic }) => {
+        // Build index on first use
+        if (!(this.docsSearchEngine as any).indexBuilt) {
+          await this.docsSearchEngine.buildIndex();
+        }
+
+        try {
+          const quickRefs = await this.docsSearchEngine.getDocumentsByCategory('quick-reference' as DocCategory);
+
+          if (topic) {
+            // Filter by topic
+            const filtered = quickRefs.filter(doc =>
+              doc.title.toLowerCase().includes(topic.toLowerCase()) ||
+              doc.keywords.some(k => k.includes(topic.toLowerCase()))
+            );
+
+            if (filtered.length === 0) {
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: JSON.stringify({
+                      success: false,
+                      error: `No quick reference found for topic: ${topic}`,
+                      availableTopics: quickRefs.map(r => r.title),
+                    }, null, 2),
+                  },
+                ],
+              };
+            }
+
+            // Get full content for first match
+            const docContent = await this.docsSearchEngine.getDocument(filtered[0].relativePath);
+            const formatted = DocsFormatter.formatForMCP(docContent);
+
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: formatted,
+                },
+              ],
+            };
+          }
+
+          // Return list of all quick references
+          const refList = quickRefs.map(r => ({
+            title: r.title,
+            path: r.relativePath,
+            keywords: r.keywords,
+          }));
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: true,
+                  quickReferences: refList,
+                  count: refList.length,
+                }, null, 2),
+              },
+            ],
+          };
+        } catch (error: any) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: false,
+                  error: error.message,
+                }, null, 2),
+              },
+            ],
+          };
+        }
+      }
+    );
+
+    this.server.tool(
+      'versatil_get_integration_guide',
+      'Get MCP integration guides (Playwright, GitHub, GitMCP, Supabase, etc.)',
+      {
+        title: 'Get Integration Guide',
+        readOnlyHint: true,
+        destructiveHint: false,
+        mcpName: z.string().optional().describe('MCP server name (playwright, github, gitmcp, supabase, etc.)'),
+      },
+      async ({ mcpName }) => {
+        // Build index on first use
+        if (!(this.docsSearchEngine as any).indexBuilt) {
+          await this.docsSearchEngine.buildIndex();
+        }
+
+        try {
+          const mcpDocs = await this.docsSearchEngine.getDocumentsByCategory('mcp' as DocCategory);
+
+          if (mcpName) {
+            // Search for specific MCP
+            const results = await this.docsSearchEngine.search(mcpName, 'mcp' as DocCategory);
+
+            if (results.length === 0) {
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: JSON.stringify({
+                      success: false,
+                      error: `No integration guide found for MCP: ${mcpName}`,
+                      availableMCPs: mcpDocs.map(m => m.title),
+                    }, null, 2),
+                  },
+                ],
+              };
+            }
+
+            // Get full content
+            const docContent = await this.docsSearchEngine.getDocument(results[0].document.relativePath);
+            const formatted = DocsFormatter.formatForMCP(docContent);
+
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: formatted,
+                },
+              ],
+            };
+          }
+
+          // Return list of all MCP integrations
+          const mcpList = mcpDocs.map(m => ({
+            title: m.title,
+            path: m.relativePath,
+            keywords: m.keywords,
+          }));
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: true,
+                  integrations: mcpList,
+                  count: mcpList.length,
+                }, null, 2),
+              },
+            ],
+          };
+        } catch (error: any) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: false,
+                  error: error.message,
+                }, null, 2),
+              },
+            ],
+          };
+        }
+      }
+    );
+
+    this.server.tool(
+      'versatil_search_examples',
+      'Search code examples across all VERSATIL documentation',
+      {
+        title: 'Search Code Examples',
+        readOnlyHint: true,
+        destructiveHint: false,
+        query: z.string().describe('Search query for code examples (language, pattern, use case)'),
+        language: z.string().optional().describe('Programming language filter (typescript, javascript, python, etc.)'),
+      },
+      async ({ query, language }) => {
+        // Build index on first use
+        if (!(this.docsSearchEngine as any).indexBuilt) {
+          await this.docsSearchEngine.buildIndex();
+        }
+
+        try {
+          // Search all documentation
+          const results = await this.docsSearchEngine.search(query);
+          const examples: any[] = [];
+
+          // Extract code blocks from all results
+          for (const result of results) {
+            const docContent = await this.docsSearchEngine.getDocument(result.document.relativePath);
+            const codeBlocks = DocsFormatter.extractCodeBlocks(docContent);
+
+            // Filter by language if specified
+            const filtered = language
+              ? codeBlocks.filter(block => block.language.toLowerCase() === language.toLowerCase())
+              : codeBlocks;
+
+            // Add to examples with metadata
+            filtered.forEach(block => {
+              examples.push({
+                code: block.code,
+                language: block.language,
+                source: result.document.title,
+                path: result.document.relativePath,
+                category: result.document.category,
+              });
+            });
+          }
+
+          if (examples.length === 0) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    success: false,
+                    message: `No code examples found for query: ${query}${language ? ` (language: ${language})` : ''}`,
+                  }, null, 2),
+                },
+              ],
+            };
+          }
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: true,
+                  query,
+                  language,
+                  examples: examples.slice(0, 10), // Limit to 10 examples
+                  totalFound: examples.length,
+                }, null, 2),
+              },
+            ],
+          };
+        } catch (error: any) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify({
+                  success: false,
+                  error: error.message,
+                }, null, 2),
+              },
+            ],
+          };
+        }
+      }
+    );
+
+    this.config.logger.info('VERSATIL MCP tools registered successfully', { count: 21 });
   }
 
   /**
@@ -1272,8 +1804,8 @@ Provide query execution plans with optimization strategies.`,
     this.config.logger.info('VERSATIL MCP Server started with stdio transport', {
       name: this.config.name,
       version: this.config.version,
-      tools: 15,
-      resources: 5,
+      tools: 21,
+      resources: 6,
       prompts: 5,
     });
   }
