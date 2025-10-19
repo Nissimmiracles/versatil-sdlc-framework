@@ -13,7 +13,7 @@ allowed-tools:
 
 ## Introduction
 
-Dynamically create custom workflow commands for VERSATIL OPERA Framework. This command generates new slash commands tailored to your project's specific needs, automatically updates plugin.json, and follows Every Inc's proven command patterns.
+Dynamically create custom workflow commands for VERSATIL OPERA Framework. This command generates new slash commands tailored to your project's specific needs, automatically updates plugin.json, and follows proven workflow command patterns (inspired by Compounding Engineering methodology).
 
 ## Command Specification
 
@@ -88,7 +88,7 @@ Example_3_Refactor_Analysis:
 ### 2. Select Command Template
 
 <thinking>
-Based on workflow pattern, select appropriate template structure from Every Inc's proven patterns.
+Based on workflow pattern, select appropriate template structure using proven command patterns.
 </thinking>
 
 **Template Types:**
@@ -138,7 +138,7 @@ Type_4_Hybrid_Command:
 ### 3. Generate Command File
 
 <thinking>
-Create markdown command file in .claude/commands/ with complete structure following Every Inc patterns.
+Create markdown command file in .claude/commands/ with complete VERSATIL structure.
 </thinking>
 
 **Generated Command Example (security-audit.md):**
