@@ -38,27 +38,44 @@ export class DocsFormatter {
   }
 
   /**
-   * Extract code blocks from markdown
+   * Extract code blocks from markdown with error handling
    */
   static extractCodeBlocks(markdown: string): CodeBlock[] {
     const codeBlocks: CodeBlock[] = [];
-    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
-    const lines = markdown.split('\n');
 
-    let match;
-    while ((match = codeBlockRegex.exec(markdown)) !== null) {
-      const language = match[1] || 'text';
-      const code = match[2].trim();
+    try {
+      const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
 
-      // Calculate line number
-      const beforeMatch = markdown.substring(0, match.index);
-      const lineNumber = beforeMatch.split('\n').length;
+      let match;
+      while ((match = codeBlockRegex.exec(markdown)) !== null) {
+        // Validate match
+        if (!match[2]) {
+          console.warn('Empty code block found, skipping');
+          continue;
+        }
 
-      codeBlocks.push({
-        language,
-        code,
-        lineNumber,
-      });
+        const language = match[1] || 'text';
+        let code = match[2].trim();
+
+        // Prevent excessively large code blocks (100KB limit)
+        if (code.length > 100000) {
+          console.warn(`Code block exceeds 100KB (${code.length} chars), truncating`);
+          code = code.substring(0, 100000) + '\n// ... (truncated)';
+        }
+
+        // Calculate line number
+        const beforeMatch = markdown.substring(0, match.index);
+        const lineNumber = beforeMatch.split('\n').length;
+
+        codeBlocks.push({
+          language,
+          code,
+          lineNumber,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to extract code blocks:', error);
+      return []; // Return empty array instead of crashing
     }
 
     return codeBlocks;

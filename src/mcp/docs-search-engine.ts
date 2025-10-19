@@ -6,6 +6,11 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { glob } from 'glob';
+import { DocsSearchError, DocsErrorCodes } from './docs-errors.js';
+
+// Configuration constants
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB default limit
+const INDEX_TTL_MS = 5 * 60 * 1000; // 5 minutes TTL
 
 export interface DocumentMetadata {
   filePath: string;
@@ -67,58 +72,143 @@ export type DocCategory =
 
 export class DocsSearchEngine {
   private docsPath: string;
+  private projectPath: string;
   private documentIndex: Map<string, DocumentMetadata>;
   private indexBuilt: boolean = false;
+  private lastIndexBuild: Date | null = null;
+  private indexBuildPromise: Promise<void> | null = null;
+  private maxFileSize: number;
+  private indexTTL: number;
 
-  constructor(projectPath: string) {
+  constructor(
+    projectPath: string,
+    options: {
+      maxFileSize?: number;
+      indexTTL?: number;
+    } = {}
+  ) {
+    this.projectPath = projectPath;
     this.docsPath = path.join(projectPath, 'docs');
     this.documentIndex = new Map();
+    this.maxFileSize = options.maxFileSize || MAX_FILE_SIZE;
+    this.indexTTL = options.indexTTL || INDEX_TTL_MS;
   }
 
   /**
    * Build search index from all documentation files
+   * @param force - Force rebuild even if index is fresh
    */
-  async buildIndex(): Promise<void> {
-    if (this.indexBuilt) {
-      return; // Already built
+  async buildIndex(force: boolean = false): Promise<void> {
+    // Return existing build promise if build is in progress
+    if (this.indexBuildPromise) {
+      console.log('Index build already in progress, waiting...');
+      return this.indexBuildPromise;
     }
 
-    try {
-      // Find all markdown files in docs directory
-      const pattern = path.join(this.docsPath, '**/*.md');
-      const files = await glob(pattern, { absolute: true });
+    // Check if rebuild is needed
+    const now = new Date();
+    if (
+      this.indexBuilt &&
+      !force &&
+      this.lastIndexBuild &&
+      (now.getTime() - this.lastIndexBuild.getTime()) < this.indexTTL
+    ) {
+      return; // Index is still fresh
+    }
 
-      for (const filePath of files) {
-        try {
-          const stats = await fs.stat(filePath);
-          const content = await fs.readFile(filePath, 'utf-8');
+    // Create build promise to prevent concurrent builds
+    this.indexBuildPromise = (async () => {
+      try {
+        console.log(`Building documentation index... (force: ${force})`);
+        const startTime = Date.now();
 
-          const relativePath = path.relative(this.docsPath, filePath);
-          const title = this.extractTitle(content, relativePath);
-          const category = this.determineCategory(relativePath);
-          const keywords = this.extractKeywords(content, title);
+        // Clear existing index if rebuilding
+        this.documentIndex.clear();
 
-          const metadata: DocumentMetadata = {
-            filePath,
-            relativePath,
-            title,
-            category,
-            size: stats.size,
-            lastModified: stats.mtime,
-            keywords,
-          };
+        // Find all markdown files in docs directory
+        const pattern = path.join(this.docsPath, '**/*.md');
+        const files = await glob(pattern, { absolute: true });
 
-          this.documentIndex.set(relativePath, metadata);
-        } catch (error) {
-          // Skip files that can't be read
-          console.error(`Error indexing ${filePath}:`, error);
+        for (const filePath of files) {
+          try {
+            const stats = await fs.stat(filePath);
+            const content = await fs.readFile(filePath, 'utf-8');
+
+            const relativePath = path.relative(this.docsPath, filePath);
+            const title = this.extractTitle(content, relativePath);
+            const category = this.determineCategory(relativePath);
+            const keywords = this.extractKeywords(content, title);
+
+            const metadata: DocumentMetadata = {
+              filePath,
+              relativePath,
+              title,
+              category,
+              size: stats.size,
+              lastModified: stats.mtime,
+              keywords,
+            };
+
+            this.documentIndex.set(relativePath, metadata);
+          } catch (error) {
+            // Skip files that can't be read
+            console.error(`Error indexing ${filePath}:`, error);
+          }
         }
-      }
 
-      this.indexBuilt = true;
-    } catch (error) {
-      throw new Error(`Failed to build documentation index: ${error}`);
-    }
+        const duration = Date.now() - startTime;
+        console.log(`Documentation index built: ${files.length} files in ${duration}ms`);
+
+        this.indexBuilt = true;
+        this.lastIndexBuild = now;
+      } catch (error) {
+        throw new DocsSearchError(
+          `Failed to build documentation index: ${error}`,
+          DocsErrorCodes.INDEX_BUILD_FAILED,
+          { error }
+        );
+      } finally {
+        this.indexBuildPromise = null;
+      }
+    })();
+
+    return this.indexBuildPromise;
+  }
+
+  /**
+   * Force rebuild of documentation index
+   */
+  async rebuildIndex(): Promise<void> {
+    return this.buildIndex(true);
+  }
+
+  /**
+   * Check if index is stale (older than TTL)
+   */
+  isIndexStale(): boolean {
+    if (!this.lastIndexBuild) return true;
+
+    const now = new Date();
+    return (now.getTime() - this.lastIndexBuild.getTime()) >= this.indexTTL;
+  }
+
+  /**
+   * Get index metadata
+   */
+  getIndexMetadata(): {
+    built: boolean;
+    lastBuild: Date | null;
+    isStale: boolean;
+    documentsCount: number;
+    ttlMs: number;
+  } {
+    return {
+      built: this.indexBuilt,
+      lastBuild: this.lastIndexBuild,
+      isStale: this.isIndexStale(),
+      documentsCount: this.documentIndex.size,
+      ttlMs: this.indexTTL,
+    };
   }
 
   /**
@@ -194,19 +284,69 @@ export class DocsSearchEngine {
   }
 
   /**
-   * Get complete document content
+   * Get complete document content with security validation
    */
   async getDocument(relativePath: string): Promise<string> {
     if (!this.indexBuilt) {
       await this.buildIndex();
     }
 
-    const metadata = this.documentIndex.get(relativePath);
-    if (!metadata) {
-      throw new Error(`Document not found: ${relativePath}`);
+    // 1. Normalize path to prevent directory traversal
+    const normalizedPath = path.normalize(relativePath);
+
+    // 2. Block path traversal patterns
+    if (normalizedPath.includes('..') || normalizedPath.startsWith('/')) {
+      throw new DocsSearchError(
+        'Path traversal not allowed',
+        DocsErrorCodes.PATH_TRAVERSAL_BLOCKED,
+        { path: relativePath, normalizedPath }
+      );
     }
 
-    return await fs.readFile(metadata.filePath, 'utf-8');
+    // 3. Get metadata from index
+    const metadata = this.documentIndex.get(normalizedPath);
+    if (!metadata) {
+      throw new DocsSearchError(
+        `Document not found: ${normalizedPath}`,
+        DocsErrorCodes.DOCUMENT_NOT_FOUND,
+        { path: normalizedPath }
+      );
+    }
+
+    // 4. Validate file path is within docs directory
+    const resolvedPath = path.resolve(metadata.filePath);
+    const allowedDocsPath = path.resolve(this.docsPath);
+
+    if (!resolvedPath.startsWith(allowedDocsPath)) {
+      throw new DocsSearchError(
+        'Security violation: Path outside docs directory',
+        DocsErrorCodes.PATH_OUTSIDE_DOCS,
+        { path: resolvedPath, allowedPath: allowedDocsPath }
+      );
+    }
+
+    // 5. Check file size before reading
+    if (metadata.size > this.maxFileSize) {
+      throw new DocsSearchError(
+        `Document too large: ${Math.round(metadata.size / 1024 / 1024)}MB (max ${Math.round(this.maxFileSize / 1024 / 1024)}MB)`,
+        DocsErrorCodes.FILE_TOO_LARGE,
+        { size: metadata.size, limit: this.maxFileSize }
+      );
+    }
+
+    // 6. Verify file is readable
+    try {
+      await fs.access(resolvedPath, fs.constants.R_OK);
+    } catch (error) {
+      throw new DocsSearchError(
+        `Cannot read file: ${normalizedPath}`,
+        DocsErrorCodes.FILE_NOT_READABLE,
+        { path: normalizedPath, error }
+      );
+    }
+
+    // 7. Read and return file content
+    return await fs.readFile(resolvedPath, 'utf-8');
   }
 
   /**

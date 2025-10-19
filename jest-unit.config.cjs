@@ -50,6 +50,7 @@ module.exports = {
     '<rootDir>/src/**/*.test.{ts,tsx,js}',
     '<rootDir>/src/**/*.spec.{ts,tsx,js}',
     '<rootDir>/tests/unit/**/*.{ts,tsx,js}',
+    '<rootDir>/tests/mcp/**/*.{ts,tsx,js}', // ⭐ MCP documentation tools tests
     // Explicitly exclude e2e and integration tests
     '!**/*.e2e.{ts,tsx,js}',
     '!**/*.playwright.{ts,tsx,js}',
