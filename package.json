@@ -2,7 +2,7 @@
   "name": "@versatil/sdlc-framework",
   "version": "6.5.0",
   "type": "module",
-  "description": "🎭 Claude Opera by VERSATIL v6.5.0 - Production-ready OPERA orchestration with 18 agents (8 core + 10 language-specific sub-agents), automatic roadmap generation, 12-MCP ecosystem (including GitMCP for repository documentation), RAG memory achieving 98%+ context retention, proactive daemon with file-based triggers, Cursor + Claude Desktop integration, 5 automation rules, and enterprise-grade security (Phase 1: Path traversal protection, file size limits, index TTL, concurrent build protection). The world's first autonomous AI-native SDLC framework with ZERO CONTEXT LOSS and intelligent project-aware onboarding.",
+  "description": "AI-Native SDLC Framework for Claude with 18 specialized agents (BA, Database, Backend, Frontend, QA, PM, AI/ML, MCP), 98%+ context retention via RAG memory, automatic quality gates (80%+ coverage, OWASP, WCAG 2.1 AA), and 12 production MCPs. Free & open source alternative to Copilot/Cursor with full-stack coordination and proactive intelligence.",
   "main": "dist/index.js",
   "bin": {
     "versatil": "./bin/versatil.js",

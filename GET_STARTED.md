@@ -1,706 +1,296 @@
-# Get Started with VERSATIL SDLC Framework
+# 🚀 Getting Started with VERSATIL
 
-🚀 **AI-Native Development Framework** with OPERA Methodology, RAG Memory, and Zero Context Loss
-
-This guide will help you install and configure VERSATIL in **less than 5 minutes**.
+**Get from zero to first result in 5 minutes** with 18 AI agents working for you.
 
 ---
 
-## Quick Start (Recommended)
+## Prerequisites
 
-```bash
-# 1. Install globally
-npm install -g versatil-sdlc-framework
-
-# 2. Run the setup wizard (optional)
-versatil config wizard
-
-# 3. Verify installation
-versatil doctor
-
-# 4. Initialize in your project
-cd your-project
-versatil init
-```
-
-**That's it!** The framework is ready to use. Agents will activate automatically as you work.
+- **Node.js** 18.0.0 or higher
+- **npm** or **yarn**
+- **Cursor IDE** or **Claude Desktop** (recommended)
 
 ---
 
-## Installation Options
+## Step 1: Install VERSATIL (2 minutes)
 
-### Option 1: Global Installation (Recommended)
-
-Best for most users. Provides `versatil` command globally.
+### Global Installation
 
 ```bash
-npm install -g versatil-sdlc-framework
-```
+# Install VERSATIL globally
+npm install -g @versatil/sdlc-framework
 
-**Verify:**
-```bash
+# Verify installation
 versatil --version
-# Should show: VERSATIL SDLC Framework v3.0.0
+# Expected output: 6.5.0
 ```
 
-### Option 2: Project-Local Installation
-
-For project-specific installations or CI/CD environments.
+### Or use via npx (no installation)
 
 ```bash
-cd your-project
-npm install --save-dev versatil-sdlc-framework
-```
-
-**Use with:**
-```bash
-npx versatil --version
-```
-
-### Option 3: From GitHub Source
-
-For contributors or cutting-edge features.
-
-```bash
-git clone https://github.com/MiraclesGIT/versatil-sdlc-framework.git
-cd versatil-sdlc-framework
-npm install
-npm run build
-npm link
+npx @versatil/sdlc-framework init
 ```
 
 ---
 
-## Platform-Specific Setup
-
-### macOS / Linux
+## Step 2: Initialize Your Project (1 minute)
 
 ```bash
-# Install
-npm install -g versatil-sdlc-framework
+# Navigate to your project directory
+cd /path/to/your/project
 
-# If you get permission errors, use one of these:
-sudo npm install -g versatil-sdlc-framework
-# OR (recommended - no sudo needed)
-npm config set prefix ~/.npm-global
-export PATH=~/.npm-global/bin:$PATH
-npm install -g versatil-sdlc-framework
+# Initialize VERSATIL (auto-detects your tech stack)
+npx versatil init
 ```
 
-### Windows
-
-**PowerShell (Recommended):**
-```powershell
-# Run our Windows installer
-.\scripts\install.ps1
-
-# Or use npm directly
-npm install -g versatil-sdlc-framework
-```
-
-**CMD:**
-```cmd
-npm install -g versatil-sdlc-framework
-```
-
-**Note for Windows users:**
-- Run PowerShell/CMD as Administrator for global installs
-- Add npm global bin directory to PATH if `versatil` command not found
+**What `versatil init` does:**
+1. ✅ Detects your tech stack (React, Vue, Python, Node.js, etc.)
+2. ✅ Recommends relevant agents from 18 available
+3. ✅ Generates personalized 4-week roadmap (`docs/VERSATIL_ROADMAP.md`)
+4. ✅ Creates `.versatil-project.json` configuration
+5. ✅ Sets up quality gates (80%+ test coverage, WCAG 2.1 AA)
 
 ---
 
-## First-Time Configuration
+## Step 3: Configure IDE Integration (1 minute)
 
-### Option 1: Interactive Wizard (Recommended)
-
-The wizard will guide you through all preferences:
+### For Cursor IDE
 
 ```bash
-versatil config wizard
+# Auto-configure MCP for Cursor
+versatil-mcp-setup --cursor
 ```
 
-You'll be asked about:
-- **Update behavior**: Auto, notify, or manual
-- **Update channel**: Stable, beta, or alpha
-- **Safety level**: Conservative, balanced, or fast
-- **Backup settings**: Automatic backups before updates
-- **Notifications**: What you want to be notified about
-- **Telemetry**: Help improve the framework (anonymous data)
+This creates `.cursor/mcp_config.json`:
 
-### Option 2: Use a Profile
+```json
+{
+  "mcpServers": {
+    "versatil": {
+      "command": "node",
+      "args": ["~/.npm-global/bin/versatil-mcp", "/your/project"]
+    }
+  }
+}
+```
 
-Quick setup with pre-configured profiles:
+### For Claude Desktop
 
 ```bash
-# Conservative (maximum safety)
-versatil config profile conservative
-
-# Balanced (recommended for most users)
-versatil config profile balanced
-
-# Aggressive (latest features)
-versatil config profile aggressive
+# Auto-configure MCP for Claude Desktop
+versatil-mcp-setup --claude-desktop
 ```
 
-### Option 3: Manual Configuration
-
-Set individual preferences:
-
-```bash
-versatil config set updateBehavior notify
-versatil config set updateChannel stable
-versatil config set safetyLevel balanced
-```
+This updates `~/Library/Application Support/Claude/claude_desktop_config.json`.
 
 ---
 
-## Verify Installation
-
-Run comprehensive health checks:
+## Step 4: Start the Proactive Daemon (30 seconds)
 
 ```bash
-versatil doctor
+# Start daemon (agents auto-activate on file saves)
+versatil-daemon start
+
+# Check daemon status
+versatil-daemon status
+# Expected output: ✅ Daemon running (PID: 12345)
 ```
 
-**Expected output:**
-```
-🔍 VERSATIL Installation Verification
-
-Checking: Framework directory exists... ✅
-Checking: Framework directory is writable... ✅
-Checking: versatil command available... ✅
-Checking: Node.js version >= 18.0.0... ✅
-Checking: npm is available... ✅
-Checking: Core dependencies installed... ✅
-Checking: Agent configurations present... ✅
-Checking: Memory system initialized... ✅
-Checking: Preferences file created... ✅
-Checking: No project directory pollution... ✅
-
-📊 Verification Results:
-  ✅ Passed: 10
-  ❌ Failed: 0
-  ⚠️  Warnings: 0
-
-✅ Installation verified successfully!
-```
+**What the daemon does:**
+- 👀 Watches your project files
+- 🤖 Auto-activates relevant agents when you save files
+- ⚡ Runs quality gates before commits
+- 📊 Provides real-time feedback in statusline
 
 ---
 
-## Initialize in Your Project
+## Step 5: See It In Action (30 seconds)
 
-Once installed, initialize the framework in your project:
+### Test 1: Edit a React Component
 
 ```bash
-cd your-project
-versatil init
+# Create or edit a component
+# File: src/components/Button.tsx
 ```
 
-This will:
-1. Detect your project type (React, Vue, Node.js, etc.)
-2. Configure OPERA agents for your stack
-3. Create `.versatil-project.json` (the ONLY file added to your project)
-4. Set up quality gates and automation
+**What happens:**
+1. Save the file → **James-Frontend** auto-activates
+2. Validates: Accessibility (WCAG 2.1 AA), responsive design, performance
+3. Provides inline suggestions if issues found
+4. Updates statusline: `🤖 James-Frontend: Component validation (92% accessible)`
 
-**IMPORTANT:** The framework follows **strict isolation**:
-- ✅ All framework data in `~/.versatil/` (your home directory)
-- ✅ Only `.versatil-project.json` added to your project
-- ✅ No framework pollution in your codebase
-- ✅ Git-safe (won't commit framework files)
+### Test 2: Edit an API Route
+
+```bash
+# Create or edit an API file
+# File: src/api/users.ts
+```
+
+**What happens:**
+1. Save the file → **Marcus-Backend** auto-activates
+2. Scans: SQL injection, XSS, CSRF, rate limiting, input sanitization
+3. Generates stress tests automatically (Rule 2)
+4. Updates statusline: `🤖 Marcus-Backend: Security scan (0 vulnerabilities)`
+
+### Test 3: Edit a Test File
+
+```bash
+# Create or edit a test
+# File: src/components/Button.test.tsx
+```
+
+**What happens:**
+1. Save the file → **Maria-QA** auto-activates
+2. Analyzes test coverage (requires 80%+)
+3. Suggests missing test cases
+4. Updates statusline: `🤖 Maria-QA: Coverage check (85% ✅)`
 
 ---
 
-## Understanding Your Setup
-
-### Where Things Are Stored
-
-```
-~/.versatil/                    # Framework home (NOT in your project)
-├── agents/                     # Agent configurations
-│   ├── maria-qa/
-│   ├── james-frontend/
-│   ├── marcus-backend/
-│   ├── alex-ba/
-│   ├── sarah-pm/
-│   └── dr-ai-ml/
-├── memory/                     # RAG memory (vector database)
-├── logs/                       # Framework logs
-├── preferences.json            # Your preferences
-└── update-history.json         # Update history
-
-your-project/
-├── .versatil-project.json      # ONLY framework file (project config)
-├── ... your code ...
-```
-
-### Configuration File Location
+## Step 6: Check Framework Health
 
 ```bash
-# View your preferences
-cat ~/.versatil/preferences.json
-
-# Edit preferences
-versatil config show
-versatil config set <key> <value>
-
-# Reset to defaults
-versatil config reset
-```
-
----
-
-## Meet the OPERA Agents
-
-The framework includes **6 specialized agents** that work proactively:
-
-### 1. **Maria-QA** 🧪 - Quality Guardian
-- **Auto-activates on**: `*.test.*`, `__tests__/**`
-- **Does**: Test coverage analysis, bug detection, quality validation
-- **Example**: Edit `LoginForm.test.tsx` → Maria analyzes coverage automatically
-
-### 2. **James-Frontend** 🎨 - UI/UX Expert
-- **Auto-activates on**: `*.tsx`, `*.jsx`, `*.vue`, `*.css`
-- **Does**: Accessibility checks (WCAG 2.1 AA), responsive design, performance
-- **Example**: Edit `Button.tsx` → James validates accessibility on save
-
-### 3. **Marcus-Backend** ⚙️ - API Architect
-- **Auto-activates on**: `*.api.*`, `routes/**`, `controllers/**`
-- **Does**: Security scans (OWASP Top 10), stress tests, < 200ms response time
-- **Example**: Create `/api/users.ts` → Marcus generates security tests
-
-### 4. **Sarah-PM** 📊 - Project Coordinator
-- **Auto-activates on**: `*.md`, `docs/**`, project events
-- **Does**: Sprint reports, milestone tracking, documentation
-- **Example**: Update `README.md` → Sarah tracks project progress
-
-### 5. **Alex-BA** 📋 - Requirements Analyst
-- **Auto-activates on**: `requirements/**`, `*.feature`, issues
-- **Does**: Extract requirements, create user stories, acceptance criteria
-- **Example**: Create feature request → Alex generates user stories
-
-### 6. **Dr.AI-ML** 🤖 - AI/ML Specialist
-- **Auto-activates on**: `*.py`, `*.ipynb`, `models/**`
-- **Does**: Model validation, performance monitoring, training optimization
-- **Example**: Update ML model → Dr.AI validates and optimizes
-
-**Key Point:** Agents work **automatically**. You don't need to call them manually.
-
----
-
-## Essential Commands
-
-### Framework Management
-
-```bash
-# Check version
-versatil --version
-
-# Health check
+# Quick health check
 versatil doctor
 
-# View help
-versatil --help
-
-# Show all commands
-versatil help
+# Expected output:
+# ✅ Framework Health: 95%
+# ✅ All 8 core agents operational
+# ✅ 12 MCP integrations configured
+# ✅ Daemon running
+# ✅ Quality gates enabled
 ```
-
-### Updates
-
-```bash
-# Check for updates
-versatil update check
-
-# Install latest update
-versatil update install
-
-# View update status
-versatil update status
-
-# List available versions
-versatil update list
-
-# View changelog
-versatil update changelog
-```
-
-### Rollback
-
-```bash
-# Rollback to previous version
-versatil rollback previous
-
-# List rollback points
-versatil rollback list
-
-# Rollback to specific version
-versatil rollback to 3.0.0
-
-# Validate current installation
-versatil rollback validate
-```
-
-### Configuration
-
-```bash
-# Show current preferences
-versatil config show
-
-# Get specific preference
-versatil config get updateBehavior
-
-# Set preference
-versatil config set updateBehavior notify
-
-# Run wizard
-versatil config wizard
-
-# Apply profile
-versatil config profile balanced
-
-# Validate configuration
-versatil config validate
-
-# Export/import preferences
-versatil config export ./my-config.json
-versatil config import ./my-config.json
-```
-
-### Project Management
-
-```bash
-# Initialize framework in project
-versatil init
-
-# Analyze project for recommendations
-versatil analyze
-
-# List available agents
-versatil agents
-
-# View MCP server status
-versatil mcp
-```
-
----
-
-## Update Channels
-
-Choose how you receive updates:
-
-### Stable (Recommended)
-- Production-ready releases only
-- Thoroughly tested
-- Updated every few weeks
-
-```bash
-versatil config set updateChannel stable
-```
-
-### Beta
-- Early access to new features
-- Generally stable
-- Updated weekly
-
-```bash
-versatil config set updateChannel beta
-```
-
-### Alpha
-- Bleeding edge features
-- May have bugs
-- Updated frequently
-
-```bash
-versatil config set updateChannel alpha
-```
-
-**Change channel anytime:**
-```bash
-versatil config channel <stable|beta|alpha>
-```
-
----
-
-## Update Behavior
-
-### Auto
-Updates install automatically (use with caution).
-
-```bash
-versatil config set updateBehavior auto
-```
-
-### Notify (Recommended)
-You're notified when updates are available. You approve before installation.
-
-```bash
-versatil config set updateBehavior notify
-```
-
-### Manual
-You check for updates manually.
-
-```bash
-versatil config set updateBehavior manual
-```
-
----
-
-## Troubleshooting
-
-### Command Not Found
-
-**Problem:** `versatil: command not found`
-
-**Solutions:**
-
-1. **Check if installed:**
-   ```bash
-   npm list -g versatil-sdlc-framework
-   ```
-
-2. **Install if missing:**
-   ```bash
-   npm install -g versatil-sdlc-framework
-   ```
-
-3. **Check PATH (macOS/Linux):**
-   ```bash
-   echo $PATH | grep npm
-   npm config get prefix
-   ```
-
-4. **Add to PATH if needed:**
-   ```bash
-   export PATH=$(npm config get prefix)/bin:$PATH
-   # Add to ~/.bashrc or ~/.zshrc to make permanent
-   ```
-
-5. **Windows - Check PATH:**
-   - Open System Properties → Environment Variables
-   - Ensure npm global bin directory is in PATH
-   - Restart terminal after changes
-
-### Permission Errors (macOS/Linux)
-
-**Problem:** `EACCES` permission denied
-
-**Solution:**
-```bash
-# Option 1: Use npx (no installation)
-npx versatil-sdlc-framework --version
-
-# Option 2: Change npm global directory (recommended)
-mkdir ~/.npm-global
-npm config set prefix ~/.npm-global
-echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
-source ~/.bashrc
-npm install -g versatil-sdlc-framework
-
-# Option 3: Use sudo (not recommended)
-sudo npm install -g versatil-sdlc-framework
-```
-
-### Framework Directory Issues
-
-**Problem:** Framework not creating `~/.versatil/` directory
-
-**Solution:**
-```bash
-# Manually create and verify
-mkdir -p ~/.versatil
-ls -la ~/.versatil
-
-# Run verification
-versatil doctor
-
-# Check permissions
-ls -ld ~/.versatil
-# Should show: drwxr-xr-x (you have write access)
-```
-
-### Update Issues
-
-**Problem:** Updates failing or interrupted
-
-**Solution:**
-```bash
-# Check for interrupted updates
-versatil update status
-
-# Recover interrupted update
-versatil update recover
-
-# Force unlock if stuck
-versatil update force-unlock
-
-# Validate current installation
-versatil rollback validate
-
-# Rollback if needed
-versatil rollback previous
-```
-
-### Health Check Failures
-
-**Problem:** `versatil doctor` shows failures
-
-**Solution:**
-```bash
-# Run doctor with verbose output
-versatil doctor
-
-# Check specific issues
-versatil config validate
-npm list -g versatil-sdlc-framework
-
-# Reinstall if corrupted
-npm uninstall -g versatil-sdlc-framework
-npm install -g versatil-sdlc-framework
-versatil config wizard
-```
-
----
-
-## Uninstallation
-
-### Clean Removal
-
-```bash
-# Option 1: Use our uninstaller (recommended)
-versatil-uninstall
-
-# Option 2: Keep framework data
-versatil-uninstall --keep-data
-
-# Option 3: Manual removal
-npm uninstall -g versatil-sdlc-framework
-rm -rf ~/.versatil  # Removes all framework data
-```
-
-### What Gets Removed
-
-- ✅ Global npm package
-- ✅ Framework directory (`~/.versatil/`)
-- ✅ All agent configurations
-- ✅ RAG memory data
-- ✅ User preferences
-- ✅ Rollback backups
-
-### What Stays Safe
-
-- ✅ Your project code (framework never touches it)
-- ✅ Git repositories
-- ✅ Project-specific configs (`.versatil-project.json` if you want to keep it)
 
 ---
 
 ## Next Steps
 
-### 1. Learn the Basics
-- Read [CLAUDE.md](./CLAUDE.md) - Core methodology
-- Read [QUICKSTART.md](./QUICKSTART.md) - Quick reference
-- Explore [docs/](./docs/) - Detailed documentation
+### View Your Personalized Roadmap
 
-### 2. Configure for Your Workflow
 ```bash
-# Run the wizard
-versatil config wizard
-
-# Or set up manually
-versatil config set updateBehavior notify
-versatil config set updateChannel stable
-versatil config set safetyLevel balanced
+# Open the auto-generated roadmap
+cat docs/VERSATIL_ROADMAP.md
 ```
 
-### 3. Initialize in Your Project
+Your roadmap includes:
+- 📅 4-week development plan
+- 🎯 Weekly milestones and tasks
+- 🤖 Agent recommendations for each phase
+- ✅ Quality gates and success metrics
+- 💡 Technology-specific best practices
+
+### Explore Agents
+
 ```bash
-cd your-project
-versatil init
-versatil analyze
+# List all available agents
+versatil show-agents
+
+# Expected output:
+# 8 Core OPERA Agents:
+#   • Alex-BA: Business Analyst
+#   • Dana-Database: Database Architect
+#   • Marcus-Backend: API Architect
+#   • James-Frontend: UI/UX Expert
+#   • Maria-QA: Quality Guardian
+#   • Sarah-PM: Project Coordinator
+#   • Dr.AI-ML: AI/ML Specialist
+#   • Oliver-MCP: MCP Orchestrator
+#
+# 10 Language Sub-Agents:
+#   • James-React, James-Vue, James-Next, James-Angular, James-Svelte
+#   • Marcus-Node, Marcus-Python, Marcus-Rails, Marcus-Go, Marcus-Java
 ```
 
-### 4. Start Coding
-Agents will activate automatically as you work! No manual intervention needed.
+### Manual Agent Invocation
 
-### 5. Join the Community
-- **GitHub**: [MiraclesGIT/versatil-sdlc-framework](https://github.com/MiraclesGIT/versatil-sdlc-framework)
-- **Issues**: Report bugs or request features
-- **Discussions**: Share your experience
+While agents auto-activate, you can also invoke them manually:
+
+```bash
+# Quality assurance
+/maria-qa review test coverage
+
+# Frontend optimization
+/james-frontend optimize page load time
+
+# Backend security
+/marcus-backend review API security
+
+# Database optimization
+/dana-database optimize user queries
+
+# Requirements analysis
+/alex-ba extract requirements from conversation
+
+# Project coordination
+/sarah-pm generate sprint report
+
+# AI/ML tasks
+/dr-ai-ml optimize model performance
+
+# MCP orchestration
+/oliver-mcp test browser automation
+```
 
 ---
 
-## Frequently Asked Questions
+## Common Issues
 
-### Q: Do I need to run agents manually?
-**A:** No! Agents activate automatically based on file patterns and context.
+### Daemon won't start
 
-### Q: Where is framework data stored?
-**A:** In `~/.versatil/` in your home directory. Never in your project.
+```bash
+# Check if port 3000 is already in use
+lsof -i :3000
 
-### Q: Will the framework pollute my project?
-**A:** No. Only `.versatil-project.json` is added to your project. Everything else is in `~/.versatil/`.
+# Stop any existing daemon
+versatil-daemon stop
 
-### Q: Can I use it in CI/CD?
-**A:** Yes! The framework detects CI environments and uses automated configuration.
+# Restart
+versatil-daemon start
+```
 
-### Q: How do I update the framework?
-**A:** Run `versatil update check` then `versatil update install`. Or enable auto-updates.
+### Agents not activating
 
-### Q: What if an update breaks something?
-**A:** Run `versatil rollback previous` to instantly restore the previous version.
+```bash
+# Check daemon status
+versatil-daemon status
 
-### Q: Is telemetry required?
-**A:** No. You can disable it during setup or anytime with `versatil config set enableTelemetry false`.
+# View daemon logs
+versatil-daemon logs
 
-### Q: Can I customize agent behavior?
-**A:** Yes! Edit agent configs in `~/.versatil/agents/` or use `versatil config`.
+# Restart daemon
+versatil-daemon restart
+```
 
-### Q: Does it work with my IDE?
-**A:** Yes! Works with Cursor, VS Code, and any IDE. Cursor integration is optimized.
+### MCP integration issues
 
-### Q: Can I use it with multiple projects?
-**A:** Yes! One framework installation works with unlimited projects.
+```bash
+# Validate MCP configuration
+versatil-mcp-setup --validate
+
+# Re-run setup
+versatil-mcp-setup --cursor --force
+```
 
 ---
 
-## Support
+## Getting Help
 
-### Get Help
-
-- 📖 **Documentation**: [GitHub Wiki](https://github.com/MiraclesGIT/versatil-sdlc-framework/wiki)
-- 🐛 **Report Bug**: [GitHub Issues](https://github.com/MiraclesGIT/versatil-sdlc-framework/issues)
-- 💡 **Request Feature**: [GitHub Discussions](https://github.com/MiraclesGIT/versatil-sdlc-framework/discussions)
-- 💬 **Ask Question**: [GitHub Discussions Q&A](https://github.com/MiraclesGIT/versatil-sdlc-framework/discussions/categories/q-a)
-
-### Quick Help Commands
-
-```bash
-versatil --help          # General help
-versatil <command> --help  # Command-specific help
-versatil doctor          # Diagnose issues
-versatil config show     # View current setup
-```
+- **📖 Documentation**: [docs/README.md](docs/README.md)
+- **💬 GitHub Discussions**: [Ask questions](https://github.com/Nissimmiracles/versatil-sdlc-framework/discussions)
+- **🐛 Report Issues**: [GitHub Issues](https://github.com/Nissimmiracles/versatil-sdlc-framework/issues)
+- **📧 Email**: nissim@versatil.vc
 
 ---
 
 ## What's Next?
 
-🎉 **You're ready to go!** The framework is installed and configured.
-
-**Recommended next steps:**
-1. ✅ Run `versatil doctor` to verify everything works
-2. ✅ Run `versatil init` in your project
-3. ✅ Start coding - agents will help automatically
-4. ✅ Run `versatil update check` periodically
-5. ✅ Star us on [GitHub](https://github.com/MiraclesGIT/versatil-sdlc-framework) ⭐
+1. **Read the Agent Reference**: [docs/agents/README.md](docs/agents/README.md)
+2. **Explore MCP Integrations**: [docs/features/mcp-ecosystem.md](docs/features/mcp-ecosystem.md)
+3. **See Real-World Examples**: [docs/MCP_EXAMPLES.md](docs/MCP_EXAMPLES.md)
+4. **Compare with Other Tools**: [docs/COMPARISON.md](docs/COMPARISON.md)
 
 ---
 
-**Framework Version**: 3.0.0
-**Last Updated**: 2025-01-03
-**Maintained By**: VERSATIL Development Team
-**License**: MIT
+**🎉 Congratulations!** You're now running VERSATIL with 18 AI agents working proactively on your project.
 
-🚀 Happy coding with VERSATIL!
+[← Back to README](README.md) | [View All Documentation](docs/README.md)

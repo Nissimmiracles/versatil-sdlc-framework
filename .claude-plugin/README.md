@@ -1,25 +1,24 @@
-# VERSATIL OPERA Framework - Claude Code Plugin
+# VERSATIL - Claude Code Plugin
 
-[![Version](https://img.shields.io/badge/version-6.4.0-blue.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework)
+[![Version](https://img.shields.io/badge/version-6.5.0-blue.svg)](https://github.com/Nissimmiracles/versatil-sdlc-framework)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugin-purple.svg)](https://claude.com/claude-code)
 
-**Enterprise-grade SDLC framework** with 17 specialized agents (7 core OPERA + Feedback-Codifier + 10 language-specific sub-agents), 5-rule automation system, and 11 MCP integrations for production-ready software development with continuous learning.
+**AI-Native SDLC Framework for Claude** with 18 specialized agents (8 core OPERA + 10 language-specific sub-agents), 5-rule automation system, and 12 MCP integrations for production-ready software development.
 
 ---
 
-## 🎯 What is VERSATIL OPERA?
+## 🎯 What is VERSATIL?
 
 VERSATIL is a **production-ready framework** that transforms Claude Code into a complete SDLC automation platform. It provides:
 
-- **17 Specialized Agents** - 7 core OPERA agents (BA, Frontend, Backend, QA, PM, AI/ML, Feedback-Codifier) + 10 language-specific sub-agents (5 backend: Node.js, Python, Rails, Go, Java; 5 frontend: React, Vue, Next.js, Angular, Svelte)
+- **18 specialized agents** - 8 core OPERA agents (Alex-BA, Dana-Database, Marcus-Backend, James-Frontend, Maria-QA, Sarah-PM, Dr.AI-ML, Oliver-MCP) + 10 language-specific sub-agents (5 backend: Node.js, Python, Rails, Go, Java; 5 frontend: React, Vue, Next.js, Angular, Svelte)
 - **Rich Activation Examples** - Each agent includes contextual examples showing when/how to activate
 - **5-Rule Automation System** - Parallel execution, stress testing, health monitoring, onboarding, releases
-- **11 MCP Integrations** - Chrome, GitHub, Vertex AI, Supabase, n8n, Semgrep, Sentry, and more
+- **12 MCP Integrations** - Chrome, GitHub, GitMCP, Vertex AI, Supabase, n8n, Semgrep, Sentry, Shadcn, Ant Design, Claude Code, and more
 - **17 Lifecycle Hooks** - Session, tool, and statusline automation
 - **Proactive Intelligence** - Auto-activation based on file patterns and code context
 - **Quality Gates** - Enforced 80%+ test coverage and WCAG 2.1 AA compliance
-- **Continuous Learning** - Feedback-Codifier learns from user feedback to improve all agents
 
 ---
 
@@ -137,40 +136,40 @@ You: "Make the search better"
 
 ---
 
-## 👥 The 6 OPERA Agents
+## 👥 The 8 Core OPERA Agents
 
-### 1. Maria-QA - Quality Assurance Lead ✅
-**Auto-activates on**: `*.test.*`, `__tests__/**`, coverage reports
+### 1. Alex-BA - Business Analyst 📊
+**Auto-activates on**: `requirements/**`, `*.feature`, user stories
 
 **Capabilities**:
-- Enforces 80%+ test coverage
-- Runs comprehensive test suites (unit, integration, e2e)
-- Validates quality gates
-- Chrome MCP browser testing
-- Security and accessibility audits
+- Requirements extraction and analysis
+- User story creation with acceptance criteria
+- Stakeholder communication
+- Business logic validation
+- ROI and impact analysis
 
 **Example Usage**:
 ```bash
-/maria-qa run full quality validation
-/maria-qa check security compliance
-/maria-qa generate test coverage report
+/alex-ba extract requirements from conversation
+/alex-ba create user stories for new feature
+/alex-ba validate acceptance criteria
 ```
 
-### 2. James-Frontend - UI/UX Architect 🎨
-**Auto-activates on**: `*.jsx`, `*.tsx`, `*.vue`, `*.css`, `components/**`
+### 2. Dana-Database - Database Architect 🗄️
+**Auto-activates on**: `*.sql`, `migrations/**`, `schema/**`, `prisma/**`
 
 **Capabilities**:
-- Modern component development (React/Vue/Svelte)
-- Responsive and accessible UI (WCAG 2.1 AA)
-- Frontend performance optimization
-- Design system implementation
-- 5 specialized sub-agents (Accessibility, Design, Performance, Components, UX Excellence)
+- Database schema design and optimization
+- Migration scripts (SQL, Prisma, TypeORM)
+- Query performance optimization
+- RLS policies for Supabase
+- Index strategy and tuning
 
 **Example Usage**:
 ```bash
-/james-frontend optimize page load performance
-/james-frontend validate accessibility compliance
-/james-frontend review component structure
+/dana-database optimize user queries
+/dana-database design multi-tenant schema
+/dana-database review migration safety
 ```
 
 ### 3. Marcus-Backend - API Architect 🔧
@@ -190,24 +189,41 @@ You: "Make the search better"
 /marcus-backend review security vulnerabilities
 ```
 
-### 4. Alex-BA - Business Analyst 📊
-**Auto-activates on**: `requirements/**`, `*.feature`, user stories
+### 4. James-Frontend - UI/UX Architect 🎨
+**Auto-activates on**: `*.jsx`, `*.tsx`, `*.vue`, `*.css`, `components/**`
 
 **Capabilities**:
-- Requirements extraction and analysis
-- User story creation with acceptance criteria
-- Stakeholder communication
-- Business logic validation
-- ROI and impact analysis
+- Modern component development (React/Vue/Svelte)
+- Responsive and accessible UI (WCAG 2.1 AA)
+- Frontend performance optimization
+- Design system implementation
+- 5 specialized sub-agents (React, Vue, Next.js, Angular, Svelte)
 
 **Example Usage**:
 ```bash
-/alex-ba extract requirements from conversation
-/alex-ba create user stories for new feature
-/alex-ba validate acceptance criteria
+/james-frontend optimize page load performance
+/james-frontend validate accessibility compliance
+/james-frontend review component structure
 ```
 
-### 5. Sarah-PM - Project Manager 📅
+### 5. Maria-QA - Quality Assurance Lead ✅
+**Auto-activates on**: `*.test.*`, `__tests__/**`, coverage reports
+
+**Capabilities**:
+- Enforces 80%+ test coverage
+- Runs comprehensive test suites (unit, integration, e2e)
+- Validates quality gates
+- Chrome MCP browser testing
+- Security and accessibility audits
+
+**Example Usage**:
+```bash
+/maria-qa run full quality validation
+/maria-qa check security compliance
+/maria-qa generate test coverage report
+```
+
+### 6. Sarah-PM - Project Manager 📅
 **Auto-activates on**: `*.md`, `docs/**`, sprint planning
 
 **Capabilities**:
@@ -224,7 +240,7 @@ You: "Make the search better"
 /sarah-pm track team velocity
 ```
 
-### 6. Dr.AI-ML - AI/ML Specialist 🤖
+### 7. Dr.AI-ML - AI/ML Specialist 🤖
 **Auto-activates on**: `*.py`, `*.ipynb`, `models/**`
 
 **Capabilities**:
@@ -241,29 +257,21 @@ You: "Make the search better"
 /dr-ai-ml deploy to production
 ```
 
-### 7. Feedback-Codifier - Continuous Improvement 🔄
-**Auto-activates on**: User feedback about agent performance
+### 8. Oliver-MCP - MCP Orchestrator 🔌
+**Auto-activates on**: MCP-related tasks, integration requests
 
 **Capabilities**:
-- Analyze false positives/negatives from agents
-- Extract patterns from user feedback
-- Update agent knowledge bases automatically
-- Track quality improvement metrics
-- Systematic learning from mistakes
+- Intelligent MCP server selection
+- Multi-MCP coordination
+- Anti-hallucination detection via GitMCP
+- Integration health monitoring
+- Automatic fallback handling
 
 **Example Usage**:
 ```bash
-# When Maria misses a test case:
-"Maria didn't catch the async error handling bug"
-→ Feedback-Codifier analyzes gap and updates Maria's test patterns
-
-# When Marcus flags false positives:
-"Marcus flagged this security issue but it's actually safe"
-→ Feedback-Codifier refines Marcus's detection rules
-
-# When James creates great patterns:
-"James's dashboard component structure worked perfectly"
-→ Feedback-Codifier codifies this as standard pattern
+/oliver-mcp query React documentation
+/oliver-mcp test browser automation
+/oliver-mcp validate GitHub integration
 ```
 
 ---
@@ -319,19 +327,20 @@ Bug tracking and version management:
 
 ## 🔌 MCP Integrations
 
-VERSATIL includes pre-configured integrations with:
+VERSATIL includes pre-configured integrations with 12 production MCPs:
 
-1. **Chrome MCP** - Browser automation and testing
+1. **Chrome/Playwright MCP** - Browser automation and testing
 2. **GitHub MCP** - Repository management and CI/CD
-3. **Vertex AI MCP** - Google Cloud AI services
-4. **Supabase MCP** - Database and backend
-5. **n8n MCP** - Workflow automation
-6. **Semgrep MCP** - Security scanning
-7. **Sentry MCP** - Error monitoring
-8. **Exa MCP** - Search and discovery
-9. **Shadcn MCP** - UI component library
-10. **Playwright MCP** - E2E testing
-11. **Filesystem MCP** - File operations
+3. **GitMCP** - GitHub repository documentation access (NEW)
+4. **Exa MCP** - AI-powered search and discovery
+5. **Vertex AI MCP** - Google Cloud AI services
+6. **Supabase MCP** - Database and backend (vector DB for RAG)
+7. **n8n MCP** - Workflow automation (525+ nodes)
+8. **Semgrep MCP** - Security scanning (30+ languages)
+9. **Sentry MCP** - Error monitoring with AI analysis
+10. **Shadcn MCP** - UI component library
+11. **Ant Design MCP** - React component system
+12. **Claude Code MCP** - Enhanced Claude Code integration
 
 ---
 
