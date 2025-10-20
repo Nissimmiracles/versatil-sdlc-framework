@@ -19,6 +19,8 @@ export interface ContextClearEvent {
   triggerType: 'input_tokens' | 'manual';
   triggerValue: number;
   agentId?: string;
+  patternsPreserved?: number; // Number of patterns extracted before clear
+  preClearHookExecuted?: boolean; // Whether pre-clear hook ran
 }
 
 export interface MemoryOperation {
@@ -55,12 +57,23 @@ export interface SessionMetrics {
   peakTokens: number;
 }
 
+/**
+ * Pre-clear hook function type
+ * Called before context clearing to extract and preserve critical patterns
+ *
+ * @param inputTokens - Current token count before clear
+ * @param agentId - Agent triggering the clear (if any)
+ * @returns Number of patterns preserved
+ */
+export type PreClearHook = (inputTokens: number, agentId?: string) => Promise<number>;
+
 export class ContextStatsTracker {
   private statsDir: string;
   private currentSession: SessionMetrics | null = null;
   private clearEvents: ContextClearEvent[] = [];
   private memoryOps: MemoryOperation[] = [];
   private startTime: Date = new Date();
+  private preClearHooks: PreClearHook[] = [];
 
   constructor(baseDir: string = path.join(os.homedir(), '.versatil', 'stats')) {
     this.statsDir = baseDir;
@@ -138,11 +151,30 @@ export class ContextStatsTracker {
 
   /**
    * Track a context clear event
+   * Executes pre-clear hooks before recording the event
    */
   async trackClearEvent(event: Omit<ContextClearEvent, 'timestamp'>): Promise<void> {
+    // Execute pre-clear hooks to preserve patterns
+    let patternsPreserved = 0;
+    let preClearHookExecuted = false;
+
+    if (this.preClearHooks.length > 0) {
+      try {
+        preClearHookExecuted = true;
+        const results = await Promise.all(
+          this.preClearHooks.map(hook => hook(event.inputTokens, event.agentId))
+        );
+        patternsPreserved = results.reduce((sum, count) => sum + count, 0);
+      } catch (error) {
+        console.warn('Pre-clear hook execution failed:', error);
+      }
+    }
+
     const clearEvent: ContextClearEvent = {
       ...event,
-      timestamp: new Date()
+      timestamp: new Date(),
+      patternsPreserved,
+      preClearHookExecuted
     };
 
     this.clearEvents.push(clearEvent);
@@ -162,9 +194,25 @@ export class ContextStatsTracker {
   }
 
   /**
-   * Track a context clear event
+   * Track a context clear event (with optional pre-clear hook execution)
    */
   async trackContextClear(event: Omit<ContextClearEvent, 'timestamp'> & { timestamp?: string; reason?: 'auto' | 'manual' }): Promise<void> {
+    // Execute pre-clear hooks to preserve patterns
+    let patternsPreserved = 0;
+    let preClearHookExecuted = false;
+
+    if (this.preClearHooks.length > 0) {
+      try {
+        preClearHookExecuted = true;
+        const results = await Promise.all(
+          this.preClearHooks.map(hook => hook(event.inputTokens, event.agentId))
+        );
+        patternsPreserved = results.reduce((sum, count) => sum + count, 0);
+      } catch (error) {
+        console.warn('Pre-clear hook execution failed:', error);
+      }
+    }
+
     const clearEvent: ContextClearEvent = {
       timestamp: event.timestamp ? new Date(event.timestamp) : new Date(),
       inputTokens: event.inputTokens,
@@ -172,7 +220,9 @@ export class ContextStatsTracker {
       tokensSaved: event.tokensSaved,
       triggerType: event.reason === 'auto' ? 'input_tokens' : 'manual',
       triggerValue: event.inputTokens,
-      agentId: event.agentId
+      agentId: event.agentId,
+      patternsPreserved,
+      preClearHookExecuted
     };
 
     this.clearEvents.push(clearEvent);
@@ -442,6 +492,43 @@ ${clearEvents
       return new Date(value);
     }
     return value;
+  }
+
+  /**
+   * Register a pre-clear hook
+   * Hooks are called before context clearing to extract and preserve patterns
+   *
+   * @param hook - Function that preserves patterns before clear
+   * @returns ID of the registered hook for later removal
+   */
+  registerPreClearHook(hook: PreClearHook): number {
+    this.preClearHooks.push(hook);
+    return this.preClearHooks.length - 1;
+  }
+
+  /**
+   * Unregister a pre-clear hook by ID
+   *
+   * @param hookId - ID returned from registerPreClearHook
+   */
+  unregisterPreClearHook(hookId: number): void {
+    if (hookId >= 0 && hookId < this.preClearHooks.length) {
+      this.preClearHooks.splice(hookId, 1);
+    }
+  }
+
+  /**
+   * Clear all pre-clear hooks
+   */
+  clearPreClearHooks(): void {
+    this.preClearHooks = [];
+  }
+
+  /**
+   * Get number of registered pre-clear hooks
+   */
+  getPreClearHookCount(): number {
+    return this.preClearHooks.length;
   }
 }
 

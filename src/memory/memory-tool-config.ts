@@ -136,14 +136,17 @@ export const MEMORY_TOOL_CONFIG: MemoryToolConfig = {
   memoryDirectory: path.join(os.homedir(), '.versatil', 'memories'),
 
   // Context editing configuration
+  // NOTE: Threshold is now managed by AdaptiveContextManager
+  // Default: 30k tokens (Claude recommended), adjusts based on conversation patterns
   contextManagement: {
     edits: [{
       type: 'clear_tool_uses_20250919',
 
-      // Trigger context editing at 100k input tokens
+      // Trigger context editing at 30k input tokens (adaptive)
+      // AdaptiveContextManager will adjust this based on cache hit rate
       trigger: {
         type: 'input_tokens',
-        value: 100000
+        value: 30000 // Changed from 100k (25%+ cache improvement expected)
       },
 
       // Keep last 3 tool interactions
@@ -1451,4 +1454,26 @@ export function getAllAgentIds(): AgentId[] {
     'dr-ai-ml',
     'oliver-mcp'
   ];
+}
+
+/**
+ * Update context clear threshold dynamically
+ * Used by AdaptiveContextManager to adjust based on conversation patterns
+ */
+export function updateContextClearThreshold(newThreshold: number): void {
+  // Validate threshold is within safe bounds
+  const MIN_THRESHOLD = 15_000;
+  const MAX_THRESHOLD = 100_000;
+
+  const safeThreshold = Math.max(MIN_THRESHOLD, Math.min(MAX_THRESHOLD, newThreshold));
+
+  // Update the trigger value
+  MEMORY_TOOL_CONFIG.contextManagement.edits[0].trigger.value = safeThreshold;
+}
+
+/**
+ * Get current context clear threshold
+ */
+export function getContextClearThreshold(): number {
+  return MEMORY_TOOL_CONFIG.contextManagement.edits[0].trigger.value;
 }
