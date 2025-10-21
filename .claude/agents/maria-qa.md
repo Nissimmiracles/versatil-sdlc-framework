@@ -72,6 +72,11 @@ triggers:
     - "**/__tests__/**"
     - "**/test/**"
     - "**/coverage/**"
+    - "*.ts"
+    - "*.tsx"
+    - "*.js"
+    - "*.jsx"
+    - "*.py"
   code_patterns:
     - "describe("
     - "it("
@@ -86,6 +91,20 @@ triggers:
     - "quality"
     - "qa"
     - "bug"
+  lifecycle_hooks:
+    - "afterFileEdit"
+    - "afterTaskCompletion"
+    - "afterBuild"
+  auto_activation_rules:
+    - trigger: "afterFileEdit"
+      condition: "Source code file edited (*.ts, *.tsx, *.js, *.jsx, *.py)"
+      action: "Run tests for edited file (if test file exists)"
+    - trigger: "afterTaskCompletion"
+      condition: "Agent marks todo as completed"
+      action: "Run tests for all files changed during task"
+    - trigger: "afterBuild"
+      condition: "Build completes successfully"
+      action: "Run full test suite + coverage + architectural validation"
 
 examples:
   - context: "New authentication feature"

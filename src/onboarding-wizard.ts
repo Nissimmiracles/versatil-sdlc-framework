@@ -333,12 +333,28 @@ Choose (1-5): `);
    versatil.log - Framework activity log
 
 🚀 Next Steps:
-   1. Review your personalized roadmap: docs/VERSATIL_ROADMAP.md
-   2. Run 'npm run dev' to start your project
-   3. Create a file matching your agent triggers to test auto-activation
-   4. Check the documentation at docs/INSTALLATION.md
 
-💡 Pro Tip: Your agents will auto-activate based on the file patterns you configured!
+   1. ⚡ Start the proactive daemon (REQUIRED for auto-activation):
+      versatil-daemon start
+
+      This enables automatic agent activation when you edit files.
+      You only need to start it once per project.
+
+   2. 📍 Review your personalized roadmap:
+      docs/VERSATIL_ROADMAP.md
+
+   3. 🧪 Test agent auto-activation:
+      • Edit a *.test.* file → Maria-QA activates
+      • Edit a *.tsx file → James-Frontend activates
+      • Or use slash commands: /maria-qa, /james-frontend
+
+   4. 📚 Check the documentation:
+      docs/INSTALLATION.md
+
+💡 Daemon Commands:
+   versatil-daemon status    # Check if running
+   versatil-daemon stop      # Stop daemon
+   versatil-daemon logs      # View daemon logs
 
 🎯 Your OPERA agents are ready:
 ${Array.from(config.agentCustomizations.keys()).map(agent => `   • ${agent}`).join('\n')}
@@ -348,9 +364,34 @@ ${Array.from(config.agentCustomizations.keys()).map(agent => `   • ${agent}`).
    • Recommended agents for each phase
    • Quality gates and success metrics
    • Technology-specific best practices
-
-Happy coding with VERSATIL! 🚀
 `);
+
+    // Ask if user wants to start daemon now
+    const startDaemon = await this.askYesNo(`
+Would you like to start the proactive daemon now? (Recommended)
+This enables automatic agent activation when you edit files. (Y/n): `, true);
+
+    if (startDaemon) {
+      console.log('\n🚀 Starting VERSATIL Proactive Daemon...');
+
+      try {
+        // Import and start daemon
+        const { execSync } = await import('child_process');
+        execSync('versatil-daemon start', { stdio: 'inherit', cwd: process.cwd() });
+        console.log('\n✅ Daemon started successfully!');
+        console.log('   Agents will now auto-activate when you edit files.');
+        console.log('   Check status anytime: versatil-daemon status');
+      } catch (error) {
+        console.error('\n⚠️  Could not start daemon automatically.');
+        console.log('   Please run manually: versatil-daemon start');
+        console.log(`   Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    } else {
+      console.log('\n⚠️  Remember to start the daemon later:');
+      console.log('   versatil-daemon start');
+    }
+
+    console.log('\nHappy coding with VERSATIL! 🚀\n');
   }
 
   // Helper methods for parsing responses

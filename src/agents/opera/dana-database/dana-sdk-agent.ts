@@ -324,7 +324,10 @@ export class DanaSDKAgent extends SDKAgentAdapter {
     sql: string;
     schemaType?: 'postgresql' | 'mysql' | 'sqlite' | 'supabase';
   }): Promise<any> {
-    return await this.schemaValidator.validate(options);
+    return await this.schemaValidator.validate({
+      sql: options.sql,
+      schemaType: options.schemaType || 'postgresql'
+    });
   }
 
   /**

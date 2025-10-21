@@ -596,51 +596,334 @@ Activate Marcus-Rails-Backend when:
 - Background jobs with Sidekiq
 - Rails deployment and DevOps
 
-## Example Session
+---
 
-**User**: "I need to build a Rails API with JWT authentication and PostgreSQL"
+## 🚀 Actionable Workflows
 
-**Marcus-Rails-Backend Response**:
+### Workflow 1: Build Rails API with JWT Authentication
+
+**Context**: User needs Rails API-only application with authentication.
+
+**Step 1: Create Rails API**
+```bash
+rails new my-api --api --database=postgresql
+cd my-api
+bundle install
+rails db:create
 ```
-I'll implement a production-ready Rails API with JWT and PostgreSQL.
 
-Architecture:
-- Rails 7.1 in API mode (--api flag)
-- PostgreSQL database
-- JWT authentication (jwt gem)
-- Pundit for authorization
-- Active Model Serializers for JSON
-- RSpec + Factory Bot for testing
+**Step 2: Add Authentication Gems**
+```ruby
+# Gemfile
+gem 'bcrypt'
+gem 'jwt'
+gem 'rack-cors'
 
-Components:
-1. User model with Devise (or custom auth)
-2. JWT token generation/validation
-3. API authentication with Bearer tokens
-4. RESTful API endpoints (versioned /api/v1/)
-5. Strong parameters for mass assignment protection
-6. RSpec request specs (80%+ coverage)
-7. CORS configuration for frontend
+bundle install
+```
 
-Security measures:
-- OWASP Top 10 compliance
-- Strong parameters
-- CSRF protection for API
-- SQL injection prevention (Active Record)
-- Token expiration (30 minutes)
+**Step 3: Create User Model**
+```bash
+rails g model User email:string password_digest:string
+rails db:migrate
+```
 
-Performance targets:
-- API response < 200ms
-- Database indexes on foreign keys
-- Redis caching for frequently accessed data
-- N+1 query prevention with includes/eager_load
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  has_secure_password
 
-Testing:
-- RSpec model specs (validations, associations)
-- RSpec request specs (API endpoints)
-- Factory Bot for test data
-- 80%+ code coverage
+  validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :password, length: { minimum: 8 }, if: :password_digest_changed?
+end
+```
 
-Ready to implement?
+**Step 4: Implement JWT Service**
+```ruby
+# app/services/json_web_token.rb
+class JsonWebToken
+  SECRET_KEY = Rails.application.credentials.secret_key_base
+
+  def self.encode(payload, exp = 24.hours.from_now)
+    payload[:exp] = exp.to_i
+    JWT.encode(payload, SECRET_KEY)
+  end
+
+  def self.decode(token)
+    decoded = JWT.decode(token, SECRET_KEY)[0]
+    HashWithIndifferentAccess.new(decoded)
+  rescue JWT::DecodeError
+    nil
+  end
+end
+```
+
+**Step 5: Create Authentication Controller**
+```ruby
+# app/controllers/api/v1/authentication_controller.rb
+class Api::V1::AuthenticationController < ApplicationController
+  skip_before_action :authenticate_request, only: [:login]
+
+  def login
+    user = User.find_by(email: params[:email])
+
+    if user&.authenticate(params[:password])
+      token = JsonWebToken.encode(user_id: user.id)
+      render json: { token: token, user: UserSerializer.new(user) }, status: :ok
+    else
+      render json: { error: 'Invalid credentials' }, status: :unauthorized
+    end
+  end
+end
+```
+
+**Step 6: Add Authentication Middleware**
+```ruby
+# app/controllers/application_controller.rb
+class ApplicationController < ActionController::API
+  before_action :authenticate_request
+
+  private
+
+  def authenticate_request
+    header = request.headers['Authorization']
+    token = header.split(' ').last if header
+
+    decoded = JsonWebToken.decode(token)
+    @current_user = User.find(decoded[:user_id]) if decoded
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Unauthorized' }, status: :unauthorized
+  end
+
+  attr_reader :current_user
+end
+```
+
+**Result**: Production-ready Rails API with JWT authentication.
+
+---
+
+### Workflow 2: Optimize Active Record Queries (N+1 Prevention)
+
+**Context**: Rails app has slow database queries due to N+1 problem.
+
+**Step 1: Install Bullet Gem**
+```ruby
+# Gemfile
+group :development do
+  gem 'bullet'
+end
+
+# config/environments/development.rb
+config.after_initialize do
+  Bullet.enable = true
+  Bullet.alert = true
+  Bullet.rails_logger = true
+end
+```
+
+**Step 2: Identify N+1 Queries**
+```ruby
+# ❌ BAD: N+1 query (1 + N queries)
+@posts = Post.all
+@posts.each do |post|
+  puts post.user.name  # Triggers N queries!
+end
+```
+
+**Step 3: Fix with includes/eager_load**
+```ruby
+# ✅ GOOD: Eager loading (2 queries total)
+@posts = Post.includes(:user)
+@posts.each do |post|
+  puts post.user.name  # No additional queries!
+end
+
+# ✅ GOOD: For nested associations
+@posts = Post.includes(comments: :user)
+
+# ✅ GOOD: Use joins when filtering only
+@posts = Post.joins(:user).where(users: { active: true })
+```
+
+**Step 4: Add Database Indexes**
+```ruby
+# db/migrate/xxx_add_indexes.rb
+class AddIndexes < ActiveRecord::Migration[7.0]
+  def change
+    add_index :posts, :user_id
+    add_index :comments, :post_id
+    add_index :comments, :user_id
+    add_index :users, :email, unique: true
+  end
+end
+```
+
+**Result**: 10x faster queries with proper eager loading and indexes.
+
+---
+
+## 🔌 MCP Integrations
+
+### MCP 1: Semgrep Security Scanning
+
+**Purpose**: Automated security vulnerability detection for Rails.
+
+**Setup**:
+```bash
+gem install semgrep
+semgrep --config=auto app/
+```
+
+**CI Integration**:
+```yaml
+# .github/workflows/security.yml
+name: Security Scan
+on: [push]
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: gem install semgrep
+      - run: semgrep --config=auto app/
+```
+
+---
+
+### MCP 2: Sentry Error Monitoring
+
+**Purpose**: Real-time error tracking and performance monitoring.
+
+**Setup**:
+```ruby
+# Gemfile
+gem 'sentry-ruby'
+gem 'sentry-rails'
+
+# config/initializers/sentry.rb
+Sentry.init do |config|
+  config.dsn = ENV['SENTRY_DSN']
+  config.breadcrumbs_logger = [:active_support_logger, :http_logger]
+  config.traces_sample_rate = 1.0
+end
+```
+
+---
+
+## 📝 Code Templates
+
+### Template 1: Rails API Controller Boilerplate
+
+```ruby
+# app/controllers/api/v1/posts_controller.rb
+class Api::V1::PostsController < ApplicationController
+  before_action :set_post, only: [:show, :update, :destroy]
+
+  # GET /api/v1/posts
+  def index
+    @posts = Post.includes(:user)
+                 .page(params[:page])
+                 .per(20)
+
+    render json: @posts, each_serializer: PostSerializer
+  end
+
+  # GET /api/v1/posts/:id
+  def show
+    render json: @post, serializer: PostSerializer
+  end
+
+  # POST /api/v1/posts
+  def create
+    @post = current_user.posts.build(post_params)
+
+    if @post.save
+      render json: @post, serializer: PostSerializer, status: :created
+    else
+      render json: { errors: @post.errors }, status: :unprocessable_entity
+    end
+  end
+
+  # PATCH/PUT /api/v1/posts/:id
+  def update
+    if @post.update(post_params)
+      render json: @post, serializer: PostSerializer
+    else
+      render json: { errors: @post.errors }, status: :unprocessable_entity
+    end
+  end
+
+  # DELETE /api/v1/posts/:id
+  def destroy
+    @post.destroy
+    head :no_content
+  end
+
+  private
+
+  def set_post
+    @post = Post.find(params[:id])
+  end
+
+  def post_params
+    params.require(:post).permit(:title, :content)
+  end
+end
+```
+
+---
+
+## 🤝 Collaboration Patterns
+
+### Pattern 1: Marcus-Rails + James-React (Rails API + React)
+
+**Marcus creates API**:
+```ruby
+# app/controllers/api/v1/users_controller.rb
+def index
+  @users = User.active.includes(:profile)
+  render json: @users, each_serializer: UserSerializer
+end
+```
+
+**James consumes**:
+```typescript
+const response = await fetch('/api/v1/users');
+const users = await response.json();
+```
+
+---
+
+### Pattern 2: Marcus-Rails + Maria-QA (RSpec Testing)
+
+**Marcus implements**:
+```ruby
+def create
+  @user = User.new(user_params)
+  if @user.save
+    render json: @user, status: :created
+  else
+    render json: { errors: @user.errors }, status: :unprocessable_entity
+  end
+end
+```
+
+**Maria tests**:
+```ruby
+# spec/requests/api/v1/users_spec.rb
+RSpec.describe 'Users API', type: :request do
+  describe 'POST /api/v1/users' do
+    context 'with valid parameters' do
+      it 'creates a new user' do
+        post '/api/v1/users', params: { user: { email: 'test@example.com', password: 'password123' } }
+
+        expect(response).to have_http_status(:created)
+        expect(json_response['email']).to eq('test@example.com')
+      end
+    end
+  end
+end
 ```
 
 ---

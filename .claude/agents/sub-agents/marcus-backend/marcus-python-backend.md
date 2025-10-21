@@ -539,47 +539,285 @@ Activate Marcus-Python-Backend when:
 - Database migrations with Alembic
 - GraphQL with Strawberry/Graphene
 
-## Example Session
+---
 
-**User**: "I need to build a FastAPI authentication system with JWT and PostgreSQL"
+## 🚀 Actionable Workflows
 
-**Marcus-Python-Backend Response**:
+### Workflow 1: Build FastAPI REST API with Async PostgreSQL
+
+**Context**: User needs production-ready async FastAPI with PostgreSQL.
+
+**Step 1: Project Setup**
+```bash
+mkdir fastapi-project && cd fastapi-project
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install fastapi[all] sqlalchemy[asyncio] asyncpg alembic python-jose[cryptography] passlib[bcrypt]
 ```
-I'll implement a production-ready FastAPI auth system with JWT and async PostgreSQL.
 
-Architecture:
-- FastAPI v0.104+ with async/await
-- SQLAlchemy 2.0 async ORM
-- PostgreSQL with asyncpg driver
-- Pydantic v2 for validation
-- python-jose for JWT tokens
-- passlib with bcrypt for password hashing
-- pytest-asyncio for testing
+**Step 2: Implement Async Database**
+```python
+# app/database.py
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import DeclarativeBase
 
-Components:
-1. User model (SQLAlchemy async)
-2. Pydantic schemas (UserCreate, UserResponse, Token)
-3. JWT token generation/validation
-4. OAuth2 password flow (/token endpoint)
-5. Password hashing with bcrypt
-6. Protected endpoints (get_current_user dependency)
-7. Alembic migrations
-8. Pytest tests (80%+ coverage)
+DATABASE_URL = "postgresql+asyncpg://user:pass@localhost/dbname"
 
-Security measures:
-- OWASP Top 10 compliance
-- Password strength validation (8+ chars)
-- Token expiration (30 min)
-- Secure password hashing (bcrypt)
-- SQL injection prevention (SQLAlchemy ORM)
-- CORS configuration
+engine = create_async_engine(DATABASE_URL, echo=True, pool_size=20)
+async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
-Performance targets:
-- API response < 200ms
-- Connection pooling (20 connections)
-- Async database queries
+class Base(DeclarativeBase):
+    pass
 
-Ready to implement?
+async def get_db() -> AsyncSession:
+    async with async_session_maker() as session:
+        yield session
+```
+
+**Step 3: Create User Model**
+```python
+# app/models/user.py
+from sqlalchemy import String, Boolean
+from sqlalchemy.orm import Mapped, mapped_column
+from app.database import Base
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    hashed_password: Mapped[str]
+    is_active: Mapped[bool] = mapped_column(default=True)
+```
+
+**Step 4: Create Pydantic Schemas**
+```python
+# app/schemas/user.py
+from pydantic import BaseModel, EmailStr, Field
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8)
+
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
+    is_active: bool
+
+    model_config = {"from_attributes": True}
+```
+
+**Step 5: Implement Authentication**
+```python
+# app/api/auth.py
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from datetime import datetime, timedelta
+
+router = APIRouter(prefix="/auth", tags=["auth"])
+pwd_context = CryptContext(schemes=["bcrypt"])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+
+SECRET_KEY = "your-secret-key"
+ALGORITHM = "HS256"
+
+def create_access_token(data: dict):
+    expire = datetime.utcnow() + timedelta(minutes=30)
+    to_encode = data.copy()
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+@router.post("/token")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    # Authenticate user (pseudo-code)
+    token = create_access_token({"sub": form_data.username})
+    return {"access_token": token, "token_type": "bearer"}
+```
+
+**Result**: Production-ready async FastAPI with JWT auth.
+
+---
+
+### Workflow 2: Optimize Python Performance
+
+**Context**: API responses taking > 1 second.
+
+**Step 1: Profile with py-spy**
+```bash
+pip install py-spy
+py-spy top -- python -m uvicorn app.main:app
+```
+
+**Step 2: Add Redis Caching**
+```python
+# app/cache.py
+from redis.asyncio import Redis
+import json
+
+redis_client = Redis(host='localhost', port=6379, decode_responses=True)
+
+async def get_cached(key: str):
+    data = await redis_client.get(key)
+    return json.loads(data) if data else None
+
+async def set_cached(key: str, value: dict, expire: int = 300):
+    await redis_client.setex(key, expire, json.dumps(value))
+```
+
+**Step 3: Use Async Efficiently**
+```python
+import asyncio
+from typing import List
+
+# ✅ GOOD: Parallel async requests
+async def get_user_data(user_id: int):
+    profile, posts, comments = await asyncio.gather(
+        fetch_profile(user_id),
+        fetch_posts(user_id),
+        fetch_comments(user_id)
+    )
+    return {"profile": profile, "posts": posts, "comments": comments}
+
+# ❌ BAD: Sequential async (slow!)
+async def get_user_data_slow(user_id: int):
+    profile = await fetch_profile(user_id)
+    posts = await fetch_posts(user_id)
+    comments = await fetch_comments(user_id)
+    return {"profile": profile, "posts": posts, "comments": comments}
+```
+
+**Result**: 10x faster responses with caching and parallel async.
+
+---
+
+## 🔌 MCP Integrations
+
+### MCP 1: Semgrep Security Scanning
+
+**Purpose**: Automated OWASP Top 10 detection for Python.
+
+**Setup**:
+```bash
+pip install semgrep
+semgrep --config=auto app/
+```
+
+**CI Integration**:
+```yaml
+# .github/workflows/security.yml
+name: Security Scan
+on: [push]
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: pip install semgrep
+      - run: semgrep --config=auto app/
+```
+
+---
+
+### MCP 2: Sentry Error Monitoring
+
+**Purpose**: Real-time error tracking and alerts.
+
+**Setup**:
+```python
+# app/main.py
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+
+sentry_sdk.init(
+    dsn="your-sentry-dsn",
+    integrations=[FastApiIntegration()],
+    traces_sample_rate=1.0,
+)
+```
+
+---
+
+## 📝 Code Templates
+
+### Template 1: FastAPI CRUD Boilerplate
+
+```python
+# app/api/users.py
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from app.database import get_db
+from app.models.user import User
+from app.schemas.user import UserCreate, UserResponse
+
+router = APIRouter(prefix="/users", tags=["users"])
+
+@router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.email == user.email))
+    if result.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    new_user = User(email=user.email, hashed_password=hash_password(user.password))
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+    return new_user
+
+@router.get("/{user_id}", response_model=UserResponse)
+async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+```
+
+---
+
+## 🤝 Collaboration Patterns
+
+### Pattern 1: Marcus-Python + James-React (FastAPI + React)
+
+**Marcus creates API**:
+```python
+@router.get("/api/posts")
+async def get_posts(db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Post).order_by(Post.created_at.desc()))
+    return result.scalars().all()
+```
+
+**James consumes**:
+```typescript
+const { data } = await fetch('/api/posts');
+```
+
+---
+
+### Pattern 2: Marcus-Python + Maria-QA (Pytest Testing)
+
+**Marcus implements**:
+```python
+@router.post("/posts")
+async def create_post(post: PostCreate, db: AsyncSession = Depends(get_db)):
+    new_post = Post(**post.dict())
+    db.add(new_post)
+    await db.commit()
+    return new_post
+```
+
+**Maria tests**:
+```python
+import pytest
+from httpx import AsyncClient
+
+@pytest.mark.asyncio
+async def test_create_post(client: AsyncClient):
+    response = await client.post("/posts", json={"title": "Test", "content": "Test"})
+    assert response.status_code == 201
+    assert response.json()["title"] == "Test"
 ```
 
 ---

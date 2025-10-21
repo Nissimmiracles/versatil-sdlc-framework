@@ -76,11 +76,13 @@ async function checkIsolation() {
 async function checkAgents() {
   console.log('Checking OPERA agents...');
 
-  const agents = ['maria-qa', 'james-frontend', 'marcus-backend', 'sarah-pm', 'alex-ba', 'dr-ai-ml'];
+  // All 8 core OPERA agents (v6.4.x)
+  const agents = ['maria-qa', 'james-frontend', 'marcus-backend', 'dana-database', 'sarah-pm', 'alex-ba', 'dr-ai-ml', 'oliver-mcp'];
   const missing = [];
 
   for (const agent of agents) {
-    const agentConfig = path.join(PROJECT_ROOT, '.claude', 'agents', `${agent}.json`);
+    // Agent definitions are in .md files (not .json)
+    const agentConfig = path.join(PROJECT_ROOT, '.claude', 'agents', `${agent}.md`);
     if (!fs.existsSync(agentConfig)) {
       missing.push(agent);
     }
@@ -92,7 +94,7 @@ async function checkAgents() {
     checks.agents.fixable = true;
   } else {
     checks.agents.status = 'pass';
-    checks.agents.message = 'All 6 OPERA agents healthy';
+    checks.agents.message = 'All 8 OPERA agents healthy (+ 10 sub-agents)';
   }
 }
 
@@ -102,16 +104,24 @@ async function checkAgents() {
 async function checkMCPServers() {
   console.log('Checking MCP servers...');
 
-  // For now, simple check - in production this would ping actual MCP servers
-  const mcpConfig = path.join(HOME_DIR, '.mcp.json');
+  // Check Cursor MCP config (correct location)
+  const mcpConfig = path.join(PROJECT_ROOT, '.cursor', 'mcp_config.json');
 
   if (!fs.existsSync(mcpConfig)) {
     checks.mcpServers.status = 'warn';
-    checks.mcpServers.message = 'No MCP configuration found';
+    checks.mcpServers.message = 'No MCP configuration found (.cursor/mcp_config.json)';
     checks.mcpServers.fixable = false;
   } else {
-    checks.mcpServers.status = 'pass';
-    checks.mcpServers.message = 'MCP configuration present';
+    // Count configured MCPs
+    try {
+      const config = JSON.parse(fs.readFileSync(mcpConfig, 'utf8'));
+      const mcpCount = Object.keys(config.mcpServers || {}).length;
+      checks.mcpServers.status = 'pass';
+      checks.mcpServers.message = `${mcpCount} MCP servers configured`;
+    } catch (error) {
+      checks.mcpServers.status = 'warn';
+      checks.mcpServers.message = 'MCP config found but invalid JSON';
+    }
   }
 }
 
@@ -132,15 +142,19 @@ async function checkRules() {
 
   try {
     const settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8'));
-    const rules = settings.versatil?.rules || {};
+    // Settings uses dot notation in keys: "versatil.rules" not nested object
+    const rules = settings['versatil.rules'] || {};
 
+    // Check all 5 rules (CLAUDE.md specification)
     let enabledCount = 0;
     if (rules.rule1_parallel_execution?.enabled) enabledCount++;
     if (rules.rule2_stress_testing?.enabled) enabledCount++;
     if (rules.rule3_daily_audit?.enabled) enabledCount++;
+    if (rules.rule4_onboarding?.enabled) enabledCount++;
+    if (rules.rule5_releases?.enabled) enabledCount++;
 
-    checks.rules.status = enabledCount >= 2 ? 'pass' : 'warn';
-    checks.rules.message = `${enabledCount}/3 rules enabled`;
+    checks.rules.status = enabledCount >= 4 ? 'pass' : 'warn';
+    checks.rules.message = `${enabledCount}/5 rules enabled`;
   } catch (error) {
     checks.rules.status = 'fail';
     checks.rules.message = 'Error reading settings';
@@ -160,8 +174,19 @@ async function checkTests() {
   console.log('Checking test coverage...');
 
   try {
-    // Check if jest config exists
-    const jestConfig = fs.existsSync(path.join(PROJECT_ROOT, 'jest.config.js'));
+    // Check if jest config exists (multiple formats)
+    const jestConfigs = [
+      'jest.config.js',
+      'jest.config.cjs',
+      'jest.config.mjs',
+      'jest.config.ts',
+      'jest.config.json'
+    ];
+
+    const jestConfig = jestConfigs.some(config =>
+      fs.existsSync(path.join(PROJECT_ROOT, config))
+    );
+
     if (!jestConfig) {
       checks.tests.status = 'warn';
       checks.tests.message = 'No Jest configuration found';

@@ -41,6 +41,35 @@ export class EnhancedJames extends RAGEnabledAgent {
       })));
     }
 
+    // Enforce route registration for page components (CRITICAL ENHANCEMENT)
+    // This addresses audit Failure #1 (8 orphaned page components)
+    const routeEnforcement = await this.enforceRouteRegistration(context);
+    if (!routeEnforcement.hasRoute && routeEnforcement.violations.length > 0) {
+      response.suggestions = response.suggestions || [];
+      response.suggestions.push(...routeEnforcement.violations.map(violation => ({
+        type: violation.type,
+        message: violation.message,
+        priority: violation.severity,
+        file: violation.file
+      })));
+
+      // Add actionable fix suggestions
+      if (routeEnforcement.suggestions.length > 0) {
+        response.suggestions.push({
+          type: 'route-fix-suggestion',
+          message: routeEnforcement.suggestions.join('\n\n'),
+          priority: 'high',
+          file: context.filePath
+        });
+      }
+
+      // Update response status to indicate architectural issue
+      response.status = 'warning';
+      if (response.message) {
+        response.message += '\n\n⚠️ ARCHITECTURAL ISSUE: Page component missing route registration. See suggestions above.';
+      }
+    }
+
     return response;
   }
 
@@ -479,6 +508,181 @@ Provide comprehensive frontend analysis with historical component patterns and p
       issues,
       warnings
     };
+  }
+
+  /**
+   * Enforce route registration for page components
+   *
+   * This method is called when James detects a new page component being created.
+   * It validates that the component has a corresponding route registration.
+   *
+   * @see docs/audit/production-audit-report.md - Failure #1 (Orphaned Pages)
+   */
+  async enforceRouteRegistration(context: any): Promise<{
+    hasRoute: boolean;
+    violations: any[];
+    suggestions: string[];
+  }> {
+    const violations: any[] = [];
+    const suggestions: string[] = [];
+
+    if (!context || !context.filePath) {
+      return { hasRoute: true, violations, suggestions };
+    }
+
+    const filePath = context.filePath;
+
+    // Check if this is a page component
+    const isPageComponent =
+      filePath.match(/\/(pages|views|routes|screens)\/.*\.(tsx|jsx|vue|svelte)$/) &&
+      !filePath.includes('.test.') &&
+      !filePath.includes('.spec.') &&
+      !filePath.includes('.stories.');
+
+    if (!isPageComponent) {
+      return { hasRoute: true, violations, suggestions };
+    }
+
+    // Look for route configuration files in the project
+    const fs = await import('fs');
+    const path = await import('path');
+    const projectRoot = process.cwd();
+
+    const routeConfigPaths = [
+      path.join(projectRoot, 'src/App.tsx'),
+      path.join(projectRoot, 'src/App.jsx'),
+      path.join(projectRoot, 'src/router/index.ts'),
+      path.join(projectRoot, 'src/router/index.js'),
+      path.join(projectRoot, 'src/routes.ts'),
+      path.join(projectRoot, 'src/routes.js'),
+      path.join(projectRoot, 'app/routes.tsx'), // Next.js
+      path.join(projectRoot, 'app/routes.jsx')
+    ];
+
+    let routeConfigContent = '';
+    let routeConfigPath = '';
+
+    for (const configPath of routeConfigPaths) {
+      try {
+        if (fs.existsSync(configPath)) {
+          routeConfigContent = fs.readFileSync(configPath, 'utf-8');
+          routeConfigPath = configPath;
+          break;
+        }
+      } catch (error) {
+        // Continue to next path
+      }
+    }
+
+    if (!routeConfigContent) {
+      violations.push({
+        type: 'missing-route-config',
+        severity: 'critical',
+        message: 'No route configuration file found (App.tsx, router/index.ts, etc.)',
+        file: filePath
+      });
+
+      suggestions.push(
+        'Create a route configuration file (e.g., src/App.tsx) to register routes'
+      );
+
+      return { hasRoute: false, violations, suggestions };
+    }
+
+    // Check if this page component is imported in the route config
+    const componentName = path.basename(filePath, path.extname(filePath));
+    const relativePathToComponent = path.relative(path.dirname(routeConfigPath), filePath);
+
+    const isImported =
+      routeConfigContent.includes(`from './${relativePathToComponent.replace(/\\/g, '/')}`) ||
+      routeConfigContent.includes(`from "./${relativePathToComponent.replace(/\\/g, '/')}`) ||
+      routeConfigContent.includes(componentName);
+
+    if (!isImported) {
+      violations.push({
+        type: 'orphaned-page',
+        severity: 'blocker',
+        message: `Page component ${componentName} has no route registration`,
+        file: filePath
+      });
+
+      // Generate route suggestion
+      const routePath = this.inferRoutePath(filePath);
+      const suggestionText = `
+Add to ${path.basename(routeConfigPath)}:
+
+1. Import the component:
+   import ${componentName} from './${relativePathToComponent.replace(/\\/g, '/').replace(/\.(tsx|jsx)$/, '')}';
+
+2. Add route definition:
+   <Route path="${routePath}" element={
+     <Suspense fallback={<LoadingSpinner />}>
+       <${componentName} />
+     </Suspense>
+   } />
+
+Or run: npm run versatil:add-route ${filePath}
+`.trim();
+
+      suggestions.push(suggestionText);
+
+      return { hasRoute: false, violations, suggestions };
+    }
+
+    // Component is imported, now check for route definition
+    const routePattern = new RegExp(`<Route[^>]*element=\\{[^}]*<${componentName}`, 'm');
+    const hasRoute = routePattern.test(routeConfigContent);
+
+    if (!hasRoute) {
+      violations.push({
+        type: 'imported-not-routed',
+        severity: 'major',
+        message: `${componentName} is imported but not used in any route`,
+        file: filePath
+      });
+
+      const routePath = this.inferRoutePath(filePath);
+      suggestions.push(`
+Component is imported but not routed. Add:
+
+<Route path="${routePath}" element={
+  <Suspense fallback={<LoadingSpinner />}>
+    <${componentName} />
+  </Suspense>
+} />
+`.trim());
+
+      return { hasRoute: false, violations, suggestions };
+    }
+
+    // All checks passed
+    return { hasRoute: true, violations: [], suggestions: [] };
+  }
+
+  /**
+   * Infer route path from file path
+   * e.g., src/pages/dealflow/DealFlowSimplified.tsx -> /dealflow/simplified
+   */
+  private inferRoutePath(filePath: string): string {
+    const parts = filePath.split('/');
+    const pagesIndex = parts.findIndex(p => p === 'pages' || p === 'views' || p === 'routes');
+
+    if (pagesIndex === -1) return '/unknown';
+
+    const routeParts = parts.slice(pagesIndex + 1);
+    const fileName = routeParts[routeParts.length - 1]
+      .replace(/\.(tsx|jsx|vue|svelte)$/, '');
+
+    // Remove 'Page', 'View', 'Simplified' suffixes
+    const cleanName = fileName
+      .replace(/(Page|View|Simplified)$/, '')
+      .replace(/([A-Z])/g, '-$1')
+      .toLowerCase()
+      .replace(/^-/, '');
+
+    routeParts[routeParts.length - 1] = cleanName;
+
+    return '/' + routeParts.filter(p => p !== 'index').join('/');
   }
 
   /**

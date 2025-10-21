@@ -3,91 +3,85 @@
     [
       "authentication with bcrypt and jwt",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ],
     [
       "secure user authentication pattern using bcrypt password hashing and jwt tokens",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ],
     [
       "typescript",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ],
     [
       "express",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ],
     [
       "bcrypt",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ],
     [
       "jsonwebtoken",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ]
   ],
@@ -95,16 +89,15 @@
     [
       "security",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ]
   ],
@@ -112,61 +105,57 @@
     [
       "typescript",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ],
     [
       "express",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ],
     [
       "bcrypt",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ],
     [
       "jsonwebtoken",
       [
-        "08b3598971ebd556a195da5cd00714c3",
-        "1cc20c52f470647b4983606bfa84dc28",
-        "3a21a2abbd7d608272f3addc3b64cfff",
-        "4b05a3ffc0d941fa6b505d0bd8a0ef34",
-        "66f584fa06f0b7d7ced2455c3da01a21",
-        "75c22d60da6770858c7c1f3ba7f37736",
-        "79f9a1aca64674c92b1d1009ba4d4e35",
-        "935dfbbe441272e8e981bb04705b8be5",
-        "a6b59c56f8f087a8c148f460a6b7eeaf",
-        "e09937cbfbeafc0ffdac1dacc9f570f2"
+        "076a63f6a32292ed564eed0eec5d39a8",
+        "1fac0350a77bc824e1f707454cde0aec",
+        "4d593d478b47a9fa55c5dfeefb815177",
+        "86195452697151c42c5e889ad0d5cc4c",
+        "8a82e75dc76d46687a7bff0e347610d9",
+        "957107ce76e5da261faf295d554896d9",
+        "af40e0542571062d3562fa972dd02e5b",
+        "c585c847ebb8c5a0f540e9ade378c838",
+        "e44cdb4be4776be96b16918dd1a69fd1"
       ]
     ]
   ]

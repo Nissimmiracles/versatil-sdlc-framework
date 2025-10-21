@@ -638,6 +638,245 @@ Activate Marcus-Java-Backend when:
 
 ---
 
+## 🚀 Actionable Workflows
+
+### Workflow 1: Build Spring Boot REST API
+
+**Step 1: Create Project**
+```bash
+# Using Spring Initializr
+spring init --dependencies=web,data-jpa,postgresql,lombok,validation my-api
+cd my-api
+```
+
+**Step 2: Create Entity**
+```java
+// src/main/java/com/example/api/entity/User.java
+@Entity
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
+    @Email
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @NotBlank
+    @Size(min = 2, max = 100)
+    private String name;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+}
+```
+
+**Step 3: Create Repository**
+```java
+// src/main/java/com/example/api/repository/UserRepository.java
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
+    Page<User> findByNameContaining(String name, Pageable pageable);
+}
+```
+
+**Step 4: Create Service**
+```java
+// src/main/java/com/example/api/service/UserService.java
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class UserService {
+    private final UserRepository repository;
+
+    public Page<UserResponse> findAll(Pageable pageable) {
+        return repository.findAll(pageable)
+                .map(this::toResponse);
+    }
+
+    @Transactional
+    public UserResponse create(UserRequest request) {
+        User user = User.builder()
+                .email(request.getEmail())
+                .name(request.getName())
+                .build();
+        return toResponse(repository.save(user));
+    }
+
+    private UserResponse toResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .build();
+    }
+}
+```
+
+**Step 5: Create Controller**
+```java
+// src/main/java/com/example/api/controller/UserController.java
+@RestController
+@RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService service;
+
+    @GetMapping
+    public ResponseEntity<Page<UserResponse>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(service.findAll(pageable));
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
+    }
+}
+```
+
+**Result**: Production-ready Spring Boot REST API.
+
+---
+
+### Workflow 2: Optimize Spring Boot Performance
+
+**Step 1: Add Caching**
+```java
+@Configuration
+@EnableCaching
+public class CacheConfig {
+    @Bean
+    public CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager("users");
+    }
+}
+
+@Service
+public class UserService {
+    @Cacheable("users")
+    public UserResponse findById(Long id) {
+        return repository.findById(id)
+                .map(this::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    @CacheEvict(value = "users", allEntries = true)
+    public UserResponse create(UserRequest request) {
+        // Create user
+    }
+}
+```
+
+**Step 2: Optimize Queries**
+```java
+// ✅ GOOD: Eager loading with EntityGraph
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    @EntityGraph(attributePaths = {"posts", "profile"})
+    Optional<User> findWithPostsById(Long id);
+}
+```
+
+**Result**: Faster responses with caching and optimized queries.
+
+---
+
+## 🔌 MCP Integrations
+
+### MCP 1: Semgrep for Java
+```bash
+semgrep --config=auto src/main/java/
+```
+
+### MCP 2: Sentry for Spring Boot
+```java
+// build.gradle
+implementation 'io.sentry:sentry-spring-boot-starter:6.0.0'
+
+// application.properties
+sentry.dsn=your-dsn
+sentry.traces-sample-rate=1.0
+```
+
+---
+
+## 📝 Code Templates
+
+### Template 1: Spring Boot Exception Handler
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage
+                ));
+        return ResponseEntity.badRequest().body(new ErrorResponse("Validation failed", errors));
+    }
+}
+```
+
+---
+
+## 🤝 Collaboration Patterns
+
+### Pattern 1: Marcus-Java + James-React
+**Marcus creates**:
+```java
+@GetMapping("/api/posts")
+public List<Post> getPosts() {
+    return postRepository.findAll();
+}
+```
+
+**James consumes**:
+```typescript
+const res = await fetch('/api/posts');
+```
+
+---
+
+### Pattern 2: Marcus-Java + Maria-QA
+**Marcus implements**:
+```java
+@PostMapping
+public ResponseEntity<User> create(@Valid @RequestBody UserRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
+}
+```
+
+**Maria tests**:
+```java
+@Test
+void shouldCreateUser() throws Exception {
+    mockMvc.perform(post("/api/v1/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {"email": "test@example.com", "name": "Test"}
+                """))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.email").value("test@example.com"));
+}
+```
+
+---
+
 **Version**: 1.0.0
 **Parent Agent**: Marcus-Backend
 **Specialization**: Java (Spring Boot)

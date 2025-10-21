@@ -178,7 +178,7 @@ export class AuditTrail {
             SecurityEventType.SUSPICIOUS_PATTERN,
             SecuritySeverity.MEDIUM,
             `Rate limit exceeded for IP: ${context.ip}`,
-            { ip: context.ip, user: context.user, retryAfter: rateCheck.retryAfter }
+            { ip: context.ip, user: context.user, metadata: { retryAfter: rateCheck.retryAfter } }
           );
         }
 
@@ -240,7 +240,7 @@ export class AuditTrail {
         SecurityEventType.SEARCH_QUERY,
         SecuritySeverity.LOW,
         `Search query: ${query}`,
-        { query, resultCount, duration, user, ip }
+        { user, ip, metadata: { query, resultCount, duration } }
       );
     }
 
@@ -270,7 +270,7 @@ export class AuditTrail {
         SecurityEventType.INDEX_BUILD,
         success ? SecuritySeverity.LOW : SecuritySeverity.HIGH,
         `Index build ${success ? 'completed' : 'failed'}`,
-        { fileCount, duration, error }
+        { metadata: { fileCount, duration, error } }
       );
     }
 

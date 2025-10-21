@@ -11,7 +11,7 @@
  * - Comprehensive logging
  */
 
-import cron from 'node-cron';
+import * as cron from 'node-cron';
 import { EventEmitter } from 'events';
 import fs from 'fs-extra';
 import path from 'path';
@@ -229,7 +229,6 @@ export class DailyAuditDaemon extends EventEmitter {
         await this.runScheduledAudit();
       },
       {
-        scheduled: true,
         timezone: this.config.timezone
       }
     );

@@ -121,7 +121,7 @@ export const DEFAULT_CONFIG: StressTestRunnerConfig = {
 /**
  * Load configuration from environment or file
  */
-export function loadConfig(): StressTestRunnerConfig {
+export async function loadConfig(): Promise<StressTestRunnerConfig> {
   // Try to load from .cursor/hooks.json
   try {
     const fs = await import('fs');

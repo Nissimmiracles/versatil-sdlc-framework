@@ -15,6 +15,7 @@ import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import { join, resolve, relative } from 'path';
 import { createHash } from 'crypto';
+import { projectVisionManager, ProjectVision, ProjectHistory, MarketAnalysis } from '../project/project-vision-manager.js';
 
 export interface ProjectContext {
   id: string;
@@ -47,6 +48,10 @@ export interface ProjectContext {
     customRules: any[];
     qualityGates: any[];
   };
+  // NEW: Three-layer context enhancement (Layer 2: Project Context)
+  vision?: ProjectVision;
+  history?: ProjectHistory;
+  marketContext?: MarketAnalysis;
 }
 
 export interface ProjectIsolationConfig {
@@ -720,6 +725,84 @@ export class MultiProjectManager extends EventEmitter {
   private async queryCrossProjectKnowledge(query: string): Promise<any[]> {
     // Query cross-project knowledge base
     return [];
+  }
+
+  // ==================== NEW: Three-Layer Context Enhancement Methods ====================
+
+  /**
+   * Store project vision
+   */
+  async storeProjectVision(projectId: string, vision: Partial<ProjectVision>): Promise<void> {
+    await projectVisionManager.storeVision(projectId, vision);
+
+    // Update in-memory project context
+    const project = this.projects.get(projectId);
+    if (project) {
+      project.vision = await projectVisionManager.getVision(projectId) || undefined;
+      this.emit('project_vision_stored', { projectId, vision });
+    }
+  }
+
+  /**
+   * Get project vision
+   */
+  async getProjectVision(projectId: string): Promise<ProjectVision | null> {
+    return await projectVisionManager.getVision(projectId);
+  }
+
+  /**
+   * Update market context for project
+   */
+  async updateProjectMarketContext(projectId: string, market: MarketAnalysis): Promise<void> {
+    await projectVisionManager.updateMarketContext(projectId, market);
+
+    // Update in-memory project context
+    const project = this.projects.get(projectId);
+    if (project) {
+      project.marketContext = await projectVisionManager.getMarketContext(projectId) || undefined;
+      this.emit('project_market_updated', { projectId, market });
+    }
+  }
+
+  /**
+   * Track project event (feature added, decision made, etc.)
+   */
+  async trackProjectEvent(
+    projectId: string,
+    event: { type: string; description: string; impact: string; agent: string; metadata?: any }
+  ): Promise<void> {
+    await projectVisionManager.trackEvent(projectId, event as any);
+    this.emit('project_event_tracked', { projectId, event });
+  }
+
+  /**
+   * Track milestone
+   */
+  async trackProjectMilestone(projectId: string, milestone: any): Promise<void> {
+    await projectVisionManager.trackMilestone(projectId, milestone);
+    this.emit('project_milestone_tracked', { projectId, milestone });
+  }
+
+  /**
+   * Get project history (events, milestones, decisions)
+   */
+  async getProjectHistory(projectId: string, limit?: number): Promise<ProjectHistory> {
+    return await projectVisionManager.getProjectHistory(projectId, limit);
+  }
+
+  /**
+   * Get enriched project context (includes vision, history, market)
+   */
+  async getEnrichedProjectContext(projectId: string): Promise<ProjectContext | null> {
+    const project = this.projects.get(projectId);
+    if (!project) return null;
+
+    // Enrich with vision, history, market context
+    project.vision = await projectVisionManager.getVision(projectId) || undefined;
+    project.history = await projectVisionManager.getProjectHistory(projectId, 50);
+    project.marketContext = await projectVisionManager.getMarketContext(projectId) || undefined;
+
+    return project;
   }
 
   private async storeProjectLearning(project: ProjectContext, type: string, data: any): Promise<void> {

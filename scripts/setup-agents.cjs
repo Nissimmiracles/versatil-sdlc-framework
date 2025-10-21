@@ -90,7 +90,8 @@ const agents = {
 class VersatilAgentSetup {
   constructor() {
     this.projectRoot = process.cwd();
-    this.versatilDir = path.join(this.projectRoot, '.versatil');
+    // ⚠️ CRITICAL: Framework data goes in ~/.versatil/ (NOT project root)
+    this.versatilDir = path.join(require('os').homedir(), '.versatil');
     this.projectConfig = this.loadProjectConfig();
     this.packageJson = this.loadPackageJson();
   }
@@ -640,7 +641,7 @@ module.exports = router;
     console.log('• Agents auto-activate based on file patterns and keywords');
     console.log('• Maria-QA reviews all code changes for quality');
     console.log('• Use .cursorrules to customize activation rules');
-    console.log('• Check .versatil/agents/ for individual agent configurations');
+    console.log('• Check ~/.versatil/agents/ for individual agent configurations (framework isolation)');
   }
 
   async run() {

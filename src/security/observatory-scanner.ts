@@ -149,7 +149,7 @@ export class ObservatoryScanner {
       throw new Error(`Failed to initiate scan: ${response.status} - ${error}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     return data.scan_id;
   }
 
@@ -170,7 +170,7 @@ export class ObservatoryScanner {
         throw new Error(`Failed to get scan results: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
 
       if (data.state === 'FINISHED') {
         return this.parseScanResult(data, scanId);
@@ -655,7 +655,7 @@ export class ObservatoryScanner {
         throw new Error(`Failed to check grade: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
 
       return {
         grade: data.grade || 'F',

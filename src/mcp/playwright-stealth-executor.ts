@@ -148,7 +148,7 @@ export class PlaywrightStealthExecutor {
 
         // Extract colors from CSS variables and computed styles
         const extractColors = () => {
-          const colors: Record<string, string[]> = {
+          const colors: Record<string, any> = {
             primary: [],
             secondary: [],
             neutral: [],
@@ -349,7 +349,7 @@ export class PlaywrightStealthExecutor {
         const status = response.status();
 
         if (status >= 400) failedRequests++;
-        if (status === 304 || response.fromCache()) cachedRequests++;
+        if (status === 304 || (response as any).fromCache?.()) cachedRequests++;
 
         try {
           const contentType = response.headers()['content-type'] || '';

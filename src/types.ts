@@ -11,6 +11,8 @@ export interface AgentResponse {
   context: any;
   data?: any;
   analysis?: any;
+  status?: 'success' | 'error' | 'warning';
+  timestamp?: string;
 }
 
 export interface AgentActivationContext {

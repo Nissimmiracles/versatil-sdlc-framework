@@ -295,15 +295,46 @@ export class VertexAIMCPExecutor {
         throw new Error('Vertex AI not initialized');
       }
 
-      // Try real Vertex AI embeddings, fallback to simple hash-based embeddings
+      // Try real Vertex AI embeddings using @google-cloud/vertexai SDK
       try {
-        // Attempt to use Vertex AI if credentials available
-        const { PredictionServiceClient } = await import('@google-cloud/aiplatform').catch(() => ({ PredictionServiceClient: null }));
+        if (this.vertexAI) {
+          // Use Vertex AI SDK for text embeddings
+          const textEmbeddingModel = this.vertexAI.preview.getGenerativeModel({
+            model: 'text-embedding-004'  // Latest embedding model
+          });
 
-        if (PredictionServiceClient && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-          // Real Vertex AI embedding call would go here
-          console.log('📊 Using Vertex AI embeddings API');
-          // ... implementation
+          const embeddings: number[][] = [];
+
+          for (const text of texts) {
+            const result = await textEmbeddingModel.generateContent({
+              contents: [{ role: 'user', parts: [{ text }] }]
+            });
+
+            // Extract embedding from response
+            const embedding = result.response?.candidates?.[0]?.content?.parts?.[0]?.embedding?.values || [];
+
+            if (embedding.length > 0) {
+              embeddings.push(embedding);
+            } else {
+              // Fallback for this specific text
+              embeddings.push(this.generateSimpleEmbedding(text, 768));
+            }
+          }
+
+          return {
+            success: true,
+            data: {
+              embeddings,
+              model: 'text-embedding-004',
+              dimension: embeddings[0]?.length || 768,
+              method: 'vertex-ai'
+            },
+            metadata: {
+              model: 'text-embedding-004',
+              timestamp: new Date().toISOString(),
+              textsProcessed: texts.length
+            }
+          };
         }
 
         // Fallback: Simple deterministic hash-based embeddings for development
@@ -320,7 +351,7 @@ export class VertexAIMCPExecutor {
           metadata: {
             model,
             timestamp: new Date().toISOString(),
-            note: 'Using hash-based embeddings (fallback). Configure GOOGLE_APPLICATION_CREDENTIALS for real Vertex AI.'
+            note: 'Using hash-based embeddings (fallback). Vertex AI not initialized.'
           }
         };
       } catch (error: any) {

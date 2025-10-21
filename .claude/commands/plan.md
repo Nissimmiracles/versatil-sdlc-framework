@@ -45,6 +45,33 @@ Transform feature requests, bugs, or improvements into well-structured implement
 
 ## Main Tasks
 
+### 0. Initialize VELOCITY Workflow (NEW)
+
+<thinking>
+Start the VELOCITY Workflow Orchestrator to track this planning session through all 5 phases (Plan → Assess → Delegate → Work → Codify). This enables automatic phase detection, state persistence, and compounding engineering benefits.
+</thinking>
+
+**Initialize Workflow:**
+
+Call velocity CLI to start workflow tracking:
+```bash
+velocity plan "<feature_description>"
+```
+
+This creates:
+- Workflow ID and state file (`~/.versatil/state/current-workflow.json`)
+- Plan phase tracking
+- Automatic transition to Assess phase when ready
+- Historical context loading from RAG
+
+**Benefits:**
+- ✅ Phase auto-detection (file edits → WORK, builds → ASSESS, session end → CODIFY)
+- ✅ Cross-session state persistence
+- ✅ Compounding engineering (next feature 40% faster)
+- ✅ Automatic learning codification
+
+**Note**: If `velocity plan` fails (orchestrator not available), continue with TodoWrite-only approach (backward compatible).
+
 ### 1. Pre-Planning Assessment (ASSESS Phase)
 
 <thinking>

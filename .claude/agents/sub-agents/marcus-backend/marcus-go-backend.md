@@ -703,6 +703,228 @@ Activate Marcus-Go-Backend when:
 
 ---
 
+## 🚀 Actionable Workflows
+
+### Workflow 1: Build Gin REST API with GORM
+
+**Step 1: Project Setup**
+```bash
+mkdir go-api && cd go-api
+go mod init github.com/username/go-api
+go get github.com/gin-gonic/gin gorm.io/gorm gorm.io/driver/postgres github.com/golang-jwt/jwt/v5
+```
+
+**Step 2: Database Setup**
+```go
+// internal/database/database.go
+package database
+
+import (
+    "gorm.io/driver/postgres"
+    "gorm.io/gorm"
+)
+
+var DB *gorm.DB
+
+func Connect() error {
+    dsn := "host=localhost user=postgres password=secret dbname=mydb port=5432"
+    db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+    if err != nil {
+        return err
+    }
+
+    sqlDB, _ := db.DB()
+    sqlDB.SetMaxOpenConns(25)
+    sqlDB.SetMaxIdleConns(5)
+
+    DB = db
+    return nil
+}
+```
+
+**Step 3: Create Models**
+```go
+// internal/models/user.go
+package models
+
+import "gorm.io/gorm"
+
+type User struct {
+    gorm.Model
+    Email    string `gorm:"uniqueIndex;not null" json:"email"`
+    Password string `gorm:"not null" json:"-"`
+    Name     string `gorm:"not null" json:"name"`
+}
+```
+
+**Step 4: Implement Controllers**
+```go
+// internal/handlers/user.go
+package handlers
+
+import (
+    "net/http"
+    "github.com/gin-gonic/gin"
+    "myapp/internal/models"
+    "myapp/internal/database"
+)
+
+func GetUsers(c *gin.Context) {
+    var users []models.User
+    database.DB.Find(&users)
+    c.JSON(http.StatusOK, users)
+}
+
+func CreateUser(c *gin.Context) {
+    var user models.User
+    if err := c.ShouldBindJSON(&user); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    database.DB.Create(&user)
+    c.JSON(http.StatusCreated, user)
+}
+```
+
+**Result**: Production-ready Gin API with GORM.
+
+---
+
+### Workflow 2: Optimize with Goroutine Worker Pool
+
+**Context**: Process many concurrent tasks efficiently.
+
+```go
+// internal/worker/pool.go
+package worker
+
+import (
+    "context"
+    "sync"
+)
+
+type Pool struct {
+    workers int
+    jobs    chan Job
+    results chan Result
+    wg      sync.WaitGroup
+}
+
+type Job struct {
+    ID   int
+    Data interface{}
+}
+
+type Result struct {
+    JobID  int
+    Output interface{}
+    Error  error
+}
+
+func NewPool(workers int) *Pool {
+    return &Pool{
+        workers: workers,
+        jobs:    make(chan Job, 100),
+        results: make(chan Result, 100),
+    }
+}
+
+func (p *Pool) Start(ctx context.Context) {
+    for i := 0; i < p.workers; i++ {
+        p.wg.Add(1)
+        go p.worker(ctx, i)
+    }
+}
+
+func (p *Pool) worker(ctx context.Context, id int) {
+    defer p.wg.Done()
+    for {
+        select {
+        case <-ctx.Done():
+            return
+        case job, ok := <-p.jobs:
+            if !ok {
+                return
+            }
+            result := p.process(job)
+            p.results <- result
+        }
+    }
+}
+
+func (p *Pool) process(job Job) Result {
+    // Process job
+    return Result{JobID: job.ID}
+}
+```
+
+**Result**: Efficient concurrent processing with bounded goroutines.
+
+---
+
+## 🔌 MCP Integrations
+
+### MCP 1: Semgrep for Go
+```bash
+semgrep --config=auto internal/
+```
+
+### MCP 2: Sentry for Go
+```go
+import "github.com/getsentry/sentry-go"
+
+sentry.Init(sentry.ClientOptions{
+    Dsn: "your-dsn",
+})
+```
+
+---
+
+## 📝 Code Templates
+
+### Template 1: Gin Router Setup
+```go
+// cmd/server/main.go
+package main
+
+import (
+    "github.com/gin-gonic/gin"
+    "myapp/internal/handlers"
+)
+
+func main() {
+    r := gin.Default()
+
+    v1 := r.Group("/api/v1")
+    {
+        v1.GET("/users", handlers.GetUsers)
+        v1.POST("/users", handlers.CreateUser)
+    }
+
+    r.Run(":8080")
+}
+```
+
+---
+
+## 🤝 Collaboration Patterns
+
+### Pattern 1: Marcus-Go + James-React
+**Marcus creates**:
+```go
+r.GET("/api/posts", func(c *gin.Context) {
+    c.JSON(200, posts)
+})
+```
+
+**James consumes**:
+```typescript
+const res = await fetch('/api/posts');
+```
+
+---
+
 **Version**: 1.0.0
 **Parent Agent**: Marcus-Backend
 **Specialization**: Go (Gin/Echo)

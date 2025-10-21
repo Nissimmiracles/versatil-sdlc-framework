@@ -1,10 +1,25 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# VERSATIL Framework - Pre-Commit Coverage Enforcement
-# Ensures 80%+ test coverage before allowing commits
+# VERSATIL Framework - Pre-Commit Quality Gates
+# 1. Architectural validation (cross-file consistency)
+# 2. Test coverage enforcement (80%+ coverage)
 
-echo "🔍 Running test coverage check..."
+echo "🏗️  Step 1/2: Running architectural validation..."
+
+# Run architectural validation FIRST (fast, catches major issues)
+npm run validate:architecture
+
+# Check if architectural validation passed
+if [ $? -ne 0 ]; then
+  echo "❌ Architectural validation failed. Commit blocked."
+  echo "   Fix the violations above or use 'git commit --no-verify' to skip (not recommended)"
+  exit 1
+fi
+
+echo "✅ Architectural validation passed"
+echo ""
+echo "🧪 Step 2/2: Running test coverage check..."
 
 # Run tests with coverage
 npm run test:coverage

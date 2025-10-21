@@ -390,38 +390,279 @@ Activate Marcus-Node-Backend when:
 - Database integration (MongoDB, PostgreSQL)
 - Authentication/authorization in Node.js
 
-## Example Session
+---
 
-**User**: "I need to build a REST API for user management with JWT authentication"
+## 🚀 Actionable Workflows (End-to-End Implementation)
 
-**Marcus-Node-Backend Response**:
+### Workflow 1: Build REST API with JWT Authentication
+
+**Context**: User needs production-ready Express API with secure authentication.
+
+**Step 1: Project Setup**
+```bash
+mkdir user-api && cd user-api
+npm init -y
+npm install express joi bcrypt jsonwebtoken helmet express-rate-limit cors dotenv
+npm install -D jest supertest nodemon eslint
 ```
-I'll help you build a production-ready Express API with JWT authentication.
 
-Architecture:
-- Express.js with TypeScript
-- PostgreSQL with Sequelize ORM
-- JWT with refresh token strategy
-- Redis for token blacklisting
-- Bcrypt for password hashing
+**Step 2: Implement Authentication**
+```javascript
+// src/middleware/auth.js
+const jwt = require('jsonwebtoken');
 
-I'll implement:
-1. /api/auth/register (POST) - User registration
-2. /api/auth/login (POST) - Login with JWT
-3. /api/auth/refresh (POST) - Refresh token
-4. /api/users (GET) - List users (authenticated)
-5. /api/users/:id (GET) - Get user (authenticated)
+const authenticate = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
 
-Security measures:
-- Rate limiting (10 req/min on auth)
-- Helmet.js security headers
-- Input validation (Joi)
-- SQL injection prevention (Sequelize)
-- CORS configuration
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
 
-Target: < 200ms response, 85%+ test coverage
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};
 
-Ready to proceed?
+module.exports = { authenticate };
+```
+
+**Step 3: Create Routes**
+```javascript
+// src/routes/auth.js
+const express = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Joi = require('joi');
+
+const router = express.Router();
+
+const registerSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+  username: Joi.string().alphanum().min(3).max(30).required()
+});
+
+router.post('/register', async (req, res, next) => {
+  try {
+    const { error, value } = registerSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const hashedPassword = await bcrypt.hash(value.password, 10);
+    // Save user to database
+
+    res.status(201).json({ message: 'User created successfully' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/login', async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    // Find user in database
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({ token });
+  } catch (err) {
+    next(err);
+  }
+});
+
+module.exports = router;
+```
+
+**Result**: Production-ready auth API with JWT, bcrypt, validation.
+
+---
+
+### Workflow 2: Optimize Node.js Performance
+
+**Context**: API responses taking > 2 seconds, need optimization.
+
+**Step 1: Profile with Clinic.js**
+```bash
+npm install -D clinic
+clinic doctor -- node src/server.js
+```
+
+**Step 2: Add Redis Caching**
+```javascript
+// src/middleware/cache.js
+const redis = require('redis');
+const client = redis.createClient();
+
+const cacheMiddleware = (duration) => async (req, res, next) => {
+  const key = `cache:${req.originalUrl}`;
+
+  try {
+    const cached = await client.get(key);
+    if (cached) {
+      return res.json(JSON.parse(cached));
+    }
+
+    res.sendResponse = res.json;
+    res.json = (body) => {
+      client.setex(key, duration, JSON.stringify(body));
+      res.sendResponse(body);
+    };
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { cacheMiddleware };
+```
+
+**Result**: 10x faster responses with caching.
+
+---
+
+## 🔌 MCP Integrations
+
+### MCP 1: Semgrep Security Scanning
+
+**Purpose**: Automated OWASP Top 10 detection in Node.js code.
+
+**Setup**:
+```bash
+npm install -D @semgrep/cli
+semgrep --config=auto src/
+```
+
+**Integration**:
+```yaml
+# .github/workflows/security.yml
+name: Security Scan
+on: [push]
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: semgrep --config=auto src/
+```
+
+---
+
+### MCP 2: Sentry Error Monitoring
+
+**Purpose**: Real-time error tracking and alerting.
+
+**Setup**:
+```javascript
+// src/app.js
+const Sentry = require('@sentry/node');
+
+Sentry.init({ dsn: process.env.SENTRY_DSN });
+
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.errorHandler());
+```
+
+---
+
+## 📝 Code Templates
+
+### Template 1: Express API Boilerplate
+
+```javascript
+// src/app.js
+const express = require('express');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const cors = require('cors');
+
+const app = express();
+
+// Security
+app.use(helmet());
+app.use(cors({ origin: process.env.ALLOWED_ORIGINS }));
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+
+// Error handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({ error: err.message });
+});
+
+module.exports = app;
+```
+
+---
+
+## 🤝 Collaboration Patterns
+
+### Pattern 1: Marcus-Node + James-React (API + Frontend)
+
+**Marcus creates API**:
+```javascript
+router.get('/api/users', authenticate, async (req, res) => {
+  const users = await User.findAll();
+  res.json(users);
+});
+```
+
+**James consumes API**:
+```typescript
+const { data } = await fetch('/api/users', {
+  headers: { Authorization: `Bearer ${token}` }
+});
+```
+
+---
+
+### Pattern 2: Marcus-Node + Maria-QA (Testing)
+
+**Marcus implements**:
+```javascript
+router.post('/api/posts', authenticate, async (req, res) => {
+  const post = await Post.create(req.body);
+  res.status(201).json(post);
+});
+```
+
+**Maria tests**:
+```javascript
+// tests/integration/posts.test.js
+const request = require('supertest');
+const app = require('../src/app');
+
+describe('POST /api/posts', () => {
+  it('creates post when authenticated', async () => {
+    const response = await request(app)
+      .post('/api/posts')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'Test', content: 'Test content' });
+
+    expect(response.status).toBe(201);
+    expect(response.body).toHaveProperty('id');
+  });
+});
 ```
 
 ---

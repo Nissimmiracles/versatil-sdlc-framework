@@ -8,6 +8,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { VERSATILLogger } from '../utils/logger.js';
 import { createClient } from '@supabase/supabase-js';
+import { gcpVectorStore } from '../lib/gcp-vector-store.js';
+import { graphRAGStore } from '../lib/graphrag-store.js';
 
 export interface MemoryDocument {
   id: string;
@@ -69,8 +71,11 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
   private indexPath: string;
   private supabase: any;
   private isSupabaseEnabled: boolean = false;
+  private isGCPEnabled: boolean = false;
+  private isGraphRAGEnabled: boolean = false;
   private edgeFunctionsEnabled: boolean = false;
   private supabaseUrl: string | null = null;
+  private vectorBackend: 'local' | 'supabase' | 'gcp' | 'graphrag' = 'local';
   
   // Enhanced configuration
   private config = {
@@ -102,13 +107,22 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     // Ensure directory exists
     await fs.promises.mkdir(this.indexPath, { recursive: true });
 
-    // Try to initialize Supabase if configured
-    await this.initializeSupabase();
+    // Try to initialize GraphRAG first (preferred - no API quota), then GCP, then Supabase
+    await this.initializeGraphRAG();
+    if (!this.isGraphRAGEnabled) {
+      await this.initializeGCP();
+      if (!this.isGCPEnabled) {
+        await this.initializeSupabase();
+      }
+    }
 
     await this.loadExistingMemories();
 
     this.logger.info('Enhanced vector memory store initialized', {
       memoryCount: this.memories.size,
+      vectorBackend: this.vectorBackend,
+      graphRAGEnabled: this.isGraphRAGEnabled,
+      gcpEnabled: this.isGCPEnabled,
       supabaseEnabled: this.isSupabaseEnabled,
       features: {
         reranking: this.config.rerankingEnabled,
@@ -116,6 +130,47 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
         hybridSearch: this.config.hybridSearchEnabled
       }
     }, 'rag-memory');
+  }
+
+  /**
+   * Initialize GraphRAG knowledge graph (PREFERRED - no API quota, works offline)
+   */
+  private async initializeGraphRAG(): Promise<void> {
+    try {
+      const gcpProject = process.env.GOOGLE_CLOUD_PROJECT;
+
+      if (gcpProject) {
+        await graphRAGStore.initialize();
+        this.isGraphRAGEnabled = true;
+        this.vectorBackend = 'graphrag';
+
+        this.logger.info('GraphRAG knowledge graph initialized', {
+          project: gcpProject,
+          benefits: 'No API quota, offline, explainable'
+        }, 'rag-memory');
+      }
+    } catch (error) {
+      this.logger.warn('GraphRAG initialization failed, trying GCP vector store', { error }, 'rag-memory');
+    }
+  }
+
+  private async initializeGCP(): Promise<void> {
+    try {
+      const gcpProject = process.env.GOOGLE_CLOUD_PROJECT;
+
+      if (gcpProject) {
+        await gcpVectorStore.initialize();
+        this.isGCPEnabled = true;
+        this.vectorBackend = 'gcp';
+
+        this.logger.info('GCP Firestore vector store initialized', {
+          project: gcpProject,
+          location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1'
+        }, 'rag-memory');
+      }
+    } catch (error) {
+      this.logger.warn('GCP initialization failed, trying Supabase', { error }, 'rag-memory');
+    }
   }
 
   private async initializeSupabase(): Promise<void> {
@@ -158,12 +213,14 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     // Store locally
     this.memories.set(id, memory);
     this.embeddings.set(id, embedding);
-    
-    // Store in vector DB if available
-    if (this.isSupabaseEnabled) {
+
+    // Store in vector DB if available (GCP preferred, then Supabase)
+    if (this.isGCPEnabled) {
+      await this.storeInGCP(memory);
+    } else if (this.isSupabaseEnabled) {
       await this.storeInSupabase(memory);
     }
-    
+
     await this.persistMemory(memory);
     
     this.emit('memory_stored', { 
@@ -182,11 +239,17 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     const startTime = Date.now();
     let documents: MemoryDocument[];
     let searchMethod = 'semantic';
-    
-    // Determine search strategy
+
+    // Determine search strategy (GraphRAG preferred - no API quota, works offline)
     if (query.queryType === 'hybrid' || this.config.hybridSearchEnabled) {
       documents = await this.hybridSearch(query);
       searchMethod = 'hybrid';
+    } else if (this.isGraphRAGEnabled) {
+      documents = await this.graphRAGSearch(query);
+      searchMethod = 'graphrag';
+    } else if (this.isGCPEnabled) {
+      documents = await this.gcpVectorSearch(query);
+      searchMethod = 'gcp-vector';
     } else if (this.isSupabaseEnabled) {
       documents = await this.vectorSearch(query);
       searchMethod = 'vector';
@@ -220,15 +283,22 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
    * Hybrid search combining semantic and keyword matching
    */
   private async hybridSearch(query: RAGQuery): Promise<MemoryDocument[]> {
-    // Semantic search
-    const semanticResults = await this.localSemanticSearch(query);
-    
+    // Semantic search (prefer GraphRAG, fallback to GCP, then local)
+    let semanticResults: MemoryDocument[];
+    if (this.isGraphRAGEnabled) {
+      semanticResults = await this.graphRAGSearch(query);
+    } else if (this.isGCPEnabled) {
+      semanticResults = await this.gcpVectorSearch(query);
+    } else {
+      semanticResults = await this.localSemanticSearch(query);
+    }
+
     // Keyword search
     const keywordResults = await this.keywordSearch(query);
-    
+
     // Merge and deduplicate
     const resultMap = new Map<string, MemoryDocument>();
-    
+
     // Add semantic results with boosted scores
     semanticResults.forEach(doc => {
       resultMap.set(doc.id, {
@@ -239,7 +309,7 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
         }
       });
     });
-    
+
     // Add keyword results
     keywordResults.forEach(doc => {
       if (resultMap.has(doc.id)) {
@@ -250,7 +320,7 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
         resultMap.set(doc.id, doc);
       }
     });
-    
+
     return Array.from(resultMap.values());
   }
 
@@ -428,7 +498,7 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
    */
   private async storeInSupabase(memory: MemoryDocument): Promise<void> {
     if (!this.isSupabaseEnabled) return;
-    
+
     try {
       const { error } = await this.supabase
         .from('versatil_memories')
@@ -441,12 +511,126 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
           agent_id: memory.metadata.agentId,
           created_at: new Date(memory.metadata.timestamp).toISOString()
         });
-        
+
       if (error) {
         this.logger.error('Failed to store in Supabase', { error }, 'rag-memory');
       }
     } catch (error) {
       this.logger.error('Supabase storage error', { error }, 'rag-memory');
+    }
+  }
+
+  /**
+   * Store memory in GCP Firestore
+   */
+  private async storeInGCP(memory: MemoryDocument): Promise<void> {
+    if (!this.isGCPEnabled) return;
+
+    try {
+      await gcpVectorStore.storePattern({
+        pattern: memory.content,
+        category: memory.metadata.tags?.[0] || 'general',
+        agent: memory.metadata.agentId,
+        effectiveness: memory.metadata.relevanceScore || 0.8,
+        timeSaved: 0, // Can be tracked separately
+        code: memory.contentType === 'code' ? memory.content : undefined,
+        description: memory.metadata.projectContext,
+        tags: memory.metadata.tags,
+        usageCount: 0,
+        lastUsed: new Date(memory.metadata.timestamp)
+      });
+
+      this.logger.debug('Stored in GCP Firestore', { id: memory.id }, 'rag-memory');
+    } catch (error) {
+      this.logger.error('GCP storage error', { error }, 'rag-memory');
+    }
+  }
+
+  /**
+   * Vector search using GCP Firestore
+   */
+  /**
+   * GraphRAG search using knowledge graph (PREFERRED - no API quota, works offline)
+   */
+  private async graphRAGSearch(query: RAGQuery): Promise<MemoryDocument[]> {
+    if (!this.isGraphRAGEnabled) {
+      return this.localSemanticSearch(query);
+    }
+
+    try {
+      const results = await graphRAGStore.query({
+        query: query.query,
+        limit: query.topK || 20,
+        minRelevance: 0.3,
+        agent: query.agentId,
+        tags: query.filters?.tags
+      });
+
+      // Convert GraphRAG results to MemoryDocument format
+      const documents: MemoryDocument[] = results.map(result => {
+        // Handle Firestore Timestamp objects (has _seconds property)
+        const lastUsed: any = result.pattern.properties.lastUsed;
+        const timestamp = (lastUsed && typeof lastUsed === 'object' && '_seconds' in lastUsed)
+          ? lastUsed._seconds * 1000  // Firestore Timestamp
+          : (lastUsed instanceof Date ? lastUsed.getTime() : Date.now());
+
+        return {
+          id: result.pattern.id,
+          content: result.pattern.properties.pattern,
+          contentType: result.pattern.properties.code ? 'code' : 'text',
+          embedding: [], // Not needed in results
+          metadata: {
+            agentId: result.pattern.properties.agent,
+            timestamp,
+            tags: result.pattern.properties.tags || [],
+            relevanceScore: result.relevanceScore,
+            projectContext: result.pattern.properties.description,
+            graphPath: result.graphPath,  // Unique to GraphRAG - shows reasoning
+            explanation: result.explanation  // Human-readable explanation
+          }
+        };
+      });
+
+      return documents;
+    } catch (error) {
+      this.logger.error('GraphRAG search error', { error }, 'rag-memory');
+      return this.localSemanticSearch(query);
+    }
+  }
+
+  private async gcpVectorSearch(query: RAGQuery): Promise<MemoryDocument[]> {
+    if (!this.isGCPEnabled) {
+      return this.localSemanticSearch(query);
+    }
+
+    try {
+      const results = await gcpVectorStore.searchSimilar({
+        text: query.query,
+        limit: query.topK || 20,
+        threshold: 0.7,
+        agent: query.agentId,
+        tags: query.filters?.tags
+      });
+
+      // Convert GCP results to MemoryDocument format
+      const documents: MemoryDocument[] = results.map(result => ({
+        id: result.pattern.id,
+        content: result.pattern.pattern,
+        contentType: result.pattern.code ? 'code' : 'text',
+        embedding: [], // Not needed in results
+        metadata: {
+          agentId: result.pattern.agent,
+          timestamp: result.pattern.created.getTime(),
+          tags: result.pattern.tags || [],
+          relevanceScore: result.similarity,
+          projectContext: result.pattern.description
+        }
+      }));
+
+      return documents;
+    } catch (error) {
+      this.logger.error('GCP vector search error', { error }, 'rag-memory');
+      return this.localSemanticSearch(query);
     }
   }
 
@@ -734,6 +918,33 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
   async queryMemories(query: string | RAGQuery): Promise<any> {
     return await this.queryMemoriesInternal(typeof query === 'string' ? { query } : query);
   }
+
+  /**
+   * Search for similar documents (alias for queryMemoriesInternal)
+   * Used by plan-generator for RAG context retrieval
+   */
+  async searchSimilar(
+    query: string,
+    options?: {
+      limit?: number;
+      threshold?: number;
+      domain?: string;
+    }
+  ): Promise<Array<{ metadata?: any; score: number }>> {
+    const ragQuery: RAGQuery = {
+      query,
+      topK: options?.limit || 5,
+      filters: options?.domain ? { tags: [options.domain] } : undefined
+    };
+
+    const result = await this.queryMemoriesInternal(ragQuery);
+
+    return result.documents.map(doc => ({
+      metadata: doc.metadata,
+      score: doc.metadata.relevanceScore || 0.5
+    }));
+  }
+
   async close(): Promise<void> {
     this.logger.info('Closing Enhanced Vector Memory Store');
 

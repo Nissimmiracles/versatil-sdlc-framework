@@ -54,11 +54,9 @@ videos/
 traces/
 
 # VERSATIL Framework Specific
-.versatil/reports/
-.versatil/cache/
-.versatil/temp/
-.versatil/logs/
-.versatil/diagnostics.json
+# ⚠️ CRITICAL: .versatil/ should ONLY exist in ~/.versatil/ (user home)
+# The framework is ISOLATED from user projects
+.versatil/
 
 # Chrome MCP Testing
 tests/visual/diffs/
@@ -139,10 +137,7 @@ email-secrets.env
 # NPM Package Files (for development)
 *.tgz
 
-# VERSATIL Agent Outputs
-.versatil/agents/*/logs/
-.versatil/agents/*/cache/
-.versatil/agents/*/temp/
+# VERSATIL Agent Outputs (now covered by .versatil/ above)
 
 # Maria-QA Generated Reports
 reports/
@@ -160,6 +155,5 @@ vulnerability-reports/
 
 # CI/CD Artifacts
 artifacts/
-.github/workflows/artifacts/.versatil/
 versatil/
 .venv-python/
