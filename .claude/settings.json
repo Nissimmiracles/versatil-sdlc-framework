@@ -1,0 +1,69 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-file-edit.ts"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-build.ts"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/subagent-stop.ts"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-codify.ts"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/before-prompt.ts"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm:*)",
+      "Bash(git:*)",
+      "Bash(node:*)",
+      "Bash(npx:*)",
+      "Read(/Users/nissimmenashe/VERSATIL SDLC FW/**)",
+      "Write(/Users/nissimmenashe/VERSATIL SDLC FW/**)",
+      "Edit(/Users/nissimmenashe/VERSATIL SDLC FW/**)"
+    ]
+  },
+  "model": "claude-sonnet-4-5"
+}
