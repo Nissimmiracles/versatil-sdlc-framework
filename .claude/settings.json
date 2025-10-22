@@ -18,6 +18,15 @@
             "command": ".claude/hooks/post-build.ts"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-agent-response.ts"
+          }
+        ]
       }
     ],
     "SubagentStop": [
