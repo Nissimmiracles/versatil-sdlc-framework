@@ -1,882 +1,889 @@
-# MCP Troubleshooting Guide
+# VERSATIL MCP Server - Troubleshooting Guide
 
-Comprehensive solutions for common MCP setup and runtime issues.
+**Version**: 6.1.0
+**Last Updated**: October 10, 2025
+
+This guide helps you diagnose and resolve common issues with the VERSATIL SDLC Framework MCP server.
 
 ---
 
 ## Table of Contents
 
-1. [Diagnostic Tools](#diagnostic-tools)
-2. [Common Errors](#common-errors)
-3. [MCP-Specific Issues](#mcp-specific-issues)
-4. [Network & Connectivity](#network--connectivity)
-5. [Performance Issues](#performance-issues)
-6. [Security & Permissions](#security--permissions)
-7. [Advanced Troubleshooting](#advanced-troubleshooting)
-8. [Getting Help](#getting-help)
+1. [Installation Issues](#installation-issues)
+2. [Server Startup Issues](#server-startup-issues)
+3. [Tool Execution Errors](#tool-execution-errors)
+4. [Resource Access Errors](#resource-access-errors)
+5. [Prompt Generation Issues](#prompt-generation-issues)
+6. [HTTP Server Issues](#http-server-issues)
+7. [Claude Desktop Integration](#claude-desktop-integration)
+8. [Performance Problems](#performance-problems)
+9. [Logging & Debugging](#logging--debugging)
+10. [Known Issues & Workarounds](#known-issues--workarounds)
 
 ---
 
-## Diagnostic Tools
+## Installation Issues
 
-### Health Check
+### Issue: `npm install` fails with dependency errors
 
-Run comprehensive health check:
-
-```bash
-# Quick check (5 seconds)
-npm run mcp:health
-
-# Verbose output (shows connection details)
-npm run mcp:health:verbose
-
-# Continuous monitoring
-npm run mcp:health:watch
+**Symptoms**:
 ```
-
-### Framework Doctor
-
-Auto-detect and fix common issues:
-
-```bash
-# Comprehensive health audit
-npm run doctor
-
-# Auto-fix issues
-npm run doctor:fix
-
-# Specific component check
-npm run doctor -- --check=mcp
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE unable to resolve dependency tree
 ```
-
-### Validation Commands
-
-```bash
-# Validate MCP configuration
-npm run validate:mcp
-
-# Validate isolation (credentials not in project)
-npm run validate:isolation
-
-# Validate environment variables
-npm run validate:env
-```
-
-### Manual Tests
-
-```bash
-# Test specific MCP
-npm run test:mcp -- --filter=github
-
-# Test MCP integration with agent
-npm run test:maria-qa  # Playwright + Chrome MCP
-npm run test:marcus    # GitHub + Semgrep + Sentry
-```
-
----
-
-## Common Errors
-
-### 1. "MCP server not found"
-
-**Error Message**:
-```
-Error: MCP server 'github' not found
-  at MCPClient.connect (/path/to/mcp-client.ts:45)
-```
-
-**Cause**: MCP package not installed or `npx` can't find it.
 
 **Solutions**:
 
-#### A. Install MCP Globally
-
+1. **Clear npm cache**:
 ```bash
-npm install -g @modelcontextprotocol/server-github
-```
-
-#### B. Use Full Path in Config
-
-Edit `.cursor/mcp_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "github": {
-      "command": "/usr/local/bin/node",
-      "args": ["/usr/local/lib/node_modules/@modelcontextprotocol/server-github/index.js"],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      }
-    }
-  }
-}
-```
-
-#### C. Verify npx Can Find Package
-
-```bash
-# Check if package exists
-npx --yes @modelcontextprotocol/server-github --version
-
-# Clear npm cache if needed
 npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+```
+
+2. **Use compatible Node.js version**:
+```bash
+# Check current version
+node --version
+
+# Install Node 18 LTS (recommended)
+nvm install 18
+nvm use 18
+npm install
+```
+
+3. **Force install** (last resort):
+```bash
+npm install --legacy-peer-deps
+```
+
+### Issue: TypeScript compilation errors during build
+
+**Symptoms**:
+```
+src/mcp/versatil-mcp-server-v2.ts(42,7): error TS2345
+```
+
+**Solutions**:
+
+1. **Verify TypeScript version**:
+```bash
+npx tsc --version  # Should be >= 5.0.0
+npm install -D typescript@latest
+```
+
+2. **Clean build**:
+```bash
+rm -rf dist/
+npm run build
+```
+
+3. **Check for syntax errors**:
+```bash
+npx tsc --noEmit  # Type-check only, no output
 ```
 
 ---
 
-### 2. "Missing credentials" / "Invalid API key"
+## Server Startup Issues
 
-**Error Message**:
-```
-Error: Missing required environment variable: GITHUB_TOKEN
-```
+### Issue: MCP server exits immediately with no output
 
-**Cause**: Environment variables not set or wrong file location.
-
-**Solutions**:
-
-#### A. Verify Credentials File Exists
-
-```bash
-# Check file exists
-ls -la ~/.versatil/.env
-
-# If missing, copy template
-cp .env.example ~/.versatil/.env
-chmod 600 ~/.versatil/.env
-```
-
-#### B. Check Variable is Set
-
-```bash
-# View all MCP credentials
-cat ~/.versatil/.env | grep -E '(GITHUB|SUPABASE|SENTRY)'
-
-# Check specific variable
-echo $GITHUB_TOKEN
-```
-
-#### C. Reload Environment
-
-```bash
-# Source credentials file
-source ~/.versatil/.env
-
-# Or restart terminal
-exit  # Then reopen terminal
-```
-
-#### D. Validate API Key Format
-
-**GitHub Token**: Starts with `ghp_` (40 characters)
-```bash
-# Valid format
-GITHUB_TOKEN=ghp_1234567890abcdefghijklmnopqrstuvwxyz12
-```
-
-**Supabase Keys**:
-```bash
-# Anon key (starts with eyJhbGc)
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# Service key (starts with eyJhbGc)
-SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**Sentry DSN**: Starts with `https://`
-```bash
-SENTRY_DSN=https://1234567890abcdef@o123456.ingest.sentry.io/123456
-```
-
----
-
-### 3. "Connection timeout" / "MCP server unresponsive"
-
-**Error Message**:
-```
-Error: Connection timeout after 5000ms
-  at MCPHealthChecker.waitForReady (mcp-health-check.cjs:258)
-```
-
-**Cause**: MCP server slow to start or network issue.
+**Symptoms**:
+- Server starts then exits
+- No error messages
+- Process exit code 0
 
 **Solutions**:
 
-#### A. Increase Timeout
+1. **Check stdio connection**:
+```bash
+# Test with echo
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | \
+  node dist/mcp/versatil-mcp-server-v2.js
+```
 
-Edit `.cursor/mcp_config.json`:
+2. **Enable debug logging**:
+```bash
+VERSATIL_LOG_LEVEL=debug node dist/mcp/versatil-mcp-server-v2.js
+```
 
+3. **Verify build artifacts**:
+```bash
+ls -la dist/mcp/versatil-mcp-server-v2.js  # Should exist
+node -c dist/mcp/versatil-mcp-server-v2.js  # Syntax check
+```
+
+### Issue: "Module not found" errors
+
+**Symptoms**:
+```
+Error: Cannot find module '@modelcontextprotocol/sdk/server/mcp.js'
+```
+
+**Solutions**:
+
+1. **Reinstall MCP SDK**:
+```bash
+npm install @modelcontextprotocol/sdk@latest
+```
+
+2. **Check module resolution**:
+```bash
+node -e "require.resolve('@modelcontextprotocol/sdk/server/mcp.js')"
+```
+
+3. **Verify package.json**:
 ```json
 {
-  "mcpServers": {
-    "semgrep": {
-      "command": "npx",
-      "args": ["-y", "semgrep-mcp"],
-      "env": {
-        "SEMGREP_API_KEY": "${SEMGREP_API_KEY}",
-        "MCP_TIMEOUT": "60000"  // 60 seconds
-      }
-    }
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.19.1"
   }
 }
 ```
 
-#### B. Test Network Connectivity
+### Issue: Agent registry initialization fails
 
-```bash
-# GitHub MCP
-curl -I https://api.github.com
-
-# Supabase MCP
-curl -I https://your-project.supabase.co
-
-# Sentry MCP
-curl -I https://sentry.io
+**Symptoms**:
 ```
-
-#### C. Check MCP Server Logs
-
-```bash
-# Run MCP directly to see errors
-npx -y @modelcontextprotocol/server-github
-
-# Expected output: MCP server startup messages
+Error: Agent registry failed to initialize
+AGENT_INITIALIZATION_FAILED
 ```
-
-#### D. Restart MCP Server
-
-```bash
-# Kill existing processes
-pkill -f "mcp-server"
-
-# Restart framework
-npm run doctor:fix
-```
-
----
-
-### 4. "Permission denied" / "Unauthorized"
-
-**Error Message**:
-```
-Error: Request failed with status code 403: Forbidden
-  at GithubMCPClient.fetchRepository (github-mcp-client.ts:89)
-```
-
-**Cause**: API token lacks required permissions.
 
 **Solutions**:
 
-#### A. Verify GitHub Token Scopes
-
-1. Go to: https://github.com/settings/tokens
-2. Click on your token
-3. Ensure these scopes are selected:
-   - ✅ `repo` - Full repository access
-   - ✅ `workflow` - Workflow management
-   - ✅ `read:org` - Organization access (if using org repos)
-
-#### B. Check Supabase Key Type
-
+1. **Check agent files exist**:
 ```bash
-# ❌ WRONG: Using anon key for backend operations
-SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InByb2plY3QiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNjQ...
-
-# ✅ CORRECT: Using service_role key
-SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InByb2plY3QiLCJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0Ijox...
+ls -la src/agents/core/agent-registry.ts
+ls -la src/agents/opera/enhanced-maria.ts
 ```
 
-Get correct key from: Project Settings → API → `service_role` secret
+2. **Verify agent imports**:
+```bash
+# Check for circular dependencies
+npx madge --circular src/
+```
 
-#### C. Check Sentry Token Permissions
-
-1. Go to: https://sentry.io/settings/account/api/auth-tokens/
-2. Click on your token
-3. Ensure these permissions:
-   - ✅ `project:read`
-   - ✅ `event:read`
-   - ✅ `org:read`
+3. **Test agent registry directly**:
+```typescript
+import { AgentRegistry } from './src/agents/core/agent-registry.js';
+const registry = new AgentRegistry();
+console.log(registry.listAgents());
+```
 
 ---
 
-### 5. "Isolation violation" / "Credentials in project"
+## Tool Execution Errors
 
-**Error Message**:
+### Issue: All tools return "INTERNAL_ERROR"
+
+**Symptoms**:
+```json
+{
+  "isError": true,
+  "code": "INTERNAL_ERROR",
+  "message": "An unexpected error occurred"
+}
 ```
-❌ Isolation violation detected!
-
-Found credentials in project directory:
-  - /Users/you/project/.env (contains GITHUB_TOKEN)
-
-Expected location:
-  - ~/.versatil/.env
-```
-
-**Cause**: Credentials stored in project directory instead of `~/.versatil/`.
 
 **Solutions**:
 
-#### A. Move Credentials to Correct Location
-
+1. **Enable error stack traces**:
 ```bash
-# Move credentials
-mv .env ~/.versatil/.env
-
-# Secure permissions
-chmod 600 ~/.versatil/.env
-
-# Remove from project
-rm -f .env
-
-# Add to .gitignore
-echo ".env" >> .gitignore
-git add .gitignore
-git commit -m "chore: add .env to .gitignore"
+NODE_ENV=development node dist/mcp/versatil-mcp-server-v2.js
 ```
 
-#### B. Validate Isolation
-
+2. **Test individual tool**:
 ```bash
-# Run isolation check
-npm run validate:isolation
-
-# Expected output:
-# ✅ Isolation validated
-# ✅ No framework files in project
-# ✅ Credentials in ~/.versatil/.env
+# Call versatil_health_check (simplest tool)
+echo '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/call",
+  "params": {
+    "name": "versatil_health_check",
+    "arguments": {"comprehensive": false}
+  }
+}' | node dist/mcp/versatil-mcp-server-v2.js
 ```
 
-#### C. Clean Up Accidentally Committed Credentials
-
+3. **Check tool registration**:
 ```bash
-# Remove from git history (CAREFUL!)
-git filter-branch --force --index-filter \
-  'git rm --cached --ignore-unmatch .env' \
-  --prune-empty --tag-name-filter cat -- --all
+# Look for this log message
+grep "VERSATIL MCP tools registered successfully" logs/versatil.log
+```
 
-# Force push (if you own the repo)
-git push origin --force --all
+### Issue: "AGENT_NOT_FOUND" error
 
-# Rotate compromised API tokens immediately!
+**Symptoms**:
+```json
+{
+  "code": "AGENT_NOT_FOUND",
+  "message": "Agent enhanced-maria not found"
+}
+```
+
+**Solutions**:
+
+1. **List available agents**:
+```bash
+# Use versatil_get_status tool
+curl -X POST http://localhost:3100/messages?sessionId=test \
+  -H "Content-Type: application/json" \
+  -d '{"method":"tools/call","params":{"name":"versatil_get_status"}}'
+```
+
+2. **Verify agent ID spelling**:
+```
+Valid agent IDs:
+- enhanced-maria
+- enhanced-james
+- enhanced-marcus
+- sarah-pm
+- alex-ba
+- dr-ai-ml
+```
+
+3. **Check agent registry**:
+```typescript
+// src/agents/core/agent-registry.ts
+const agent = registry.getAgent('enhanced-maria');
+if (!agent) {
+  console.error('Agent not registered');
+}
+```
+
+### Issue: Tool validation errors
+
+**Symptoms**:
+```json
+{
+  "code": "VALIDATION_ERROR",
+  "message": "Invalid parameter type for 'testType'"
+}
+```
+
+**Solutions**:
+
+1. **Check parameter schema**:
+```typescript
+// Example for versatil_run_tests
+{
+  testType: z.enum(['unit', 'integration', 'e2e', 'visual', 'performance', 'security']),
+  coverage: z.boolean().optional(),
+  chromeMCP: z.boolean().optional()
+}
+```
+
+2. **Validate JSON format**:
+```bash
+# Use jq to validate JSON
+echo '{"testType":"unit"}' | jq .
+```
+
+3. **Check required vs optional params**:
+```
+Required: testType
+Optional: coverage, chromeMCP
 ```
 
 ---
 
-## MCP-Specific Issues
+## Resource Access Errors
 
-### GitHub MCP
+### Issue: "RESOURCE_NOT_FOUND" error
 
-#### Issue: "Repository not found"
-
-**Solution**:
-```bash
-# Check repository exists
-curl -H "Authorization: token $GITHUB_TOKEN" \
-  https://api.github.com/repos/owner/repo
-
-# Verify owner/repo in .env
-cat ~/.versatil/.env | grep GITHUB
+**Symptoms**:
+```json
+{
+  "code": "RESOURCE_NOT_FOUND",
+  "message": "Resource not found: versatil://invalid-resource"
+}
 ```
 
-#### Issue: "Rate limit exceeded"
+**Solutions**:
 
-**Solution**:
+1. **List available resources**:
 ```bash
-# Check current rate limit
-curl -H "Authorization: token $GITHUB_TOKEN" \
-  https://api.github.com/rate_limit
+# Call resources/list
+echo '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "resources/list"
+}' | node dist/mcp/versatil-mcp-server-v2.js
+```
 
-# Upgrade to authenticated requests (5000/hour vs 60/hour)
-# Ensure GITHUB_TOKEN is set correctly
+2. **Verify URI format**:
+```
+Correct: versatil://quality-metrics
+Wrong:   versatil:/quality-metrics  (missing /)
+Wrong:   versatil//quality-metrics   (missing :)
+Wrong:   quality-metrics             (missing protocol)
+```
+
+3. **Check resource registration**:
+```typescript
+// src/mcp/versatil-mcp-server-v2.ts
+// Look for server.resource() calls
+```
+
+### Issue: Dynamic resource returns empty data
+
+**Symptoms**:
+```json
+{
+  "contents": [{
+    "uri": "versatil://agent-status/enhanced-maria",
+    "text": "{}"
+  }]
+}
+```
+
+**Solutions**:
+
+1. **Verify agent is initialized**:
+```bash
+# Check agent startup logs
+grep "Agent initialized" logs/versatil.log
+```
+
+2. **Test with static resource first**:
+```bash
+# versatil://quality-metrics always returns data
+curl "http://localhost:3100/resources/read?uri=versatil://quality-metrics"
+```
+
+3. **Check resource handler**:
+```typescript
+// Ensure handler returns valid data structure
+return {
+  contents: [{
+    uri: uri.href,
+    text: JSON.stringify(data, null, 2),
+    mimeType: 'application/json'
+  }]
+};
+```
+
+### Issue: Resource URI template variables not working
+
+**Symptoms**:
+```
+URI: versatil://agent-status/{agentId}
+Error: Variable {agentId} not replaced
+```
+
+**Solutions**:
+
+1. **Use proper ResourceTemplate**:
+```typescript
+new ResourceTemplate('versatil://agent-status/{agentId}', {
+  list: undefined  // Required parameter
+})
+```
+
+2. **Test variable extraction**:
+```bash
+# Call with specific agentId
+curl "http://localhost:3100/resources/read?uri=versatil://agent-status/enhanced-maria"
+```
+
+3. **Check callback signature**:
+```typescript
+async (uri, { agentId }) => {
+  // agentId should be extracted from URI
+  console.log('Agent ID:', agentId);
+}
 ```
 
 ---
 
-### Playwright MCP
+## Prompt Generation Issues
 
-#### Issue: "Browser not installed"
+### Issue: Prompt returns empty messages array
 
-**Error**:
+**Symptoms**:
+```json
+{
+  "description": "Code analysis prompt...",
+  "messages": []
+}
 ```
-Error: Executable doesn't exist at /Users/you/.cache/ms-playwright/chromium-1234/chrome-mac/Chromium.app
-```
 
-**Solution**:
+**Solutions**:
+
+1. **Check prompt arguments**:
 ```bash
-# Install Playwright browsers
-npm run playwright:install
-
-# Or install specific browser
-npx playwright install chromium
-
-# Verify installation
-ls ~/.cache/ms-playwright/
+# Ensure all required arguments provided
+{
+  "filePath": "src/api/login.ts",
+  "analysisType": "security"  // Must be valid enum value
+}
 ```
 
-#### Issue: "Display server not found" (Linux)
+2. **Verify prompt handler**:
+```typescript
+async ({ filePath, analysisType }) => {
+  return {
+    messages: [{
+      role: 'user',
+      content: {
+        type: 'text',
+        text: promptText  // Must not be empty
+      }
+    }]
+  };
+}
+```
 
-**Solution**:
+3. **Test with simple prompt**:
 ```bash
-# Install Xvfb for headless display
-sudo apt-get install xvfb
+# Try analyze-code with 'quality' type (simplest)
+echo '{
+  "method": "prompts/get",
+  "params": {
+    "name": "analyze-code",
+    "arguments": {
+      "filePath": "test.ts",
+      "analysisType": "quality"
+    }
+  }
+}' | node dist/mcp/versatil-mcp-server-v2.js
+```
 
-# Run with Xvfb
-xvfb-run --auto-servernum npm run test:e2e
+### Issue: Invalid enum value for prompt arguments
+
+**Symptoms**:
+```
+Error: Invalid value "invalid-type" for analysisType
+Expected: quality, security, performance, architecture, comprehensive
+```
+
+**Solutions**:
+
+1. **Check valid enum values**:
+```typescript
+// analyze-code prompt
+analysisType: z.enum(['quality', 'security', 'performance', 'architecture', 'comprehensive'])
+
+// test-generation prompt
+testType: z.enum(['unit', 'integration', 'e2e', 'visual', 'performance', 'security'])
+
+// performance-optimization prompt
+metric: z.enum(['response-time', 'throughput', 'memory', 'bundle-size', 'database-queries'])
+```
+
+2. **Use exact enum spelling**:
+```json
+Correct: "analysisType": "quality"
+Wrong:   "analysisType": "Quality"  (case-sensitive)
+Wrong:   "analysisType": "qual"     (not a valid value)
 ```
 
 ---
 
-### Supabase MCP
+## HTTP Server Issues
 
-#### Issue: "Vector store not initialized"
+### Issue: HTTP server won't start - port already in use
 
-**Solution**:
-```bash
-# Run migrations
-npm run migrate:vector-store
-
-# Check migration status
-npm run migrate:vector-store:status
-
-# Validate schema
-npm run migrate:vector-store:validate
+**Symptoms**:
+```
+Error: listen EADDRINUSE: address already in use :::3100
 ```
 
-#### Issue: "Connection pool exhausted"
+**Solutions**:
 
-**Solution**:
-
-Edit `~/.versatil/.env`:
+1. **Find and kill process using port**:
 ```bash
-# Increase pool size
-DB_POOL_MIN=2
-DB_POOL_MAX=20  # Was 10
-DB_POOL_IDLE_TIMEOUT=30000
+# macOS/Linux
+lsof -ti:3100 | xargs kill -9
+
+# Or use different port
+PORT=3200 node dist/mcp/versatil-mcp-http-server.js
+```
+
+2. **Check what's using the port**:
+```bash
+lsof -i :3100
+netstat -an | grep 3100
+```
+
+3. **Configure different port**:
+```typescript
+const server = new VERSATILMCPHTTPServer(mcpConfig, {
+  port: 3200  // Use different port
+});
+```
+
+### Issue: CORS errors in browser
+
+**Symptoms**:
+```
+Access to fetch at 'http://localhost:3100' from origin 'http://localhost:3000' has been blocked by CORS policy
+```
+
+**Solutions**:
+
+1. **Configure CORS origins**:
+```typescript
+const server = new VERSATILMCPHTTPServer(mcpConfig, {
+  cors: {
+    enabled: true,
+    origins: [
+      'http://localhost:3000',
+      'http://localhost:3100',
+      'http://127.0.0.1:*'
+    ]
+  }
+});
+```
+
+2. **Test CORS headers**:
+```bash
+curl -H "Origin: http://localhost:3000" \
+  -H "Access-Control-Request-Method: POST" \
+  -X OPTIONS \
+  http://localhost:3100/messages
+```
+
+3. **Check preflight response**:
+```
+Expected headers:
+- Access-Control-Allow-Origin: http://localhost:3000
+- Access-Control-Allow-Methods: GET, POST, OPTIONS
+- Access-Control-Allow-Headers: Content-Type, Authorization
+```
+
+### Issue: SSE connection drops immediately
+
+**Symptoms**:
+```
+SSE connection established then immediately closed
+EventSource readyState: 2 (CLOSED)
+```
+
+**Solutions**:
+
+1. **Check server logs**:
+```bash
+# Look for SSE connection errors
+tail -f logs/versatil.log | grep SSE
+```
+
+2. **Test SSE endpoint directly**:
+```bash
+curl -N -H "Accept: text/event-stream" http://localhost:3100/sse
+```
+
+3. **Verify keep-alive**:
+```typescript
+// SSE transport should send periodic keep-alive
+// Check for `:keep-alive` comments in stream
+```
+
+4. **Check reverse proxy timeout** (if using nginx/apache):
+```nginx
+# nginx
+proxy_read_timeout 300s;
+proxy_send_timeout 300s;
 ```
 
 ---
 
-### Semgrep MCP
+## Claude Desktop Integration
 
-#### Issue: "Slow scan performance" (> 3 seconds)
+### Issue: Claude doesn't see MCP server
 
-**Solution**:
+**Symptoms**:
+- No MCP tools available in Claude
+- Server not listed in Claude settings
+- No connection logs
 
-Reduce scan scope in `.semgrepconfig.yml`:
+**Solutions**:
 
-```yaml
-rules:
-  - id: security-audit
-    pattern-either:
-      - pattern: eval(...)
-      - pattern: exec(...)
-    severity: ERROR
-    languages: [javascript, typescript]
-    paths:
-      include:
-        - src/  # Only scan src/
-      exclude:
-        - node_modules/
-        - dist/
-        - test/
-```
-
----
-
-### Sentry MCP
-
-#### Issue: "DSN parsing failed"
-
-**Error**:
-```
-Error: Invalid Sentry DSN format
-```
-
-**Solution**:
-
-Verify DSN format:
-```bash
-# Correct format
-SENTRY_DSN=https://<key>@<organization>.ingest.sentry.io/<project-id>
-
-# Example
-SENTRY_DSN=https://1234567890abcdef@o123456.ingest.sentry.io/123456
-```
-
-Get correct DSN from: Settings → Projects → [Your Project] → Client Keys (DSN)
-
----
-
-## Network & Connectivity
-
-### Firewall Blocking MCP Connections
-
-**Symptom**: All MCPs timeout or fail to connect.
-
-**Solution**:
-
-#### A. Check Firewall Rules
-
-**macOS**:
-```bash
-# Check firewall status
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
-
-# Allow Node.js
-sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /usr/local/bin/node
-```
-
-**Linux (ufw)**:
-```bash
-# Allow outbound HTTPS
-sudo ufw allow out 443/tcp
-```
-
-#### B. Configure Proxy (if behind corporate proxy)
-
-Edit `~/.versatil/.env`:
-```bash
-# HTTP proxy
-HTTP_PROXY=http://proxy.company.com:8080
-HTTPS_PROXY=http://proxy.company.com:8080
-
-# No proxy for local services
-NO_PROXY=localhost,127.0.0.1,.local
-```
-
----
-
-### SSL/TLS Certificate Errors
-
-**Error**:
-```
-Error: unable to verify the first certificate
-```
-
-**Solution**:
-
-#### A. Trust Self-Signed Certificates (Development Only)
-
-```bash
-# ⚠️ DEVELOPMENT ONLY - DO NOT USE IN PRODUCTION
-export NODE_TLS_REJECT_UNAUTHORIZED=0
-```
-
-#### B. Add Corporate CA Certificate
-
+1. **Verify config file location**:
 ```bash
 # macOS
-sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain /path/to/ca.crt
+~/Library/Application Support/Claude/claude_desktop_config.json
+
+# Windows
+%APPDATA%/Claude/claude_desktop_config.json
 
 # Linux
-sudo cp /path/to/ca.crt /usr/local/share/ca-certificates/
-sudo update-ca-certificates
+~/.config/Claude/claude_desktop_config.json
 ```
 
----
-
-## Performance Issues
-
-### MCP Health Check Slow (> 10 seconds)
-
-**Cause**: Too many MCPs or network latency.
-
-**Solutions**:
-
-#### A. Disable Unused MCPs
-
-Comment out in `.cursor/mcp_config.json`:
-
+2. **Check config format**:
 ```json
 {
   "mcpServers": {
-    // "exa": {  // Disabled
-    //   "command": "npx",
-    //   ...
-    // }
+    "versatil": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/versatil-sdlc-framework/dist/mcp/versatil-mcp-server-v2.js"
+      ],
+      "env": {
+        "NODE_ENV": "development",
+        "VERSATIL_MCP_MODE": "true"
+      }
+    }
   }
 }
 ```
 
-#### B. Increase Health Check Timeout
-
+3. **Use absolute paths**:
 ```bash
-# Run with longer timeout
-MCP_HEALTH_TIMEOUT=30000 npm run mcp:health
+# Find absolute path
+pwd  # /Users/username/versatil-sdlc-framework
+# Use: /Users/username/versatil-sdlc-framework/dist/mcp/versatil-mcp-server-v2.js
 ```
 
-#### C. Run Health Checks in Parallel
+4. **Restart Claude Desktop**:
+```bash
+# macOS
+killall Claude
+open -a Claude
 
-Edit `scripts/mcp-health-check.cjs`:
-
-```javascript
-// Before (sequential)
-for (const [name, config] of Object.entries(configs)) {
-  results.push(await this.checkMCP(name, config));
-}
-
-// After (parallel)
-const promises = Object.entries(configs).map(([name, config]) =>
-  this.checkMCP(name, config)
-);
-results = await Promise.all(promises);
+# Verify connection in Claude Dev Tools
+# Help > Toggle Developer Tools > Console
 ```
 
----
+### Issue: MCP server crashes in Claude Desktop
 
-### High Memory Usage (> 1GB)
-
-**Cause**: Too many concurrent MCP connections or memory leak.
+**Symptoms**:
+- Claude shows "MCP server disconnected"
+- Tools work for a few seconds then fail
+- Repeated crashes
 
 **Solutions**:
 
-#### A. Limit Concurrent Connections
-
-Edit `~/.versatil/.env`:
+1. **Check Claude logs**:
 ```bash
-MCP_MAX_CONNECTIONS=5  # Was 10
-MCP_CONNECTION_POOL_SIZE=3  # Was 5
+# macOS
+~/Library/Logs/Claude/mcp-server-versatil.log
+
+# Look for error stack traces
+tail -100 ~/Library/Logs/Claude/mcp-server-versatil.log
 ```
 
-#### B. Monitor Memory Usage
-
+2. **Test server standalone**:
 ```bash
-# Watch memory usage
-watch -n 5 'ps aux | grep mcp'
-
-# Or use npm script
-npm run monitor -- --watch
+# Run server outside Claude to see errors
+node dist/mcp/versatil-mcp-server-v2.js
 ```
 
-#### C. Restart MCP Connections Periodically
+3. **Increase memory limit**:
+```json
+{
+  "mcpServers": {
+    "versatil": {
+      "command": "node",
+      "args": [
+        "--max-old-space-size=4096",
+        "/path/to/versatil-mcp-server-v2.js"
+      ]
+    }
+  }
+}
+```
 
-Add to cron (Linux/macOS):
-```bash
-# Restart MCPs daily at 3 AM
-0 3 * * * cd ~/.versatil && npm run mcp:restart
+4. **Check for uncaught exceptions**:
+```typescript
+// Add to server startup
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception:', error);
+});
 ```
 
 ---
 
-## Security & Permissions
+## Performance Problems
 
-### Credentials Leaked to Git
+### Issue: Slow tool execution (> 5 seconds)
 
-**Immediate Actions**:
+**Symptoms**:
+- Tools take long time to respond
+- Timeout errors
+- High CPU usage
 
-1. **Rotate Compromised Tokens** (highest priority)
-   ```bash
-   # GitHub: Delete token immediately
-   # https://github.com/settings/tokens
+**Solutions**:
 
-   # Supabase: Rotate service key
-   # https://app.supabase.com → Project Settings → API → Generate New
-
-   # Sentry: Revoke auth token
-   # https://sentry.io/settings/account/api/auth-tokens/
-   ```
-
-2. **Remove from Git History**
-   ```bash
-   # Use BFG Repo-Cleaner (faster than git filter-branch)
-   brew install bfg  # macOS
-   # Or download from: https://rtyley.github.io/bfg-repo-cleaner/
-
-   # Remove .env files
-   bfg --delete-files .env
-
-   # Clean git history
-   git reflog expire --expire=now --all
-   git gc --prune=now --aggressive
-
-   # Force push
-   git push origin --force --all
-   ```
-
-3. **Verify Removal**
-   ```bash
-   # Search for leaked credentials
-   git log --all --full-history -- '*.env'
-
-   # Should return no results
-   ```
-
----
-
-### File Permission Errors
-
-**Error**:
-```
-Error: EACCES: permission denied, open '~/.versatil/.env'
-```
-
-**Solution**:
+1. **Profile tool execution**:
 ```bash
-# Fix file permissions
-chmod 600 ~/.versatil/.env
-chmod 700 ~/.versatil/
+# Enable performance monitoring
+VERSATIL_PERFORMANCE_MONITORING=true node dist/mcp/versatil-mcp-server-v2.js
+```
 
-# Verify
-ls -la ~/.versatil/.env
-# Should show: -rw------- (owner read/write only)
+2. **Check for blocking operations**:
+```typescript
+// Avoid synchronous file operations
+// Use async/await for all I/O
+```
+
+3. **Monitor resource usage**:
+```bash
+# Check memory and CPU
+top -pid $(pgrep -f versatil-mcp-server)
+```
+
+4. **Optimize agent operations**:
+```typescript
+// Cache agent instances
+// Use connection pooling
+// Batch database queries
+```
+
+### Issue: Memory leak - growing heap size
+
+**Symptoms**:
+```
+Memory usage increases over time
+Eventually crashes with OOM error
+```
+
+**Solutions**:
+
+1. **Monitor memory usage**:
+```bash
+node --trace-gc dist/mcp/versatil-mcp-server-v2.js
+```
+
+2. **Check for event listener leaks**:
+```typescript
+// Ensure event listeners are cleaned up
+process.setMaxListeners(20);  // Increase if needed
+```
+
+3. **Profile with heap snapshot**:
+```bash
+node --inspect dist/mcp/versatil-mcp-server-v2.js
+# Open chrome://inspect
+# Take heap snapshots
+```
+
+4. **Clear caches periodically**:
+```typescript
+// Implement cache TTL
+// Limit cache size
+// Use weak references for large objects
 ```
 
 ---
 
-## Advanced Troubleshooting
+## Logging & Debugging
 
 ### Enable Debug Logging
 
-#### A. Framework-Wide Debug
-
 ```bash
-# Set debug level
-export LOG_LEVEL=debug
+# Maximum verbosity
+VERSATIL_LOG_LEVEL=debug node dist/mcp/versatil-mcp-server-v2.js
 
-# Run command with debug output
-DEBUG=* npm run mcp:health
+# Log to file
+VERSATIL_LOG_FILE=versatil-debug.log node dist/mcp/versatil-mcp-server-v2.js
+
+# Both console and file
+VERSATIL_LOG_LEVEL=debug VERSATIL_LOG_FILE=versatil.log node dist/mcp/versatil-mcp-server-v2.js
 ```
 
-#### B. MCP-Specific Debug
-
-Edit `.cursor/mcp_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
-        "DEBUG": "github-mcp:*",  // Enable debug logs
-        "LOG_LEVEL": "debug"
-      }
-    }
-  }
-}
-```
-
-#### C. View MCP Logs
+### Inspect MCP Messages
 
 ```bash
-# Framework logs
-tail -f ~/.versatil/logs/opera-mcp.log
+# Log all JSON-RPC messages
+tee versatil-messages.log | node dist/mcp/versatil-mcp-server-v2.js | tee versatil-responses.log
+```
 
-# MCP-specific logs
-tail -f ~/.versatil/logs/mcp-github.log
-tail -f ~/.versatil/logs/mcp-playwright.log
+### Debug TypeScript Source
+
+```bash
+# Run with source maps
+node --enable-source-maps dist/mcp/versatil-mcp-server-v2.js
+
+# Attach debugger
+node --inspect-brk dist/mcp/versatil-mcp-server-v2.js
+# Open chrome://inspect
+```
+
+### Test Individual Components
+
+```typescript
+// Test agent registry
+import { AgentRegistry } from './src/agents/core/agent-registry.js';
+const registry = new AgentRegistry();
+console.log('Agents:', registry.listAgents());
+
+// Test error sanitizer
+import { sanitizeError } from './src/mcp/error-sanitizer.js';
+const error = new Error('Test error with /sensitive/path');
+console.log('Sanitized:', sanitizeError(error));
 ```
 
 ---
 
-### Capture Network Traffic
+## Known Issues & Workarounds
 
-Use `mitmproxy` to inspect MCP API calls:
+### Issue: Windows path handling
 
-```bash
-# Install mitmproxy
-brew install mitmproxy  # macOS
-# Or: pip install mitmproxy
+**Symptom**: File paths with backslashes fail on Windows
 
-# Start proxy
-mitmproxy -p 8080
-
-# Configure proxy for MCPs
-export HTTP_PROXY=http://localhost:8080
-export HTTPS_PROXY=http://localhost:8080
-
-# Run MCP command
-npm run mcp:health
-
-# View captured requests in mitmproxy UI
+**Workaround**:
+```typescript
+// Normalize paths
+const path = filePath.replace(/\\/g, '/');
 ```
 
----
+### Issue: Large response truncation
 
-### Generate Debug Report
+**Symptom**: Tool responses > 100KB get truncated
 
-```bash
-# Comprehensive debug report
-npm run doctor -- --report > debug-report.txt
-
-# Includes:
-# - Framework version
-# - Node.js version
-# - MCP configurations
-# - Health check results
-# - Environment variables (sanitized)
-# - Recent logs
-# - System information
+**Workaround**:
+```typescript
+// Use resource for large data
+// Tools should return < 100KB
+// Resources can return larger payloads
 ```
 
-Send `debug-report.txt` when requesting support.
+### Issue: Chrome MCP requires Playwright installation
+
+**Symptom**: `chromeMCP: true` fails if Playwright not installed
+
+**Workaround**:
+```bash
+# Install Playwright browsers
+npx playwright install chromium
+```
 
 ---
 
 ## Getting Help
 
-### Before Asking for Help
+### Before Opening an Issue
 
-1. **Run diagnostics**:
-   ```bash
-   npm run doctor
-   npm run mcp:health:verbose
-   npm run validate:isolation
-   ```
+1. ✅ Check this troubleshooting guide
+2. ✅ Search existing issues: https://github.com/MiraclesGIT/versatil-sdlc-framework/issues
+3. ✅ Enable debug logging and check logs
+4. ✅ Test with minimal reproduction case
+5. ✅ Include version information (`node --version`, `npm --version`)
 
-2. **Check logs**:
-   ```bash
-   tail -100 ~/.versatil/logs/opera-mcp.log
-   ```
+### Opening a Support Issue
 
-3. **Search existing issues**:
-   - GitHub: https://github.com/Nissimmiracles/versatil-sdlc-framework/issues
+Include:
+- **Version**: Node.js, npm, VERSATIL framework
+- **Environment**: OS, Claude Desktop version (if applicable)
+- **Error Message**: Full error with stack trace
+- **Steps to Reproduce**: Minimal reproduction steps
+- **Expected Behavior**: What should happen
+- **Actual Behavior**: What actually happens
+- **Logs**: Debug logs (`VERSATIL_LOG_LEVEL=debug`)
 
-### Reporting Bugs
+### Emergency Support
 
-Create an issue with:
-
-1. **Error message** (full stack trace)
-2. **Steps to reproduce**
-3. **Environment**:
-   ```bash
-   node --version
-   npm --version
-   versatil --version
-   cat ~/.versatil/.env | grep -v 'KEY\|TOKEN\|SECRET'  # Sanitized
-   ```
-4. **Debug report**: `npm run doctor -- --report`
-
-### Community Support
-
-- **GitHub Discussions**: https://github.com/Nissimmiracles/versatil-sdlc-framework/discussions
+For critical production issues:
+- **Email**: support@versatil.dev
 - **Discord**: https://discord.gg/versatil
-- **Stack Overflow**: Tag `versatil-framework`
-
-### Commercial Support
-
-For enterprise support, contact: support@versatil.dev
+- **Response Time**: < 4 hours for P0, < 24 hours for P1
 
 ---
 
-## Appendix: Error Code Reference
-
-| Code | Error | Cause | Solution |
-|------|-------|-------|----------|
-| `MCP-001` | Server not found | Package not installed | `npm install -g <package>` |
-| `MCP-002` | Missing credentials | Env vars not set | Check `~/.versatil/.env` |
-| `MCP-003` | Connection timeout | Network issue or slow server | Increase timeout |
-| `MCP-004` | Permission denied | Invalid API token | Check token scopes |
-| `MCP-005` | Isolation violation | Credentials in project | Move to `~/.versatil/` |
-| `MCP-006` | Invalid configuration | Malformed JSON | Validate `mcp_config.json` |
-| `MCP-007` | Rate limit exceeded | Too many API calls | Wait or upgrade tier |
-| `MCP-008` | SSL certificate error | Untrusted certificate | Add CA cert |
-| `MCP-009` | Memory exhausted | Too many connections | Reduce pool size |
-| `MCP-010` | Process crash | Unhandled exception | Check logs, report bug |
-
----
-
-**Last Updated**: October 19, 2025
-**Framework Version**: 6.4.0
+**Last Updated**: October 10, 2025
+**Framework Version**: 6.1.0
+**Maintained By**: VERSATIL Development Team

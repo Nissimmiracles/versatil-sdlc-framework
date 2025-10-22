@@ -59,19 +59,21 @@ VERSATIL v6.6.0 introduces the **Three-Layer Context System** - the first AI fra
 
 ### 3. Comparison Table Enhancement (Lines 66-77)
 
+**IMPORTANT**: Position VERSATIL as a **complementary framework**, NOT a competitor!
+
 **Current**:
 | Feature | Copilot | Cursor | Windsurf | **VERSATIL** |
 
 **New**:
-| Feature | Copilot | Cursor | Windsurf | Cline | **VERSATIL v6.6.0** |
-|---------|---------|--------|----------|-------|---------------------|
-| **Context-Aware Code** | ❌ | ❌ | ❌ | ❌ | ✅ **Matches YOUR style** |
-| **Auto-Detected Preferences** | ❌ | ❌ | ❌ | ❌ | ✅ **From git (15s)** |
-| **Privacy-Isolated Learning** | ❌ | ❌ | ❌ | ❌ | ✅ **100% guaranteed** |
-| **Team Convention Enforcement** | ❌ | ❌ | ❌ | ❌ | ✅ **Automatic** |
-| **Compounding Engineering** | ❌ | ❌ | ❌ | ❌ | ✅ **40% faster by Feature 5** |
+| Capability | AI Assistants Alone<br/>(Copilot/Cursor/Windsurf/Cline) | **+ VERSATIL Framework** |
+|------------|----------------------------------------------------------|--------------------------|
+| **Context-Aware Code** | ❌ Generic code suggestions | ✅ **Matches YOUR coding style automatically** |
+| **Auto-Detected Preferences** | ❌ Manual configuration required | ✅ **Learns from git in 15 seconds** |
+| **Privacy-Isolated Learning** | ❌ Shared training data | ✅ **100% private pattern isolation** |
+| **Team Convention Enforcement** | ❌ Manual linting setup | ✅ **Automatic team standard enforcement** |
+| **Compounding Engineering** | ❌ Same speed every time | ✅ **40% faster by Feature 5** |
 
-**Why**: Show VERSATIL is THE ONLY framework with context-aware generation.
+**Why**: Show VERSATIL **enhances** AI assistants (not competes with them). VERSATIL works **with** Claude/Cursor/Copilot.
 
 ---
 

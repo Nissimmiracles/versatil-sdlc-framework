@@ -208,7 +208,7 @@
   },
   "quickStart": {
     "install": "Clone or install via Claude Code marketplace",
-    "verify": "Run: node test-native-hooks.cjs",
+    "verify": "Run: npm run demo:native",
     "demo": "Edit any test file to see Maria-QA auto-activate",
     "learn": "Read: docs/testing/NATIVE_VS_NON_NATIVE_DEMO.md"
   }

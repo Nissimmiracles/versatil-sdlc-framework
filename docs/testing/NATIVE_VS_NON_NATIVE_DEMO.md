@@ -284,7 +284,7 @@ head -5 .claude/hooks/post-file-edit.ts
 
 ### 4. Run Interactive Demo
 ```bash
-node test-native-hooks.cjs
+npm run demo:native
 # Shows real-time hook simulation
 ```
 
@@ -443,4 +443,4 @@ grep "Stop" .claude/settings.json -A 5
 
 **Summary**: VERSATIL is 100% natively integrated with Claude SDK. No custom YAML. No bash workarounds. Just official SDK hooks that work everywhere.
 
-**Proof**: Run `node test-native-hooks.cjs` to see it in action.
+**Proof**: Run `npm run demo:native` to see it in action.

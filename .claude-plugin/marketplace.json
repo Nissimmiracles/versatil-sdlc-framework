@@ -75,7 +75,7 @@
       },
       "quickStart": {
         "install": "git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git",
-        "verify": "node test-native-hooks.cjs",
+        "verify": "npm run demo:native",
         "demo": "Edit any test file to see agents auto-activate"
       }
     }

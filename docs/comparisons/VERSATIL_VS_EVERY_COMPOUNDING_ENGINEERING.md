@@ -353,6 +353,8 @@ $ /review
 
 **Manual effort**: 3 commands + manual reflection + manual documentation
 
+**Note**: VERSATIL demo available at: `npm run demo:native`
+
 ### VERSATIL Example (Automatic)
 
 ```bash

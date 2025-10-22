@@ -91,6 +91,8 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
+.!*
+*~$*
 
 # Package Managers
 # package-lock.json  # Needed for GitHub Actions npm ci

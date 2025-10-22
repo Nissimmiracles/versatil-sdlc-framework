@@ -37,6 +37,9 @@ function sleep(ms) {
   execSync(`sleep ${ms / 1000}`);
 }
 
+// Find project root (2 levels up from tests/demo/)
+const projectRoot = path.resolve(__dirname, '..', '..');
+
 // ============================================================================
 // VERIFICATION: Prove Native Integration
 // ============================================================================
@@ -46,7 +49,7 @@ header('🔍 STEP 1: VERIFY 100% NATIVE SDK INTEGRATION');
 log('\n📋 Checking for custom YAML fields (should be NONE)...', 'yellow');
 sleep(500);
 
-const agentsDir = path.join(__dirname, '.claude/agents');
+const agentsDir = path.join(projectRoot, '.claude/agents');
 const agentFiles = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
 
 let hasCustomFields = false;
@@ -67,7 +70,7 @@ if (!hasCustomFields) {
 log('\n📋 Checking .claude/settings.json for native SDK hooks...', 'yellow');
 sleep(500);
 
-const settingsPath = path.join(__dirname, '.claude/settings.json');
+const settingsPath = path.join(projectRoot, '.claude/settings.json');
 const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
 
 const sdkHooks = ['PostToolUse', 'SubagentStop', 'Stop', 'UserPromptSubmit'];
@@ -90,7 +93,7 @@ if (allHooksPresent) {
 log('\n📋 Checking hook scripts (should be TypeScript, not bash)...', 'yellow');
 sleep(500);
 
-const hooksDir = path.join(__dirname, '.claude/hooks');
+const hooksDir = path.join(projectRoot, '.claude/hooks');
 const hookFiles = fs.readdirSync(hooksDir).filter(f => f.endsWith('.ts'));
 
 log(`   Found ${hookFiles.length} TypeScript hooks:`, 'cyan');
