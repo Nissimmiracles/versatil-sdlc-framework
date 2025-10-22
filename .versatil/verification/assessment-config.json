@@ -1,0 +1,205 @@
+{
+  "assessmentRules": {
+    "security": {
+      "patterns": [
+        "auth",
+        "login",
+        "password",
+        "token",
+        "jwt",
+        "session",
+        "crypto",
+        "hash",
+        "encrypt",
+        "credential",
+        "secret",
+        "api-key",
+        "oauth",
+        "permission",
+        "role",
+        "access-control"
+      ],
+      "assessments": [
+        {
+          "type": "Security",
+          "tool": "semgrep",
+          "command": "npx semgrep scan --config=auto --severity=ERROR --severity=WARNING",
+          "threshold": 0,
+          "mandatory": true,
+          "reason": "Security vulnerabilities must be zero for authentication code"
+        },
+        {
+          "type": "TestCoverage",
+          "tool": "jest",
+          "command": "npm run test:coverage -- --collectCoverageFrom=\"**/{auth,login,session}/**/*.{ts,js}\"",
+          "threshold": 90,
+          "mandatory": true,
+          "reason": "Security code requires 90%+ test coverage"
+        }
+      ],
+      "priority": "critical"
+    },
+    "api": {
+      "patterns": [
+        "api",
+        "route",
+        "endpoint",
+        "controller",
+        "handler",
+        "request",
+        "response",
+        "http",
+        "rest",
+        "graphql",
+        "mutation",
+        "query",
+        "resolver"
+      ],
+      "assessments": [
+        {
+          "type": "Security",
+          "tool": "semgrep",
+          "command": "npx semgrep scan --config=auto --severity=ERROR",
+          "threshold": 0,
+          "mandatory": true,
+          "reason": "API endpoints must have zero critical vulnerabilities"
+        },
+        {
+          "type": "TestCoverage",
+          "tool": "jest",
+          "command": "npm run test:coverage -- --testPathPattern=\".*\\\\.(test|spec)\\\\.(ts|js)\"",
+          "threshold": 80,
+          "mandatory": true,
+          "reason": "API endpoints require 80%+ test coverage"
+        },
+        {
+          "type": "APICompliance",
+          "tool": "api-linter",
+          "command": "npx @redocly/cli lint openapi.yaml",
+          "mandatory": false,
+          "reason": "Validate OpenAPI spec compliance"
+        }
+      ],
+      "priority": "high"
+    },
+    "ui": {
+      "patterns": [
+        "component",
+        "jsx",
+        "tsx",
+        "vue",
+        "svelte",
+        "react",
+        "angular",
+        "ui",
+        "frontend",
+        "view",
+        "page",
+        "layout",
+        "button",
+        "form",
+        "input",
+        "modal"
+      ],
+      "assessments": [
+        {
+          "type": "Accessibility",
+          "tool": "axe-core",
+          "command": "npx @axe-core/cli --exit",
+          "threshold": 90,
+          "mandatory": true,
+          "reason": "UI components must meet WCAG 2.1 AA standards (90%+ score)"
+        },
+        {
+          "type": "Performance",
+          "tool": "lighthouse",
+          "command": "npx lighthouse --only-categories=performance --quiet --chrome-flags=\"--headless\"",
+          "threshold": 90,
+          "mandatory": false,
+          "reason": "UI should maintain 90+ performance score"
+        },
+        {
+          "type": "TestCoverage",
+          "tool": "jest",
+          "command": "npm run test:coverage -- --testPathPattern=\".*\\\\.(test|spec)\\\\.(tsx|jsx)\"",
+          "threshold": 75,
+          "mandatory": false,
+          "reason": "UI components should have 75%+ test coverage"
+        }
+      ],
+      "priority": "high"
+    },
+    "test": {
+      "patterns": [
+        "test",
+        "spec",
+        ".test.",
+        ".spec.",
+        "__tests__",
+        "jest",
+        "vitest",
+        "playwright",
+        "cypress"
+      ],
+      "assessments": [
+        {
+          "type": "TestCoverage",
+          "tool": "jest",
+          "command": "npm run test:coverage",
+          "threshold": 80,
+          "mandatory": true,
+          "reason": "Overall test coverage must be ≥80%"
+        },
+        {
+          "type": "CodeQuality",
+          "tool": "eslint",
+          "command": "npx eslint --max-warnings=0",
+          "mandatory": false,
+          "reason": "Test code should follow linting rules"
+        }
+      ],
+      "priority": "medium"
+    },
+    "database": {
+      "patterns": [
+        "migration",
+        "schema",
+        "database",
+        "db",
+        "sql",
+        "prisma",
+        "typeorm",
+        "sequelize",
+        "model",
+        "entity",
+        "rls",
+        "policy"
+      ],
+      "assessments": [
+        {
+          "type": "Security",
+          "tool": "semgrep",
+          "command": "npx semgrep scan --config=auto --severity=ERROR",
+          "threshold": 0,
+          "mandatory": true,
+          "reason": "Database migrations must have zero SQL injection vulnerabilities"
+        },
+        {
+          "type": "TestCoverage",
+          "tool": "jest",
+          "command": "npm run test:coverage -- --testPathPattern=\".*database.*\\\\.(test|spec)\\\\.(ts|js)\"",
+          "threshold": 85,
+          "mandatory": true,
+          "reason": "Database layer requires 85%+ test coverage"
+        }
+      ],
+      "priority": "critical"
+    }
+  },
+  "thresholds": {
+    "testCoverage": 80,
+    "securityVulnerabilities": 0,
+    "performanceScore": 90,
+    "accessibilityScore": 90
+  }
+}

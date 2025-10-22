@@ -16,6 +16,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, appendFileSync } from 'fs';
 import { execSync } from 'child_process';
 import { join } from 'path';
+import { AssessmentEngine } from '../../src/agents/verification/assessment-engine';
 
 interface HookInput {
   toolName: string;
@@ -32,6 +33,8 @@ interface Claim {
   extractedFrom: string;
   confidence: number;
   needsVerification: boolean;
+  filePath?: string;
+  context?: string;
 }
 
 interface VerificationResult {
@@ -67,7 +70,9 @@ function extractClaims(toolName: string, toolInput: any, toolOutput: any): Claim
       category: 'FileCreation',
       extractedFrom: 'Write tool',
       confidence: 0,
-      needsVerification: true
+      needsVerification: true,
+      filePath: toolInput.file_path,
+      context: toolInput.content?.substring(0, 500) // First 500 chars for pattern detection
     });
 
     if (toolInput.content) {
@@ -77,7 +82,8 @@ function extractClaims(toolName: string, toolInput: any, toolOutput: any): Claim
         category: 'Metric',
         extractedFrom: 'Write tool content',
         confidence: 0,
-        needsVerification: true
+        needsVerification: true,
+        filePath: toolInput.file_path
       });
     }
   }
@@ -89,7 +95,9 @@ function extractClaims(toolName: string, toolInput: any, toolOutput: any): Claim
       category: 'FileEdit',
       extractedFrom: 'Edit tool',
       confidence: 0,
-      needsVerification: true
+      needsVerification: true,
+      filePath: toolInput.file_path,
+      context: toolInput.new_string?.substring(0, 500) // New content for pattern detection
     });
   }
 
@@ -411,6 +419,86 @@ if (flaggedClaims.length > 0) {
 }
 
 console.log(`\n✅ Proof log saved: ${proofLogPath}`);
+
+// ============================================================================
+// ASSESSMENT ENGINE INTEGRATION (Phase 1)
+// ============================================================================
+
+console.log('\n🔬 Assessment Engine: Analyzing claims for quality audits...');
+
+const assessmentEngine = new AssessmentEngine(workingDirectory);
+const assessmentPlans: any[] = [];
+
+for (const claim of claims) {
+  if (assessmentEngine.needsAssessment(claim)) {
+    const plan = assessmentEngine.planAssessment(claim);
+
+    if (plan.needsAssessment) {
+      assessmentPlans.push(plan);
+
+      const priorityIcon = plan.priority === 'critical' ? '🚨' : plan.priority === 'high' ? '⚠️' : 'ℹ️';
+      console.log(`   ${priorityIcon} ${claim.text}`);
+      console.log(`      → Reason: ${plan.reason}`);
+      console.log(`      → Priority: ${plan.priority.toUpperCase()}`);
+      console.log(`      → Assessments: ${plan.assessments.length}`);
+
+      for (const assessment of plan.assessments) {
+        const mandatoryBadge = assessment.mandatory ? '[MANDATORY]' : '[OPTIONAL]';
+        console.log(`         • ${assessment.type} (${assessment.tool}) ${mandatoryBadge}`);
+        console.log(`           ${assessment.reason}`);
+      }
+
+      console.log(`      → Estimated duration: ${plan.estimatedDuration}`);
+    }
+  }
+}
+
+// Save assessment plans to log
+if (assessmentPlans.length > 0) {
+  const assessmentLogPath = join(verificationLogDir, 'assessment-plans.jsonl');
+
+  for (const plan of assessmentPlans) {
+    const logEntry = JSON.stringify({
+      sessionId,
+      timestamp: new Date().toISOString(),
+      claim: plan.claim.text,
+      priority: plan.priority,
+      reason: plan.reason,
+      assessments: plan.assessments.map((a: any) => ({
+        type: a.type,
+        tool: a.tool,
+        mandatory: a.mandatory,
+        threshold: a.threshold
+      })),
+      estimatedDuration: plan.estimatedDuration
+    }) + '\n';
+
+    appendFileSync(assessmentLogPath, logEntry, 'utf-8');
+  }
+
+  console.log(`\n📋 Assessment Summary:`);
+  console.log(`   Total claims needing assessment: ${assessmentPlans.length}`);
+
+  const criticalCount = assessmentPlans.filter(p => p.priority === 'critical').length;
+  const highCount = assessmentPlans.filter(p => p.priority === 'high').length;
+
+  if (criticalCount > 0) console.log(`   🚨 Critical priority: ${criticalCount}`);
+  if (highCount > 0) console.log(`   ⚠️  High priority: ${highCount}`);
+
+  const totalMandatory = assessmentPlans.reduce((sum, p) =>
+    sum + p.assessments.filter((a: any) => a.mandatory).length, 0);
+
+  console.log(`   Mandatory assessments: ${totalMandatory}`);
+  console.log(`   Assessment plans saved: ${assessmentLogPath}`);
+
+  console.log(`\n💡 Next Steps:`);
+  console.log(`   • Review assessment plans in ${assessmentLogPath}`);
+  console.log(`   • Phase 2: Auto-execute assessments via Maria-QA/Marcus/James`);
+  console.log(`   • Phase 3: Block merges if mandatory assessments fail`);
+} else {
+  console.log(`   ✓ No quality assessments required`);
+}
+
 console.log('─'.repeat(60) + '\n');
 
 process.exit(0);
