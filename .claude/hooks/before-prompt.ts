@@ -104,6 +104,48 @@ function loadPattern(filename: string, workingDir: string): Pattern | null {
   }
 }
 
+/**
+ * Load project-level context from PROJECT.md
+ * Always loads on every prompt for project-specific patterns.
+ */
+function loadProjectContext(workingDir: string): string | null {
+  try {
+    const projectPath = path.join(workingDir, 'PROJECT.md');
+    if (fs.existsSync(projectPath)) {
+      const content = fs.readFileSync(projectPath, 'utf-8');
+      return `# Project Context\n\n${content}`;
+    }
+  } catch (error) {
+    // Fail gracefully
+  }
+  return null;
+}
+
+/**
+ * Detect library mentions and return skill notifications (Skills-First Architecture)
+ * Instead of loading full claude.md files, notify about available library-guides skills.
+ */
+function detectLibraryMentions(userMessage: string): string[] {
+  const libraries = [
+    'agents', 'orchestration', 'rag', 'testing', 'mcp',
+    'templates', 'planning', 'intelligence', 'memory', 'learning',
+    'ui', 'hooks', 'context', 'validation', 'dashboard'
+  ];
+
+  const messageLower = userMessage.toLowerCase();
+  const detectedLibraries: string[] = [];
+
+  for (const library of libraries) {
+    // Check if library name is mentioned in prompt
+    const libraryPattern = new RegExp(`\\b${library}\\b|src/${library}/`, 'i');
+    if (libraryPattern.test(messageLower)) {
+      detectedLibraries.push(library);
+    }
+  }
+
+  return detectedLibraries;
+}
+
 async function main() {
   try {
     const input: HookInput = JSON.parse(fs.readFileSync(process.stdin.fd, 'utf-8'));
@@ -117,34 +159,89 @@ async function main() {
 
     const matchedFiles = detectMatchingPatterns(userMessage);
 
-    if (matchedFiles.length === 0) {
+    // Detect library mentions (Skills-First Architecture - Phase 3)
+    const detectedLibraries = detectLibraryMentions(userMessage);
+
+    // Skills-first approach: Notify about available patterns and libraries
+    const hasPatterns = matchedFiles.length > 0;
+    const hasLibraryMentions = detectedLibraries.length > 0;
+
+    // Exit if nothing to inject
+    if (!hasPatterns && !hasLibraryMentions) {
       process.exit(0);
     }
 
-    const patterns: Pattern[] = [];
-    for (const filename of matchedFiles) {
-      const pattern = loadPattern(filename, workingDir);
-      if (pattern) {
-        patterns.push(pattern);
-      }
+    // Log to stderr for user visibility
+    if (hasPatterns) {
+      console.error(`\n🧠 [RAG Patterns] ${matchedFiles.length} pattern(s) available:`);
+      matchedFiles.forEach((filename, i) => {
+        const patternName = filename.replace('.json', '').replace(/-v[\d.]+$/, '');
+        console.error(`  ${i + 1}. ${patternName} - See rag-patterns skill`);
+      });
+      console.error(`  💡 TIP: Patterns loaded via Skills (progressive disclosure)`);
     }
 
-    if (patterns.length > 0) {
-      // Log to stderr for user visibility in terminal
-      console.error(`\n🧠 [RAG] Auto-activated ${patterns.length} pattern(s):`);
-      patterns.forEach((p, i) => {
-        console.error(`  ${i + 1}. ${p.name} (${(p.metrics.successRate * 100).toFixed(0)}% success)`);
+    if (hasLibraryMentions) {
+      console.error(`\n📚 [Library Guides] ${detectedLibraries.length} library guide(s) available:`);
+      detectedLibraries.forEach((lib, i) => {
+        console.error(`  ${i + 1}. ${lib}/ - See ${lib}-library skill for conventions`);
       });
-      console.error('');
 
-      // Output to stdout for Claude context injection
-      const ragContext = {
-        role: 'system',
-        content: `# RAG Patterns Auto-Activated\n\nThe following patterns from your implementation history have been retrieved:\n\n${patterns.map((p, i) => `## Pattern ${i + 1}: ${p.name}\n\n**Success Rate**: ${(p.metrics.successRate * 100).toFixed(0)}%\n**Effort**: ${p.metrics.effortHours || 'N/A'}h (estimated: ${p.metrics.estimatedHours || 'N/A'}h)\n**Version**: ${p.metadata.version}\n${p.metadata.commitHash ? `**Commit**: ${p.metadata.commitHash}\n` : ''}\n**Description**: ${p.description}\n\n### Implementation\n\n\`\`\`typescript\n${p.implementation.code}\n\`\`\`\n\n### Instructions\n${p.implementation.instructions.map(inst => `- ${inst}`).join('\n')}\n\n${p.implementation.files ? `### Related Files\n${p.implementation.files.map(f => `- \`${f.path}\`${f.lines ? `:${f.lines}` : ''} - ${f.description}`).join('\n')}\n` : ''}`).join('\n---\n\n')}\n\n**Use these patterns to answer the user's question with YOUR specific implementation details, not generic knowledge.**`
+      const conventions = {
+        'agents': 'OPERA agent patterns, handoff contracts, sub-agent routing',
+        'rag': 'Pattern search, GraphRAG → Vector → Local fallback chain',
+        'testing': 'Jest + ts-jest, 80%+ coverage, Maria-QA standards',
+        'orchestration': 'PlanFirstOrchestrator, parallel execution, dependency resolution',
+        'mcp': 'MCP servers, anti-hallucination verification',
+        'templates': 'Template matching, 70% threshold scoring',
+        'planning': 'Todo generation, dependency graphs, execution waves',
+        'intelligence': 'Model selection (o1 vs claude-sonnet)',
+        'memory': 'Vector store, privacy isolation (User > Team > Project > Public)',
+        'learning': 'Pattern codification, compounding engineering (40% speedup)',
+        'ui': 'React components, WCAG 2.1 AA accessibility',
+        'hooks': 'Lifecycle hooks, context injection',
+        'context': 'CRG priority resolution, CAG generation',
+        'validation': 'Schema validation, quality gates',
+        'dashboard': 'Metrics visualization, real-time updates'
       };
 
-      console.log(JSON.stringify(ragContext));
+      const primaryLib = detectedLibraries[0];
+      const hint = conventions[primaryLib] || 'library-specific conventions';
+      console.error(`  💡 TIP: Use ${primaryLib}-library skill for: ${hint}`);
     }
+
+    console.error('');
+
+    // Skills-First Context Injection (Phase 3 Complete)
+    let contextContent = '';
+
+    // Notify about RAG patterns (Skills will provide details)
+    if (hasPatterns) {
+      const patternNames = matchedFiles.map(f => f.replace('.json', '').replace(/-v[\d.]+$/, ''));
+      contextContent += `# Available RAG Patterns\n\n`;
+      contextContent += `The following historical patterns are relevant to this query:\n\n`;
+      contextContent += patternNames.map(name => `- **${name}** - Use \`rag-patterns/${name}\` skill for details`).join('\n');
+      contextContent += `\n\n**Skills provide progressive disclosure:** metadata (~15 tokens) → SKILL.md (~500 tokens) → references (~2,000 tokens)`;
+    }
+
+    // Notify about library guides (Skills will provide details - Phase 3 NEW)
+    if (hasLibraryMentions) {
+      if (hasPatterns) {
+        contextContent += '\n\n---\n\n';
+      }
+      contextContent += `# Available Library Guides\n\n`;
+      contextContent += `The following library-specific guides are relevant:\n\n`;
+      contextContent += detectedLibraries.map(lib => `- **${lib}-library** - Use \`library-guides/${lib}-library\` skill for:\n  - Core conventions and patterns\n  - Quick start code examples\n  - Important gotchas and edge cases\n  - Testing guidelines and coverage requirements`).join('\n\n');
+      contextContent += `\n\n**Token savings:** 85-95% reduction vs full claude.md injection (notification ~50 tokens vs full file ~2,000 tokens)`;
+    }
+
+    // Output minimal context (notification only, no full files)
+    const combinedContext = {
+      role: 'system',
+      content: contextContent
+    };
+
+    console.log(JSON.stringify(combinedContext));
 
   } catch (error) {
     // Fail gracefully
