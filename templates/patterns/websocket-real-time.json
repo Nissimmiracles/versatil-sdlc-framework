@@ -1,0 +1,157 @@
+{
+  "name": "WebSocket Real-Time Communication",
+  "category": "Real-Time",
+  "keywords": ["websocket", "socket.io", "real-time", "ws", "chat", "live", "push", "broadcast", "room", "event"],
+  "description": "Complete real-time communication system using WebSocket/Socket.io for bidirectional client-server messaging, room management, and live updates.",
+  "estimated_effort": {
+    "hours": 6,
+    "range": "4-8",
+    "confidence": 88
+  },
+  "complexity": "Medium",
+  "time_savings": "3-4 hours per implementation",
+  "success_rate": 92,
+  "technologies": ["Socket.io", "ws", "WebSocket API", "Express", "Redis (optional)"],
+  "use_cases": [
+    "Real-time chat applications",
+    "Live notifications/alerts",
+    "Collaborative editing (Google Docs style)",
+    "Live dashboards/analytics",
+    "Multiplayer games",
+    "Live location tracking"
+  ],
+  "implementation": {
+    "server_setup": {
+      "description": "Socket.io server with Express integration",
+      "code": "// Server: src/websocket/socket-server.ts\nimport { Server } from 'socket.io';\nimport { createServer } from 'http';\nimport express from 'express';\nimport { verifyToken } from './auth';\n\nconst app = express();\nconst httpServer = createServer(app);\n\nconst io = new Server(httpServer, {\n  cors: {\n    origin: process.env.CLIENT_URL || 'http://localhost:3000',\n    credentials: true\n  },\n  pingTimeout: 60000,\n  pingInterval: 25000\n});\n\n// Authentication middleware\nio.use(async (socket, next) => {\n  const token = socket.handshake.auth.token;\n  \n  if (!token) {\n    return next(new Error('Authentication error'));\n  }\n  \n  try {\n    const user = await verifyToken(token);\n    socket.data.user = user;\n    next();\n  } catch (err) {\n    next(new Error('Invalid token'));\n  }\n});\n\n// Connection handler\nio.on('connection', (socket) => {\n  const userId = socket.data.user.id;\n  console.log(`User connected: ${userId}`);\n  \n  // Join user to their personal room\n  socket.join(`user:${userId}`);\n  \n  // Handle disconnection\n  socket.on('disconnect', (reason) => {\n    console.log(`User disconnected: ${userId}, reason: ${reason}`);\n  });\n  \n  // Custom event handlers\n  socket.on('error', (error) => {\n    console.error(`Socket error for user ${userId}:`, error);\n  });\n});\n\nhttpServer.listen(3001, () => {\n  console.log('WebSocket server running on port 3001');\n});\n\nexport { io };",
+      "file": "src/websocket/socket-server.ts",
+      "lines": "1-55"
+    },
+    "client_setup": {
+      "description": "React client with Socket.io-client",
+      "code": "// Client: src/hooks/useWebSocket.ts\nimport { useEffect, useState, useCallback } from 'react';\nimport { io, Socket } from 'socket.io-client';\nimport { getAuthToken } from '../utils/auth';\n\ninterface UseWebSocketOptions {\n  url?: string;\n  autoConnect?: boolean;\n}\n\nexport function useWebSocket(options: UseWebSocketOptions = {}) {\n  const [socket, setSocket] = useState<Socket | null>(null);\n  const [connected, setConnected] = useState(false);\n  const [error, setError] = useState<string | null>(null);\n  \n  useEffect(() => {\n    const socketInstance = io(options.url || 'http://localhost:3001', {\n      auth: {\n        token: getAuthToken()\n      },\n      autoConnect: options.autoConnect !== false,\n      reconnection: true,\n      reconnectionAttempts: 5,\n      reconnectionDelay: 1000,\n      reconnectionDelayMax: 5000\n    });\n    \n    socketInstance.on('connect', () => {\n      console.log('WebSocket connected');\n      setConnected(true);\n      setError(null);\n    });\n    \n    socketInstance.on('disconnect', (reason) => {\n      console.log('WebSocket disconnected:', reason);\n      setConnected(false);\n      \n      if (reason === 'io server disconnect') {\n        // Server disconnected, manual reconnect needed\n        socketInstance.connect();\n      }\n    });\n    \n    socketInstance.on('connect_error', (err) => {\n      console.error('Connection error:', err.message);\n      setError(err.message);\n      setConnected(false);\n    });\n    \n    setSocket(socketInstance);\n    \n    return () => {\n      socketInstance.disconnect();\n    };\n  }, [options.url, options.autoConnect]);\n  \n  const emit = useCallback((event: string, data: any) => {\n    if (socket && connected) {\n      socket.emit(event, data);\n    } else {\n      console.warn('Socket not connected, cannot emit event');\n    }\n  }, [socket, connected]);\n  \n  const on = useCallback((event: string, handler: (...args: any[]) => void) => {\n    if (socket) {\n      socket.on(event, handler);\n      return () => socket.off(event, handler);\n    }\n  }, [socket]);\n  \n  return { socket, connected, error, emit, on };\n}",
+      "file": "src/hooks/useWebSocket.ts",
+      "lines": "1-75"
+    },
+    "room_management": {
+      "description": "Room-based messaging (chat rooms, channels)",
+      "code": "// Server: Room management\nio.on('connection', (socket) => {\n  // Join room\n  socket.on('room:join', async (roomId: string) => {\n    try {\n      await socket.join(roomId);\n      \n      // Notify room members\n      socket.to(roomId).emit('user:joined', {\n        userId: socket.data.user.id,\n        username: socket.data.user.username,\n        timestamp: new Date()\n      });\n      \n      // Send confirmation\n      socket.emit('room:joined', { roomId });\n      \n      console.log(`User ${socket.data.user.id} joined room ${roomId}`);\n    } catch (err) {\n      socket.emit('error', { message: 'Failed to join room' });\n    }\n  });\n  \n  // Leave room\n  socket.on('room:leave', (roomId: string) => {\n    socket.leave(roomId);\n    \n    // Notify room members\n    socket.to(roomId).emit('user:left', {\n      userId: socket.data.user.id,\n      username: socket.data.user.username,\n      timestamp: new Date()\n    });\n    \n    console.log(`User ${socket.data.user.id} left room ${roomId}`);\n  });\n  \n  // Send message to room\n  socket.on('message:send', (data: { roomId: string; message: string }) => {\n    const { roomId, message } = data;\n    \n    // Broadcast to everyone in room except sender\n    socket.to(roomId).emit('message:receive', {\n      userId: socket.data.user.id,\n      username: socket.data.user.username,\n      message,\n      timestamp: new Date()\n    });\n    \n    // Confirm to sender\n    socket.emit('message:sent', { roomId, messageId: Date.now() });\n  });\n});",
+      "file": "src/websocket/room-handlers.ts",
+      "lines": "1-50"
+    },
+    "broadcasting": {
+      "description": "Server-side broadcasting patterns",
+      "code": "// Broadcasting patterns\n\n// 1. Broadcast to all connected clients\nexport function broadcastToAll(event: string, data: any) {\n  io.emit(event, data);\n}\n\n// 2. Broadcast to specific user (all their connections)\nexport function broadcastToUser(userId: string, event: string, data: any) {\n  io.to(`user:${userId}`).emit(event, data);\n}\n\n// 3. Broadcast to room\nexport function broadcastToRoom(roomId: string, event: string, data: any) {\n  io.to(roomId).emit(event, data);\n}\n\n// 4. Broadcast to multiple rooms\nexport function broadcastToRooms(roomIds: string[], event: string, data: any) {\n  roomIds.forEach(roomId => {\n    io.to(roomId).emit(event, data);\n  });\n}\n\n// 5. Broadcast to everyone except sender\nexport function broadcastExcept(socket: Socket, event: string, data: any) {\n  socket.broadcast.emit(event, data);\n}\n\n// Example: Notification system\nexport async function sendNotification(userId: string, notification: any) {\n  broadcastToUser(userId, 'notification', {\n    id: Date.now(),\n    ...notification,\n    timestamp: new Date()\n  });\n  \n  // Also save to database\n  await saveNotification(userId, notification);\n}",
+      "file": "src/websocket/broadcast.ts",
+      "lines": "1-38"
+    },
+    "reconnection_logic": {
+      "description": "Client-side reconnection with exponential backoff",
+      "code": "// Client: Reconnection handling\nimport { useEffect, useState } from 'react';\nimport { Socket } from 'socket.io-client';\n\nexport function useReconnection(socket: Socket | null) {\n  const [reconnectAttempts, setReconnectAttempts] = useState(0);\n  const [isReconnecting, setIsReconnecting] = useState(false);\n  \n  useEffect(() => {\n    if (!socket) return;\n    \n    socket.on('reconnect_attempt', (attempt) => {\n      console.log(`Reconnection attempt ${attempt}`);\n      setReconnectAttempts(attempt);\n      setIsReconnecting(true);\n    });\n    \n    socket.on('reconnect', (attemptNumber) => {\n      console.log(`Reconnected after ${attemptNumber} attempts`);\n      setReconnectAttempts(0);\n      setIsReconnecting(false);\n    });\n    \n    socket.on('reconnect_failed', () => {\n      console.error('Reconnection failed after max attempts');\n      setIsReconnecting(false);\n      // Show error to user\n    });\n    \n    socket.on('reconnect_error', (error) => {\n      console.error('Reconnection error:', error);\n    });\n    \n    return () => {\n      socket.off('reconnect_attempt');\n      socket.off('reconnect');\n      socket.off('reconnect_failed');\n      socket.off('reconnect_error');\n    };\n  }, [socket]);\n  \n  return { reconnectAttempts, isReconnecting };\n}",
+      "file": "src/hooks/useReconnection.ts",
+      "lines": "1-42"
+    }
+  },
+  "prerequisites": [
+    "Node.js 18+ and npm/yarn",
+    "Socket.io 4.x (npm install socket.io socket.io-client)",
+    "Express server setup",
+    "Authentication system (JWT recommended)",
+    "CORS configuration for cross-origin requests"
+  ],
+  "step_by_step": [
+    {
+      "step": 1,
+      "title": "Install Dependencies",
+      "command": "npm install socket.io socket.io-client && npm install --save-dev @types/socket.io"
+    },
+    {
+      "step": 2,
+      "title": "Create WebSocket Server",
+      "details": "Set up Socket.io server with Express integration (src/websocket/socket-server.ts)"
+    },
+    {
+      "step": 3,
+      "title": "Add Authentication Middleware",
+      "details": "Verify JWT tokens on socket connection using io.use() middleware"
+    },
+    {
+      "step": 4,
+      "title": "Implement Connection Handlers",
+      "details": "Handle connect, disconnect, and error events"
+    },
+    {
+      "step": 5,
+      "title": "Add Room Management",
+      "details": "Implement room:join, room:leave, and message:send handlers"
+    },
+    {
+      "step": 6,
+      "title": "Create Client Hook (useWebSocket)",
+      "details": "React hook for connection management with auto-reconnect"
+    },
+    {
+      "step": 7,
+      "title": "Add Broadcasting Utilities",
+      "details": "Helper functions for different broadcast patterns"
+    },
+    {
+      "step": 8,
+      "title": "Configure CORS",
+      "details": "Set allowed origins in Socket.io server options"
+    },
+    {
+      "step": 9,
+      "title": "Test Connection",
+      "details": "Verify connect/disconnect, room join/leave, and message delivery"
+    },
+    {
+      "step": 10,
+      "title": "Add Monitoring",
+      "details": "Log connection counts, error rates, and latency metrics"
+    }
+  ],
+  "security": {
+    "authentication": "JWT token verification on socket connection",
+    "cors": "Whitelist allowed origins, enable credentials",
+    "rate_limiting": "Limit events per second per socket (e.g., 10 messages/second)",
+    "input_validation": "Validate all incoming event data",
+    "namespace_isolation": "Use Socket.io namespaces for different apps"
+  },
+  "warnings": [
+    "⚠️ WebSocket connections bypass HTTP middlewares - implement auth at socket level",
+    "⚠️ Memory leaks possible - always clean up socket listeners in useEffect cleanup",
+    "⚠️ Reconnection can cause duplicate event handlers - use socket.off() before socket.on()",
+    "⚠️ Load balancing requires sticky sessions or Redis adapter for multiple server instances",
+    "⚠️ Ping/pong timeout defaults may be too short for slow networks"
+  ],
+  "lessons_learned": [
+    "Use Redis adapter (socket.io-redis) for horizontal scaling across multiple servers",
+    "Set reasonable pingTimeout (60s) and pingInterval (25s) to avoid false disconnects",
+    "Always join users to their personal room (user:${userId}) for targeted messaging",
+    "Implement exponential backoff for reconnection to avoid server overload",
+    "Log disconnect reasons (io server disconnect vs transport close) for debugging",
+    "Use Socket.io namespaces to separate concerns (e.g., /chat, /notifications)",
+    "Validate room permissions before allowing users to join (prevents unauthorized access)"
+  ],
+  "testing": {
+    "unit_tests": "Mock socket.io-client in tests using jest.mock()",
+    "integration_tests": "Use socket.io-client in tests to connect to test server",
+    "load_tests": "Artillery.io for load testing WebSocket connections (1000+ concurrent)"
+  },
+  "monitoring": {
+    "metrics": [
+      "Active connections count",
+      "Connection errors per minute",
+      "Average message latency",
+      "Reconnection rate",
+      "Room size distribution"
+    ],
+    "tools": ["Socket.io admin UI", "Prometheus + Grafana", "CloudWatch (AWS)"]
+  },
+  "related_patterns": [
+    "api-rate-limiting.json (for WebSocket rate limiting)",
+    "auth-system.yaml (for JWT authentication)",
+    "redis-integration.json (for scaling with Redis adapter)"
+  ]
+}

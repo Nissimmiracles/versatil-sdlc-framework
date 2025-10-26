@@ -1,0 +1,161 @@
+{
+  "name": "Payment Integration (Stripe & PayPal)",
+  "category": "E-Commerce",
+  "keywords": ["payment", "stripe", "paypal", "checkout", "subscription", "webhook", "refund", "billing", "card", "invoice"],
+  "description": "Complete payment processing system with Stripe and PayPal integration, subscription management, webhook handling, and PCI compliance.",
+  "estimated_effort": {
+    "hours": 12,
+    "range": "10-15",
+    "confidence": 85
+  },
+  "complexity": "Large",
+  "time_savings": "5-6 hours per implementation",
+  "success_rate": 89,
+  "technologies": ["Stripe", "PayPal SDK", "Express", "PostgreSQL/Supabase", "Webhook handlers"],
+  "use_cases": [
+    "E-commerce checkouts",
+    "SaaS subscription billing",
+    "Marketplace payments",
+    "Donation platforms",
+    "Event ticket sales",
+    "Digital product sales"
+  ],
+  "implementation": {
+    "stripe_setup": {
+      "description": "Stripe checkout with Payment Intents API",
+      "code": "// Server: src/payments/stripe-service.ts\nimport Stripe from 'stripe';\nimport { PaymentIntent } from '@stripe/stripe-js';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {\n  apiVersion: '2023-10-16'\n});\n\nexport class StripePaymentService {\n  /**\n   * Create payment intent for one-time payment\n   */\n  async createPaymentIntent(params: {\n    amount: number; // in cents\n    currency: string;\n    customerId?: string;\n    metadata?: Record<string, string>;\n  }): Promise<PaymentIntent> {\n    try {\n      const paymentIntent = await stripe.paymentIntents.create({\n        amount: params.amount,\n        currency: params.currency,\n        customer: params.customerId,\n        metadata: params.metadata,\n        automatic_payment_methods: {\n          enabled: true\n        }\n      });\n      \n      return paymentIntent;\n    } catch (error) {\n      console.error('Stripe payment intent creation failed:', error);\n      throw new Error('Payment initialization failed');\n    }\n  }\n  \n  /**\n   * Create Stripe customer\n   */\n  async createCustomer(params: {\n    email: string;\n    name?: string;\n    metadata?: Record<string, string>;\n  }): Promise<Stripe.Customer> {\n    return await stripe.customers.create({\n      email: params.email,\n      name: params.name,\n      metadata: params.metadata\n    });\n  }\n  \n  /**\n   * Attach payment method to customer\n   */\n  async attachPaymentMethod(customerId: string, paymentMethodId: string): Promise<void> {\n    await stripe.paymentMethods.attach(paymentMethodId, {\n      customer: customerId\n    });\n    \n    // Set as default payment method\n    await stripe.customers.update(customerId, {\n      invoice_settings: {\n        default_payment_method: paymentMethodId\n      }\n    });\n  }\n  \n  /**\n   * Create subscription\n   */\n  async createSubscription(params: {\n    customerId: string;\n    priceId: string;\n    trialDays?: number;\n  }): Promise<Stripe.Subscription> {\n    const subscription = await stripe.subscriptions.create({\n      customer: params.customerId,\n      items: [{ price: params.priceId }],\n      trial_period_days: params.trialDays,\n      expand: ['latest_invoice.payment_intent']\n    });\n    \n    return subscription;\n  }\n  \n  /**\n   * Cancel subscription\n   */\n  async cancelSubscription(subscriptionId: string, immediate = false): Promise<Stripe.Subscription> {\n    if (immediate) {\n      return await stripe.subscriptions.cancel(subscriptionId);\n    } else {\n      // Cancel at period end\n      return await stripe.subscriptions.update(subscriptionId, {\n        cancel_at_period_end: true\n      });\n    }\n  }\n  \n  /**\n   * Issue refund\n   */\n  async refund(params: {\n    paymentIntentId: string;\n    amount?: number; // partial refund amount\n    reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer';\n  }): Promise<Stripe.Refund> {\n    return await stripe.refunds.create({\n      payment_intent: params.paymentIntentId,\n      amount: params.amount,\n      reason: params.reason\n    });\n  }\n}",
+      "file": "src/payments/stripe-service.ts",
+      "lines": "1-108"
+    },
+    "stripe_checkout_flow": {
+      "description": "Client-side Stripe checkout (React)",
+      "code": "// Client: src/components/StripeCheckout.tsx\nimport { useState } from 'react';\nimport { loadStripe } from '@stripe/stripe-js';\nimport { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';\nimport axios from 'axios';\n\nconst stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY!);\n\nfunction CheckoutForm({ amount }: { amount: number }) {\n  const stripe = useStripe();\n  const elements = useElements();\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState<string | null>(null);\n  \n  const handleSubmit = async (e: React.FormEvent) => {\n    e.preventDefault();\n    \n    if (!stripe || !elements) return;\n    \n    setLoading(true);\n    setError(null);\n    \n    try {\n      // Create payment intent on server\n      const { data } = await axios.post('/api/payments/create-intent', {\n        amount, // in cents\n        currency: 'usd'\n      });\n      \n      // Confirm payment\n      const { error: stripeError } = await stripe.confirmPayment({\n        elements,\n        confirmParams: {\n          return_url: `${window.location.origin}/payment/success`\n        }\n      });\n      \n      if (stripeError) {\n        setError(stripeError.message || 'Payment failed');\n      }\n    } catch (err: any) {\n      setError(err.response?.data?.error || 'Payment failed');\n    } finally {\n      setLoading(false);\n    }\n  };\n  \n  return (\n    <form onSubmit={handleSubmit}>\n      <PaymentElement />\n      {error && <div className=\"error\">{error}</div>}\n      <button type=\"submit\" disabled={!stripe || loading}>\n        {loading ? 'Processing...' : `Pay $${(amount / 100).toFixed(2)}`}\n      </button>\n    </form>\n  );\n}\n\nexport function StripeCheckout({ amount }: { amount: number }) {\n  return (\n    <Elements stripe={stripePromise} options={{ mode: 'payment', amount, currency: 'usd' }}>\n      <CheckoutForm amount={amount} />\n    </Elements>\n  );\n}",
+      "file": "src/components/StripeCheckout.tsx",
+      "lines": "1-62"
+    },
+    "webhook_handling": {
+      "description": "Stripe webhook handler with signature verification",
+      "code": "// Server: src/webhooks/stripe-webhook.ts\nimport { Request, Response } from 'express';\nimport Stripe from 'stripe';\nimport { updatePaymentStatus, updateSubscriptionStatus } from '../db/payments';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {\n  apiVersion: '2023-10-16'\n});\n\nconst webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;\n\nexport async function handleStripeWebhook(req: Request, res: Response) {\n  const sig = req.headers['stripe-signature'] as string;\n  \n  let event: Stripe.Event;\n  \n  try {\n    // Verify webhook signature\n    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);\n  } catch (err: any) {\n    console.error('Webhook signature verification failed:', err.message);\n    return res.status(400).send(`Webhook Error: ${err.message}`);\n  }\n  \n  // Handle different event types\n  switch (event.type) {\n    case 'payment_intent.succeeded':\n      const paymentIntent = event.data.object as Stripe.PaymentIntent;\n      await updatePaymentStatus(paymentIntent.id, 'succeeded');\n      console.log(`Payment ${paymentIntent.id} succeeded`);\n      break;\n      \n    case 'payment_intent.payment_failed':\n      const failedPayment = event.data.object as Stripe.PaymentIntent;\n      await updatePaymentStatus(failedPayment.id, 'failed');\n      console.log(`Payment ${failedPayment.id} failed`);\n      break;\n      \n    case 'customer.subscription.created':\n      const subscription = event.data.object as Stripe.Subscription;\n      await updateSubscriptionStatus(subscription.id, 'active', {\n        customerId: subscription.customer as string,\n        priceId: subscription.items.data[0].price.id,\n        currentPeriodEnd: new Date(subscription.current_period_end * 1000)\n      });\n      break;\n      \n    case 'customer.subscription.updated':\n      const updatedSub = event.data.object as Stripe.Subscription;\n      await updateSubscriptionStatus(updatedSub.id, updatedSub.status);\n      break;\n      \n    case 'customer.subscription.deleted':\n      const deletedSub = event.data.object as Stripe.Subscription;\n      await updateSubscriptionStatus(deletedSub.id, 'canceled');\n      break;\n      \n    case 'charge.refunded':\n      const refund = event.data.object as Stripe.Charge;\n      await updatePaymentStatus(refund.payment_intent as string, 'refunded');\n      break;\n      \n    default:\n      console.log(`Unhandled event type: ${event.type}`);\n  }\n  \n  res.json({ received: true });\n}\n\n// Express route setup\nexport function setupWebhookRoute(app: express.Application) {\n  // IMPORTANT: Use raw body for signature verification\n  app.post('/webhooks/stripe', \n    express.raw({ type: 'application/json' }),\n    handleStripeWebhook\n  );\n}",
+      "file": "src/webhooks/stripe-webhook.ts",
+      "lines": "1-75"
+    },
+    "paypal_integration": {
+      "description": "PayPal Express Checkout integration",
+      "code": "// Server: src/payments/paypal-service.ts\nimport paypal from '@paypal/checkout-server-sdk';\n\nconst environment = process.env.NODE_ENV === 'production'\n  ? new paypal.core.LiveEnvironment(\n      process.env.PAYPAL_CLIENT_ID!,\n      process.env.PAYPAL_CLIENT_SECRET!\n    )\n  : new paypal.core.SandboxEnvironment(\n      process.env.PAYPAL_CLIENT_ID!,\n      process.env.PAYPAL_CLIENT_SECRET!\n    );\n\nconst client = new paypal.core.PayPalHttpClient(environment);\n\nexport class PayPalPaymentService {\n  /**\n   * Create PayPal order\n   */\n  async createOrder(params: {\n    amount: string; // e.g., '100.00'\n    currency: string;\n    description?: string;\n  }) {\n    const request = new paypal.orders.OrdersCreateRequest();\n    request.prefer('return=representation');\n    request.requestBody({\n      intent: 'CAPTURE',\n      purchase_units: [\n        {\n          amount: {\n            currency_code: params.currency,\n            value: params.amount\n          },\n          description: params.description\n        }\n      ],\n      application_context: {\n        brand_name: 'Your Company',\n        landing_page: 'BILLING',\n        user_action: 'PAY_NOW',\n        return_url: `${process.env.APP_URL}/payment/success`,\n        cancel_url: `${process.env.APP_URL}/payment/cancel`\n      }\n    });\n    \n    const response = await client.execute(request);\n    return response.result;\n  }\n  \n  /**\n   * Capture PayPal order\n   */\n  async captureOrder(orderId: string) {\n    const request = new paypal.orders.OrdersCaptureRequest(orderId);\n    request.requestBody({});\n    \n    const response = await client.execute(request);\n    return response.result;\n  }\n  \n  /**\n   * Refund PayPal payment\n   */\n  async refund(captureId: string, amount?: { value: string; currency_code: string }) {\n    const request = new paypal.payments.CapturesRefundRequest(captureId);\n    if (amount) {\n      request.requestBody({ amount });\n    }\n    \n    const response = await client.execute(request);\n    return response.result;\n  }\n}",
+      "file": "src/payments/paypal-service.ts",
+      "lines": "1-72"
+    }
+  },
+  "prerequisites": [
+    "Stripe account (get API keys from dashboard.stripe.com)",
+    "PayPal Business account (developer.paypal.com)",
+    "SSL certificate (HTTPS required for production)",
+    "Database for storing payment records",
+    "Environment variables: STRIPE_SECRET_KEY, STRIPE_PUBLIC_KEY, STRIPE_WEBHOOK_SECRET, PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET",
+    "PCI compliance understanding (never store raw card numbers)"
+  ],
+  "step_by_step": [
+    {
+      "step": 1,
+      "title": "Install Payment SDKs",
+      "command": "npm install stripe @stripe/stripe-js @stripe/react-stripe-js @paypal/checkout-server-sdk"
+    },
+    {
+      "step": 2,
+      "title": "Set Environment Variables",
+      "details": "Add Stripe and PayPal API keys to .env file (never commit these!)"
+    },
+    {
+      "step": 3,
+      "title": "Create Stripe Service",
+      "details": "Implement StripePaymentService with payment intents and subscriptions"
+    },
+    {
+      "step": 4,
+      "title": "Set Up Webhook Endpoint",
+      "details": "Create /webhooks/stripe route with signature verification"
+    },
+    {
+      "step": 5,
+      "title": "Configure Stripe Webhook in Dashboard",
+      "details": "Add webhook URL to Stripe dashboard, select events to listen for"
+    },
+    {
+      "step": 6,
+      "title": "Create Client Checkout Component",
+      "details": "Implement StripeCheckout with Elements provider"
+    },
+    {
+      "step": 7,
+      "title": "Add PayPal Service (Optional)",
+      "details": "Implement PayPalPaymentService for alternative payment method"
+    },
+    {
+      "step": 8,
+      "title": "Create Database Tables",
+      "details": "Store payments, subscriptions, customers (never store card numbers!)"
+    },
+    {
+      "step": 9,
+      "title": "Test in Sandbox Mode",
+      "details": "Use Stripe test cards (4242 4242 4242 4242) and PayPal sandbox"
+    },
+    {
+      "step": 10,
+      "title": "Switch to Production",
+      "details": "Replace test keys with live keys, test with real card (refund immediately)"
+    }
+  ],
+  "security": {
+    "pci_compliance": "Never store raw card numbers - use Stripe/PayPal tokenization",
+    "webhook_verification": "Always verify webhook signatures before processing",
+    "https_only": "All payment pages must use HTTPS",
+    "idempotency": "Use idempotency keys to prevent duplicate charges",
+    "amount_validation": "Validate payment amounts on server-side (never trust client)"
+  },
+  "warnings": [
+    "⚠️ NEVER log or store raw card numbers - PCI DSS violation with massive fines",
+    "⚠️ Always verify webhook signatures - attackers can fake webhook calls",
+    "⚠️ Test refunds in sandbox - production refunds are IRREVERSIBLE",
+    "⚠️ Stripe test mode and live mode have separate API keys - don't mix them",
+    "⚠️ Set up retry logic for failed webhooks - they may arrive out of order",
+    "⚠️ Subscription cancellations may have delayed effects (cancel_at_period_end)",
+    "⚠️ Currency amounts must be in smallest unit (cents for USD, yen for JPY)",
+    "⚠️ Failed payments may retry automatically - handle duplicate webhooks with idempotency"
+  ],
+  "lessons_learned": [
+    "Use Stripe checkout sessions for hosted payment pages (less code, PCI compliant)",
+    "Always store payment_intent_id in database for reconciliation",
+    "Set up webhook retries in Stripe dashboard (automatic retry with exponential backoff)",
+    "Use metadata field to link payments to your system (user_id, order_id)",
+    "Implement idempotency with database unique constraints on payment_intent_id",
+    "Handle 'requires_action' status for 3D Secure authentication",
+    "Store subscription price_id for easy plan upgrades/downgrades",
+    "Test declined cards in sandbox: 4000 0000 0000 0002 (generic decline)"
+  ],
+  "testing": {
+    "stripe_test_cards": [
+      "4242 4242 4242 4242 - Success",
+      "4000 0000 0000 0002 - Card declined",
+      "4000 0000 0000 9995 - Insufficient funds",
+      "4000 0025 0000 3155 - 3D Secure required"
+    ],
+    "webhook_testing": "Use Stripe CLI (stripe listen --forward-to localhost:3000/webhooks/stripe)",
+    "integration_tests": "Mock Stripe SDK in tests, test webhook handlers with sample events"
+  },
+  "monitoring": {
+    "metrics": [
+      "Payment success rate",
+      "Average payment amount",
+      "Refund rate",
+      "Subscription churn rate",
+      "Failed payment reasons"
+    ],
+    "tools": ["Stripe Dashboard", "Sentry for error tracking", "CloudWatch/DataDog"]
+  },
+  "related_patterns": [
+    "auth-system.yaml (for customer authentication)",
+    "api-rate-limiting.json (to prevent payment API abuse)",
+    "email-templates.json (for payment receipts/invoices)"
+  ]
+}

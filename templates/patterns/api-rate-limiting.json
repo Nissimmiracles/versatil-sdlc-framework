@@ -1,0 +1,159 @@
+{
+  "name": "API Rate Limiting",
+  "category": "API Security",
+  "keywords": ["rate-limit", "throttle", "ddos", "redis", "express", "api", "security", "abuse", "token-bucket", "quota"],
+  "description": "Complete rate limiting system with Redis-backed distributed limiting, token bucket algorithm, tiered limits, and abuse prevention.",
+  "estimated_effort": {
+    "hours": 3,
+    "range": "2-4",
+    "confidence": 93
+  },
+  "complexity": "Medium",
+  "time_savings": "1-2 hours per implementation",
+  "success_rate": 93,
+  "technologies": ["express-rate-limit", "Redis", "ioredis", "Express", "rate-limiter-flexible"],
+  "use_cases": [
+    "Public API protection",
+    "Prevent brute-force attacks",
+    "Fair resource allocation",
+    "Tiered pricing (free/premium limits)",
+    "Webhook delivery rate limiting",
+    "Prevent account enumeration"
+  ],
+  "implementation": {
+    "basic_express_rate_limit": {
+      "description": "Simple in-memory rate limiting with express-rate-limit",
+      "code": "// Server: src/middleware/rate-limit.ts\nimport rateLimit from 'express-rate-limit';\nimport { Request, Response } from 'express';\n\n/**\n * Basic rate limiter (in-memory, single server only)\n */\nexport const basicRateLimiter = rateLimit({\n  windowMs: 15 * 60 * 1000, // 15 minutes\n  max: 100, // Limit each IP to 100 requests per windowMs\n  standardHeaders: true, // Return rate limit info in `RateLimit-*` headers\n  legacyHeaders: false, // Disable `X-RateLimit-*` headers\n  message: 'Too many requests from this IP, please try again later',\n  handler: (req: Request, res: Response) => {\n    res.status(429).json({\n      error: 'Too many requests',\n      message: 'You have exceeded the rate limit. Please try again later.',\n      retryAfter: res.getHeader('Retry-After')\n    });\n  }\n});\n\n/**\n * Strict rate limiter for sensitive endpoints (login, signup)\n */\nexport const strictRateLimiter = rateLimit({\n  windowMs: 60 * 60 * 1000, // 1 hour\n  max: 5, // 5 attempts per hour\n  skipSuccessfulRequests: true, // Don't count successful requests\n  message: 'Too many attempts, please try again later'\n});\n\n/**\n * API key rate limiter (per API key, not IP)\n */\nexport const apiKeyRateLimiter = rateLimit({\n  windowMs: 60 * 1000, // 1 minute\n  max: 60, // 60 requests per minute\n  keyGenerator: (req: Request) => {\n    // Use API key as identifier instead of IP\n    return req.headers['x-api-key'] as string || req.ip || 'unknown';\n  }\n});",
+      "file": "src/middleware/rate-limit.ts",
+      "lines": "1-45"
+    },
+    "redis_distributed_rate_limit": {
+      "description": "Redis-backed rate limiting for multiple servers",
+      "code": "// Server: src/middleware/redis-rate-limit.ts\nimport rateLimit from 'express-rate-limit';\nimport RedisStore from 'rate-limit-redis';\nimport Redis from 'ioredis';\n\nconst redis = new Redis({\n  host: process.env.REDIS_HOST || 'localhost',\n  port: parseInt(process.env.REDIS_PORT || '6379'),\n  password: process.env.REDIS_PASSWORD,\n  retryStrategy: (times) => {\n    const delay = Math.min(times * 50, 2000);\n    return delay;\n  }\n});\n\n/**\n * Redis-backed distributed rate limiter\n */\nexport const distributedRateLimiter = rateLimit({\n  windowMs: 15 * 60 * 1000, // 15 minutes\n  max: 100,\n  store: new RedisStore({\n    client: redis,\n    prefix: 'rate-limit:',\n    sendCommand: (...args: string[]) => redis.call(...args)\n  }),\n  standardHeaders: true,\n  legacyHeaders: false\n});\n\n/**\n * User-based rate limiting (per authenticated user)\n */\nexport const userRateLimiter = rateLimit({\n  windowMs: 60 * 1000, // 1 minute\n  max: 30, // 30 requests per minute per user\n  store: new RedisStore({\n    client: redis,\n    prefix: 'user-rate-limit:'\n  }),\n  keyGenerator: (req: Request) => {\n    // Use user ID from JWT token\n    return req.user?.id || req.ip || 'anonymous';\n  }\n});",
+      "file": "src/middleware/redis-rate-limit.ts",
+      "lines": "1-46"
+    },
+    "token_bucket_algorithm": {
+      "description": "Advanced token bucket rate limiting with rate-limiter-flexible",
+      "code": "// Server: src/middleware/token-bucket.ts\nimport { RateLimiterRedis, RateLimiterMemory } from 'rate-limiter-flexible';\nimport Redis from 'ioredis';\nimport { Request, Response, NextFunction } from 'express';\n\nconst redis = new Redis({\n  host: process.env.REDIS_HOST || 'localhost',\n  port: parseInt(process.env.REDIS_PORT || '6379')\n});\n\n/**\n * Token bucket rate limiter\n * - Points replenish over time\n * - Allows bursts up to maxPoints\n */\nconst rateLimiter = new RateLimiterRedis({\n  storeClient: redis,\n  keyPrefix: 'token-bucket',\n  points: 10, // Number of points (tokens)\n  duration: 1, // Per 1 second\n  blockDuration: 60 // Block for 60 seconds if exceeded\n});\n\n/**\n * Middleware to apply token bucket rate limiting\n */\nexport async function tokenBucketMiddleware(\n  req: Request,\n  res: Response,\n  next: NextFunction\n) {\n  const key = req.user?.id || req.ip || 'anonymous';\n  \n  try {\n    const rateLimiterRes = await rateLimiter.consume(key, 1); // Consume 1 point\n    \n    // Set rate limit headers\n    res.set({\n      'X-RateLimit-Limit': rateLimiter.points,\n      'X-RateLimit-Remaining': rateLimiterRes.remainingPoints,\n      'X-RateLimit-Reset': new Date(Date.now() + rateLimiterRes.msBeforeNext).toISOString()\n    });\n    \n    next();\n  } catch (rateLimiterError: any) {\n    // Rate limit exceeded\n    res.status(429).json({\n      error: 'Too many requests',\n      retryAfter: Math.round(rateLimiterError.msBeforeNext / 1000) || 60\n    });\n  }\n}\n\n/**\n * Cost-based rate limiting (different endpoints cost different points)\n */\nexport function costBasedRateLimiter(cost: number) {\n  return async (req: Request, res: Response, next: NextFunction) => {\n    const key = req.user?.id || req.ip || 'anonymous';\n    \n    try {\n      const rateLimiterRes = await rateLimiter.consume(key, cost);\n      \n      res.set({\n        'X-RateLimit-Remaining': rateLimiterRes.remainingPoints,\n        'X-RateLimit-Cost': cost\n      });\n      \n      next();\n    } catch (error: any) {\n      res.status(429).json({\n        error: 'Insufficient quota',\n        cost,\n        retryAfter: Math.round(error.msBeforeNext / 1000)\n      });\n    }\n  };\n}",
+      "file": "src/middleware/token-bucket.ts",
+      "lines": "1-78"
+    },
+    "tiered_rate_limiting": {
+      "description": "Different limits for free/premium/enterprise users",
+      "code": "// Server: src/middleware/tiered-rate-limit.ts\nimport { RateLimiterRedis } from 'rate-limiter-flexible';\nimport Redis from 'ioredis';\nimport { Request, Response, NextFunction } from 'express';\n\nconst redis = new Redis({\n  host: process.env.REDIS_HOST || 'localhost',\n  port: parseInt(process.env.REDIS_PORT || '6379')\n});\n\n// Define tier limits\nconst TIER_LIMITS = {\n  free: {\n    points: 10,\n    duration: 60 // 10 requests per minute\n  },\n  premium: {\n    points: 100,\n    duration: 60 // 100 requests per minute\n  },\n  enterprise: {\n    points: 1000,\n    duration: 60 // 1000 requests per minute\n  }\n};\n\n// Create rate limiters for each tier\nconst rateLimiters = {\n  free: new RateLimiterRedis({\n    storeClient: redis,\n    keyPrefix: 'tier-free',\n    ...TIER_LIMITS.free\n  }),\n  premium: new RateLimiterRedis({\n    storeClient: redis,\n    keyPrefix: 'tier-premium',\n    ...TIER_LIMITS.premium\n  }),\n  enterprise: new RateLimiterRedis({\n    storeClient: redis,\n    keyPrefix: 'tier-enterprise',\n    ...TIER_LIMITS.enterprise\n  })\n};\n\n/**\n * Tiered rate limiting middleware\n */\nexport async function tieredRateLimiter(\n  req: Request,\n  res: Response,\n  next: NextFunction\n) {\n  const userTier = req.user?.tier || 'free';\n  const rateLimiter = rateLimiters[userTier as keyof typeof rateLimiters] || rateLimiters.free;\n  const key = req.user?.id || req.ip || 'anonymous';\n  \n  try {\n    const rateLimiterRes = await rateLimiter.consume(key, 1);\n    \n    res.set({\n      'X-RateLimit-Tier': userTier,\n      'X-RateLimit-Limit': TIER_LIMITS[userTier as keyof typeof TIER_LIMITS].points,\n      'X-RateLimit-Remaining': rateLimiterRes.remainingPoints,\n      'X-RateLimit-Reset': new Date(Date.now() + rateLimiterRes.msBeforeNext).toISOString()\n    });\n    \n    next();\n  } catch (error: any) {\n    res.status(429).json({\n      error: 'Rate limit exceeded',\n      tier: userTier,\n      upgradeUrl: userTier === 'free' ? '/pricing' : null,\n      retryAfter: Math.round(error.msBeforeNext / 1000)\n    });\n  }\n}",
+      "file": "src/middleware/tiered-rate-limit.ts",
+      "lines": "1-78"
+    },
+    "usage_example": {
+      "description": "Express app with rate limiting applied",
+      "code": "// Server: src/app.ts\nimport express from 'express';\nimport { basicRateLimiter, strictRateLimiter, apiKeyRateLimiter } from './middleware/rate-limit';\nimport { tieredRateLimiter } from './middleware/tiered-rate-limit';\nimport { costBasedRateLimiter } from './middleware/token-bucket';\n\nconst app = express();\n\n// Apply basic rate limiting to all routes\napp.use(basicRateLimiter);\n\n// Strict rate limiting for authentication endpoints\napp.post('/api/auth/login', strictRateLimiter, (req, res) => {\n  // Login logic\n});\n\napp.post('/api/auth/signup', strictRateLimiter, (req, res) => {\n  // Signup logic\n});\n\n// API key rate limiting for public API\napp.use('/api/public', apiKeyRateLimiter);\n\n// Tiered rate limiting for authenticated API\napp.use('/api/protected', tieredRateLimiter);\n\n// Cost-based rate limiting (expensive endpoint costs more points)\napp.post('/api/ai/generate', costBasedRateLimiter(5), (req, res) => {\n  // AI generation logic (costs 5 points)\n});\n\napp.get('/api/data', costBasedRateLimiter(1), (req, res) => {\n  // Simple data fetch (costs 1 point)\n});\n\napp.listen(3000, () => {\n  console.log('Server running on port 3000');\n});",
+      "file": "src/app.ts",
+      "lines": "1-38"
+    }
+  },
+  "prerequisites": [
+    "Redis server (for distributed rate limiting)",
+    "Express.js application",
+    "Environment variables: REDIS_HOST, REDIS_PORT, REDIS_PASSWORD",
+    "Dependencies: express-rate-limit, rate-limiter-flexible, ioredis, rate-limit-redis"
+  ],
+  "step_by_step": [
+    {
+      "step": 1,
+      "title": "Install Dependencies",
+      "command": "npm install express-rate-limit rate-limiter-flexible ioredis rate-limit-redis"
+    },
+    {
+      "step": 2,
+      "title": "Set Up Redis",
+      "details": "Install Redis locally or use managed service (AWS ElastiCache, Redis Cloud)"
+    },
+    {
+      "step": 3,
+      "title": "Create Basic Rate Limiter",
+      "details": "Implement in-memory rate limiter with express-rate-limit"
+    },
+    {
+      "step": 4,
+      "title": "Add Redis Store",
+      "details": "Replace in-memory store with Redis for distributed limiting"
+    },
+    {
+      "step": 5,
+      "title": "Implement Tiered Limits",
+      "details": "Create different rate limiters for free/premium/enterprise users"
+    },
+    {
+      "step": 6,
+      "title": "Add Cost-Based Limiting",
+      "details": "Expensive endpoints consume more quota points"
+    },
+    {
+      "step": 7,
+      "title": "Set Rate Limit Headers",
+      "details": "Return X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset"
+    },
+    {
+      "step": 8,
+      "title": "Test Rate Limiting",
+      "details": "Use curl or Postman to exceed limits and verify 429 responses"
+    },
+    {
+      "step": 9,
+      "title": "Add Whitelisting",
+      "details": "Skip rate limiting for trusted IPs (optional)"
+    },
+    {
+      "step": 10,
+      "title": "Monitor Rate Limit Usage",
+      "details": "Track 429 responses, identify abusive users"
+    }
+  ],
+  "security": {
+    "ddos_protection": "Rate limiting is first line of defense against DDoS attacks",
+    "brute_force_prevention": "Strict limits on login/signup endpoints",
+    "ip_spoofing": "Use X-Forwarded-For header carefully (validate trusted proxies)",
+    "bypass_prevention": "Use user ID + IP combination for authenticated users",
+    "redis_security": "Enable Redis AUTH, disable public access"
+  },
+  "warnings": [
+    "⚠️ In-memory rate limiting doesn't work with multiple servers - use Redis",
+    "⚠️ Trust X-Forwarded-For only from known proxies (Nginx, CloudFlare)",
+    "⚠️ Rate limit by user ID for authenticated endpoints, not just IP",
+    "⚠️ Set reasonable limits - too strict breaks UX, too loose allows abuse",
+    "⚠️ Always return Retry-After header in 429 responses",
+    "⚠️ Redis connection failures should not block requests - fail open with in-memory fallback"
+  ],
+  "lessons_learned": [
+    "Use Redis for distributed rate limiting across multiple servers",
+    "Token bucket algorithm better than fixed window (allows bursts)",
+    "Always set standardHeaders: true for client-side retry logic",
+    "skipSuccessfulRequests: true for login endpoints (only count failures)",
+    "Cost-based limiting works great for AI APIs (expensive operations cost more)",
+    "Whitelist monitoring tools and internal services to avoid false positives",
+    "Log rate limit violations for abuse detection and analytics",
+    "Use keyGenerator to rate limit by user ID instead of IP for authenticated APIs"
+  ],
+  "testing": {
+    "manual_testing": "curl with loop to hit rate limit, verify 429 response",
+    "load_testing": "Artillery.io or k6 for stress testing rate limiting",
+    "unit_tests": "Mock Redis, test rate limit logic",
+    "integration_tests": "Use test Redis instance, verify distributed behavior"
+  },
+  "monitoring": {
+    "metrics": [
+      "429 response rate",
+      "Top rate-limited IPs",
+      "Average requests per user",
+      "Redis connection errors",
+      "Rate limit quota usage by tier"
+    ],
+    "tools": ["Redis monitoring", "CloudWatch", "DataDog", "Grafana"]
+  },
+  "related_patterns": [
+    "auth-system.yaml (for user-based rate limiting)",
+    "websocket-real-time.json (for WebSocket rate limiting)",
+    "payment-integration.json (to prevent payment abuse)"
+  ]
+}

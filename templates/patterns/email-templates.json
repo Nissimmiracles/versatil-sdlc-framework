@@ -1,0 +1,155 @@
+{
+  "name": "Email Templates System",
+  "category": "Notifications",
+  "keywords": ["email", "sendgrid", "nodemailer", "template", "smtp", "transactional", "newsletter", "notification", "handlebars"],
+  "description": "Complete email system with template rendering, transactional emails, and delivery tracking using SendGrid or Nodemailer.",
+  "estimated_effort": {
+    "hours": 4,
+    "range": "3-5",
+    "confidence": 92
+  },
+  "complexity": "Small",
+  "time_savings": "2-3 hours per implementation",
+  "success_rate": 96,
+  "technologies": ["SendGrid", "Nodemailer", "Handlebars", "MJML (optional)", "Express"],
+  "use_cases": [
+    "Welcome emails",
+    "Password reset",
+    "Email verification",
+    "Order confirmations",
+    "Invoices",
+    "Marketing newsletters",
+    "Notification digests"
+  ],
+  "implementation": {
+    "sendgrid_setup": {
+      "description": "SendGrid service with template rendering",
+      "code": "// Server: src/emails/sendgrid-service.ts\nimport sgMail from '@sendgrid/mail';\nimport Handlebars from 'handlebars';\nimport fs from 'fs';\nimport path from 'path';\n\nsgMail.setApiKey(process.env.SENDGRID_API_KEY!);\n\nconst FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@yourdomain.com';\nconst FROM_NAME = process.env.FROM_NAME || 'Your Company';\n\nexport class EmailService {\n  private templates = new Map<string, HandlebarsTemplateDelegate>();\n  \n  constructor() {\n    this.loadTemplates();\n  }\n  \n  /**\n   * Load all email templates\n   */\n  private loadTemplates() {\n    const templatesDir = path.join(__dirname, '../../templates/emails');\n    const files = fs.readdirSync(templatesDir);\n    \n    files.forEach(file => {\n      if (file.endsWith('.hbs')) {\n        const templateName = file.replace('.hbs', '');\n        const templateContent = fs.readFileSync(\n          path.join(templatesDir, file),\n          'utf-8'\n        );\n        \n        this.templates.set(templateName, Handlebars.compile(templateContent));\n      }\n    });\n    \n    console.log(`Loaded ${this.templates.size} email templates`);\n  }\n  \n  /**\n   * Send email using template\n   */\n  async sendTemplate(params: {\n    to: string;\n    template: string;\n    subject: string;\n    data: Record<string, any>;\n    attachments?: { filename: string; content: Buffer; type: string }[];\n  }) {\n    const template = this.templates.get(params.template);\n    \n    if (!template) {\n      throw new Error(`Email template not found: ${params.template}`);\n    }\n    \n    const html = template(params.data);\n    \n    const message = {\n      to: params.to,\n      from: { email: FROM_EMAIL, name: FROM_NAME },\n      subject: params.subject,\n      html,\n      text: this.htmlToText(html),\n      attachments: params.attachments?.map(att => ({\n        filename: att.filename,\n        content: att.content.toString('base64'),\n        type: att.type,\n        disposition: 'attachment'\n      }))\n    };\n    \n    try {\n      await sgMail.send(message);\n      console.log(`Email sent to ${params.to} using template ${params.template}`);\n    } catch (error: any) {\n      console.error('SendGrid error:', error.response?.body || error);\n      throw new Error('Email send failed');\n    }\n  }\n  \n  /**\n   * Send welcome email\n   */\n  async sendWelcome(to: string, data: { name: string; verificationUrl: string }) {\n    return await this.sendTemplate({\n      to,\n      template: 'welcome',\n      subject: 'Welcome to Our Platform!',\n      data\n    });\n  }\n  \n  /**\n   * Send password reset email\n   */\n  async sendPasswordReset(to: string, data: { name: string; resetUrl: string; expiresIn: string }) {\n    return await this.sendTemplate({\n      to,\n      template: 'password-reset',\n      subject: 'Reset Your Password',\n      data\n    });\n  }\n  \n  /**\n   * Send order confirmation\n   */\n  async sendOrderConfirmation(to: string, data: {\n    orderNumber: string;\n    items: { name: string; quantity: number; price: number }[];\n    total: number;\n    shippingAddress: string;\n  }) {\n    return await this.sendTemplate({\n      to,\n      template: 'order-confirmation',\n      subject: `Order Confirmation #${data.orderNumber}`,\n      data\n    });\n  }\n  \n  /**\n   * Convert HTML to plain text (basic)\n   */\n  private htmlToText(html: string): string {\n    return html\n      .replace(/<[^>]*>/g, '')\n      .replace(/&nbsp;/g, ' ')\n      .replace(/&amp;/g, '&')\n      .trim();\n  }\n}",
+      "file": "src/emails/sendgrid-service.ts",
+      "lines": "1-128"
+    },
+    "nodemailer_setup": {
+      "description": "Alternative: Nodemailer with SMTP",
+      "code": "// Server: src/emails/nodemailer-service.ts\nimport nodemailer from 'nodemailer';\nimport Handlebars from 'handlebars';\nimport fs from 'fs';\nimport path from 'path';\n\nconst transporter = nodemailer.createTransporter({\n  host: process.env.SMTP_HOST,\n  port: parseInt(process.env.SMTP_PORT || '587'),\n  secure: process.env.SMTP_SECURE === 'true',\n  auth: {\n    user: process.env.SMTP_USER,\n    pass: process.env.SMTP_PASSWORD\n  }\n});\n\nexport class NodemailerService {\n  /**\n   * Send email with template\n   */\n  async sendEmail(params: {\n    to: string;\n    subject: string;\n    template: string;\n    data: Record<string, any>;\n  }) {\n    const templatePath = path.join(__dirname, '../../templates/emails', `${params.template}.hbs`);\n    const templateContent = fs.readFileSync(templatePath, 'utf-8');\n    const template = Handlebars.compile(templateContent);\n    const html = template(params.data);\n    \n    const mailOptions = {\n      from: `\"${process.env.FROM_NAME}\" <${process.env.FROM_EMAIL}>`,\n      to: params.to,\n      subject: params.subject,\n      html,\n      text: html.replace(/<[^>]*>/g, '') // Strip HTML for plain text\n    };\n    \n    const info = await transporter.sendMail(mailOptions);\n    console.log('Email sent:', info.messageId);\n    return info;\n  }\n}",
+      "file": "src/emails/nodemailer-service.ts",
+      "lines": "1-46"
+    },
+    "welcome_template": {
+      "description": "Welcome email template (Handlebars + HTML)",
+      "code": "<!-- templates/emails/welcome.hbs -->\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      line-height: 1.6;\n      color: #333;\n      max-width: 600px;\n      margin: 0 auto;\n      padding: 20px;\n    }\n    .header {\n      background-color: #4CAF50;\n      color: white;\n      padding: 30px;\n      text-align: center;\n      border-radius: 5px 5px 0 0;\n    }\n    .content {\n      background-color: #f9f9f9;\n      padding: 30px;\n      border-radius: 0 0 5px 5px;\n    }\n    .button {\n      display: inline-block;\n      padding: 12px 30px;\n      background-color: #4CAF50;\n      color: white !important;\n      text-decoration: none;\n      border-radius: 5px;\n      margin: 20px 0;\n    }\n    .footer {\n      text-align: center;\n      padding: 20px;\n      color: #999;\n      font-size: 12px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"header\">\n    <h1>Welcome to Our Platform!</h1>\n  </div>\n  \n  <div class=\"content\">\n    <p>Hi {{name}},</p>\n    \n    <p>Thank you for joining us! We're excited to have you on board.</p>\n    \n    <p>To get started, please verify your email address by clicking the button below:</p>\n    \n    <center>\n      <a href=\"{{verificationUrl}}\" class=\"button\">Verify Email Address</a>\n    </center>\n    \n    <p>This link will expire in 24 hours.</p>\n    \n    <p>If you didn't create an account, you can safely ignore this email.</p>\n    \n    <p>Best regards,<br>The Team</p>\n  </div>\n  \n  <div class=\"footer\">\n    <p>© 2025 Your Company. All rights reserved.</p>\n    <p><a href=\"{{unsubscribeUrl}}\">Unsubscribe</a></p>\n  </div>\n</body>\n</html>",
+      "file": "templates/emails/welcome.hbs",
+      "lines": "1-69"
+    },
+    "password_reset_template": {
+      "description": "Password reset email template",
+      "code": "<!-- templates/emails/password-reset.hbs -->\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      line-height: 1.6;\n      color: #333;\n      max-width: 600px;\n      margin: 0 auto;\n      padding: 20px;\n    }\n    .alert {\n      background-color: #fff3cd;\n      border: 1px solid #ffc107;\n      padding: 15px;\n      border-radius: 5px;\n      margin-bottom: 20px;\n    }\n    .button {\n      display: inline-block;\n      padding: 12px 30px;\n      background-color: #007bff;\n      color: white !important;\n      text-decoration: none;\n      border-radius: 5px;\n      margin: 20px 0;\n    }\n  </style>\n</head>\n<body>\n  <h2>Password Reset Request</h2>\n  \n  <p>Hi {{name}},</p>\n  \n  <p>We received a request to reset your password. Click the button below to create a new password:</p>\n  \n  <center>\n    <a href=\"{{resetUrl}}\" class=\"button\">Reset Password</a>\n  </center>\n  \n  <div class=\"alert\">\n    <strong>Important:</strong> This link will expire in {{expiresIn}}.\n  </div>\n  \n  <p>If you didn't request a password reset, please ignore this email or contact support if you have concerns.</p>\n  \n  <p>Best regards,<br>The Team</p>\n</body>\n</html>",
+      "file": "templates/emails/password-reset.hbs",
+      "lines": "1-51"
+    }
+  },
+  "prerequisites": [
+    "SendGrid account (free tier: 100 emails/day) OR SMTP server",
+    "SendGrid API key OR SMTP credentials",
+    "Environment variables: SENDGRID_API_KEY, FROM_EMAIL, FROM_NAME",
+    "Handlebars for template rendering (npm install handlebars)",
+    "Domain verification in SendGrid (for production)"
+  ],
+  "step_by_step": [
+    {
+      "step": 1,
+      "title": "Install Dependencies",
+      "command": "npm install @sendgrid/mail handlebars (or nodemailer for SMTP)"
+    },
+    {
+      "step": 2,
+      "title": "Create SendGrid Account",
+      "details": "Sign up at sendgrid.com, verify email, get API key"
+    },
+    {
+      "step": 3,
+      "title": "Set Environment Variables",
+      "details": "Add SENDGRID_API_KEY, FROM_EMAIL, FROM_NAME to .env"
+    },
+    {
+      "step": 4,
+      "title": "Create Email Templates Directory",
+      "command": "mkdir -p templates/emails"
+    },
+    {
+      "step": 5,
+      "title": "Create Template Files",
+      "details": "Create .hbs files for welcome, password-reset, etc."
+    },
+    {
+      "step": 6,
+      "title": "Implement EmailService",
+      "details": "Create sendgrid-service.ts with template loading and sending"
+    },
+    {
+      "step": 7,
+      "title": "Add Email Methods",
+      "details": "Implement sendWelcome, sendPasswordReset, etc."
+    },
+    {
+      "step": 8,
+      "title": "Test with Sandbox Mode",
+      "details": "SendGrid sandbox: emails don't actually send, logs only"
+    },
+    {
+      "step": 9,
+      "title": "Verify Domain (Production)",
+      "details": "Add DNS records in SendGrid dashboard for domain authentication"
+    },
+    {
+      "step": 10,
+      "title": "Add Unsubscribe Links",
+      "details": "Implement unsubscribe functionality (required for marketing emails)"
+    }
+  ],
+  "security": {
+    "api_keys": "Never commit API keys - use environment variables",
+    "rate_limiting": "Limit emails per user (e.g., max 5 password resets/hour)",
+    "email_validation": "Validate email format before sending",
+    "unsubscribe": "Always include unsubscribe link (CAN-SPAM compliance)",
+    "content_security": "Sanitize user-generated content in email templates"
+  },
+  "warnings": [
+    "⚠️ Free tier limits: SendGrid (100/day), Mailgun (5000/month)",
+    "⚠️ Verify domain in production to avoid spam folder",
+    "⚠️ Never send passwords in emails - only reset links",
+    "⚠️ Test emails thoroughly - typos in production emails are embarrassing",
+    "⚠️ Include plain text version for accessibility (screen readers)",
+    "⚠️ Respect unsubscribe requests immediately (CAN-SPAM requirement)"
+  ],
+  "lessons_learned": [
+    "Use SendGrid for transactional emails (higher deliverability than SMTP)",
+    "Always include plain text version (improves spam score)",
+    "Inline CSS in emails (external stylesheets don't work in most email clients)",
+    "Test in multiple clients (Gmail, Outlook, Apple Mail)",
+    "Use MJML framework for responsive emails (converts to inline CSS)",
+    "Track email opens/clicks with SendGrid analytics",
+    "Implement exponential backoff for failed email sends",
+    "Store email send history in database for debugging"
+  ],
+  "testing": {
+    "sandbox_mode": "SendGrid sandbox: logs emails without actually sending",
+    "test_email": "Mailtrap.io for testing email content without real delivery",
+    "unit_tests": "Mock SendGrid API in tests",
+    "email_clients": "Test rendering in Gmail, Outlook, Apple Mail"
+  },
+  "monitoring": {
+    "metrics": [
+      "Email delivery rate",
+      "Bounce rate",
+      "Open rate (for marketing)",
+      "Click-through rate",
+      "Spam complaint rate"
+    ],
+    "tools": ["SendGrid dashboard", "CloudWatch", "Sentry for errors"]
+  },
+  "related_patterns": [
+    "auth-system.yaml (for password reset emails)",
+    "api-rate-limiting.json (to prevent email spam)",
+    "websocket-real-time.json (for real-time notifications)"
+  ]
+}

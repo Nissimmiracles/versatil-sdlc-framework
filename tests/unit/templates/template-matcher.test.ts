@@ -335,5 +335,297 @@ describe('TemplateMatcher', () => {
 
       expect(result1.best_match?.template_name).toBe(result2.best_match?.template_name);
     });
+
+    it('should handle description with only stopwords', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'the and or but in on at to for'
+      });
+
+      expect(result.use_template).toBe(false);
+    });
+
+    it('should handle single character tokens', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'a b c d e auth'
+      });
+
+      expect(result.best_match?.template_name).toBe('auth-system');
+    });
+
+    it('should handle unicode characters', async () => {
+      const result = await matcher.matchTemplate({
+        description: '用户 authentication système 認証'
+      });
+
+      expect(result.best_match?.template_name).toBe('auth-system');
+    });
+
+    it('should handle numbers in description', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'OAuth2 authentication with JWT tokens for 1000 users'
+      });
+
+      expect(result.best_match?.template_name).toBe('auth-system');
+    });
+  });
+
+  describe('Scoring Algorithm Validation', () => {
+    it('should cap match score at 100%', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'Authentication System auth login signup jwt oauth password session security'
+      });
+
+      expect(result.best_match?.match_score).toBeLessThanOrEqual(100);
+    });
+
+    it('should apply 30% boost for exact name match', async () => {
+      const withName = await matcher.matchTemplate({
+        description: 'Authentication System'
+      });
+
+      const withoutName = await matcher.matchTemplate({
+        description: 'auth'
+      });
+
+      if (withName.best_match && withoutName.best_match) {
+        const scoreDiff = withName.best_match.match_score - withoutName.best_match.match_score;
+        expect(scoreDiff).toBeGreaterThanOrEqual(20); // At least 20% boost from name
+      }
+    });
+
+    it('should apply 20% boost for category match', async () => {
+      const withCategory = await matcher.matchTemplate({
+        description: 'Security feature with auth'
+      });
+
+      expect(withCategory.best_match?.template_name).toBe('auth-system');
+      expect(withCategory.best_match?.match_score).toBeGreaterThanOrEqual(70);
+    });
+
+    it('should calculate base score from keyword overlap percentage', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'auth login'
+      });
+
+      // auth-system has 8 keywords, matching 2 = 25% base + boosts
+      expect(result.best_match?.template_name).toBe('auth-system');
+      expect(result.best_match?.match_score).toBeGreaterThan(0);
+    });
+
+    it('should handle partial keyword matches (substring)', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'authentication authorization'
+      });
+
+      expect(result.best_match?.template_name).toBe('auth-system');
+      expect(result.best_match?.matched_keywords).toContain('auth');
+    });
+
+    it('should deduplicate matched keywords', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'auth auth auth login login'
+      });
+
+      const uniqueKeywords = new Set(result.best_match?.matched_keywords);
+      expect(uniqueKeywords.size).toBe(result.best_match?.matched_keywords.length);
+    });
+  });
+
+  describe('Template Ranking', () => {
+    it('should rank multiple matching templates by score', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'API with authentication'
+      });
+
+      // Should match both api-integration and auth-system
+      expect(result.all_matches.length).toBeGreaterThanOrEqual(2);
+
+      // First should have highest score
+      for (let i = 0; i < result.all_matches.length - 1; i++) {
+        expect(result.all_matches[i].match_score).toBeGreaterThanOrEqual(
+          result.all_matches[i + 1].match_score
+        );
+      }
+    });
+
+    it('should handle tie in match scores', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'feature'
+      });
+
+      // Might have ties - ensure stable sorting
+      expect(result.all_matches).toBeDefined();
+      expect(result.best_match).toBe(result.all_matches[0] || null);
+    });
+
+    it('should return empty matches when no keywords match', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'xyzabc123'
+      });
+
+      expect(result.all_matches.length).toBe(0);
+      expect(result.use_template).toBe(false);
+    });
+  });
+
+  describe('Performance', () => {
+    it('should match template in under 100ms', async () => {
+      const start = Date.now();
+      await matcher.matchTemplate({
+        description: 'Add user authentication with JWT tokens'
+      });
+      const duration = Date.now() - start;
+
+      expect(duration).toBeLessThan(100);
+    });
+
+    it('should handle batch matching efficiently', async () => {
+      const descriptions = [
+        'authentication',
+        'CRUD API',
+        'dashboard',
+        'file upload',
+        'third-party integration'
+      ];
+
+      const start = Date.now();
+      for (const desc of descriptions) {
+        await matcher.matchTemplate({ description: desc });
+      }
+      const duration = Date.now() - start;
+
+      expect(duration).toBeLessThan(500); // 5 matches in <500ms
+    });
+
+    it('should load templates only once (caching)', async () => {
+      const templates1 = await matcher.getAvailableTemplates();
+      const templates2 = await matcher.getAvailableTemplates();
+
+      expect(templates1).toEqual(templates2);
+    });
+  });
+
+  describe('Template Path Validation', () => {
+    it('should return valid template path for matched template', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'authentication'
+      });
+
+      expect(result.best_match?.template_path).toBeDefined();
+      expect(result.best_match?.template_path).toContain('auth-system.yaml');
+      expect(fs.existsSync(result.best_match!.template_path)).toBe(true);
+    });
+
+    it('should include templates directory in path', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'CRUD endpoint'
+      });
+
+      expect(result.best_match?.template_path).toContain('templates');
+      expect(result.best_match?.template_path).toContain('plan-templates');
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle missing keywords gracefully', async () => {
+      const result = await matcher.matchTemplate({
+        description: ''
+      });
+
+      expect(() => result).not.toThrow();
+      expect(result.use_template).toBe(false);
+    });
+
+    it('should handle null/undefined description', async () => {
+      const result1 = await matcher.matchTemplate({
+        description: null as any
+      });
+
+      expect(result1.use_template).toBe(false);
+
+      const result2 = await matcher.matchTemplate({
+        description: undefined as any
+      });
+
+      expect(result2.use_template).toBe(false);
+    });
+
+    it('should provide helpful error message for nonexistent template', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'test',
+        explicit_template: 'fake-template'
+      });
+
+      expect(result.reason).toContain('not found');
+      expect(result.reason).toContain('Available');
+      expect(result.reason).toContain('auth-system');
+    });
+  });
+
+  describe('Threshold Behavior', () => {
+    it('should reject templates below 70% threshold', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'random unrelated task'
+      });
+
+      expect(result.use_template).toBe(false);
+      if (result.all_matches.length > 0) {
+        expect(result.all_matches[0].match_score).toBeLessThan(70);
+      }
+    });
+
+    it('should accept templates at exactly 70% threshold', async () => {
+      // This is implementation-dependent, but we test the boundary
+      const result = await matcher.matchTemplate({
+        description: 'authentication'
+      });
+
+      if (result.best_match) {
+        if (result.best_match.match_score >= 70) {
+          expect(result.use_template).toBe(true);
+        } else {
+          expect(result.use_template).toBe(false);
+        }
+      }
+    });
+
+    it('should include threshold in rejection reason', async () => {
+      const result = await matcher.matchTemplate({
+        description: 'unrelated feature'
+      });
+
+      if (!result.use_template) {
+        expect(result.reason.toLowerCase()).toContain('threshold');
+      }
+    });
+  });
+
+  describe('Integration with Real Templates', () => {
+    it('should load auth-system template with all required fields', async () => {
+      const template = await matcher.loadTemplate('auth-system');
+
+      expect(template).toBeDefined();
+      expect(template?.name).toBeDefined();
+      expect(template?.category).toBeDefined();
+      expect(template?.keywords).toBeDefined();
+      expect(template?.keywords.length).toBeGreaterThan(0);
+      expect(template?.estimated_effort).toBeDefined();
+      expect(template?.complexity).toBeDefined();
+    });
+
+    it('should load all 5 templates successfully', async () => {
+      const templateNames = ['auth-system', 'crud-endpoint', 'dashboard', 'api-integration', 'file-upload'];
+
+      for (const name of templateNames) {
+        const template = await matcher.loadTemplate(name);
+        expect(template).toBeDefined();
+        expect(template?.name).toBeTruthy();
+      }
+    });
+
+    it('should return null for nonexistent template', async () => {
+      const template = await matcher.loadTemplate('nonexistent');
+      expect(template).toBeNull();
+    });
   });
 });

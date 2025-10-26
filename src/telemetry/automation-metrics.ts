@@ -245,6 +245,228 @@ export class AutomationMetricsService {
 **Metrics stored in**: .versatil/telemetry/metrics.json
     `.trim();
   }
+
+  /**
+   * Get hook performance statistics (P50, P95, P99)
+   */
+  getHookPerformance(): {
+    totalExecutions: number;
+    avgTime: number;
+    p50: number;
+    p95: number;
+    p99: number;
+    byHookType: Record<string, { count: number; avgTime: number }>;
+  } {
+    const events = this.readMetrics();
+    const hookEvents = events.filter(e => e.type === 'hook_execution');
+
+    if (hookEvents.length === 0) {
+      return {
+        totalExecutions: 0,
+        avgTime: 0,
+        p50: 0,
+        p95: 0,
+        p99: 0,
+        byHookType: {}
+      };
+    }
+
+    const times = hookEvents
+      .map(e => (e.data as HookExecutionMetric).executionTimeMs)
+      .sort((a, b) => a - b);
+
+    const avgTime = times.reduce((sum, t) => sum + t, 0) / times.length;
+    const p50 = times[Math.floor(times.length * 0.5)];
+    const p95 = times[Math.floor(times.length * 0.95)];
+    const p99 = times[Math.floor(times.length * 0.99)];
+
+    const byHookType: Record<string, { count: number; avgTime: number }> = {};
+    hookEvents.forEach(event => {
+      const hook = event.data as HookExecutionMetric;
+      if (!byHookType[hook.hookType]) {
+        byHookType[hook.hookType] = { count: 0, avgTime: 0 };
+      }
+      byHookType[hook.hookType].count++;
+      byHookType[hook.hookType].avgTime += hook.executionTimeMs;
+    });
+
+    Object.keys(byHookType).forEach(type => {
+      byHookType[type].avgTime /= byHookType[type].count;
+    });
+
+    return { totalExecutions: hookEvents.length, avgTime, p50, p95, p99, byHookType };
+  }
+
+  /**
+   * Get agent activation statistics
+   */
+  getAgentActivationStats(): {
+    totalSuggestions: number;
+    totalActivations: number;
+    activationRate: number;
+    byAgent: Record<string, { suggested: number; activated: number; rate: number }>;
+  } {
+    const events = this.readMetrics();
+    const agentEvents = events.filter(e => e.type === 'agent_activation');
+
+    const totalSuggestions = agentEvents.filter(e => (e.data as AgentActivationMetric).suggested).length;
+    const totalActivations = agentEvents.filter(e => (e.data as AgentActivationMetric).activated).length;
+    const activationRate = totalSuggestions > 0 ? totalActivations / totalSuggestions : 0;
+
+    const byAgent: Record<string, { suggested: number; activated: number; rate: number }> = {};
+    agentEvents.forEach(event => {
+      const agent = (event.data as AgentActivationMetric).agent;
+      if (!byAgent[agent]) {
+        byAgent[agent] = { suggested: 0, activated: 0, rate: 0 };
+      }
+      if ((event.data as AgentActivationMetric).suggested) byAgent[agent].suggested++;
+      if ((event.data as AgentActivationMetric).activated) byAgent[agent].activated++;
+    });
+
+    Object.keys(byAgent).forEach(agent => {
+      byAgent[agent].rate = byAgent[agent].suggested > 0
+        ? byAgent[agent].activated / byAgent[agent].suggested
+        : 0;
+    });
+
+    return { totalSuggestions, totalActivations, activationRate, byAgent };
+  }
+
+  /**
+   * Get top patterns by usage
+   */
+  getTopPatterns(limit = 10): Array<{ pattern: string; count: number; successRate: number }> {
+    const events = this.readMetrics();
+    const templateEvents = events.filter(e => e.type === 'template_application');
+
+    const patternStats: Record<string, { suggested: number; applied: number }> = {};
+
+    templateEvents.forEach(event => {
+      const template = (event.data as TemplateApplicationMetric).template;
+      if (!patternStats[template]) {
+        patternStats[template] = { suggested: 0, applied: 0 };
+      }
+      if ((event.data as TemplateApplicationMetric).suggested) patternStats[template].suggested++;
+      if ((event.data as TemplateApplicationMetric).applied) patternStats[template].applied++;
+    });
+
+    const patterns = Object.entries(patternStats)
+      .map(([pattern, stats]) => ({
+        pattern,
+        count: stats.applied,
+        successRate: stats.suggested > 0 ? stats.applied / stats.suggested : 0
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
+
+    return patterns;
+  }
+
+  /**
+   * Get cross-skill loading patterns
+   */
+  getCrossSkillPatterns(): {
+    avgSkillsLoaded: number;
+    mostCommonCombinations: Array<{ primary: string; related: string[]; count: number }>;
+  } {
+    const events = this.readMetrics();
+    const skillEvents = events.filter(e => e.type === 'cross_skill_loading');
+
+    if (skillEvents.length === 0) {
+      return { avgSkillsLoaded: 0, mostCommonCombinations: [] };
+    }
+
+    const totalLoaded = skillEvents.reduce(
+      (sum, e) => sum + (e.data as CrossSkillLoadingMetric).loadedCount,
+      0
+    );
+    const avgSkillsLoaded = totalLoaded / skillEvents.length;
+
+    const combinations: Record<string, { primary: string; related: string[]; count: number }> = {};
+    skillEvents.forEach(event => {
+      const data = event.data as CrossSkillLoadingMetric;
+      const key = `${data.primarySkill}:${data.relatedSkills.join(',')}`;
+      if (!combinations[key]) {
+        combinations[key] = { primary: data.primarySkill, related: data.relatedSkills, count: 0 };
+      }
+      combinations[key].count++;
+    });
+
+    const mostCommonCombinations = Object.values(combinations)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    return { avgSkillsLoaded, mostCommonCombinations };
+  }
+
+  /**
+   * Generate comprehensive analytics report
+   */
+  generateAnalyticsReport(): string {
+    const hookPerf = this.getHookPerformance();
+    const agentStats = this.getAgentActivationStats();
+    const topPatterns = this.getTopPatterns(10);
+    const crossSkill = this.getCrossSkillPatterns();
+
+    let report = `# VERSATIL Telemetry Analytics Report\n\n`;
+    report += `**Generated**: ${new Date().toISOString()}\n\n`;
+    report += `---\n\n`;
+
+    // Hook Performance
+    report += `## 🚀 Hook Performance\n\n`;
+    report += `- **Total Executions**: ${hookPerf.totalExecutions}\n`;
+    report += `- **Average Time**: ${hookPerf.avgTime.toFixed(2)}ms\n`;
+    report += `- **P50 Latency**: ${hookPerf.p50.toFixed(2)}ms\n`;
+    report += `- **P95 Latency**: ${hookPerf.p95.toFixed(2)}ms\n`;
+    report += `- **P99 Latency**: ${hookPerf.p99.toFixed(2)}ms\n\n`;
+
+    report += `### By Hook Type\n\n`;
+    Object.entries(hookPerf.byHookType).forEach(([type, stats]) => {
+      report += `- **${type}**: ${stats.count} executions, ${stats.avgTime.toFixed(2)}ms avg\n`;
+    });
+    report += `\n`;
+
+    // Agent Activation
+    report += `## 🤖 Agent Auto-Activation\n\n`;
+    report += `- **Total Suggestions**: ${agentStats.totalSuggestions}\n`;
+    report += `- **Total Activations**: ${agentStats.totalActivations}\n`;
+    report += `- **Activation Rate**: ${(agentStats.activationRate * 100).toFixed(1)}%\n\n`;
+
+    report += `### By Agent\n\n`;
+    Object.entries(agentStats.byAgent)
+      .sort((a, b) => b[1].suggested - a[1].suggested)
+      .forEach(([agent, stats]) => {
+        report += `- **${agent}**: ${stats.activated}/${stats.suggested} (${(stats.rate * 100).toFixed(1)}%)\n`;
+      });
+    report += `\n`;
+
+    // Top Patterns
+    report += `## 📊 Top 10 Patterns\n\n`;
+    if (topPatterns.length > 0) {
+      topPatterns.forEach((pattern, index) => {
+        report += `${index + 1}. **${pattern.pattern}**: ${pattern.count} uses, ${(pattern.successRate * 100).toFixed(1)}% success rate\n`;
+      });
+    } else {
+      report += `_No pattern usage data available yet_\n`;
+    }
+    report += `\n`;
+
+    // Cross-Skill Loading
+    report += `## 🔗 Cross-Skill Loading\n\n`;
+    report += `- **Avg Skills Loaded**: ${crossSkill.avgSkillsLoaded.toFixed(1)}\n\n`;
+    if (crossSkill.mostCommonCombinations.length > 0) {
+      report += `### Most Common Combinations\n\n`;
+      crossSkill.mostCommonCombinations.forEach((combo, index) => {
+        report += `${index + 1}. **${combo.primary}** → [${combo.related.join(', ')}] (${combo.count}x)\n`;
+      });
+    }
+    report += `\n`;
+
+    report += `---\n\n`;
+    report += `**Data Source**: \`.versatil/telemetry/metrics.json\`\n`;
+
+    return report;
+  }
 }
 
 /**
