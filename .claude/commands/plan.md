@@ -110,20 +110,32 @@ Use the PatternSearchService to query historical implementations via GraphRAG (p
 
 Import and use the pattern search service:
 ```typescript
-import { patternSearchService } from '@/rag/pattern-search';
+import { patternSearchService } from '../../src/rag/pattern-search.js';
 
-const searchResult = await patternSearchService.searchSimilarFeatures({
-  description: feature_description,
-  category: detected_category, // auth, crud, dashboard, integration, file-upload
-  min_similarity: 0.75,
-  limit: 5
-});
+// Query historical patterns with error handling
+let searchResult = null;
+let hasHistoricalContext = false;
 
-// Extract insights
-const avgEffort = searchResult.average_effort;
-const consolidatedLessons = searchResult.consolidated_lessons;
-const confidence = searchResult.confidence_score;
-const topPatterns = searchResult.patterns; // Top 5 similar features
+try {
+  searchResult = await patternSearchService.searchSimilarFeatures({
+    description: feature_description,
+    category: detected_category, // auth, crud, dashboard, integration, file-upload
+    min_similarity: 0.75,
+    limit: 5
+  });
+
+  hasHistoricalContext = searchResult.patterns.length > 0;
+
+  // Extract insights
+  const avgEffort = searchResult.avg_effort;
+  const consolidatedLessons = searchResult.consolidated_lessons;
+  const avgConfidence = searchResult.avg_confidence;
+  const topPatterns = searchResult.patterns; // Top 5 similar features
+  const searchMethod = searchResult.search_method; // graphrag, vector, local, none
+} catch (error) {
+  console.warn('Pattern search failed, continuing without historical context:', error);
+  // Graceful degradation - continue with templates/research
+}
 ```
 
 **Historical Context Output:**

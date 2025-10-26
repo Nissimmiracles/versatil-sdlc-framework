@@ -251,3 +251,111 @@ When editing backend/frontend code, the framework automatically routes to specia
 **Complete Reference**: [.claude/AGENT_TRIGGERS.md](.claude/AGENT_TRIGGERS.md)
 
 ---
+
+## 📚 Library-Specific Context (v6.6.0+)
+
+**Per-Library Rules & Patterns for Precision Development**
+
+Beyond project-wide conventions, VERSATIL supports library-specific context files (`claude.md`) in each major module. These files provide targeted guidance when working with specific parts of the codebase.
+
+### The Four-Layer Context System
+
+```
+User Preferences (HIGHEST - ~/.versatil/users/[id]/profile.json)
+    ↓
+Library Context (NEW - src/[library]/claude.md)
+    ↓
+Team Conventions (CLAUDE.md, project root)
+    ↓
+Framework Defaults (LOWEST)
+```
+
+**Priority**: When conventions conflict, higher layers always win.
+
+### How It Works
+
+When you edit a file like `src/rag/pattern-search.ts`, the `before-prompt` hook:
+1. Detects library from path: `rag`
+2. Loads `src/rag/claude.md` if it exists
+3. Injects library-specific context into system message
+4. Combines with RAG patterns and team conventions
+
+### Library Context Files
+
+Each `claude.md` provides:
+- **Purpose**: What the library does (1-2 sentences)
+- **Key Concepts**: Core abstractions and patterns
+- **Conventions & Rules**: Library-specific coding standards
+- **Usage Patterns**: Copy-paste code examples
+- **Important Gotchas**: Common mistakes and footguns
+- **Related Libraries**: Dependencies and interactions
+- **Testing Requirements**: Coverage and test patterns
+
+### Priority Libraries (15 with context files)
+
+| Library | Purpose | Key Pattern |
+|---------|---------|-------------|
+| **agents/** | OPERA agent definitions | Handoff contracts, role specialization |
+| **rag/** | Pattern search & RAG | GraphRAG first, Vector fallback |
+| **orchestration/** | Workflow coordination | Phase detection, state persistence |
+| **planning/** | Feature planning | CODIFY phase, effort estimation |
+| **templates/** | Template matching | 70% threshold, keyword scoring |
+| **hooks/** | Event system | Native SDK, hook lifecycle |
+| **mcp/** | MCP integration | Server management, protocol |
+| **context/** | Context management | Three-layer priority system |
+| **intelligence/** | AI/ML features | Adaptive learning |
+| **learning/** | Learning system | Codification, feedback loops |
+| **memory/** | Memory management | State persistence, caching |
+| **testing/** | Test infrastructure | 80%+ coverage, Maria-QA patterns |
+| **validation/** | Quality gates | Contract validation, rules |
+| **ui/** | UI components | React, accessibility (WCAG 2.1 AA) |
+| **dashboard/** | Dashboard features | Charts, visualization |
+
+### Benefits
+
+- **Faster onboarding**: New contributors get library-specific guidance immediately
+- **Fewer mistakes**: Common gotchas documented with solutions
+- **Consistent patterns**: Everyone follows the same library conventions
+- **Precision context**: Only inject rules relevant to current work
+
+### Example: src/rag/claude.md
+
+```markdown
+# RAG (Retrieval-Augmented Generation)
+
+## Purpose
+Pattern search and historical context retrieval using GraphRAG + Vector stores.
+
+## Key Rule
+⚠️ **Always try GraphRAG first** - It's offline and has no API quota
+
+## Common Pattern
+\`\`\`typescript
+import { patternSearchService } from './pattern-search.js';
+
+const result = await patternSearchService.searchSimilarFeatures({
+  description: 'Add user authentication',
+  min_similarity: 0.75,
+  limit: 5
+});
+\`\`\`
+
+## Important Gotcha
+GraphRAG initialization can fail silently - check `search_method` in result.
+```
+
+### Creating New Library Context
+
+When creating a new library or major module:
+
+1. Copy template: `templates/context/library-claude.md.template`
+2. Fill in sections based on actual code
+3. Include real examples with file:line references
+4. Document gotchas from git history/issues
+5. Keep under 200 lines (signal over noise)
+6. Place in `src/[library]/claude.md`
+
+**Template**: [templates/context/library-claude.md.template](templates/context/library-claude.md.template)
+**Audit Report**: [docs/context/LIBRARY_AUDIT_REPORT.md](docs/context/LIBRARY_AUDIT_REPORT.md)
+
+---
