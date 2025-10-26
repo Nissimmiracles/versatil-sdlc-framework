@@ -197,6 +197,9 @@ module.exports = {
         '<rootDir>/tests/integration/**/*.{ts,tsx}',
         '<rootDir>/tests/agents/**/*.{ts,tsx}',
         '<rootDir>/tests/update/**/*.{ts,tsx}',
+        '<rootDir>/tests/rag/**/*.{ts,tsx}',
+        '<rootDir>/tests/templates/**/*.{ts,tsx}',
+        '<rootDir>/tests/planning/**/*.{ts,tsx}',
         // Exclude Playwright integration tests and helper files
         '!<rootDir>/tests/integration/**/*.e2e.{ts,tsx}',
         '!<rootDir>/tests/integration/**/*.playwright.{ts,tsx}',

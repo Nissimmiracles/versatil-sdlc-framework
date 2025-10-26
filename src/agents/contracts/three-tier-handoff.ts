@@ -230,7 +230,7 @@ export class ThreeTierHandoffBuilder {
     if (workItems.length === 0) {
       workItems.push({
         id: `work-plan-${Date.now()}`,
-        type: 'planning',
+        type: 'analysis',
         description: `Plan three-tier implementation for ${this.requirements.name}`,
         acceptanceCriteria: [
           'Requirements analyzed',

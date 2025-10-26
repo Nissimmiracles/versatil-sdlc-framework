@@ -76,9 +76,9 @@ export class TodoFileGenerator {
     'XL': 16
   };
 
-  constructor() {
+  constructor(todosDir?: string) {
     this.logger = new VERSATILLogger();
-    this.todosDir = path.join(process.cwd(), 'todos');
+    this.todosDir = todosDir || path.join(process.cwd(), 'todos');
     this.templatePath = path.join(this.todosDir, '000-pending-p1-TEMPLATE.md');
   }
 

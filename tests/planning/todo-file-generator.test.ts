@@ -24,7 +24,7 @@ describe('TodoFileGenerator', () => {
       fs.copyFileSync(templateSrc, templateDest);
     }
 
-    generator = new TodoFileGenerator();
+    generator = new TodoFileGenerator(testTodosDir);
   });
 
   afterEach(() => {

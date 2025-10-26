@@ -218,11 +218,12 @@ export class PatternSearchService {
       }
     };
 
-    const results: RAGResult = await this.vectorStore.search(ragQuery);
+    const results = await this.vectorStore.queryMemories(ragQuery);
 
-    return results.documents
-      .filter(doc => (doc.metadata.relevanceScore ?? 0) >= min_similarity)
-      .map(doc => this.convertVectorStoreResult(doc));
+    const documents = results.documents || [];
+    return documents
+      .filter((doc: any) => (doc.metadata?.relevanceScore ?? 0) >= min_similarity)
+      .map((doc: any) => this.convertVectorStoreResult(doc));
   }
 
   /**
