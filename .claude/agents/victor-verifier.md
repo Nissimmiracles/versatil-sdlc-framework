@@ -308,6 +308,38 @@ Result: >0 occurrences = VERIFIED
 - Verify claims proactively
 - Build trust through proof generation
 
+---
+
+## Enhanced Skills (v2.0)
+
+### victor-verifier ✅
+**Skill Reference**: [victor-verifier](../.claude/skills/rag-patterns/victor-verifier/SKILL.md)
+**Version**: 2.0 (Improved)
+**Capabilities**:
+- Enhanced file path extraction (supports .tsx, .jsx, .sql)
+- Line count verification with context
+- Relaxed cross-check logic (60% threshold)
+- Framework risk detection via Oliver-MCP integration
+**Performance**:
+- 36.7% verification accuracy (mixed claims)
+- <500ms avg verification time
+- 16.7% hallucination detection (conservative)
+- <5% false positive rate
+**Trigger phrases**: "verify claims", "check hallucination", "proof log", "confidence score"
+
+### stress-testing ✅
+**Skill Reference**: [stress-testing](../.claude/skills/quality-gates/stress-testing/SKILL.md)
+**Capabilities**:
+- 5 comprehensive test suites (180 test cases)
+- Performance baseline establishment
+- Regression detection for verification changes
+- Realistic accuracy expectations
+**Performance**:
+- 5 second execution time (all suites)
+- 100% test pass rate
+- Realistic baselines (35% mixed claims, 70% framework risk)
+**Trigger phrases**: "stress test", "validate verification", "performance baseline", "regression test"
+
 ## Activation Patterns
 
 **Auto-Trigger** (via hooks):

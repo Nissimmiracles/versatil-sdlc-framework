@@ -170,6 +170,70 @@ const INTENT_PATTERNS: Record<string, IntentConfig> = {
         productivity: '5x faster (40min → 8min)'
       }
     ]
+  },
+  implementing_oauth: {
+    regex: /oauth|oauth2|google.*auth|github.*auth|social.*login|sso|passport/i,
+    suggestions: [
+      {
+        type: 'rag-pattern',
+        pattern: 'oauth2-integration',
+        path: '.versatil/learning/patterns/oauth2-integration.json',
+        productivity: 'Proven pattern - 4-6 hours typical'
+      },
+      { type: 'library', skill: 'marcus-backend', reason: 'API security and OAuth flow implementation' },
+      { type: 'library', skill: 'testing-library', reason: 'OAuth testing (80%+ coverage)' }
+    ]
+  },
+  creating_migration: {
+    regex: /migration|migrate|schema.*change|alter.*table|add.*column|prisma.*migrate/i,
+    suggestions: [
+      {
+        type: 'rag-pattern',
+        pattern: 'database-migration',
+        path: '.versatil/learning/patterns/database-migration.json',
+        productivity: 'Proven pattern - 2-3 hours typical'
+      },
+      { type: 'library', skill: 'dana-database', reason: 'Database schema and migration patterns' },
+      { type: 'agent', agent: 'Dana-Database', autoActivate: true }
+    ]
+  },
+  implementing_graphql: {
+    regex: /graphql|apollo|schema.*query|mutation|resolver|subscription/i,
+    suggestions: [
+      {
+        type: 'rag-pattern',
+        pattern: 'graphql-api',
+        path: '.versatil/learning/patterns/graphql-api.json',
+        productivity: 'Proven pattern - 5-7 hours typical'
+      },
+      { type: 'library', skill: 'marcus-backend', reason: 'GraphQL API design and resolvers' },
+      { type: 'library', skill: 'testing-library', reason: 'GraphQL testing (80%+ coverage)' }
+    ]
+  },
+  creating_component: {
+    regex: /create.*component|new.*component|react.*component|tsx.*file|functional.*component/i,
+    suggestions: [
+      {
+        type: 'rag-pattern',
+        pattern: 'react-component',
+        path: '.versatil/learning/patterns/react-component.json',
+        productivity: 'Proven pattern - 2-4 hours typical'
+      },
+      { type: 'library', skill: 'james-frontend', reason: 'React patterns and accessibility (WCAG 2.1 AA)' },
+      { type: 'agent', agent: 'James-Frontend', autoActivate: true }
+    ]
+  },
+  deploying_docker: {
+    regex: /docker|dockerfile|docker-compose|containerize|deploy|multi.*stage/i,
+    suggestions: [
+      {
+        type: 'rag-pattern',
+        pattern: 'docker-deployment',
+        path: '.versatil/learning/patterns/docker-deployment.json',
+        productivity: 'Proven pattern - 3-5 hours typical'
+      },
+      { type: 'library', skill: 'marcus-backend', reason: 'Docker setup and orchestration' }
+    ]
   }
 };
 

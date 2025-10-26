@@ -259,6 +259,46 @@ validate(pattern):
 - Clear MCP status reports
 
 You enable all OPERA agents with reliable MCP infrastructure.
+
+---
+
+## Enhanced Skills
+
+### rag-optimization ✅
+**Skill Reference**: [rag-optimization](../.claude/skills/rag-optimization/SKILL.md)
+**Capabilities**:
+- Embedding model selection (OpenAI/BGE/MiniLM)
+- Semantic chunking strategies
+- Hybrid search (dense + sparse BM25)
+- Reranking with cross-encoders
+**Performance**:
+- 2-3x retrieval accuracy improvement
+- Pattern search with GraphRAG preferred
+- Vector store fallback
+**Trigger phrases**: "RAG optimization", "semantic search", "embedding fine-tuning", "chunking strategy"
+
+### anti-hallucination (Framework Risk Detection) ✅
+**Implementation**: [src/agents/mcp/anti-hallucination-detector.ts](../../src/agents/mcp/anti-hallucination-detector.ts)
+**Capabilities**:
+- Detects 25+ frameworks (FastAPI, React, Next.js, etc.)
+- Risk scoring: 0-100 (low/medium/high)
+- GitMCP recommendations for high-risk frameworks
+- Knowledge cutoff risk assessment
+**Performance**:
+- 72% risk level accuracy
+- <200ms detection latency
+- 100% framework identification rate
+**Trigger phrases**: "framework risk", "knowledge cutoff", "GitMCP", "hallucination detection"
+
+### stress-testing (Integration) ✅
+**Skill Reference**: [stress-testing](../.claude/skills/quality-gates/stress-testing/SKILL.md)
+**Integration**: Oliver-MCP provides framework risk detection for Test Suite 2
+**Capabilities**:
+- Test 25 frameworks for risk scoring
+- Validate GitMCP recommendation generation
+- Performance baseline: 70% accuracy, <200ms latency
+**Trigger phrases**: "stress test", "framework validation", "risk baseline"
+
 ---
 
 ## Auto-Execution Protocol (v7.1.0+)

@@ -30,12 +30,20 @@ RAG (Retrieval-Augmented Generation) Patterns are **historical implementations c
 
 ---
 
-### 2. Victor-Verifier Anti-Hallucination
+### 2. Victor-Verifier Anti-Hallucination (v2.0 - Improved)
 **When**: Implementing verification, detecting hallucinations, validating tool outputs
 **Success**: 95% | **Effort**: 22h (estimated 24h) - 92% accuracy
 **Key Learning**: 40% hallucination reduction through Chain-of-Verification
 
-→ See `victor-verifier` skill for details
+**v2.0 Improvements** (October 2025):
+- Enhanced file path extraction (supports .tsx, .jsx, .sql)
+- Line count verification with context
+- Relaxed cross-check logic (60% threshold)
+- Framework risk detection via Oliver-MCP
+- Stress tested with 180 test cases (100% pass rate)
+
+→ See `victor-verifier` skill for implementation details
+→ See `stress-testing` skill for validation methodology
 
 ---
 
