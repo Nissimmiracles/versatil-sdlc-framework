@@ -10,8 +10,8 @@
  */
 
 module.exports = {
-  // Root directory resolution
-  rootDir: __dirname,
+  // Root directory resolution - set to project root, not config dir
+  rootDir: require('path').resolve(__dirname, '..'),
 
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -112,13 +112,13 @@ module.exports = {
 
   // Jest projects for different test types
   projects: [
-    './jest-unit.config.cjs',
+    require('path').resolve(__dirname, './jest-unit.config.cjs'),
     {
       displayName: {
         name: 'STRESS',
         color: 'red'
       },
-      rootDir: __dirname,
+      rootDir: require('path').resolve(__dirname, '..'),
       preset: 'ts-jest',
       testEnvironment: 'node',
       transform: {
@@ -156,7 +156,7 @@ module.exports = {
         name: 'INTEGRATION',
         color: 'magenta'
       },
-      rootDir: __dirname,
+      rootDir: require('path').resolve(__dirname, '..'),
       preset: 'ts-jest',
       testEnvironment: 'node',
       transform: {

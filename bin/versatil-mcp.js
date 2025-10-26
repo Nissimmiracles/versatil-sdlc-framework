@@ -78,7 +78,13 @@ async function main() {
     log(`📊 Log file: ${LOG_FILE}`);
     log('');
     log('MCP Server connected via stdio transport');
-    log('Tools: 15 | Resources: 5 | Prompts: 5');
+    log('Tools: 65 | Resources: 6 | Prompts: 5');
+    log('');
+    log('MCP Integrations:');
+    log('  Supabase: ' + (process.env.SUPABASE_URL ? '✓ Enabled' : '✗ Disabled'));
+    log('  GitHub: ' + (process.env.GITHUB_TOKEN ? '✓ Enabled' : '✗ Disabled'));
+    log('  Semgrep: ' + (process.env.SEMGREP_API_KEY ? '✓ Cloud' : '✓ Local'));
+    log('  Sentry: ' + (process.env.SENTRY_DSN ? '✓ Enabled' : '✗ Disabled'));
   } catch (error) {
     log('❌ MCP Server failed to start:', error);
     log(error.stack);

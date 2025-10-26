@@ -346,7 +346,11 @@
     "prettier": "^3.0.0",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.2",
     "typescript-eslint": "^8.44.0"
+  },
+  "overrides": {
+    "@azure/identity": "^4.2.1"
   },
   "engines": {
     "node": ">=18.0.0",

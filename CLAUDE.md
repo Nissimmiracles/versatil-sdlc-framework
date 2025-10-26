@@ -138,3 +138,39 @@ The context system enables **Compounding Engineering** - each feature makes the 
 - **Implementation Status**: [docs/THREE_LAYER_CONTEXT_COMPLETE.md](docs/THREE_LAYER_CONTEXT_COMPLETE.md)
 
 ---
+
+## 🤖 Agent Auto-Activation System
+
+VERSATIL agents automatically activate based on file patterns and context - **no manual slash commands needed** for routine tasks.
+
+### How It Works
+
+```
+Edit File → Hook Fires → JSON Suggestion → Claude Invokes Agent via Task Tool
+```
+
+**Example**: Edit `LoginForm.test.tsx` → Maria-QA automatically activates for quality validation
+
+### Agent Triggers Quick Reference
+
+| Agent | Auto-Activates On | Priority |
+|-------|------------------|----------|
+| **Maria-QA** | `*.test.*`, `*.spec.*`, `__tests__/**` | ⚡ High |
+| **James-Frontend** | `*.tsx`, `*.jsx`, `*.vue`, `*.css` | 🎨 Medium |
+| **Marcus-Backend** | `api/**`, `routes/**`, `*.api.*` | ⚙️ High |
+| **Dana-Database** | `*.sql`, `migrations/**`, `*.prisma` | 🗄️ High |
+| **Dr.AI-ML** | `ml/**/*.py`, `*.ipynb`, `models/**` | 🤖 Medium |
+| **Alex-BA** | `requirements/**`, `*.feature` | 📊 Medium |
+| **Sarah-PM** | `*.md`, `docs/**` | 👔 Low |
+| **Oliver-MCP** | `mcp/**`, `*.mcp.*` | 🔌 Medium |
+
+### Sub-Agent Routing (Automatic)
+
+When editing backend/frontend code, the framework automatically routes to specialized sub-agents:
+
+**Frontend**: React, Vue, Next.js, Angular, Svelte
+**Backend**: Node.js, Python, Rails, Go, Java
+
+**Complete Reference**: [.claude/AGENT_TRIGGERS.md](.claude/AGENT_TRIGGERS.md)
+
+---

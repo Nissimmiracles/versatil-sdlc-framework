@@ -12,8 +12,8 @@ module.exports = {
     color: 'cyan'
   },
 
-  // Root directory resolution
-  rootDir: __dirname,
+  // Root directory resolution - set to project root, not config dir
+  rootDir: require('path').resolve(__dirname, '..'),
 
   // Preset and environment
   preset: 'ts-jest',
