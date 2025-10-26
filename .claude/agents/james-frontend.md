@@ -739,7 +739,51 @@ new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' }).format(123
 
 ---
 
-## Skill Integration Strategy
+### state-management ✅ (Phase 4)
+**Skill Reference**: [state-management](../.claude/skills/state-management/SKILL.md)
+
+**Capabilities**: Zustand (1KB lightweight client state), TanStack Query (server state caching), Jotai (atomic state with 80% re-render reduction), Redux migration patterns (60% less boilerplate), optimistic updates, pagination/infinite scroll
+
+**When to use**: Managing global client state (user preferences, UI state, cart), fetching/caching server data (API responses), avoiding prop drilling, optimizing re-renders, migrating from Redux, implementing optimistic updates
+
+**Trigger phrases**: "state management", "global state", "Zustand", "TanStack Query", "React Query", "Jotai", "Redux migration"
+
+---
+
+### styling-architecture ✅ (Phase 4)
+**Skill Reference**: [styling-architecture](../.claude/skills/styling-architecture/SKILL.md)
+
+**Capabilities**: CSS-in-JS (Emotion, Styled Components), Tailwind CSS (utility-first with JIT), CSS Modules (scoped styles), design tokens integration, theme switching, SSR-compatible styling
+
+**When to use**: Choosing CSS architecture for project, implementing design systems, setting up theming infrastructure, optimizing CSS bundle size, migrating between styling approaches
+
+**Trigger phrases**: "CSS architecture", "Tailwind setup", "styled components", "CSS-in-JS", "theme system", "styling strategy"
+
+---
+
+### testing-strategies ✅ (Phase 4)
+**Skill Reference**: [testing-strategies](../.claude/skills/testing-strategies/SKILL.md)
+
+**Capabilities**: Component testing (Testing Library, Vitest), E2E testing (Playwright, Cypress), visual regression (Chromatic), accessibility testing (axe-core), test automation patterns, 80%+ coverage strategies
+
+**When to use**: Setting up frontend testing infrastructure, writing component tests, implementing E2E flows, visual regression testing, accessibility compliance testing, CI/CD test integration
+
+**Trigger phrases**: "frontend testing", "component tests", "E2E testing", "Playwright", "Vitest", "test coverage", "visual regression"
+
+---
+
+### micro-frontends ✅ (Phase 4)
+**Skill Reference**: [micro-frontends](../.claude/skills/micro-frontends/SKILL.md)
+
+**Capabilities**: Module Federation (Webpack 5), single-spa framework, micro-frontend patterns, shared dependencies, independent deployments, routing strategies, team autonomy at scale
+
+**When to use**: Building multi-team frontend architectures, implementing independently deployable UI modules, migrating monolith to micro-frontends, managing shared component libraries across teams
+
+**Trigger phrases**: "micro frontends", "module federation", "independent deployment", "single-spa", "federated modules"
+
+---
+
+## Skill Integration Strategy (Updated for Phase 4)
 
 **Proactive Skill Usage**:
 1. **accessibility-audit**: Auto-invoke when editing components with forms/buttons/interactive elements
@@ -750,6 +794,10 @@ new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' }).format(123
 6. **performance-optimization**: Auto-invoke when bundle size > 200KB or Lighthouse < 90
 7. **animation-interaction**: Reference when "animation", "transition", or "micro-interaction" mentioned
 8. **i18n**: Auto-invoke when "translation", "locale", or "multi-language" mentioned
+9. **state-management**: Auto-invoke when "state", "Zustand", "Redux", or "global state" mentioned
+10. **styling-architecture**: Reference when "CSS", "Tailwind", "styled components", or "theming" mentioned
+11. **testing-strategies**: Auto-invoke when "testing", "test coverage", or "E2E" mentioned
+12. **micro-frontends**: Reference when "micro frontend", "module federation", or "independent deployment" mentioned
 
 **Skill Cross-References**:
 - accessibility-audit ↔ visual-regression (component-level vs page-level testing)
@@ -760,14 +808,41 @@ new Intl.NumberFormat(locale, { style: 'currency', currency: 'USD' }).format(123
 - animation-interaction ↔ performance-optimization (60fps GPU-accelerated animations)
 - i18n ↔ accessibility-audit (RTL layout affects screen reader order)
 - i18n ↔ design-tokens (tokens can be locale-specific for CJK fonts)
+- state-management ↔ performance-optimization (re-render optimization, selector patterns)
+- state-management ↔ testing-strategies (testing Zustand stores, TanStack Query mocks)
+- styling-architecture ↔ design-tokens (token consumption in Tailwind/CSS-in-JS)
+- styling-architecture ↔ performance-optimization (CSS bundle size, critical CSS)
+- testing-strategies ↔ accessibility-audit (axe-core integration in component tests)
+- micro-frontends ↔ state-management (shared state across micro-frontends)
 
-**Quality Multiplier**: With these 8 skills, you achieve:
+**Quality Multiplier**: With these 12 skills, you achieve:
 - **95%+ WCAG 2.2 compliance** (up from 60%)
 - **100% design-code consistency** (up from 70%)
 - **40% faster accessible UI development**
 - **300% ROI through automation** (design tokens + i18n)
 - **95% reduction in visual bugs** (visual regression)
 - **50% faster animation implementation** (Framer Motion + GSAP patterns)
+- **60% less state management boilerplate** (Zustand vs Redux)
+- **80%+ test coverage** (component + E2E + visual + a11y)
+
+---
+
+## Enhanced Skills (Phase 4/5)
+
+### cross-domain-patterns ✅
+
+**Skill Reference**: [cross-domain-patterns](../.claude/skills/cross-domain-patterns/SKILL.md)
+
+**Capabilities**: Full-stack patterns combining frontend/backend/database - JWT authentication flow, real-time WebSocket features, S3 file upload, full-stack CRUD, database schemas
+
+**When to use**: Building complete features spanning multiple layers, full-stack authentication, real-time collaboration, file upload systems
+
+**Key patterns**:
+- JWT authentication with frontend login + backend validation + session storage
+- Real-time features with WebSocket client + server + database persistence
+- File upload with frontend form + S3 integration + database metadata
+
+**Trigger phrases**: "full-stack", "authentication flow", "real-time features", "file upload", "end-to-end"
 
 ---
 

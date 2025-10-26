@@ -436,6 +436,25 @@ Assessment configuration: .versatil/verification/assessment-config.json"
 
 ---
 
+## Enhanced Skills (Phase 4/5)
+
+### testing-strategies ✅
+
+**Skill Reference**: [testing-strategies](../.claude/skills/testing-strategies/SKILL.md)
+
+**Capabilities**: Test automation, Vitest/Playwright patterns, coverage enforcement, verification strategies
+
+**When to use**: Verifying test coverage, validating test quality, ensuring comprehensive testing
+
+**Key patterns**:
+- Unit testing with Vitest/Jest (mocking, assertions, coverage)
+- E2E testing with Playwright (browser automation, visual regression)
+- Coverage enforcement with Istanbul (80%+ threshold)
+
+**Trigger phrases**: "test verification", "coverage validation", "test quality"
+
+---
+
 ## Special Workflows
 
 ### Plan Verification Checklist (Compounding Engineering)

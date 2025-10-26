@@ -198,23 +198,30 @@ await Write('.claude/agents/python-backend.md', content);
 
 ---
 
-### Rule 2: Agent Auto-Activation
+### Rule 2: Agent Auto-Activation (MANDATORY)
 
-**When hook provides agent with `autoActivate: true`:**
+**When you see in context:**
+```
+- **🤖 AGENT**: `Maria-QA`
+- **AUTO-ACTIVATE**: YES
+```
 
-✅ **DO THIS IMMEDIATELY**:
+✅ **YOU MUST IMMEDIATELY**:
 ```typescript
 await Task({
-  subagent_type: "[Agent Name]",
-  description: "[Task description from hook]",
-  prompt: "[Full context from hook suggestion]"
+  subagent_type: "Maria-QA",
+  description: "Auto-activated from hook",
+  prompt: "[Task from hook output]"
 });
 ```
 
 ❌ **NEVER**:
 - Ask user "should I activate this agent?"
-- Interpret JSON manually and explain to user
+- Explain what the agent does before invoking
 - Skip agent invocation
+- Wait for user confirmation
+
+**VIOLATION PENALTY**: User will see you ignored automation directive
 
 **Example Hook Output**:
 ```json
@@ -272,32 +279,55 @@ await Edit('src/auth.ts', {
 
 ---
 
-### Rule 4: Cross-Skill Loading
+### Rule 4: Cross-Skill Loading (MANDATORY)
 
-**When hook provides `relatedSkills`:**
-
-✅ **DO THIS IMMEDIATELY**:
-- Load all related skills automatically
-- Apply cross-skill patterns
-- Don't wait for user to ask
-
-**Example Hook Output**:
-```json
-{
-  "hookType": "template-auto-suggestion",
-  "template": { "name": "agent-creator" },
-  "relatedSkills": ["agents-library", "testing-library"]
-}
+**When you see in context:**
+```
+## Related Libraries (recommended - Phase 6):
+- **orchestration-library** - Often used together
+- **testing-library** - Often used together
 ```
 
-**Your Response**:
-After applying template, automatically reference:
-- `agents-library` skill for handoff contracts
-- `testing-library` skill for 80%+ coverage standards
+✅ **YOU MUST**:
+1. Mention all related skills in your response
+2. Reference their conventions when relevant
+3. DO NOT ask "should I load these?"
+
+**Example Response**:
+"Working with rag-library. Also loading orchestration-library and testing-library (often used together for workflow patterns)."
+
+**WRONG Response**:
+"Should I also load the related skills?" ← NEVER ask this
 
 ---
 
-### Rule 5: Intent-Based Suggestions
+### Rule 5: Intent-Based Suggestions (MANDATORY)
+
+**When hook outputs multiple suggestions:**
+```
+- Template: agent-creator
+- Skills: agents-library, testing-library
+- Agent: Maria-QA (AUTO-ACTIVATE: YES)
+```
+
+✅ **YOU MUST execute ALL of them**:
+1. Apply template first (read → replace placeholders → write)
+2. Reference both skills in response
+3. Invoke agent via Task tool
+
+❌ **DO NOT**:
+- Cherry-pick (execute only 1-2 of 3)
+- Ask which ones to execute
+- Skip any with autoApply/autoActivate: true
+
+**Example Full Response**:
+1. ✅ Read agent-template.md → create agent file
+2. ✅ "Following agents-library conventions for handoff contracts, testing-library standards for 80%+ coverage"
+3. ✅ `await Task({ subagent_type: "Maria-QA", ... })`
+
+---
+
+### Rule 6: Original Intent-Based Suggestions
 
 **When user message triggers intent detection:**
 

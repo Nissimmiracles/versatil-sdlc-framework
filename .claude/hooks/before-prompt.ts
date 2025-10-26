@@ -111,17 +111,8 @@ const INTENT_PATTERNS: Record<string, IntentConfig> = {
       { type: 'library', skill: 'testing-library', reason: 'Agent testing (80%+ coverage)' }
     ]
   },
-  implementing_auth: {
-    regex: /\bauth\b|login|jwt|oauth|session|cookie.*token|authenticate/i,
-    suggestions: [
-      {
-        type: 'rag-pattern',
-        pattern: 'jwt-auth-cookies',
-        success: '98%',
-        effort: '12h'
-      }
-    ]
-  },
+  // implementing_auth removed - jwt-auth-cookies pattern doesn't exist yet
+  // TODO: Re-enable when .versatil/learning/patterns/jwt-auth-cookies.json is created
   writing_tests: {
     regex: /\btest\b|coverage|jest|spec|\.test\.|\.spec\.|unit.*test|integration.*test/i,
     suggestions: [
@@ -470,12 +461,9 @@ async function main() {
     }
 
     // Output minimal context (notification only, no full files)
-    const combinedContext = {
-      role: 'system',
-      content: contextContent
-    };
-
-    console.log(JSON.stringify(combinedContext));
+    // UserPromptSubmit hooks MUST output plain text to stdout (NOT JSON with role/content wrapper)
+    // Per SDK docs: "stdout is added as context for Claude" when exit code is 0
+    console.log(contextContent);
 
   } catch (error) {
     // Fail gracefully

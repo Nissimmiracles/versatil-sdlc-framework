@@ -36,6 +36,10 @@
           {
             "type": "command",
             "command": ".claude/hooks/dist/subagent-stop.cjs"
+          },
+          {
+            "type": "command",
+            "command": ".claude/hooks/dist/post-action-validator.cjs"
           }
         ]
       }

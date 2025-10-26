@@ -39,13 +39,15 @@ function isNewFile(filePath: string): boolean {
   try {
     const stats = require('fs').statSync(filePath);
     // File is "new" if:
-    // 1. Very small (< 200 bytes) - likely just created
-    // 2. Modified very recently (< 10 seconds ago)
+    // 1. Empty (0 bytes)
+    // 2. Very small (< 200 bytes) - likely just created
+    // 3. Modified very recently (< 30 seconds ago) - increased from 10s
+    const isEmpty = stats.size === 0;
     const isSmall = stats.size < 200;
-    const isRecent = (Date.now() - stats.mtimeMs) < 10000;
-    return isSmall || isRecent;
+    const isRecent = (Date.now() - stats.mtimeMs) < 30000; // 30 seconds
+    return isEmpty || isSmall || isRecent;
   } catch {
-    return false;
+    return false; // File doesn't exist yet (will fail on Write matcher)
   }
 }
 
