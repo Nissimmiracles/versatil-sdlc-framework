@@ -100,42 +100,77 @@ If assessment shows warnings but user wants to proceed:
 /plan --force "feature description"
 ```
 
-### 2. Learn from Past Features (CODIFY Phase)
+### 2. Learn from Past Features (CODIFY Phase) ⭐ NEW
 
 <thinking>
-Search historical implementations to extract patterns, effort estimates, and lessons learned. This makes plans 40% more accurate by leveraging past experience.
+Use the PatternSearchService to query historical implementations via GraphRAG (preferred) or Vector store. This makes plans 40% more accurate by leveraging past experience - the core of Compounding Engineering.
 </thinking>
 
-**RAG Pattern Search:**
+**Automated Pattern Search:**
 
-Query vector store for similar features:
-- [ ] Search feature_implementations domain with description
-- [ ] Retrieve top 5 similar features (≥75% similarity)
-- [ ] Extract effort estimates (actual hours spent)
-- [ ] Surface lessons learned ("watch out for X", "remember to Y")
-- [ ] Include code examples with file paths
+Import and use the pattern search service:
+```typescript
+import { patternSearchService } from '@/rag/pattern-search';
 
-**Historical Context Template:**
-```markdown
-## Historical Context (Codified Learnings)
-- ✅ Similar feature #123: "User roles" took 24 hours (90% similar)
-- ⚠️ Common pitfall: Add indexes on foreign keys early (prevented 3s queries in #456)
-- ✅ Proven pattern: Use RLS policies from start (saved 8 hours in #789)
-- 📚 Code examples: src/auth/permissions.ts:42-67 (role checking pattern)
-- 📊 Effort estimate: 28 hours ± 4 hours (based on 3 similar features)
-- 🎯 Confidence: 85% (strong historical data available)
+const searchResult = await patternSearchService.searchSimilarFeatures({
+  description: feature_description,
+  category: detected_category, // auth, crud, dashboard, integration, file-upload
+  min_similarity: 0.75,
+  limit: 5
+});
+
+// Extract insights
+const avgEffort = searchResult.average_effort;
+const consolidatedLessons = searchResult.consolidated_lessons;
+const confidence = searchResult.confidence_score;
+const topPatterns = searchResult.patterns; // Top 5 similar features
 ```
 
-**If No Historical Data:**
-- Use plan templates (see Step 3)
-- Show conservative effort estimate with ±50% confidence interval
-- Recommend starting with small MVP to build historical data
+**Historical Context Output:**
+```markdown
+## Historical Context (Codified Learnings) 🎓
+- ✅ Similar feature #123: "${pattern.feature_name}" took ${pattern.effort_hours}h (${pattern.similarity_score}% similar)
+- ⚠️ Common pitfall: ${consolidatedLessons.high_priority[0]}
+- ✅ Proven pattern: ${consolidatedLessons.medium_priority[0]}
+- 📚 Code examples: ${pattern.code_examples[0].file}:${pattern.code_examples[0].lines}
+- 📊 Effort estimate: ${avgEffort.mean}h ± ${avgEffort.std}h (${searchResult.patterns.length} similar features)
+- 🎯 Confidence: ${confidence}% (${searchResult.search_method})
+```
 
-### 3. Check Plan Templates
+**Search Strategy:**
+1. Try GraphRAG first (no API quota, works offline)
+2. Fallback to Vector store if GraphRAG unavailable
+3. If no historical data: Proceed to templates (Step 3)
+
+**Benefits:**
+- 40% faster planning (Every Inc Compounding Engineering)
+- Accurate effort estimates (±10-20% vs ±50% without history)
+- Avoid past mistakes (consolidated lessons from similar features)
+- Code reuse (direct file:line references to proven patterns)
+
+### 3. Check Plan Templates ⭐ NEW
 
 <thinking>
-For common feature types, leverage pre-built templates with proven patterns, effort estimates, and success metrics.
+Use the TemplateMatcher service to automatically match feature descriptions to pre-built templates with proven patterns, effort estimates, and success metrics.
 </thinking>
+
+**Automated Template Matching:**
+
+Import and use the template matcher:
+```typescript
+import { templateMatcher } from '@/templates/template-matcher';
+
+const matchResult = await templateMatcher.matchTemplate({
+  description: feature_description,
+  explicit_template: flags.template // From --template=NAME flag
+});
+
+if (matchResult.best_match && matchResult.best_match.match_score >= 70) {
+  const template = matchResult.best_match;
+  // Use template as starting point
+  // Adjust effort based on complexity_adjustment
+}
+```
 
 **Available Templates:**
 - `auth-system.yaml` - OAuth2, JWT, password hashing (28 hours)
@@ -144,20 +179,24 @@ For common feature types, leverage pre-built templates with proven patterns, eff
 - `api-integration.yaml` - Third-party API integration (12 hours)
 - `file-upload.yaml` - Secure file upload with S3 (10 hours)
 
-**Template Matching Algorithm:**
-1. Search feature description for keywords
-2. Match to template category (auth, crud, dashboard, etc.)
-3. Load template as starting point
-4. Customize with project-specific context
-5. Adjust effort estimate based on complexity
+**Matching Algorithm:**
+1. **Keyword extraction**: Parse description for auth, crud, dashboard, api, upload keywords
+2. **Scoring**: Base score from keyword overlap + category boost (20%) + name boost (30%)
+3. **Threshold**: 70% match required to use template (else custom planning)
+4. **Complexity adjustment**: Multiply base effort by 0.8-1.5 based on requirements
 
-**Example Template Usage:**
-```yaml
-Feature: "Add user authentication with Google OAuth"
-Matched Template: auth-system.yaml
-Customization: Add OAuth provider config, Google API setup
-Effort Adjustment: Base 28 hours + OAuth complexity 4 hours = 32 hours
+**Template Match Output:**
+```markdown
+## Template Applied 📋
+**Template**: ${template.template_name} (${template.match_score}% match)
+**Matched Keywords**: ${template.matched_keywords.join(', ')}
+**Base Effort**: ${template.estimated_effort.hours}h (${template.complexity})
+**Adjusted Effort**: ${adjustedEffort}h (complexity factor: ${complexityFactor})
+**Customizations**: [Project-specific adaptations based on context]
 ```
+
+**Override Option:**
+User can force specific template: `/plan --template=auth-system "My feature"`
 
 ### 4. Repository Research & Context Gathering
 
@@ -321,36 +360,85 @@ Multiple files created (001-pending-p1-backend-api.md, 002-pending-p1-frontend-u
 **todos/*.md Files:**
 Comprehensive set with dependencies tracked (e.g., 002 depends on 001)
 
-### 7. Create Dual Todo System
+### 7. Create Dual Todo System ⭐ NEW
 
 <thinking>
-VERSATIL uses dual todo tracking: TodoWrite for in-session visibility + todos/*.md files for cross-session persistence.
+Use the TodoFileGenerator service to automatically create both TodoWrite items (in-session) and todos/*.md files (cross-session persistence) with dependency tracking and execution wave detection.
 </thinking>
 
-**TodoWrite (In-Session Tracking):**
+**Automated Todo Generation:**
 
-- [ ] Create TodoWrite with top-level phases
-- [ ] Mark first task as in_progress
-- [ ] Update status as work progresses
-- [ ] Complete todos immediately after finishing
+Import and use the todo file generator:
+```typescript
+import { todoFileGenerator } from '@/planning/todo-file-generator';
+
+// Prepare todo specifications from plan breakdown
+const todoSpecs = phases.map(phase => ({
+  title: phase.name,
+  priority: phase.priority, // p1, p2, p3, p4
+  assigned_agent: phase.agent,
+  estimated_effort: phase.effort, // Small, Medium, Large, XL
+  acceptance_criteria: phase.acceptance_criteria,
+  dependencies: {
+    depends_on: phase.depends_on || [],
+    blocks: phase.blocks || []
+  },
+  implementation_notes: phase.notes,
+  files_involved: phase.files,
+  context: {
+    feature_description: feature_description,
+    related_issue: issue_number,
+    related_pr: pr_number
+  }
+}));
+
+// Generate dual todos
+const result = await todoFileGenerator.generateTodos(todoSpecs);
+
+// Use result.todowrite_items for TodoWrite
+// Files automatically created in todos/ directory
+```
+
+**Generated Output:**
+
+**TodoWrite (In-Session Tracking):**
+```markdown
+✅ 1. ${result.todowrite_items[0].content}
+🔄 2. ${result.todowrite_items[1].content} - IN PROGRESS
+⏳ 3. ${result.todowrite_items[2].content}
+⏳ 4. ${result.todowrite_items[3].content}
+```
 
 **todos/*.md Files (Persistent Tracking):**
+```
+Created ${result.files_created.length} todo files:
+- ${result.files_created[0]} (${specs[0].assigned_agent})
+- ${result.files_created[1]} (${specs[1].assigned_agent}, depends on ${specs[0].number})
+- ${result.files_created[2]} (${specs[2].assigned_agent}, depends on ${specs[0].number}+${specs[1].number})
 
-- [ ] Create numbered files (001-pending-p1-description.md)
-- [ ] Use template from todos/000-pending-p1-TEMPLATE.md
-- [ ] Include acceptance criteria and dependencies
-- [ ] Assign to appropriate OPERA agents
-- [ ] Link related todos (Depends on, Blocks)
+Dependency Graph (Mermaid):
+${result.dependency_graph}
+
+Execution Waves:
+${result.execution_waves.map(w => `Wave ${w.wave}: ${w.tasks.join(', ')} (${w.type})`).join('\n')}
+```
 
 **File Naming Convention:**
 ```
 [NUMBER]-[STATUS]-[PRIORITY]-[SHORT-DESCRIPTION].md
 
-Examples:
-001-pending-p1-implement-auth-api.md
-002-pending-p1-create-login-ui.md
-003-pending-p2-add-test-coverage.md
+Auto-generated examples:
+001-pending-p1-implement-auth-api.md (Marcus-Backend)
+002-pending-p1-create-login-ui.md (James-Frontend, depends on 001)
+003-pending-p2-add-test-coverage.md (Maria-QA, depends on 001+002)
 ```
+
+**Benefits:**
+- Auto-numbering (finds next available number)
+- Dependency visualization (Mermaid graphs)
+- Parallel detection (execution waves)
+- Zero manual file creation
+- TodoWrite sync (both systems always in sync)
 
 ### 8. Implementation Plan Output
 

@@ -13,22 +13,9 @@ module.exports = {
   // Root directory resolution - set to project root, not config dir
   rootDir: require('path').resolve(__dirname, '..'),
 
-  preset: 'ts-jest',
+  // NO preset - prevents babel-jest from auto-activating (Native SDK requirement)
   testEnvironment: 'node',
   roots: ['<rootDir>/src', '<rootDir>/tests'],
-
-  // Explicitly disable Babel (Native SDK uses ts-node)
-  globals: {
-    'ts-jest': {
-      isolatedModules: true,
-      babelConfig: false
-    }
-  },
-
-  // Force Jest to NEVER use babel-jest
-  transformIgnorePatterns: [
-    'node_modules/(?!(@modelcontextprotocol)/)'
-  ],
 
   // Hybrid test matching - Jest handles unit tests, Playwright handles e2e
   testMatch: [

@@ -2,10 +2,11 @@
 
 ## Status
 - [x] In Progress
-- **Priority**: P1 (Critical)
+- **Priority**: P1 (Critical - Master tracker)
 - **Created**: 2025-10-13
-- **Assigned**: Alex-BA + Marcus-Backend + James-Frontend (Parallel Research Team)
-- **Estimated Effort**: Large (6-8 hours)
+- **Updated**: 2025-10-26 (organized into 6 sub-tasks)
+- **Assigned**: All Agents (Coordination)
+- **Estimated Effort**: Large (9 hours total across 6 sub-tasks)
 
 ## Description
 
@@ -13,14 +14,48 @@ Transform the `/plan` command from basic parallel research into a fully empowere
 
 ## Acceptance Criteria
 
-- [ ] **Assess Phase Added**: Pre-planning quality gates check dependencies, health, prerequisites
-- [ ] **Codify Phase Added**: Auto-learn from similar past features using RAG search
-- [ ] **Plan Templates**: Pre-built templates for auth, CRUD, dashboards, API integrations
-- [ ] **Effort Estimation**: AI-powered effort estimates based on historical data
-- [ ] **Historical Context**: Search and incorporate lessons from similar past implementations
-- [ ] **Enhanced Output**: Plans include confidence scores, risks, and alternative approaches
-- [ ] **Three-Tier Analysis**: Database (Dana) → API (Marcus) → Frontend (James) coordination
-- [ ] **TodoWrite Integration**: Auto-create dual todos (TodoWrite + todos/*.md files)
+- [x] **Assess Phase Added**: Pre-planning quality gates ✅ (already implemented via `/assess` command)
+- [ ] **Codify Phase Added**: Auto-learn from similar past features → **002-pending-p1-pattern-search-service.md**
+- [ ] **Plan Templates**: Pre-built templates → **003-pending-p1-template-matcher-service.md**
+- [ ] **Effort Estimation**: From historical data → **002 + 003** (pattern search + templates)
+- [ ] **Historical Context**: Incorporate lessons → **002** (pattern search service)
+- [ ] **Enhanced Output**: Confidence/risks/alternatives → **006** (plan command integration)
+- [x] **Three-Tier Analysis**: Database → API → Frontend ✅ (already in plan.md)
+- [ ] **TodoWrite Integration**: Dual todos → **004-pending-p1-todo-file-generator-service.md**
+
+## Sub-Task Breakdown
+
+This master task has been broken down into 6 organized sub-tasks:
+
+### Wave 1: Core Services (Parallel - 3 hours)
+- **002-pending-p1-pattern-search-service.md** *(Marcus + Dr.AI-ML)*
+  - Pattern search from RAG (GraphRAG + Vector store)
+  - Historical effort estimates and lessons learned
+
+- **003-pending-p1-template-matcher-service.md** *(Sarah-PM + Alex-BA)*
+  - Auto-match feature descriptions to 5 existing templates
+  - Keyword matching and scoring algorithm
+
+- **004-pending-p1-todo-file-generator-service.md** *(Sarah-PM + Marcus)*
+  - Create persistent todos/*.md files from plans
+  - Dual todo system (TodoWrite + files)
+
+### Wave 2: Quality Gate (Sequential - 2 hours)
+- **005-pending-p2-integration-tests-plan-command.md** *(Maria-QA)*
+  - Integration tests for full /plan workflow
+  - Test all services working together
+
+### Wave 3: Integration (Sequential - 2 hours)
+- **006-pending-p1-plan-command-integration.md** *(Sarah-PM + Alex-BA + Marcus)*
+  - Integrate all services into .claude/commands/plan.md
+  - Enhanced output format with confidence, risk, alternatives
+
+### Wave 4: Documentation (Sequential - 1 hour)
+- **007-pending-p2-documentation-updates.md** *(Sarah-PM + Alex-BA)*
+  - Update all docs with enhanced features
+  - Create compounding engineering guide
+
+**Total**: 9 hours across 6 sub-tasks
 
 ## Context
 
@@ -38,11 +73,18 @@ Transform the `/plan` command from basic parallel research into a fully empowere
 
 ## Dependencies
 
-- **Depends on**: None (starting point for v7.0)
-- **Blocks**:
-  - 002 - Enhance /work command (needs improved plans)
-  - 003 - Enhance /review command (needs planning context)
-- **Related to**: All Phase 1 workflow enhancements
+- **Depends on**: None (master coordination task)
+- **Blocks**: All sub-tasks (002, 003, 004, 005, 006, 007)
+- **Sub-tasks**:
+  - 002 - Pattern Search Service (P1)
+  - 003 - Template Matcher Service (P1)
+  - 004 - Todo File Generator Service (P1)
+  - 005 - Integration Tests (P2)
+  - 006 - Plan Command Integration (P1)
+  - 007 - Documentation Updates (P2)
+- **Future work**:
+  - Enhance /work command (needs improved plans from this task)
+  - Enhance /review command (needs planning context)
 
 ## Implementation Notes
 
@@ -318,13 +360,15 @@ Implement OAuth2-compliant authentication with JWT tokens, secure password hashi
 When marking as resolved:
 
 1. ✅ All 8 acceptance criteria met
-2. ✅ Assessment phase working (health check, git status, dependencies)
-3. ✅ Codify phase working (RAG search returns similar features)
-4. ✅ At least 3 plan templates created (auth, CRUD, dashboard)
-5. ✅ Effort estimation showing confidence intervals
-6. ✅ TodoWrite + todos/*.md files auto-created
-7. ✅ Tests passing (80%+ coverage)
-8. ✅ Documentation updated
+2. ✅ All 6 sub-tasks (002-007) marked as RESOLVED
+3. ✅ Pattern search service implemented and tested (002)
+4. ✅ Template matcher service implemented and tested (003)
+5. ✅ Todo file generator implemented and tested (004)
+6. ✅ Integration tests passing (005)
+7. ✅ Plan command integration complete (006)
+8. ✅ Documentation updated (007)
+9. ✅ Manual testing complete (all 5 templates work)
+10. ✅ Compounding engineering demonstrated (40% improvement path)
 
 ---
 
