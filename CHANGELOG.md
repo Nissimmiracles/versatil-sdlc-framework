@@ -5,6 +5,38 @@ All notable changes to the VERSATIL SDLC Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.5.1] - 2025-10-26
+
+### Added
+- **8 New MCP Tools** for Pattern Library Integration
+  - pattern_search: Search v7.5.0 pattern library with keyword matching
+  - pattern_apply: Apply pattern template with guided setup
+  - websocket_setup: Socket.io server + client configuration
+  - payment_setup: Stripe/PayPal integration with webhooks
+  - s3_upload_setup: AWS S3 file upload with image optimization
+  - email_setup: SendGrid/Nodemailer email system
+  - rate_limit_setup: Redis-backed API rate limiting
+  - telemetry_report: Generate analytics report via MCP
+
+- **MCP Ecosystem Growth**: 21 → 29 tools (+38%)
+- **Oliver-MCP Agent Enhancement**: Intelligent routing for pattern tools
+- **Pattern Library Access**: MCP-based search, apply, and setup (vs manual JSON reading)
+
+### Changed
+- config/mcp.json: Added 8 pattern tools, updated capabilities
+- .claude/agents/oliver-mcp.md: Added Pattern Library section with routing rules
+- package.json: Version 7.5.0 → 7.5.1
+
+### Files Changed
+- NEW: src/mcp/pattern-mcp-tools.ts (420+ lines, 8 tool implementations)
+- MODIFIED: config/mcp.json (+8 tools)
+- MODIFIED: .claude/agents/oliver-mcp.md (Pattern Library routing)
+- MODIFIED: package.json (version bump)
+- NEW: docs/v7.5.1_RELEASE_NOTES.md
+
+### Migration
+No breaking changes. Backward-compatible patch release.
+
 ## [7.5.0] - 2025-10-26
 
 ### Added

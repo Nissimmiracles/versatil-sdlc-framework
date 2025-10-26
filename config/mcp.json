@@ -1,6 +1,6 @@
 {
   "name": "versatil-sdlc-framework",
-  "version": "6.1.0",
+  "version": "7.5.1",
   "description": "VERSATIL SDLC Framework MCP Server - AI-native development with 18 OPERA agents (8 core + 10 sub-agents), 12-MCP ecosystem (including GitMCP), adaptive intelligence, and automated quality gates. Local-first architecture with full SDLC orchestration.",
   "author": "VERSATIL Development Team",
   "license": "MIT",
@@ -149,6 +149,54 @@
         "description": "Query GitHub repository documentation via GitMCP (Alex-BA, Marcus, James, Dr.AI-ML)",
         "category": "documentation",
         "readOnly": true
+      },
+      {
+        "name": "pattern_search",
+        "description": "Search v7.5.0 pattern library (WebSocket, Payments, S3, Email, Rate-limiting) with implementation code",
+        "category": "patterns",
+        "readOnly": true
+      },
+      {
+        "name": "pattern_apply",
+        "description": "Apply pattern template to current project with guided setup and code generation",
+        "category": "patterns",
+        "readOnly": false
+      },
+      {
+        "name": "websocket_setup",
+        "description": "Set up WebSocket real-time communication (Socket.io server + client hooks)",
+        "category": "patterns",
+        "readOnly": false
+      },
+      {
+        "name": "payment_setup",
+        "description": "Set up payment integration (Stripe/PayPal with webhooks and subscriptions)",
+        "category": "patterns",
+        "readOnly": false
+      },
+      {
+        "name": "s3_upload_setup",
+        "description": "Set up S3 file upload (presigned URLs, image optimization, multipart upload)",
+        "category": "patterns",
+        "readOnly": false
+      },
+      {
+        "name": "email_setup",
+        "description": "Set up email templates system (SendGrid/Nodemailer with Handlebars)",
+        "category": "patterns",
+        "readOnly": false
+      },
+      {
+        "name": "rate_limit_setup",
+        "description": "Set up API rate limiting (Redis-backed with token bucket and tiered limits)",
+        "category": "patterns",
+        "readOnly": false
+      },
+      {
+        "name": "telemetry_report",
+        "description": "Generate telemetry analytics report (hook performance, agent activation, pattern usage)",
+        "category": "analytics",
+        "readOnly": true
       }
     ],
     "resources": [
@@ -279,7 +327,7 @@
       }
     ],
     "capabilities": [
-      "21 MCP Tools: Full SDLC automation (agent management, orchestration, testing, deployment, analytics, documentation via GitMCP)",
+      "29 MCP Tools: Full SDLC automation + v7.5.0 patterns (agent management, orchestration, testing, deployment, analytics, documentation, pattern library)",
       "5 MCP Resources: Real-time framework data (agent status, quality metrics, performance, SDLC phase, activity logs)",
       "5 MCP Prompts: AI-powered development guidance (code analysis, refactoring, testing, security, performance)",
       "17 specialized OPERA agents (8 core + 10 language-specific sub-agents)",
@@ -310,7 +358,8 @@
       "emergency-response",
       "autonomous-goals",
       "browser-automation",
-      "documentation"
+      "documentation",
+      "patterns"
     ],
     "tags": [
       "sdlc",
@@ -325,7 +374,14 @@
       "adaptive-learning",
       "documentation",
       "github",
-      "gitmcp"
+      "gitmcp",
+      "patterns",
+      "websocket",
+      "payments",
+      "s3",
+      "email",
+      "rate-limiting",
+      "telemetry"
     ],
     "requirements": {
       "node": ">=16.0.0",
