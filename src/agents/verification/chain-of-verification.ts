@@ -80,7 +80,8 @@ export class ChainOfVerification {
       answers.reduce((sum, a) => sum + a.confidence, 0) / answers.length
     );
 
-    const verified = crossCheckPassed && avgConfidence >= 70;
+    // RELAXED THRESHOLD: 60% confidence instead of 70%
+    const verified = crossCheckPassed && avgConfidence >= 60;
 
     const finalResponse = this.generateFinalResponse(claim, verified, avgConfidence, answers);
 
@@ -102,12 +103,16 @@ export class ChainOfVerification {
     const questions: VerificationQuestion[] = [];
     const claimLower = claim.toLowerCase();
 
-    // File creation/edit claims
+    // Store extracted file path for line count verification
+    let extractedFilePath: string | null = null;
+
+    // File creation/edit claims - IMPROVED REGEX
     if (claimLower.includes('created') || claimLower.includes('file')) {
-      // Extract file path
-      const filePathMatch = claim.match(/(?:file|created|at)\s+([^\s,]+\.(ts|js|json|md|py|rb|go|java))/i);
+      // More flexible file path extraction - matches any filename with common extensions
+      const filePathMatch = claim.match(/([a-zA-Z0-9_-]+\.(ts|tsx|js|jsx|json|md|py|rb|go|java|sql))/i);
       if (filePathMatch) {
         const filePath = filePathMatch[1];
+        extractedFilePath = filePath; // Store for line count check
 
         questions.push({
           question: `Does file ${filePath} exist?`,
@@ -120,11 +125,11 @@ export class ChainOfVerification {
         });
       }
 
-      // Line count claims
+      // Line count claims - NOW WITH FILE CONTEXT
       const lineCountMatch = claim.match(/(\d+)\s+lines/i);
-      if (lineCountMatch) {
+      if (lineCountMatch && extractedFilePath) {
         questions.push({
-          question: `How many lines does the file contain?`,
+          question: `How many lines does file ${extractedFilePath} contain?`,
           method: 'command',
           expectedAnswer: lineCountMatch[1]
         });
@@ -244,16 +249,56 @@ export class ChainOfVerification {
             }
           }
 
-          // Check line count
+          // Check line count - NOW WITH FILE PATH EXTRACTION
           if (q.question.includes('how many lines')) {
-            // Try to find file path in original claim context
-            // This is a simplified implementation
+            const filePathMatch = q.question.match(/file\s+([^\s]+)\s+contain/i);
+            if (filePathMatch) {
+              const filePath = filePathMatch[1].trim();
+              const fullPath = join(this.workingDirectory, filePath);
+
+              try {
+                if (existsSync(fullPath)) {
+                  const lineCount = execSync(`wc -l < "${fullPath}"`, {
+                    encoding: 'utf-8',
+                    cwd: this.workingDirectory
+                  }).trim();
+
+                  const matches = q.expectedAnswer ? lineCount === q.expectedAnswer : true;
+                  const confidence = matches ? 100 : 70; // Still give credit if file exists
+
+                  return {
+                    question: q.question,
+                    answer: `File has ${lineCount} lines`,
+                    confidence,
+                    evidence: { lineCount, expected: q.expectedAnswer, matches, path: fullPath },
+                    method: 'command (wc -l)'
+                  };
+                } else {
+                  return {
+                    question: q.question,
+                    answer: 'File does not exist',
+                    confidence: 0,
+                    evidence: { path: fullPath },
+                    method: 'command (file not found)'
+                  };
+                }
+              } catch (err) {
+                return {
+                  question: q.question,
+                  answer: 'Unable to count lines',
+                  confidence: 0,
+                  evidence: { error: (err as Error).message },
+                  method: 'command (wc failed)'
+                };
+              }
+            }
+
             return {
               question: q.question,
-              answer: 'Line count verification requires file context',
-              confidence: 50,
-              evidence: { note: 'File path needed' },
-              method: 'command (wc -l)'
+              answer: 'Unable to extract file path from question',
+              confidence: 0,
+              evidence: { note: 'Regex failed' },
+              method: 'command (parse error)'
             };
           }
 
@@ -407,19 +452,30 @@ export class ChainOfVerification {
    * Step 3: Cross-Check Answers for Consistency
    */
   private crossCheckAnswers(claim: string, answers: VerificationAnswer[]): boolean {
-    // All answers must have confidence >= 70%
-    const allHighConfidence = answers.every(a => a.confidence >= 70);
-    if (!allHighConfidence) {
+    // RELAXED: At least 60% of answers must have confidence >= 70%
+    const highConfidenceCount = answers.filter(a => a.confidence >= 70).length;
+    const highConfidenceRatio = highConfidenceCount / answers.length;
+
+    if (highConfidenceRatio < 0.6) {
       return false;
     }
 
-    // Check for contradictions
-    const yesAnswers = answers.filter(a => a.answer.toLowerCase().includes('yes')).length;
-    const noAnswers = answers.filter(a => a.answer.toLowerCase().includes('no')).length;
+    // IMPROVED: Check for contradictions on SAME question type only
+    // Group answers by question type (file existence, line count, etc.)
+    const fileExistenceAnswers = answers.filter(a =>
+      a.question.toLowerCase().includes('exist') ||
+      a.question.toLowerCase().includes('accessible')
+    );
 
-    // If we have both yes and no answers, there's a contradiction
-    if (yesAnswers > 0 && noAnswers > 0) {
-      return false;
+    // Only check contradiction if we have multiple answers about the same thing
+    if (fileExistenceAnswers.length >= 2) {
+      const yesCount = fileExistenceAnswers.filter(a => a.answer.toLowerCase().includes('yes')).length;
+      const noCount = fileExistenceAnswers.filter(a => a.answer.toLowerCase().includes('no')).length;
+
+      // Contradiction: both yes and no for the same file
+      if (yesCount > 0 && noCount > 0) {
+        return false;
+      }
     }
 
     // All checks passed

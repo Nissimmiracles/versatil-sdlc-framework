@@ -111,8 +111,19 @@ const INTENT_PATTERNS: Record<string, IntentConfig> = {
       { type: 'library', skill: 'testing-library', reason: 'Agent testing (80%+ coverage)' }
     ]
   },
-  // implementing_auth removed - jwt-auth-cookies pattern doesn't exist yet
-  // TODO: Re-enable when .versatil/learning/patterns/jwt-auth-cookies.json is created
+  implementing_auth: {
+    regex: /auth|authentication|login|signup|jwt|oauth|session|cookie.*auth/i,
+    suggestions: [
+      {
+        type: 'rag-pattern',
+        pattern: 'jwt-auth-cookies',
+        path: '.versatil/learning/patterns/jwt-auth-cookies.json',
+        productivity: 'Proven pattern - 2-3 hours typical'
+      },
+      { type: 'library', skill: 'marcus-backend', reason: 'API security and OWASP validation' },
+      { type: 'library', skill: 'testing-library', reason: 'Auth testing (80%+ coverage)' }
+    ]
+  },
   writing_tests: {
     regex: /\btest\b|coverage|jest|spec|\.test\.|\.spec\.|unit.*test|integration.*test/i,
     suggestions: [
