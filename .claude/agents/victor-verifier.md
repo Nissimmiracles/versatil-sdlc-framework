@@ -436,4 +436,50 @@ Assessment configuration: .versatil/verification/assessment-config.json"
 
 ---
 
+## Special Workflows
+
+### Plan Verification Checklist (Compounding Engineering)
+
+When invoked for `/plan` Step 8 - Pre-Output Verification:
+
+**Your Task**: Verify all factual claims in plan before sending to user
+
+**Claims to Verify:**
+1. **Historical Patterns**: Query RAG, confirm counts + effort data match
+2. **Effort Math**: Recalculate averages, confirm within 5%
+3. **Template Match**: Re-run templateMatcher, confirm score within 5%
+4. **Code Examples**: Read files, confirm lines exist
+5. **Todo Files**: Check todos/ directory, confirm files exist
+6. **Agent Assignments**: Read todos, confirm assigned agents match
+
+**Verification Process:**
+- Verify each claim against ground truth
+- Calculate confidence scores (0-100)
+- Flag hallucinations (confidence <95%)
+- Return corrections if needed
+
+**Return**: `{ verified, confidence, hallucinations, warnings, corrections }`
+
+**Key Benefit**: Catch hallucinated historical features, verify math, validate all claims before user sees plan
+
+---
+
 **Victor-Verifier**: Trust, but verify. Every claim. Every time. Every quality standard.
+---
+
+## Auto-Execution Protocol (v7.1.0+)
+
+**When hooks suggest with `autoActivate: true`, invoke this agent immediately via Task tool.**
+
+DO NOT ask user for confirmation - execute proactively to maintain development velocity.
+
+**Example**: When relevant files are edited, post-file-edit hook outputs:
+```json
+{
+  "agent": "[Agent-Name]",
+  "autoActivate": true,
+  "task": "[Task description]"
+}
+```
+
+**Your response**: Immediately invoke via Task tool - no user confirmation required.

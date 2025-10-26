@@ -33,11 +33,117 @@ const fileName = basename(filePath);
 const relativePath = filePath.replace(workingDirectory, '').replace(/^\//, '');
 
 /**
+ * Helper: Detect if file is newly created (not just edited) - Phase 6
+ */
+function isNewFile(filePath: string): boolean {
+  try {
+    const stats = require('fs').statSync(filePath);
+    // File is "new" if:
+    // 1. Very small (< 200 bytes) - likely just created
+    // 2. Modified very recently (< 10 seconds ago)
+    const isSmall = stats.size < 200;
+    const isRecent = (Date.now() - stats.mtimeMs) < 10000;
+    return isSmall || isRecent;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Agent Activation Rules
  * Based on file patterns and extensions
+ * Phase 6: Enhanced with template auto-suggestions for new files
  */
 
-// Maria-QA: Test files
+// Phase 6: Template auto-suggestion for new agent files
+if (fileName.match(/\.claude\/agents\/.*\.md$/) && isNewFile(filePath)) {
+  console.log(JSON.stringify({
+    hookType: 'template-auto-suggestion',
+    message: '💡 Creating new agent detected',
+    template: {
+      name: 'agent-creator',
+      path: '.claude/skills/code-generators/agent-creator/assets/agent-template.md',
+      productivity: '6x faster (60min → 10min)',
+      placeholders: 40
+    },
+    action: 'COPY_TEMPLATE_NOW',
+    instructions: [
+      'Read template from assets/ path',
+      'Replace {{AGENT_NAME}}, {{ROLE}}, {{TOOLS}}, etc.',
+      'Write to target location',
+      'Notify user what was applied'
+    ],
+    relatedSkills: ['agents-library', 'testing-library'],
+    autoApply: true,
+    priority: 'high'
+  }));
+  process.exit(0);
+}
+
+// Phase 6: Template auto-suggestion for new command files
+if (fileName.match(/\.claude\/commands\/.*\.md$/) && isNewFile(filePath)) {
+  console.log(JSON.stringify({
+    hookType: 'template-auto-suggestion',
+    message: '💡 Creating new command detected',
+    template: {
+      name: 'command-creator',
+      path: '.claude/skills/code-generators/command-creator/assets/command-template.md',
+      productivity: '5.6x faster (45min → 8min)',
+      placeholders: 30
+    },
+    action: 'COPY_TEMPLATE_NOW',
+    relatedSkills: ['orchestration-library', 'planning-library'],
+    autoApply: true,
+    priority: 'high'
+  }));
+  process.exit(0);
+}
+
+// Phase 6: Template auto-suggestion for new hook files
+if (fileName.match(/\.claude\/hooks\/.*\.ts$/) && isNewFile(filePath)) {
+  console.log(JSON.stringify({
+    hookType: 'template-auto-suggestion',
+    message: '💡 Creating new hook detected',
+    template: {
+      name: 'hook-creator',
+      path: '.claude/skills/code-generators/hook-creator/assets/hook-template.ts',
+      productivity: '5x faster (30min → 6min)',
+      placeholders: 25
+    },
+    action: 'COPY_TEMPLATE_NOW',
+    relatedSkills: ['hooks-library', 'rag-patterns'],
+    relatedPattern: 'native-sdk-integration',
+    autoApply: true,
+    priority: 'high'
+  }));
+  process.exit(0);
+}
+
+// Phase 6: Template auto-suggestion + agent activation for new test files
+if (fileName.match(/\.(test|spec)\.(ts|tsx|js|jsx)$/) && isNewFile(filePath)) {
+  console.log(JSON.stringify({
+    hookType: 'template-auto-suggestion + agent-activation',
+    message: '💡 Creating new test file detected',
+    template: {
+      name: 'test-creator',
+      path: '.claude/skills/code-generators/test-creator/assets/unit-test-template.ts',
+      productivity: '5x faster',
+      pattern: 'AAA (Arrange-Act-Assert)'
+    },
+    agent: {
+      name: 'Maria-QA',
+      autoActivate: true,
+      task: 'Validate test structure and coverage requirements (80%+ standard)'
+    },
+    action: 'COPY_TEMPLATE_THEN_INVOKE_AGENT',
+    relatedSkills: ['testing-library', 'quality-gates'],
+    autoApply: true,
+    priority: 'high'
+  }));
+  process.exit(0);
+}
+
+// Maria-QA: Test files (existing file edits)
 if (fileName.match(/\.(test|spec)\.(ts|tsx|js|jsx)$/) || relativePath.includes('__tests__')) {
   console.log(JSON.stringify({
     hookType: 'agent-activation-suggestion',

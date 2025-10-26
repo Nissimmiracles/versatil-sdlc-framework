@@ -9,6 +9,9 @@ allowed-tools:
   - "Write"
   - "Grep"
   - "Glob"
+  - "Bash"
+skills:
+  - "compounding-engineering"
 ---
 
 # Plan Feature Implementation with OPERA Agents
@@ -211,39 +214,29 @@ Task oliver-mcp: `Route pattern search to optimal RAG store with anti-hallucinat
 **If all stores fail:** Log warning, return empty array, don't throw error`
 ```
 
-**Actual Implementation (Service Integration):**
+**Actual Implementation (Skill Integration):**
 
-Use the PatternSearchService directly for reliable execution:
+Use the `compounding-engineering` skill to execute PatternSearchService:
+
+```bash
+! npx tsx .claude/skills/compounding-engineering/scripts/execute-pattern-search.ts \
+  --description "${feature_description}" \
+  --category "${detected_category}" \
+  --min-similarity 0.75 \
+  --limit 5
+```
+
+The skill returns JSON with pattern search results:
 
 ```typescript
-import { patternSearchService } from '../../src/rag/pattern-search.js';
+// Parse JSON output from skill execution
+const searchResult = JSON.parse(skillOutput);
+const hasHistoricalContext = searchResult.patterns.length > 0;
 
-// Query historical patterns with error handling
-let searchResult = null;
-let hasHistoricalContext = false;
-
-try {
-  searchResult = await patternSearchService.searchSimilarFeatures({
-    description: feature_description,
-    category: detected_category, // auto-detect or from template
-    min_similarity: 0.75,
-    limit: 5
-  });
-
-  hasHistoricalContext = searchResult.patterns.length > 0;
-
-} catch (error) {
-  console.warn('Pattern search failed, continuing without historical context:', error);
-  // Graceful degradation - continue with templates/research
-  searchResult = {
-    patterns: [],
-    total_found: 0,
-    search_method: 'none',
-    avg_effort: null,
-    avg_confidence: null,
-    consolidated_lessons: [],
-    recommended_approach: 'Proceed with template-based planning'
-  };
+// Graceful degradation on error (skill returns error JSON, not throws)
+if (searchResult.error) {
+  console.warn('Pattern search failed:', searchResult.error);
+  // searchResult will have empty patterns array and fallback structure
 }
 ```
 
@@ -378,31 +371,32 @@ if (sarahDecision.decision === 'use_template') {
 }
 ```
 
-**Actual Implementation (Service Integration):**
+**Actual Implementation (Skill Integration):**
 
-Use the TemplateMatcher service directly for reliable execution:
+Use the `compounding-engineering` skill to execute TemplateMatcher:
+
+```bash
+! npx tsx .claude/skills/compounding-engineering/scripts/execute-template-matcher.ts \
+  --description "${feature_description}" \
+  ${flags.template ? `--template "${flags.template}"` : ''}
+```
+
+The skill returns JSON with template matching results:
 
 ```typescript
-import { templateMatcher } from '../../src/templates/template-matcher.js';
-
-// Match feature to template with error handling
-let matchResult = null;
+// Parse JSON output from skill execution
+const matchResult = JSON.parse(skillOutput);
 let templateUsed = null;
 
-try {
-  matchResult = await templateMatcher.matchTemplate({
-    description: feature_description,
-    explicit_template: flags.template // from /plan --template=NAME
-  });
+// Use template if score ≥70% (or explicit flag provided)
+if (matchResult.use_template && matchResult.best_match) {
+  templateUsed = matchResult.best_match;
+}
 
-  // Use template if score ≥70% (or explicit flag provided)
-  if (matchResult.use_template && matchResult.best_match) {
-    templateUsed = matchResult.best_match;
-  }
-
-} catch (error) {
-  console.warn('Template matching failed, proceeding with custom planning:', error);
-  // Graceful degradation - proceed without template
+// Graceful degradation on error
+if (matchResult.error) {
+  console.warn('Template matching failed:', matchResult.error);
+  // Proceed with custom planning (agent-driven)
 }
 ```
 
@@ -854,7 +848,17 @@ Comprehensive set with dependencies tracked (e.g., 002 depends on 001)
 Sarah-PM orchestrates dual todo creation using her PM expertise for dependency detection, agent assignments, and execution wave planning. This provides transparent reasoning instead of black-box service calls.
 </thinking>
 
-**🚨 MANDATORY: Invoke sarah-pm agent with Task tool for todo orchestration**
+**⛔ BLOCKING STEP - YOU MUST INVOKE SARAH-PM USING THE TASK TOOL:**
+
+**ACTION: Invoke Sarah-PM Agent**
+Call the Task tool with:
+- `subagent_type: "Sarah-PM"`
+- `description: "Generate dual todo system with dependencies"`
+- `prompt: "Generate dual todo system for '${feature_description}'. Input: Phase breakdown from Steps 2-5, historical patterns, template selection, agent research findings. Your strategic planning: (1) Create todo specs from phases with title/priority/agent/effort/acceptance_criteria, (2) Detect dependencies automatically (frontend→backend, tests→all, migrations→API), (3) Assign optimal agents by expertise, (4) Identify execution waves (parallel Wave 1, sequential Wave 2/3), (5) Generate Mermaid dependency graph, (6) Link historical patterns to todos, (7) Create TodoWrite specs + todos/*.md file specs. Return: { todos_for_todowrite: [], todos_files: [], dependency_graph_mermaid: string, execution_waves: {wave1: [], wave2: [], wave3: []}, reasoning: string }"`
+
+**STOP AND WAIT for Sarah-PM agent to complete before proceeding.**
+
+**⛔ CHECKPOINT: You MUST have Sarah-PM's todo orchestration output before Step 8. Use her strategic planning to create the dual todo system.**
 
 **Agent-Driven Todo Orchestration:**
 
@@ -977,9 +981,12 @@ return {
 // Wait for Sarah to complete planning
 const todoOrchestration = await waitForAgent('sarah-pm');
 
-// Sarah uses the service to write files
-import { todoFileGenerator } from '../../src/planning/todo-file-generator.js';
-const todoResult = await todoFileGenerator.generateTodos(todoOrchestration.todo_specs);
+// Use compounding-engineering skill to generate todos
+! npx tsx .claude/skills/compounding-engineering/scripts/execute-todo-generator.ts \
+  --specs-json '${JSON.stringify(todoOrchestration.todo_specs)}'
+
+// Parse JSON output from skill execution
+const todoResult = JSON.parse(skillOutput);
 ```
 
 **Generated Output:**
@@ -1041,7 +1048,17 @@ Auto-generated examples:
 Before sending plan to user, invoke Victor-Verifier to validate all factual claims (historical patterns, effort math, code examples, todo files). This prevents hallucinations in planning phase.
 </thinking>
 
-**🚨 MANDATORY: Invoke victor-verifier agent with Task tool to validate all claims BEFORE showing plan to user**
+**⛔ BLOCKING STEP - YOU MUST INVOKE VICTOR-VERIFIER USING THE TASK TOOL BEFORE SENDING PLAN TO USER:**
+
+**ACTION: Invoke Victor-Verifier Agent**
+Call the Task tool with:
+- `subagent_type: "Victor-Verifier"`
+- `description: "Verify all plan claims before output"`
+- `prompt: "Verify ALL factual claims in the plan before sending to user. Claims to verify: (1) Historical Patterns - confirm ${searchResult.patterns.length} features exist in RAG, validate effort hours match, (2) Effort Math - recalculate averages and complexity adjustments within 5%, (3) Template Match - re-run matcher, confirm score within 5%, (4) Code Examples - read files, confirm lines exist and contain expected code, (5) Todo Files - check todos/ directory, confirm files exist, (6) Agent Assignments - read todo files, confirm assigned_agent matches claims. Verification Process: For each claim, verify against ground truth, calculate confidence score (100 = verified, 90 = within tolerance, 0 = hallucination). Return: { verified: boolean, confidence: number 0-100, hallucinations: [{claim, actual, severity}], warnings: [{claim, actual, severity}], corrections: [{original_claim, corrected_claim}] }. Threshold: confidence ≥95% to approve, <95% flag corrections."`
+
+**STOP AND WAIT for Victor-Verifier agent to complete before displaying plan to user.**
+
+**⛔ CHECKPOINT: If Victor reports hallucinations (confidence <95%), CORRECT all flagged claims before showing plan. If verified (≥95%), proceed to display.**
 
 **Pre-Output Verification:**
 

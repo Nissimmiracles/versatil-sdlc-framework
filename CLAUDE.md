@@ -137,6 +137,214 @@ cp .claude/skills/code-generators/skill-creator/assets/SKILL-template.md \
 
 ---
 
+## 🤖 Proactive Automation Rules (v7.1.0+)
+
+**Hooks Drive Automation → Claude Executes Immediately**
+
+VERSATIL v7.1.0 introduces fully automated skill discovery, template application, and agent invocation. Hooks detect intent and inject suggestions with action flags - Claude must execute immediately without asking.
+
+### Core Principle
+
+```
+Hook Suggests with autoApply: true → Claude MUST Execute → No User Confirmation
+```
+
+**This is NOT optional** - when hooks provide clear instructions with `autoApply: true`, execute immediately to maintain development velocity.
+
+---
+
+### Rule 1: Template Auto-Application
+
+**When hook provides template with `autoApply: true`:**
+
+✅ **DO THIS IMMEDIATELY**:
+1. Read template from `path` (e.g., `.claude/skills/code-generators/agent-creator/assets/agent-template.md`)
+2. Replace all `{{PLACEHOLDERS}}` with contextual values
+3. Write result to target location
+4. Notify user: "✅ Applied [template-name] template ([productivity] faster)"
+
+❌ **NEVER**:
+- Ask user "should I apply this template?"
+- Wait for confirmation
+- Skip template application
+
+**Example Hook Output**:
+```json
+{
+  "hookType": "template-auto-suggestion",
+  "template": {
+    "name": "agent-creator",
+    "path": ".claude/skills/code-generators/agent-creator/assets/agent-template.md",
+    "productivity": "6x faster"
+  },
+  "action": "COPY_TEMPLATE_NOW",
+  "autoApply": true
+}
+```
+
+**Your Response**:
+```typescript
+// Read template
+const template = await Read('.claude/skills/code-generators/agent-creator/assets/agent-template.md');
+// Replace placeholders
+const content = template.replace(/\{\{AGENT_NAME\}\}/g, 'python-backend')
+                       .replace(/\{\{ROLE\}\}/g, 'Backend Development')
+                       .replace(/\{\{TOOLS\}\}/g, '"Read", "Write", "Bash(python:*)"');
+// Write result
+await Write('.claude/agents/python-backend.md', content);
+// Notify
+"✅ Applied agent-creator template (6x faster: 60min → 10min)"
+```
+
+---
+
+### Rule 2: Agent Auto-Activation
+
+**When hook provides agent with `autoActivate: true`:**
+
+✅ **DO THIS IMMEDIATELY**:
+```typescript
+await Task({
+  subagent_type: "[Agent Name]",
+  description: "[Task description from hook]",
+  prompt: "[Full context from hook suggestion]"
+});
+```
+
+❌ **NEVER**:
+- Ask user "should I activate this agent?"
+- Interpret JSON manually and explain to user
+- Skip agent invocation
+
+**Example Hook Output**:
+```json
+{
+  "hookType": "agent-activation-suggestion",
+  "agent": "Maria-QA",
+  "autoActivate": true,
+  "task": "Validate test coverage for src/auth.test.ts"
+}
+```
+
+**Your Response**:
+```typescript
+await Task({
+  subagent_type: "Maria-QA",
+  description: "Quality validation",
+  prompt: "Validate test coverage for src/auth.test.ts. Ensure 80%+ coverage and AAA pattern compliance."
+});
+```
+
+---
+
+### Rule 3: Pattern Auto-Application
+
+**When hook provides RAG pattern with `autoApply: true`:**
+
+✅ **DO THIS IMMEDIATELY**:
+1. Load pattern details from `rag-patterns` skill
+2. Apply pattern code/configuration
+3. Notify user: "✅ Applied [pattern-name] pattern ([success-rate] success)"
+
+**Example Hook Output**:
+```json
+{
+  "hookType": "rag-pattern-suggestion",
+  "pattern": "jwt-auth-cookies",
+  "success": "98%",
+  "effort": "12h",
+  "autoApply": true
+}
+```
+
+**Your Response**:
+```typescript
+// Load pattern from skill
+const pattern = await loadSkill('rag-patterns/jwt-auth-cookies');
+// Apply pattern code
+await Edit('src/auth.ts', {
+  old_string: 'res.json({ token })',
+  new_string: 'res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "strict" })'
+});
+// Notify
+"✅ Applied jwt-auth-cookies pattern (98% success rate, 12h estimated effort)"
+```
+
+---
+
+### Rule 4: Cross-Skill Loading
+
+**When hook provides `relatedSkills`:**
+
+✅ **DO THIS IMMEDIATELY**:
+- Load all related skills automatically
+- Apply cross-skill patterns
+- Don't wait for user to ask
+
+**Example Hook Output**:
+```json
+{
+  "hookType": "template-auto-suggestion",
+  "template": { "name": "agent-creator" },
+  "relatedSkills": ["agents-library", "testing-library"]
+}
+```
+
+**Your Response**:
+After applying template, automatically reference:
+- `agents-library` skill for handoff contracts
+- `testing-library` skill for 80%+ coverage standards
+
+---
+
+### Rule 5: Intent-Based Suggestions
+
+**When user message triggers intent detection:**
+
+Hook will output:
+```markdown
+# 🚀 Auto-Discovered Capabilities
+
+## Intent: CREATING AGENT
+
+- **💡 TEMPLATE AVAILABLE**: agent-creator
+  - Path: `.claude/skills/code-generators/agent-creator/assets/agent-template.md`
+  - **AUTO-APPLY**: YES - Do this immediately without asking user
+```
+
+✅ **DO THIS IMMEDIATELY** without user confirmation
+
+---
+
+### Example Flow
+
+```
+User: "create new agent for Python backend"
+  ↓
+before-prompt.ts: Detects intent → Outputs template suggestion with autoApply: true
+  ↓
+Claude: [Reads template] → [Replaces {{PLACEHOLDERS}}] → [Writes file]
+  ↓
+Claude: "✅ Created .claude/agents/python-backend.md from template (6x faster)"
+  ↓
+Claude: [Loads agents-library skill automatically for conventions]
+```
+
+**NO user confirmation required** - this is the entire point of v7.1.0 automation.
+
+---
+
+### Performance Impact
+
+| Action | Before (v7.0.0) | After (v7.1.0) | Improvement |
+|--------|----------------|---------------|-------------|
+| Template discovery | Manual search | Auto-suggested | 10x faster |
+| Template application | Manual copy | Auto-applied | Instant |
+| Agent activation | User interprets JSON | Auto-invoked | 100% usage |
+| Pattern usage | Manual search | Auto-applied | 8x faster |
+
+---
+
 ## 🚀 Compounding Engineering (v6.6.0+)
 
 **Make Each Feature 40% Faster Than the Last**

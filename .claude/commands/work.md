@@ -145,6 +145,24 @@ TodoWrite Example for 001-pending-p1-implement-auth-api.md:
 Systematically work through each subtask, updating both TodoWrite (in-session) and todos/*.md (persistent) as progress is made.
 </thinking>
 
+**⛔ BLOCKING STEP - YOU MUST INVOKE ASSIGNED AGENTS USING THE TASK TOOL:**
+
+For each subtask, follow this workflow:
+
+1. **Read todo file** to identify `assigned_agent` (e.g., "Marcus-Backend", "James-Frontend")
+2. **Invoke agent via Task tool**:
+   - `subagent_type: [assigned_agent from file]`
+   - `description: "Implement [task title]"`
+   - `prompt: "Implement [task description from todo file]. Context: [historical patterns, acceptance criteria, files involved]. Return: { implementation_summary, files_modified, tests_added, lessons_learned }"`
+3. **STOP AND WAIT** for agent to complete work
+4. **Update both systems**:
+   - TodoWrite: Mark task as completed
+   - todos/*.md: Update status, add agent's implementation notes
+
+**Do NOT execute work directly - ALWAYS route to the assigned agent via Task tool.**
+
+**⛔ CHECKPOINT: Each task MUST be completed by its assigned agent before proceeding to the next task.**
+
 **Implementation Workflow:**
 
 ```yaml

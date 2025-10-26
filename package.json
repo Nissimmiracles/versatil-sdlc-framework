@@ -1,6 +1,6 @@
 {
   "name": "@versatil/sdlc-framework",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "type": "module",
   "description": "AI-Native SDLC Framework for Claude with 18 specialized agents (BA, Database, Backend, Frontend, QA, PM, AI/ML, MCP), 98%+ context retention via RAG memory, automatic quality gates (80%+ coverage, OWASP, WCAG 2.1 AA), and 12 production MCPs. Free & open source alternative to Copilot/Cursor with full-stack coordination and proactive intelligence.",
   "main": "dist/index.js",

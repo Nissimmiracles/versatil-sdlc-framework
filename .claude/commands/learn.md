@@ -150,6 +150,28 @@ Feature Metrics:
 Embed learnings into vector store for future retrieval during planning phase.
 </thinking>
 
+**⛔ BLOCKING STEP - YOU MUST INVOKE DR.AI-ML AND OLIVER-MCP USING THE TASK TOOL:**
+
+**ACTION 1: Invoke Dr.AI-ML Agent**
+Call the Task tool with:
+- `subagent_type: "Dr.AI-ML"`
+- `description: "Extract patterns and generate embeddings"`
+- `prompt: "Extract reusable patterns from completed work. Input: Session learnings (${learning_count} items), completed todos (${todo_count} items), implementation notes. Your ML expertise: (1) Analyze successful approaches and identify patterns, (2) Generate semantic embeddings for pattern search, (3) Calculate confidence scores for each pattern, (4) Consolidate lessons learned with priority levels (high/medium/low), (5) Extract code examples with file:line references. Return: { patterns: [{pattern_name, description, embedding, confidence, lessons_learned, code_examples}], storage_metadata: {} }"`
+
+**STOP AND WAIT for Dr.AI-ML agent to complete before proceeding.**
+
+**ACTION 2: Invoke Oliver-MCP Agent**
+Call the Task tool with:
+- `subagent_type: "Oliver-MCP"`
+- `description: "Route to RAG store with validation"`
+- `prompt: "Route patterns to optimal RAG store with anti-hallucination validation. Input: Patterns from Dr.AI-ML (${pattern_count} patterns). Your routing expertise: (1) Try GraphRAG first (no API quota, offline), (2) Fallback to Vector store if GraphRAG unavailable, (3) Validate patterns aren't hallucinated (cross-check with actual files), (4) Ensure data quality before storage, (5) Return storage confirmation with method used. Return: { stored: boolean, method: 'graphrag'|'vector'|'local', pattern_ids: [], validation_results: {} }"`
+
+**STOP AND WAIT for Oliver-MCP agent to complete before proceeding.**
+
+**Do NOT directly call RAG services - route through agents for ML-powered extraction and quality validation.**
+
+**⛔ CHECKPOINT: You MUST have BOTH agent outputs before confirming patterns are stored. Verify Oliver confirms successful storage.**
+
 **RAG Storage:**
 
 ```typescript

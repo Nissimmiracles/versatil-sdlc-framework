@@ -1,0 +1,191 @@
+# [LIBRARY_NAME] - Library Context Guide
+
+**Priority**: [HIGH|MEDIUM|LOW]
+**Agent(s)**: [Primary agents that work with this library]
+**Last Updated**: [YYYY-MM-DD]
+
+## 📋 Library Purpose
+
+[1-2 sentence description of what this library does and its role in VERSATIL]
+
+## 🎯 Core Concepts
+
+### Key Abstractions
+- **[Concept 1]**: [Brief explanation]
+- **[Concept 2]**: [Brief explanation]
+- **[Concept 3]**: [Brief explanation]
+
+### Design Patterns Used
+- [Pattern 1]: [When to use it]
+- [Pattern 2]: [When to use it]
+
+## 📁 File Organization
+
+```
+src/[library]/
+├── index.ts              # Main exports
+├── [core-module].ts      # [Purpose]
+├── [helper-module].ts    # [Purpose]
+└── types.ts              # TypeScript definitions
+```
+
+## ✅ Development Rules
+
+### DO ✓
+- ✓ [Rule 1 - e.g., "Always validate inputs at service boundaries"]
+- ✓ [Rule 2 - e.g., "Use VERSATILLogger for all logging"]
+- ✓ [Rule 3 - e.g., "Export singleton instances for stateful services"]
+
+### DON'T ✗
+- ✗ [Anti-pattern 1 - e.g., "Don't use console.log, use logger"]
+- ✗ [Anti-pattern 2 - e.g., "Don't mutate global state"]
+- ✗ [Anti-pattern 3 - e.g., "Don't skip error handling"]
+
+## 🔧 Common Patterns
+
+### Pattern 1: [Name]
+**When to use**: [Use case]
+
+```typescript
+// Good example
+[code snippet showing correct usage]
+```
+
+### Pattern 2: [Name]
+**When to use**: [Use case]
+
+```typescript
+// Good example
+[code snippet showing correct usage]
+```
+
+## ⚠️ Gotchas & Edge Cases
+
+### Gotcha 1: [Issue name]
+**Problem**: [What goes wrong]
+**Solution**: [How to fix it]
+
+```typescript
+// ❌ Bad
+[incorrect code]
+
+// ✅ Good
+[correct code]
+```
+
+### Gotcha 2: [Issue name]
+**Problem**: [What goes wrong]
+**Solution**: [How to fix it]
+
+## 🧪 Testing Guidelines
+
+### Test Structure
+```typescript
+describe('[LibraryName] - [Module]', () => {
+  describe('[Function/Class]', () => {
+    it('should [expected behavior]', async () => {
+      // Arrange
+      // Act
+      // Assert
+    });
+  });
+});
+```
+
+### Common Test Patterns
+- **Unit tests**: Test individual functions/classes in isolation
+- **Integration tests**: Test library interactions with dependencies
+- **Mock patterns**: [How to mock external dependencies]
+
+### Coverage Requirements
+- Minimum: 80% (Enhanced Maria-QA standard)
+- Critical paths: 90%+
+- Focus areas: [List critical functions/classes]
+
+## 🔗 Dependencies
+
+### Internal Dependencies
+- [Library 1]: [Why needed]
+- [Library 2]: [Why needed]
+
+### External Dependencies
+- [Package 1]: [Why needed, version constraints]
+- [Package 2]: [Why needed, version constraints]
+
+## 🎨 Code Style Preferences
+
+### Naming Conventions
+- **Functions**: camelCase (e.g., `processRequest`)
+- **Classes**: PascalCase (e.g., `RequestProcessor`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`)
+- **Types/Interfaces**: PascalCase with descriptive names
+
+### Async Patterns
+- **Preferred**: async/await
+- **Avoid**: Raw promises unless necessary
+
+### Error Handling
+```typescript
+try {
+  // Operation
+} catch (error) {
+  this.logger.error('[Context]', { error }, 'module-name');
+  throw new Error(`[Descriptive message]: ${error.message}`);
+}
+```
+
+## 📊 Performance Considerations
+
+### Performance Targets
+- [Metric 1]: [Target value]
+- [Metric 2]: [Target value]
+
+### Optimization Tips
+- [Tip 1]: [How to optimize]
+- [Tip 2]: [How to optimize]
+
+## 🔍 Debugging Tips
+
+### Common Issues
+1. **[Issue 1]**: [Symptom] → [Diagnosis] → [Fix]
+2. **[Issue 2]**: [Symptom] → [Diagnosis] → [Fix]
+
+### Debug Logging
+```typescript
+// Enable debug mode
+process.env.DEBUG = '[library-name]:*';
+```
+
+## 📚 Related Documentation
+
+- [Doc 1]: [Path or URL]
+- [Doc 2]: [Path or URL]
+- [OPERA Agent]: [Which agent(s) use this library]
+
+## 🚀 Quick Start Example
+
+```typescript
+import { [mainExport] } from '@/[library]/index.js';
+
+// Basic usage
+const service = new [MainClass]();
+const result = await service.[primaryMethod]({
+  // Configuration
+});
+
+console.log(result);
+```
+
+## 🔄 Migration Notes
+
+### From Previous Versions
+- [Change 1]: [What changed and how to update]
+- [Change 2]: [What changed and how to update]
+
+### Deprecation Warnings
+- [Deprecated feature]: Use [replacement] instead
+
+---
+
+**Auto-injected via**: `.claude/hooks/before-prompt.ts` → `loadLibraryContext()`
+**Priority Layer**: User Preferences > **Library Context** > Team Conventions > Framework Defaults

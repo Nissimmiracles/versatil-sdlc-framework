@@ -73,6 +73,20 @@ Work Scope Analysis:
 Match work items to the best-suited OPERA agents based on specialization.
 </thinking>
 
+**⛔ BLOCKING STEP - YOU MUST INVOKE SARAH-PM USING THE TASK TOOL:**
+
+**ACTION: Invoke Sarah-PM Agent**
+Call the Task tool with:
+- `subagent_type: "Sarah-PM"`
+- `description: "Strategic work distribution"`
+- `prompt: "Distribute work items to optimal OPERA agents. Input: Todo list (${todo_count} items), agent capabilities (Dana-Database, Marcus-Backend, James-Frontend, Maria-QA, Alex-BA, Dr.AI-ML, Oliver-MCP), project context. Your strategic planning: (1) Analyze each work item requirements, (2) Match to agent specializations, (3) Consider workload balancing, (4) Detect dependencies between assignments, (5) Provide reasoning for each assignment. Agent specializations: Dana=database/migrations, Marcus=backend/API/security, James=frontend/UI/accessibility, Maria=testing/QA, Alex=requirements/business logic, Dr.AI-ML=ML/AI/data science, Oliver=MCP/routing/anti-hallucination. Return: { assignments: [{todo_id, assigned_agent, reasoning}], workload_distribution: {}, dependency_notes: string }"`
+
+**STOP AND WAIT for Sarah-PM agent to complete before applying assignments.**
+
+**Do NOT assign agents manually - let Sarah-PM make strategic decisions using her PM expertise.**
+
+**⛔ CHECKPOINT: You MUST have Sarah-PM's assignments before updating todos. Apply her recommendations exactly as provided.**
+
 **Agent Specializations:**
 
 ```yaml
