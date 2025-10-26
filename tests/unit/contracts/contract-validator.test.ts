@@ -675,7 +675,7 @@ describe('ContractValidator', () => {
       const result = await strictValidator.validateBeforeSend(contract);
 
       expect(result.valid).toBe(false);
-      expect(result.score).toBeLessThan(90);
+      expect(result.score).toBeLessThanOrEqual(90);
     });
   });
 

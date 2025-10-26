@@ -226,8 +226,24 @@ export class ThreeTierHandoffBuilder {
       });
     }
 
-    // Work items are part of the context, not a direct property
-    // baseBuilder.workItems = workItems;
+    // If no work items created, add a minimal planning work item
+    if (workItems.length === 0) {
+      workItems.push({
+        id: `work-plan-${Date.now()}`,
+        type: 'planning',
+        description: `Plan three-tier implementation for ${this.requirements.name}`,
+        acceptanceCriteria: [
+          'Requirements analyzed',
+          'Architecture designed',
+          'Technical approach defined'
+        ],
+        estimatedEffort: 1,
+        priority: 'high'
+      });
+    }
+
+    // Add work items to the base contract
+    workItems.forEach(item => baseBuilder.addWorkItem(item));
 
     // Set expected output
     baseBuilder.setExpectedOutput({
@@ -371,7 +387,8 @@ export class ThreeTierHandoffBuilder {
     await tracker.trackContractCreated(contract, validation);
 
     if (!validation.valid) {
-      console.warn('Contract validation failed:', validation.errors);
+      const errorMessages = validation.errors.map((e: any) => e.message).join(', ');
+      throw new Error(`Contract validation failed: ${errorMessages}`);
     }
 
     return { contract, validation };

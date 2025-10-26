@@ -11,6 +11,30 @@ VERSATIL uses a **dual todo system** inspired by Every Inc's proven workflow:
 
 Together, these systems ensure **zero context loss** across sessions and enable effective team collaboration.
 
+### 🆕 Automated Todo Generation (v6.6.0+)
+
+The enhanced `/plan` command now automatically generates both todo systems using the **Todo File Generator** service:
+
+```bash
+/plan "Add user authentication"
+```
+
+**What Gets Created**:
+- ✅ Numbered `todos/*.md` files (001-pending-p1-auth-api.md, 002-pending-p1-login-ui.md, etc.)
+- ✅ TodoWrite items synchronized with files
+- ✅ Dependency graphs (Mermaid diagrams)
+- ✅ Execution waves (parallel vs sequential task detection)
+- ✅ Auto-numbering (finds next available number)
+- ✅ Agent assignments (Marcus-Backend, James-Frontend, etc.)
+
+**Benefits**:
+- **Zero manual file creation** - All todos generated automatically
+- **Dependency tracking** - Visual graphs show task relationships
+- **Parallel execution** - Detects which tasks can run simultaneously
+- **Consistent structure** - Template-based generation ensures quality
+
+**See**: [Pattern Search Service](../src/planning/todo-file-generator.ts) for implementation details
+
 ---
 
 ## File Naming Convention

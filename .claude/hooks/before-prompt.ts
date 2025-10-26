@@ -130,11 +130,20 @@ async function main() {
     }
 
     if (patterns.length > 0) {
+      // Log to stderr for user visibility in terminal
       console.error(`\n🧠 [RAG] Auto-activated ${patterns.length} pattern(s):`);
       patterns.forEach((p, i) => {
         console.error(`  ${i + 1}. ${p.name} (${(p.metrics.successRate * 100).toFixed(0)}% success)`);
       });
       console.error('');
+
+      // Output to stdout for Claude context injection
+      const ragContext = {
+        role: 'system',
+        content: `# RAG Patterns Auto-Activated\n\nThe following patterns from your implementation history have been retrieved:\n\n${patterns.map((p, i) => `## Pattern ${i + 1}: ${p.name}\n\n**Success Rate**: ${(p.metrics.successRate * 100).toFixed(0)}%\n**Effort**: ${p.metrics.effortHours || 'N/A'}h (estimated: ${p.metrics.estimatedHours || 'N/A'}h)\n**Version**: ${p.metadata.version}\n${p.metadata.commitHash ? `**Commit**: ${p.metadata.commitHash}\n` : ''}\n**Description**: ${p.description}\n\n### Implementation\n\n\`\`\`typescript\n${p.implementation.code}\n\`\`\`\n\n### Instructions\n${p.implementation.instructions.map(inst => `- ${inst}`).join('\n')}\n\n${p.implementation.files ? `### Related Files\n${p.implementation.files.map(f => `- \`${f.path}\`${f.lines ? `:${f.lines}` : ''} - ${f.description}`).join('\n')}\n` : ''}`).join('\n---\n\n')}\n\n**Use these patterns to answer the user's question with YOUR specific implementation details, not generic knowledge.**`
+      };
+
+      console.log(JSON.stringify(ragContext));
     }
 
   } catch (error) {

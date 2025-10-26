@@ -152,11 +152,36 @@ graph TB
 ```
 
 **Real Impact:**
-- **Feature 1** (Auth): 125 minutes ⏱️
-- **Feature 2** (Admin): 75 minutes ⚡ **40% faster**
-- **Feature 5**: 50 minutes ⚡ **60% faster**
+- **Feature 1** (Auth): 125 minutes ⏱️ (baseline)
+- **Feature 2** (Admin): 75 minutes ⚡ **40% faster** (learned patterns)
+- **Feature 5**: 50 minutes ⚡ **60% faster** (compounding effect!)
 
-**[📖 Learn more about Compounding Engineering →](docs/architecture/FLYWHEEL.md)**
+### 🎯 Three Services Power This (NEW in v6.6.0)
+
+1. **Pattern Search** (`src/rag/pattern-search.ts`)
+   - Finds similar historical features via GraphRAG/Vector store
+   - Avg effort: 27h ± 4h (88% confidence vs ±50% without history)
+   - Consolidated lessons: "Add indexes early", "Use RLS policies"
+
+2. **Template Matcher** (`src/templates/template-matcher.ts`)
+   - Auto-matches to 5 proven templates (auth, crud, dashboard, api, upload)
+   - 70% threshold for template use
+   - Complexity adjustment: 0.8x-1.5x based on requirements
+
+3. **Todo File Generator** (`src/planning/todo-file-generator.ts`)
+   - Dual todos: TodoWrite (in-session) + `todos/*.md` (cross-session)
+   - Dependency graphs (Mermaid), execution waves (parallel detection)
+   - Auto-numbering, zero manual file creation
+
+**Example: `/plan "Add authentication"`**
+```typescript
+Pattern Search: Found 3 similar → avg 27h ± 4h (88% confidence)
+Template Match: auth-system.yaml (88% score) → base 28h
+Combined: 29h ± 3h (91% confidence) ✨
+Created: 6 todo files + TodoWrite items + Mermaid graph
+```
+
+**[📖 Complete Guide: Compounding Engineering →](docs/guides/compounding-engineering.md)**
 
 ---
 

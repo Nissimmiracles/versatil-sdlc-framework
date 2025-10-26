@@ -440,87 +440,166 @@ Auto-generated examples:
 - Zero manual file creation
 - TodoWrite sync (both systems always in sync)
 
-### 8. Implementation Plan Output
+### 8. Implementation Plan Output ⭐ ENHANCED
 
-**Enhanced Plan Structure:**
+**Enhanced Plan Structure with Confidence Scoring:**
 
 ```markdown
 ## Executive Summary
-[2-3 sentence overview] **Confidence: [0-100%]** (based on [N] similar implementations)
+[2-3 sentence overview]
 
-**Estimated Effort**: [X] hours ± [Y] hours (confidence interval from historical data)
+**🎯 Confidence Score: ${confidence}%** (based on ${historicalCount} similar implementations)
+**📊 Estimated Effort**: ${avgEffort.mean}h ± ${avgEffort.std}h (${confidenceInterval}% confidence)
+**🎬 Ready to Execute**: ${readinessScore >= 90 ? '✅ YES' : readinessScore >= 70 ? '⚠️ WITH CAUTION' : '❌ FIX BLOCKERS FIRST'}
+
+---
 
 ## Assessment Results (ASSESS Phase)
-- ✅ Framework Health: 100%
-- ✅ Git Status: Clean working tree
-- ✅ Dependencies: All installed, no vulnerabilities
-- ✅ Database: Connected (Supabase production)
-- ✅ Environment: All required variables set
-- ✅ Build/Tests: Passing
-- **Readiness Score**: 95% - ✅ GO
+- ✅ Framework Health: ${healthScore}%
+- ${gitClean ? '✅' : '❌'} Git Status: ${gitStatus}
+- ${depsOk ? '✅' : '❌'} Dependencies: ${depStatus}
+- ${dbConnected ? '✅' : '⚠️'} Database: ${dbStatus}
+- ${envValid ? '✅' : '❌'} Environment: ${envStatus}
+- ${buildPassing ? '✅' : '❌'} Build/Tests: ${buildStatus}
+- **Readiness Score**: ${readinessScore}% - ${readinessVerdict}
 
-## Historical Context (CODIFY Phase)
-- ✅ Similar feature #123: "[Name]" took [X] hours ([Y]% similar)
-- ⚠️ Common pitfall: [Specific issue to avoid]
-- ✅ Proven pattern: [What worked well in past]
-- 📚 Code examples: [file_path:line_range] ([description])
-- 📊 Effort accuracy: ±[X]% (based on [N] features)
+---
 
-## Template Applied
-**Template**: [auth-system|crud-endpoint|dashboard|api-integration|file-upload|none]
-**Customizations**: [How template was adapted for this feature]
+## Historical Context (CODIFY Phase) 🎓
+${searchResult.patterns.length > 0 ? `
+- ✅ Similar feature "${searchResult.patterns[0].feature_name}": ${searchResult.patterns[0].effort_hours}h (${searchResult.patterns[0].similarity_score}% similar)
+- ⚠️ High-priority lessons: ${searchResult.consolidated_lessons.high.join(', ')}
+- ✅ Proven patterns: ${searchResult.consolidated_lessons.medium.join(', ')}
+- 📚 Code examples: ${searchResult.patterns[0].code_examples[0].file}:${searchResult.patterns[0].code_examples[0].lines}
+- 📊 Historical accuracy: ±${searchResult.effort_variance}% (${searchResult.patterns.length} features analyzed)
+- 🎯 Confidence: ${searchResult.confidence_score}% (via ${searchResult.search_method})
+` : `
+⚠️ No historical data found - using template-based estimates
+📊 Estimated effort has ±50% confidence interval (conservative)
+💡 Recommendation: Start with small MVP to build historical data for future features
+`}
+
+---
+
+## Template Applied 📋
+**Template**: ${matchResult.best_match?.template_name || 'None (custom planning)'}
+${matchResult.best_match ? `
+**Match Score**: ${matchResult.best_match.match_score}% (keywords: ${matchResult.best_match.matched_keywords.join(', ')})
+**Base Effort**: ${matchResult.best_match.estimated_effort.hours}h (${matchResult.best_match.complexity})
+**Complexity Adjustment**: ${complexityFactor}x → Adjusted effort: ${adjustedEffort}h
+**Customizations**: [Project-specific adaptations based on repository context]
+` : `
+**Reason**: No template matched above 70% threshold
+**Approach**: Custom agent-driven research and planning
+`}
+
+---
+
+## Alternative Approaches 🔀
+${alternatives.map(alt => `
+### Option ${alt.number}: ${alt.name} (Effort: ${alt.effort}h)
+**Pros**: ${alt.pros.join(', ')}
+**Cons**: ${alt.cons.join(', ')}
+**Risk Level**: ${alt.risk}
+`).join('\n')}
+
+**Recommended**: Option ${recommendedOption} (best balance of effort vs. risk)
+
+---
+
+## Risk Assessment ⚠️
+
+### High Priority Risks 🔴
+${risks.high.map(r => `- ${r.description} (Mitigation: ${r.mitigation})`).join('\n')}
+
+### Medium Priority Risks 🟡
+${risks.medium.map(r => `- ${r.description} (Mitigation: ${r.mitigation})`).join('\n')}
+
+### Low Priority Risks 🟢
+${risks.low.map(r => `- ${r.description}`).join('\n')}
+
+---
 
 ## User Stories (Alex-BA)
-- As a [user type], I want [goal] so that [benefit]
-- Acceptance criteria: [measurable outcomes]
+${userStories.map(story => `
+- **As a** ${story.role}, **I want** ${story.goal} **so that** ${story.benefit}
+  - Acceptance: ${story.acceptance.join(', ')}
+`).join('\n')}
+
+---
 
 ## Technical Approach
 
 ### Backend (Marcus-Backend)
-- API endpoints: [list with routes]
-- Data models: [list with fields]
-- Security: [OWASP considerations]
-- Performance: [< 200ms target]
+- **API Endpoints**: ${apiEndpoints.map(e => `${e.method} ${e.route}`).join(', ')}
+- **Data Models**: ${dataModels.join(', ')}
+- **Security**: ${securityConsiderations.join(', ')}
+- **Performance Target**: < 200ms API response time
 
 ### Frontend (James-Frontend)
-- Components: [list with hierarchy]
-- State management: [approach]
-- Accessibility: [WCAG 2.1 AA requirements]
-- Responsive: [breakpoints]
+- **Components**: ${components.join(', ')}
+- **State Management**: ${stateManagement}
+- **Accessibility**: WCAG 2.1 AA compliant (${a11yRequirements.join(', ')})
+- **Responsive**: ${breakpoints.join(', ')}
 
 ### Testing (Maria-QA)
-- Unit tests: [coverage target 80%+]
-- Integration tests: [scenarios]
-- E2E tests: [user flows]
-- Security tests: [OWASP validation]
+- **Unit Tests**: 80%+ coverage required
+- **Integration Tests**: ${integrationScenarios.join(', ')}
+- **E2E Tests**: ${e2eFlows.join(', ')}
+- **Security Tests**: OWASP Top 10 validation
+
+---
 
 ## Implementation Phases
 
-### Phase 1: [Name] (Agent: [Name])
-- **Tasks**: [list]
-- **Deliverables**: [list]
-- **Acceptance**: [criteria]
-- **Effort**: [Small|Medium|Large|XL]
+${phases.map((phase, i) => `
+### Phase ${i+1}: ${phase.name} (${phase.agent})
+- **Effort**: ${phase.effort} (${effortHours[phase.effort]}h)
+- **Tasks**: ${phase.tasks.join(', ')}
+- **Deliverables**: ${phase.deliverables.join(', ')}
+- **Acceptance**: ${phase.acceptance.join(', ')}
+- **Dependencies**: ${phase.depends_on.length > 0 ? `Depends on Phase ${phase.depends_on.join(', ')}` : 'None'}
+`).join('\n')}
 
-### Phase 2: [Name] (Agent: [Name])
-[Repeat structure]
+---
 
-## Dependencies & Risks
-- **Depends on**: [external factors]
-- **Blocks**: [what this blocks]
-- **Risks**: [potential issues]
-- **Mitigation**: [strategies]
+## Dual Todo System 📝
 
-## Success Metrics
-- **User satisfaction**: [target]
-- **Performance**: [benchmarks]
-- **Quality**: [coverage, scores]
-- **Timeline**: [estimated completion]
+**TodoWrite (In-Session)**:
+${todowriteItems.map((item, i) => `${item.status === 'completed' ? '✅' : item.status === 'in_progress' ? '🔄' : '⏳'} ${i+1}. ${item.content}`).join('\n')}
 
-## References
-- Similar code: [file_path:line_number]
-- Documentation: [urls]
-- Related PRs: [#numbers]
+**Persistent Files Created**:
+${createdFiles.map(f => `- ${f.filename} (${f.agent}, ${f.effort})`).join('\n')}
+
+**Dependency Graph**:
+\`\`\`mermaid
+${dependencyGraph}
+\`\`\`
+
+**Execution Waves** (for parallel execution):
+${executionWaves.map(w => `- Wave ${w.wave}: ${w.tasks.join(', ')} (${w.type === 'parallel' ? '⚡ parallel' : '🔗 sequential'})`).join('\n')}
+
+---
+
+## Success Metrics 🎯
+- **User Satisfaction**: ${successMetrics.userSatisfaction}
+- **Performance**: ${successMetrics.performance}
+- **Quality**: ${successMetrics.quality}
+- **Timeline**: ${successMetrics.timeline}
+
+---
+
+## References 📚
+- **Similar Code**: ${references.code.map(r => `${r.file}:${r.line}`).join(', ')}
+- **Documentation**: ${references.docs.join(', ')}
+- **Related PRs**: ${references.prs.join(', ')}
+
+---
+
+## Next Steps ▶️
+1. Review and approve plan (confidence: ${confidence}%)
+2. Execute Phase 1: ${phases[0].name}
+3. Run `/work` to begin implementation with OPERA agents
 ```
 
 ### 9. Parallel Agent Execution Pattern
