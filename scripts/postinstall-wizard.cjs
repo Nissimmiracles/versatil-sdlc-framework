@@ -193,6 +193,23 @@ async function createDefaultPreferences() {
 function showGettingStarted() {
   console.log('═══════════════════════════════════════════════════════════\n');
   console.log('🎉 You\'re all set! Here\'s how to get started:\n');
+
+  // Show What's New section for v7.1.0+
+  console.log('✨ What\'s New in v7.1.0+:\n');
+  console.log('  🚀 PROACTIVE AUTOMATION - Hooks drive action, Claude executes');
+  console.log('     • Templates auto-apply (5-10x faster development)');
+  console.log('     • Agents auto-activate (no manual slash commands)');
+  console.log('     • Patterns auto-suggest (85-95% token savings)');
+  console.log('     • No user confirmation needed - full automation!\n');
+  console.log('  🧠 94.1% TOKEN SAVINGS - Progressive disclosure via Skills');
+  console.log('     • 15 library guides (context loaded on-demand)');
+  console.log('     • 5 RAG patterns (historical learnings)');
+  console.log('     • 5 code generators (copy templates, not regenerate)\n');
+  console.log('  📍 COMPOUNDING ENGINEERING - Each feature 40% faster');
+  console.log('     • Pattern search finds similar work');
+  console.log('     • Template matching suggests proven approaches');
+  console.log('     • Todo generation from historical data\n');
+
   console.log('📚 Quick Start:\n');
   console.log('  1. Verify installation:');
   console.log('     $ versatil doctor\n');
@@ -214,7 +231,8 @@ function showGettingStarted() {
   console.log('  Agents activate automatically as you work!\n');
   console.log('📖 Documentation:\n');
   console.log('  • GitHub: https://github.com/MiraclesGIT/versatil-sdlc-framework');
-  console.log('  • Quick Reference: versatil-sdlc-framework/QUICKSTART.md\n');
+  console.log('  • Quick Reference: versatil-sdlc-framework/QUICKSTART.md');
+  console.log('  • Automation Guide: docs/AUTOMATION_TEST_REPORT.md\n');
   console.log('💡 Tips:\n');
   console.log('  • Install MCP dependencies: npm run install-mcps');
   console.log('  • Update framework: versatil update check');

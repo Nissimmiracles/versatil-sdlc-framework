@@ -17,6 +17,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { getMetricsService } from '../../src/telemetry/automation-metrics.js';
 
 interface HookInput {
   prompt?: string;
@@ -405,6 +406,8 @@ function detectLibraryMentions(userMessage: string): LibraryDetection {
 }
 
 async function main() {
+  const hookStartTime = Date.now(); // Track execution time for telemetry
+
   try {
     const input: HookInput = JSON.parse(fs.readFileSync(process.stdin.fd, 'utf-8'));
 
@@ -539,6 +542,90 @@ async function main() {
     // UserPromptSubmit hooks MUST output plain text to stdout (NOT JSON with role/content wrapper)
     // Per SDK docs: "stdout is added as context for Claude" when exit code is 0
     console.log(contextContent);
+
+    // ============================================================================
+    // TELEMETRY TRACKING (v7.4.0)
+    // ============================================================================
+    try {
+      const metricsService = getMetricsService(workingDir);
+      const sessionId = input.context?.sessionId as string | undefined || 'unknown';
+
+      // Track hook execution
+      const hookEndTime = Date.now();
+      metricsService.trackHookExecution({
+        timestamp: new Date().toISOString(),
+        hookType: 'UserPromptSubmit',
+        hookName: 'before-prompt',
+        executionTimeMs: hookEndTime - hookStartTime,
+        exitCode: 0,
+        outputSize: contextContent.length,
+        sessionId
+      });
+
+      // Track intent detection and pattern suggestions
+      if (hasIntentSuggestions) {
+        const intentMatches = Object.entries(INTENT_PATTERNS).filter(([_, pattern]) =>
+          pattern.regex.test(userMessage)
+        );
+
+        for (const [intentName, pattern] of intentMatches) {
+          // Track RAG pattern suggestions
+          const ragSuggestions = pattern.suggestions.filter(s => s.type === 'rag-pattern');
+          for (const suggestion of ragSuggestions) {
+            metricsService.trackContextInjection({
+              timestamp: new Date().toISOString(),
+              source: 'intent-detection',
+              itemsInjected: 1,
+              injectionTimeMs: 0, // Instant (metadata only)
+              sessionId
+            });
+          }
+
+          // Track agent auto-activation suggestions
+          const agentSuggestions = pattern.suggestions.filter(s => s.type === 'agent');
+          for (const agentSuggestion of agentSuggestions) {
+            metricsService.trackAgentActivation({
+              timestamp: new Date().toISOString(),
+              agent: (agentSuggestion as any).agent,
+              suggested: true,
+              activated: false, // Will be tracked later when Task tool is invoked
+              autoActivate: (agentSuggestion as any).autoActivate || false,
+              sessionId,
+              trigger: `intent:${intentName}`
+            });
+          }
+
+          // Track template suggestions
+          const templateSuggestions = pattern.suggestions.filter(s => s.type === 'template');
+          for (const templateSuggestion of templateSuggestions) {
+            metricsService.trackTemplateApplication({
+              timestamp: new Date().toISOString(),
+              template: (templateSuggestion as any).skill,
+              suggested: true,
+              applied: false, // Will be tracked later when template is actually used
+              autoApply: true, // Auto-apply is enabled in v7.4.0
+              sessionId,
+              filePattern: intentName
+            });
+          }
+        }
+      }
+
+      // Track cross-skill loading
+      if (hasLibraryMentions && detectedLibraries.related.length > 0) {
+        metricsService.trackCrossSkillLoading({
+          timestamp: new Date().toISOString(),
+          primarySkill: detectedLibraries.primary[0] || 'unknown',
+          relatedSkills: detectedLibraries.related,
+          loadedCount: detectedLibraries.related.length,
+          sessionId
+        });
+      }
+
+    } catch (telemetryError) {
+      // Telemetry failures should not break the hook
+      // Silently fail to maintain user experience
+    }
 
   } catch (error) {
     // Fail gracefully
