@@ -14,7 +14,7 @@
  * - Error handling
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
+// Jest globals (describe, it, expect, beforeEach) are available globally
 import {
   ThreeTierHandoffBuilder,
   createThreeTierHandoff,
@@ -29,8 +29,8 @@ import {
 } from '../../../src/agents/contracts/agent-handoff-contract.js';
 
 describe('ThreeTierHandoffBuilder', () => {
-  let requirements: FeatureRequirements;
-  let builder: ThreeTierHandoffBuilder;
+  let requirements;
+  let builder;
 
   beforeEach(() => {
     requirements = {
@@ -65,7 +65,7 @@ describe('ThreeTierHandoffBuilder', () => {
 
   describe('Adding API Endpoints', () => {
     it('should add API endpoint', async () => {
-      const endpoint: APIEndpoint = {
+      const endpoint = {
         method: 'POST',
         path: '/api/auth/login',
         description: 'User login endpoint'
@@ -154,7 +154,7 @@ describe('ThreeTierHandoffBuilder', () => {
 
   describe('Adding Database Tables', () => {
     it('should add database table', async () => {
-      const table: DatabaseTable = {
+      const table = {
         name: 'users',
         columns: [
           { name: 'id', type: 'uuid', nullable: false },
@@ -283,7 +283,7 @@ describe('ThreeTierHandoffBuilder', () => {
 
   describe('Adding UI Components', () => {
     it('should add UI component', async () => {
-      const component: UIComponent = {
+      const component = {
         name: 'LoginForm',
         type: 'component',
         description: 'User login form with email and password'
@@ -385,7 +385,7 @@ describe('ThreeTierHandoffBuilder', () => {
     });
 
     it('should use provided memory snapshot', async () => {
-      const customSnapshot: MemorySnapshot = {
+      const customSnapshot = {
         agentId: 'alex-ba',
         timestamp: new Date(),
         memoryFiles: {
@@ -704,7 +704,7 @@ describe('ThreeTierHandoffBuilder', () => {
     });
 
     it('should use provided memory snapshot in helper', async () => {
-      const customSnapshot: MemorySnapshot = {
+      const customSnapshot = {
         agentId: 'alex-ba',
         timestamp: new Date(),
         memoryFiles: {},

@@ -45,7 +45,7 @@ jobs:
         run: npm run build
 
       - name: Run update system tests
-        run: npm test -- --testPathPattern="update|config" --coverage --testTimeout=30000
+        run: npm test -- --testPathPatterns="update|config" --coverage --testTimeout=30000
         timeout-minutes: 5
 
       - name: Test version comparison

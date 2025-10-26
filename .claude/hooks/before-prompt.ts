@@ -1,58 +1,147 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env -S npx tsx
+
 /**
- * Before-Prompt Hook
- * Triggers when user submits a prompt
- * Injects context from learning system
+ * UserPromptSubmit Hook - Automatic RAG Pattern Activation
  *
- * SDK Hook: UserPromptSubmit
+ * This hook automatically detects keywords in user prompts and retrieves
+ * relevant learning patterns from the RAG system (.versatil/learning/patterns/).
+ *
+ * When activated, it injects pattern context into the conversation so Claude
+ * can provide answers based on YOUR actual implementation (not generic LLM knowledge).
+ *
+ * Example:
+ *   User: "How do I implement hooks?"
+ *   Hook detects: "hooks" → Retrieves native-sdk-integration-v6.6.0.json
+ *   Result: Claude answers with YOUR v6.6.0 hook implementation
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface HookInput {
-  toolName: string;
-  prompt: string;
-  workingDirectory: string;
-  sessionId: string;
+  prompt?: string;
+  message?: string;
+  workingDirectory?: string;
+  context?: Record<string, unknown>;
 }
 
-// Read hook input from stdin
-const input: HookInput = JSON.parse(readFileSync(0, 'utf-8'));
+interface Pattern {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  implementation: {
+    code: string;
+    instructions: string[];
+    files?: Array<{
+      path: string;
+      lines?: string;
+      description: string;
+    }>;
+  };
+  metrics: {
+    successRate: number;
+    effortHours?: number;
+    estimatedHours?: number;
+    accuracyPercent?: number;
+  };
+  metadata: {
+    tags: string[];
+    commitHash?: string;
+    version: string;
+  };
+}
 
-const { prompt, workingDirectory } = input;
+// Keyword mapping to pattern files
+const KEYWORD_MAP: Record<string, string> = {
+  // Native SDK Integration
+  'hook|hooks|sdk|native|settings\\.json|posttooluse|subagent.*stop|stop.*hook|userpromptsub':
+    'native-sdk-integration-v6.6.0.json',
 
-// Load recent learnings from session history
-const learningLogPath = join(workingDirectory, '.versatil/learning/session-history.jsonl');
+  // Victor-Verifier
+  'verification|verifier|verify|hallucination|anti.*hallucination|victor|cove|chain.*of.*verification|proof.*log|confidence.*scor':
+    'victor-verifier-anti-hallucination.json',
 
-if (existsSync(learningLogPath)) {
-  try {
-    const logs = readFileSync(learningLogPath, 'utf-8')
-      .split('\n')
-      .filter(line => line.trim())
-      .slice(-5) // Last 5 sessions
-      .map(line => JSON.parse(line));
+  // Assessment Engine
+  'assessment|assess|quality.*audit|pattern.*detection|security.*scan|coverage.*requirement|semgrep|lighthouse|axe.*core':
+    'assessment-engine-v6.6.0.json',
 
-    const recentPatterns = logs
-      .flatMap(log => log.patterns || [])
-      .filter((pattern, index, self) => self.indexOf(pattern) === index) // Unique
-      .slice(0, 3); // Top 3
+  // Session CODIFY
+  'codify|learning|compounding|session.*end|claude\\.md|automatic.*learning|stop.*hook.*learning':
+    'session-codify-compounding.json',
 
-    if (recentPatterns.length > 0) {
-      console.log('\n💡 Recent Patterns from Learning System:');
-      recentPatterns.forEach(pattern => console.log(`   • ${pattern}`));
-      console.log('');
+  // Marketplace
+  'marketplace|repository.*org|cleanup|archive|plugin.*metadata|\\.claude.*plugin':
+    'marketplace-repository-organization.json'
+};
+
+function detectMatchingPatterns(userMessage: string): string[] {
+  const messageLower = userMessage.toLowerCase();
+  const matchedFiles: string[] = [];
+
+  for (const [keywords, patternFile] of Object.entries(KEYWORD_MAP)) {
+    const regex = new RegExp(keywords, 'i');
+    if (regex.test(messageLower)) {
+      matchedFiles.push(patternFile);
     }
-  } catch (err) {
-    // Ignore errors reading learning log
+  }
+
+  return Array.from(new Set(matchedFiles));
+}
+
+function loadPattern(filename: string, workingDir: string): Pattern | null {
+  try {
+    const patternPath = path.join(workingDir, '.versatil', 'learning', 'patterns', filename);
+
+    if (!fs.existsSync(patternPath)) {
+      return null;
+    }
+
+    const content = fs.readFileSync(patternPath, 'utf-8');
+    return JSON.parse(content) as Pattern;
+  } catch (error) {
+    return null;
   }
 }
 
-// Check for project-specific context
-const claudeMdPath = join(workingDirectory, 'CLAUDE.md');
-if (existsSync(claudeMdPath)) {
-  // CLAUDE.md exists and will be loaded by SDK automatically
-  // Just notify that context is available
+async function main() {
+  try {
+    const input: HookInput = JSON.parse(fs.readFileSync(process.stdin.fd, 'utf-8'));
+
+    const userMessage = input.prompt || input.message || '';
+    const workingDir = input.workingDirectory || process.cwd();
+
+    if (!userMessage) {
+      process.exit(0);
+    }
+
+    const matchedFiles = detectMatchingPatterns(userMessage);
+
+    if (matchedFiles.length === 0) {
+      process.exit(0);
+    }
+
+    const patterns: Pattern[] = [];
+    for (const filename of matchedFiles) {
+      const pattern = loadPattern(filename, workingDir);
+      if (pattern) {
+        patterns.push(pattern);
+      }
+    }
+
+    if (patterns.length > 0) {
+      console.error(`\n🧠 [RAG] Auto-activated ${patterns.length} pattern(s):`);
+      patterns.forEach((p, i) => {
+        console.error(`  ${i + 1}. ${p.name} (${(p.metrics.successRate * 100).toFixed(0)}% success)`);
+      });
+      console.error('');
+    }
+
+  } catch (error) {
+    // Fail gracefully
+  }
+
+  process.exit(0);
 }
 
-process.exit(0);
+main();

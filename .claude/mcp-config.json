@@ -1,0 +1,22 @@
+{
+  "$schema": "../config/mcp-config.schema.json",
+  "description": "VERSATIL Framework MCP Configuration with Skills Documentation",
+  "mcpServers": {
+    "skills-docs": {
+      "url": "https://gitmcp.io/anthropics/skills",
+      "timeout": 10000,
+      "criticalityLevel": "low",
+      "description": "Anthropic Skills Documentation - Access comprehensive skill guides via GitMCP"
+    }
+  },
+  "checkInterval": 300000,
+  "logFile": "logs/mcp-health.log",
+  "alertThreshold": 3,
+  "comments": {
+    "skills-docs": "GitMCP server providing access to Anthropic's skills repository documentation",
+    "timeout": "Timeout in milliseconds (10000 = 10 seconds)",
+    "criticalityLevel": "low | medium | high - determines alert urgency",
+    "checkInterval": "Interval between health checks in milliseconds (300000 = 5 minutes)",
+    "alertThreshold": "Number of consecutive failures before alerting"
+  }
+}

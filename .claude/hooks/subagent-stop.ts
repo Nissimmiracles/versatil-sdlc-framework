@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env -S npx tsx
 /**
  * Subagent-Stop Hook
  * Triggers after subagent (Task tool) completion

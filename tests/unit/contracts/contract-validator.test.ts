@@ -14,7 +14,7 @@
  * - Error and warning generation
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
+// Jest globals (describe, it, expect, beforeEach) are available globally - no import needed
 import {
   ContractValidator,
   validateContract,
@@ -29,7 +29,7 @@ import {
 } from '../../../src/agents/contracts/agent-handoff-contract.js';
 
 describe('ContractValidator', () => {
-  let validator: ContractValidator;
+  let validator;
 
   beforeEach(() => {
     validator = new ContractValidator();
@@ -47,7 +47,7 @@ describe('ContractValidator', () => {
 
     it('should reject contract without contractId', async () => {
       const contract = createValidContract();
-      contract.contractId = '' as any;
+      contract.contractId = '';
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -64,7 +64,7 @@ describe('ContractValidator', () => {
 
     it('should reject contract without version', async () => {
       const contract = createValidContract();
-      contract.version = '' as any;
+      contract.version = '';
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -97,7 +97,7 @@ describe('ContractValidator', () => {
 
     it('should reject contract without sender', async () => {
       const contract = createValidContract();
-      contract.sender = {} as any;
+      contract.sender = {};
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -131,7 +131,7 @@ describe('ContractValidator', () => {
 
     it('should reject contract without type', async () => {
       const contract = createValidContract();
-      contract.type = undefined as any;
+      contract.type = undefined;
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -165,7 +165,7 @@ describe('ContractValidator', () => {
 
     it('should reject contract without memory snapshot', async () => {
       const contract = createValidContract();
-      contract.memorySnapshot = undefined as any;
+      contract.memorySnapshot = undefined;
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -184,7 +184,7 @@ describe('ContractValidator', () => {
   describe('Business Logic Validation', () => {
     it('should reject work item without id', async () => {
       const contract = createValidContract();
-      contract.workItems[0].id = '' as any;
+      contract.workItems[0].id = '';
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -251,7 +251,7 @@ describe('ContractValidator', () => {
 
     it('should warn on missing expected output', async () => {
       const contract = createValidContract();
-      contract.expectedOutput = undefined as any;
+      contract.expectedOutput = undefined;
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -338,7 +338,7 @@ describe('ContractValidator', () => {
   describe('Memory Snapshot Validation', () => {
     it('should reject missing memory snapshot', async () => {
       const contract = createValidContract();
-      contract.memorySnapshot = null as any;
+      contract.memorySnapshot = null;
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -355,7 +355,7 @@ describe('ContractValidator', () => {
 
     it('should reject snapshot without agentId', async () => {
       const contract = createValidContract();
-      contract.memorySnapshot.agentId = '' as any;
+      contract.memorySnapshot.agentId = '';
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -372,7 +372,7 @@ describe('ContractValidator', () => {
 
     it('should reject snapshot without timestamp', async () => {
       const contract = createValidContract();
-      contract.memorySnapshot.timestamp = null as any;
+      contract.memorySnapshot.timestamp = null;
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -507,7 +507,7 @@ describe('ContractValidator', () => {
     it('should warn on quality gate without threshold', async () => {
       const contract = createValidContract();
       contract.expectedOutput.qualityGates = [
-        { name: 'Coverage', description: 'Test coverage', threshold: undefined as any }
+        { name: 'Coverage', description: 'Test coverage', threshold: undefined }
       ];
 
       const result = await validator.validateBeforeSend(contract);
@@ -689,8 +689,8 @@ describe('ContractValidator', () => {
 
     it('should deduct points for errors', async () => {
       const contract = createValidContract();
-      contract.contractId = '' as any; // Critical error (-15)
-      contract.version = '' as any; // High error (-15)
+      contract.contractId = ''; // Critical error (-15)
+      contract.version = ''; // High error (-15)
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -711,13 +711,13 @@ describe('ContractValidator', () => {
     it('should clamp score between 0 and 100', async () => {
       const contract = createValidContract();
       // Add many errors to push score below 0
-      contract.contractId = '' as any;
-      contract.version = '' as any;
-      contract.sender = {} as any;
+      contract.contractId = '';
+      contract.version = '';
+      contract.sender = {};
       contract.receivers = [];
-      contract.type = undefined as any;
+      contract.type = undefined;
       contract.workItems = [];
-      contract.memorySnapshot = null as any;
+      contract.memorySnapshot = null;
 
       const result = await validator.validateBeforeSend(contract);
 
@@ -730,7 +730,7 @@ describe('ContractValidator', () => {
     it('should skip schema validation when disabled', async () => {
       const customValidator = new ContractValidator({ validateSchema: false });
       const contract = createValidContract();
-      contract.contractId = '' as any; // Would normally fail schema validation
+      contract.contractId = ''; // Would normally fail schema validation
 
       const result = await customValidator.validateBeforeSend(contract);
 
@@ -756,7 +756,7 @@ describe('ContractValidator', () => {
     it('should skip memory validation when disabled', async () => {
       const customValidator = new ContractValidator({ validateMemory: false });
       const contract = createValidContract();
-      contract.memorySnapshot.agentId = '' as any; // Would normally fail
+      contract.memorySnapshot.agentId = ''; // Would normally fail
 
       const result = await customValidator.validateBeforeSend(contract);
 
@@ -802,7 +802,7 @@ describe('ContractValidator', () => {
 
 // Helper functions
 
-function createValidContract(): AgentHandoffContract {
+function createValidContract() {
   const builder = new ContractBuilder('alex-ba');
 
   builder
@@ -861,7 +861,7 @@ function createValidContract(): AgentHandoffContract {
   return builder.build();
 }
 
-function createValidThreeTierContract(): ThreeTierHandoffContract {
+function createValidThreeTierContract() {
   const baseContract = createValidContract();
 
   return {

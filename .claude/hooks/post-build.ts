@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env -S npx tsx
 /**
  * Post-Build Hook
  * Triggers after build commands complete

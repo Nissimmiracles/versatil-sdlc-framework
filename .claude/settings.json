@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/post-file-edit.ts"
+            "command": ".claude/hooks/dist/post-file-edit.cjs"
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/post-build.ts"
+            "command": ".claude/hooks/dist/post-build.cjs"
           }
         ]
       },
@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/post-agent-response.ts"
+            "command": ".claude/hooks/dist/post-agent-response.cjs"
           }
         ]
       }
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/subagent-stop.ts"
+            "command": ".claude/hooks/dist/subagent-stop.cjs"
           }
         ]
       }
@@ -46,7 +46,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/session-codify.ts"
+            "command": ".claude/hooks/dist/session-codify.cjs"
           }
         ]
       }
@@ -57,7 +57,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/before-prompt.ts"
+            "command": ".claude/hooks/dist/before-prompt.cjs"
           }
         ]
       }

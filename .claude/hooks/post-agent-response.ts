@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env -S npx tsx
 /**
  * Post-Agent-Response Hook (Victor-Verifier Integration)
  * Triggers after any tool use to extract and verify factual claims

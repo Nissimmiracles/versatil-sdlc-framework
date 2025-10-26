@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env -S npx tsx
 /**
  * Post-File-Edit Hook
  * Triggers agent auto-activation after file edits

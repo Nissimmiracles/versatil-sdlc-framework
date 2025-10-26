@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env -S npx tsx
 /**
  * Session-Codify Hook (COMPOUNDING ENGINEERING - THE MISSING PIECE!)
  * Triggers at end of session to capture learnings

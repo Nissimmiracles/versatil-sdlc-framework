@@ -281,7 +281,7 @@ async function runStressTests(stressTests) {
       if (test.type === 'existing') {
         // Run existing Jest/Playwright test
         const output = execSync(
-          `npm run test:stress -- --testPathPattern="${test.testFile}"`,
+          `npm run test:stress -- --testPathPatterns="${test.testFile}"`,
           {
             cwd: resolve(__dirname, '../../..'),
             timeout: CONFIG.timeout,

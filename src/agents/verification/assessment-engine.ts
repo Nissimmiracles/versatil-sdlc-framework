@@ -308,7 +308,7 @@ export class AssessmentEngine {
             {
               type: 'TestCoverage',
               tool: 'jest',
-              command: 'npm run test:coverage -- --testPathPattern=".*\\.(test|spec)\\.(ts|js)"',
+              command: 'npm run test:coverage -- --testPathPatterns=".*\\.(test|spec)\\.(ts|js)"',
               threshold: 80,
               mandatory: true,
               reason: 'API endpoints require 80%+ test coverage'
@@ -345,7 +345,7 @@ export class AssessmentEngine {
             {
               type: 'TestCoverage',
               tool: 'jest',
-              command: 'npm run test:coverage -- --testPathPattern=".*\\.(test|spec)\\.(tsx|jsx)"',
+              command: 'npm run test:coverage -- --testPathPatterns=".*\\.(test|spec)\\.(tsx|jsx)"',
               threshold: 75,
               mandatory: false,
               reason: 'UI components should have 75%+ test coverage'
@@ -388,7 +388,7 @@ export class AssessmentEngine {
             {
               type: 'TestCoverage',
               tool: 'jest',
-              command: 'npm run test:coverage -- --testPathPattern=".*database.*\\.(test|spec)\\.(ts|js)"',
+              command: 'npm run test:coverage -- --testPathPatterns=".*database.*\\.(test|spec)\\.(ts|js)"',
               threshold: 85,
               mandatory: true,
               reason: 'Database layer requires 85%+ test coverage'

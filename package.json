@@ -29,6 +29,7 @@
     "recover": "node scripts/recover-framework.cjs",
     "typecheck": "tsc --noEmit",
     "build": "node scripts/show-framework-active.cjs --quick && tsc && ~/.versatil/hooks/afterBuild.sh",
+    "build:hooks": "bash scripts/build-hooks.sh",
     "build:security": "node scripts/show-framework-active.cjs --quick && tsc && echo 'Security modules compiled'",
     "build:watch": "node scripts/show-framework-active.cjs --quick && tsc --watch",
     "build:release": "npm run lint && npm run build && npm run test:full",
@@ -140,7 +141,7 @@
     "context:stats": "node scripts/context-stats.cjs stats",
     "context:report": "node scripts/context-stats.cjs report",
     "context:cleanup": "node scripts/context-stats.cjs cleanup",
-    "context:test": "node scripts/test-context-stats.cjs",
+    "context:test": "node scripts/test-three-layer-context.cjs",
     "rag:setup": "node scripts/setup-supabase.cjs",
     "rag:migrate": "node scripts/migrate-vector-store.cjs",
     "rag:migrate:gcp": "node scripts/migrate-to-gcp.cjs",
@@ -154,7 +155,6 @@
     "learning:test": "node scripts/test-learning.cjs",
     "learning:test:verbose": "node scripts/test-learning.cjs --verbose",
     "context:migrate": "node scripts/migrate-project-context.cjs",
-    "context:test": "node scripts/test-three-layer-context.cjs",
     "verify:agent-count": "node scripts/verify-agent-count.cjs",
     "fix:agent-count": "node scripts/fix-agent-count.cjs",
     "session:compass": "node scripts/session-compass.cjs",
@@ -234,9 +234,7 @@
     "audit:daemon:run": "node bin/versatil-audit-daemon.js run",
     "audit:daemon:logs": "node bin/versatil-audit-daemon.js logs",
     "scenarios:test": "node dist/testing/scenarios/run-scenario-tests.js",
-    "prepare": "husky",
-    "rag:migrate:gcp": "node scripts/migrate-to-gcp.cjs",
-    "rag:test:gcp": "node scripts/test-gcp-rag.cjs"
+    "prepare": "husky"
   },
   "keywords": [
     "claude-opera",
@@ -328,7 +326,7 @@
     "@percy/playwright": "^1.0.9",
     "@playwright/test": "^1.55.0",
     "@types/fs-extra": "^11.0.4",
-    "@types/jest": "^29.5.0",
+    "@types/jest": "^29.5.13",
     "@types/node": "^24.5.2",
     "@types/tar": "^6.1.10",
     "@types/ws": "^8.5.10",
@@ -338,7 +336,7 @@
     "eslint": "^8.57.1",
     "globals": "^16.4.0",
     "husky": "^9.1.7",
-    "jest": "^29.6.0",
+    "jest": "^29.7.0",
     "jest-html-reporters": "^3.1.7",
     "jest-junit": "^16.0.0",
     "playwright": "^1.55.0",
@@ -347,6 +345,7 @@
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.7.0",
     "typescript-eslint": "^8.44.0"
   },
   "overrides": {

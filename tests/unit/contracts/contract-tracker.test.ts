@@ -13,7 +13,7 @@
  * - Integration with stats tracker
  */
 
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+// Jest globals (describe, it, expect, beforeEach, afterEach) are available globally
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
@@ -31,8 +31,8 @@ import {
 import { ValidationResult } from '../../../src/agents/contracts/contract-validator.js';
 
 describe('ContractTracker', () => {
-  let tracker: ContractTracker;
-  let testStatsDir: string;
+  let tracker;
+  let testStatsDir;
 
   beforeEach(async () => {
     // Create temporary test directory
@@ -98,7 +98,7 @@ describe('ContractTracker', () => {
 
     it('should track contract creation with validation result', async () => {
       const contract = createTestContract();
-      const validationResult: ValidationResult = {
+      const validationResult = {
         valid: true,
         errors: [],
         warnings: [],
@@ -281,7 +281,7 @@ describe('ContractTracker', () => {
       const contract = createTestContract();
       await tracker.trackContractCreated(contract);
 
-      const validationResult: ValidationResult = {
+      const validationResult = {
         valid: true,
         errors: [],
         warnings: [{ field: 'test', message: 'Test warning', impact: 'low' }],
@@ -300,7 +300,7 @@ describe('ContractTracker', () => {
       const contract = createTestContract();
       await tracker.trackContractCreated(contract);
 
-      const validationResult: ValidationResult = {
+      const validationResult = {
         valid: false,
         errors: [
           { field: 'field1', message: 'Error 1', severity: 'high' },
@@ -639,7 +639,7 @@ describe('ContractTracker', () => {
 
 // Helper function
 
-function createTestContract(): AgentHandoffContract {
+function createTestContract() {
   const builder = new ContractBuilder('alex-ba');
 
   builder

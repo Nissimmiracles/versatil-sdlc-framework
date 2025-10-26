@@ -42,9 +42,9 @@ jest.mock('../../src/update/github-release-checker', () => ({
 }));
 
 describe('UpdateManager', () => {
-  let updateManager: UpdateManager;
-  let versatilHome: string;
-  let updateHistoryFile: string;
+  let updateManager;
+  let versatilHome;
+  let updateHistoryFile;
 
   // Get references to mocked modules
   const fs = require('fs/promises');
@@ -61,7 +61,7 @@ describe('UpdateManager', () => {
     (fs.readdir as jest.Mock).mockResolvedValue([]);
 
     // Setup mockExecAsync (promise-based) with smart command handling
-    mockExecAsync.mockImplementation((cmd: string) => {
+    mockExecAsync.mockImplementation((cmd) => {
       if (cmd.includes('tar -czf') || cmd.includes('tar -xzf')) {
         return Promise.resolve({ stdout: '', stderr: '' });
       } else if (cmd.includes('npm update')) {
@@ -70,7 +70,7 @@ describe('UpdateManager', () => {
         // Extract version from npm update command or return default
         const updateMatch = (mockExecAsync.mock.calls || [])
           .flat()
-          .find((call: string) => typeof call === 'string' && call.includes('npm update'))
+          .find((call) => typeof call === 'string' && call.includes('npm update'))
           ?.match(/@(\d+\.\d+\.\d+)/);
         const version = updateMatch ? updateMatch[1] : '3.0.0';
         return Promise.resolve({ stdout: version, stderr: '' });
@@ -104,7 +104,7 @@ describe('UpdateManager', () => {
   describe('1. checkForUpdates - no updates available', () => {
     it('should return hasUpdate=false when current version is latest', async () => {
       const currentVersion = '3.0.0';
-      const mockResult: UpdateCheckResult = {
+      const mockResult = {
         hasUpdate: false,
         currentVersion: '3.0.0',
         latestVersion: '3.0.0'
@@ -122,7 +122,7 @@ describe('UpdateManager', () => {
 
     it('should handle check when already on future version', async () => {
       const currentVersion = '4.0.0';
-      const mockResult: UpdateCheckResult = {
+      const mockResult = {
         hasUpdate: false,
         currentVersion: '4.0.0',
         latestVersion: '3.0.0'
@@ -149,7 +149,7 @@ describe('UpdateManager', () => {
         prerelease: false
       };
 
-      const mockResult: UpdateCheckResult = {
+      const mockResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0',
@@ -169,7 +169,7 @@ describe('UpdateManager', () => {
     });
 
     it('should correctly identify minor version updates', async () => {
-      const mockResult: UpdateCheckResult = {
+      const mockResult = {
         hasUpdate: true,
         currentVersion: '3.0.0',
         latestVersion: '3.1.0',
@@ -185,7 +185,7 @@ describe('UpdateManager', () => {
     });
 
     it('should correctly identify patch version updates', async () => {
-      const mockResult: UpdateCheckResult = {
+      const mockResult = {
         hasUpdate: true,
         currentVersion: '3.0.0',
         latestVersion: '3.0.1',
@@ -207,7 +207,7 @@ describe('UpdateManager', () => {
       const targetVersion = '3.0.0';
 
       // Mock update check
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0',
@@ -216,7 +216,7 @@ describe('UpdateManager', () => {
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
       // Mock backup creation and update commands
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('tar -czf')) {
           return Promise.resolve({ stdout: '', stderr: '' });
         } else if (cmd.includes('npm update')) {
@@ -245,14 +245,14 @@ describe('UpdateManager', () => {
         backupBeforeUpdate: false
       });
 
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
       };
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('npm update')) {
           return Promise.resolve({ stdout: 'Updated', stderr: '' });
         } else if (cmd.includes('versatil --version')) {
@@ -271,14 +271,14 @@ describe('UpdateManager', () => {
     });
 
     it('should record successful update in history', async () => {
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
       };
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('npm update')) {
           return Promise.resolve({ stdout: 'Updated', stderr: '' });
         } else if (cmd.includes('versatil --version')) {
@@ -310,14 +310,14 @@ describe('UpdateManager', () => {
     });
 
     it('should handle npm update failures gracefully', async () => {
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
       };
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('npm update')) {
           return Promise.reject(new Error('ECONNREFUSED: Connection refused'));
         }
@@ -334,14 +334,14 @@ describe('UpdateManager', () => {
     });
 
     it('should continue with failed backup warning', async () => {
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
       };
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('tar -czf')) {
           return Promise.reject(new Error('Backup failed'));
         } else if (cmd.includes('npm update')) {
@@ -366,14 +366,14 @@ describe('UpdateManager', () => {
 
   describe('5. installUpdate - checksum validation', () => {
     it('should detect version mismatch after installation', async () => {
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
       };
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('npm update')) {
           return Promise.resolve({ stdout: 'Updated', stderr: '' });
         } else if (cmd.includes('versatil --version')) {
@@ -392,14 +392,14 @@ describe('UpdateManager', () => {
     });
 
     it('should accept version without v prefix', async () => {
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
       };
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('npm update')) {
           return Promise.resolve({ stdout: 'Updated', stderr: '' });
         } else if (cmd.includes('versatil --version')) {
@@ -419,9 +419,9 @@ describe('UpdateManager', () => {
     it('should rollback to previous version from backup', async () => {
       const backupFile = path.join(versatilHome, 'backups', 'versatil-v2.5.0-2025-10-03T12-00-00.tar.gz');
 
-      (fs.readdir as jest.Mock).mockResolvedValue(['versatil-v2.5.0-2025-10-03T12-00-00.tar.gz'] as any);
+      (fs.readdir as jest.Mock).mockResolvedValue(['versatil-v2.5.0-2025-10-03T12-00-00.tar.gz']);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('tar -xzf')) {
           return Promise.resolve({ stdout: '', stderr: '' });
         }
@@ -444,9 +444,9 @@ describe('UpdateManager', () => {
         'versatil-v2.4.0-2025-10-01T12-00-00.tar.gz',
         'versatil-v2.5.0-2025-10-03T12-00-00.tar.gz',
         'versatil-v2.3.0-2025-09-30T12-00-00.tar.gz'
-      ] as any);
+      ]);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('tar -xzf')) {
           return Promise.resolve({ stdout: '', stderr: '' });
         }
@@ -463,9 +463,9 @@ describe('UpdateManager', () => {
     });
 
     it('should handle rollback failure gracefully', async () => {
-      (fs.readdir as jest.Mock).mockResolvedValue(['backup.tar.gz'] as any);
+      (fs.readdir as jest.Mock).mockResolvedValue(['backup.tar.gz']);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('tar -xzf')) {
           return Promise.reject(new Error('Extraction failed'));
         }
@@ -481,7 +481,7 @@ describe('UpdateManager', () => {
     });
 
     it('should handle no backups found', async () => {
-      (fs.readdir as jest.Mock).mockResolvedValue([] as any);
+      (fs.readdir as jest.Mock).mockResolvedValue([]);
 
       const result = await updateManager.rollback();
 
@@ -494,7 +494,7 @@ describe('UpdateManager', () => {
 
   describe('7. updateLock - prevent concurrent updates', () => {
     it('should handle concurrent update attempts', async () => {
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
@@ -502,7 +502,7 @@ describe('UpdateManager', () => {
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
       let updateInProgress = false;
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('npm update')) {
           if (updateInProgress) {
             return Promise.reject(new Error('Update already in progress'));
@@ -532,7 +532,7 @@ describe('UpdateManager', () => {
 
   describe('8. backupCreation - verify backup before update', () => {
     it('should create backup before starting update', async () => {
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
@@ -542,7 +542,7 @@ describe('UpdateManager', () => {
       let backupCreated = false;
       let updateStarted = false;
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('tar -czf')) {
           expect(updateStarted).toBe(false); // Backup should happen before update
           backupCreated = true;
@@ -564,14 +564,14 @@ describe('UpdateManager', () => {
     });
 
     it('should create backup with correct naming convention', async () => {
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
       };
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('tar -czf')) {
           // Verify backup path includes version and timestamp
           expect(cmd).toMatch(/versatil-v2\.5\.0-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}\.tar\.gz/);
@@ -588,14 +588,14 @@ describe('UpdateManager', () => {
     });
 
     it('should create backups directory if it does not exist', async () => {
-      const mockCheckResult: UpdateCheckResult = {
+      const mockCheckResult = {
         hasUpdate: true,
         currentVersion: '2.5.0',
         latestVersion: '3.0.0'
       };
       sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-      mockExecAsync.mockImplementation((cmd: string) => {
+      mockExecAsync.mockImplementation((cmd) => {
         if (cmd.includes('tar -czf')) {
           return Promise.resolve({ stdout: '', stderr: '' });
         } else if (cmd.includes('npm update')) {
@@ -705,7 +705,7 @@ describe('UpdateManager', () => {
           'versatil-v2.3.0-2025-09-30T12-00-00.tar.gz'
         ];
 
-        (fs.readdir as jest.Mock).mockResolvedValue(mockBackups as any);
+        (fs.readdir as jest.Mock).mockResolvedValue(mockBackups);
 
         const backups = await updateManager.listBackups();
 
@@ -720,7 +720,7 @@ describe('UpdateManager', () => {
           'versatil-v2.4.0-2025-10-01T12-00-00.tar.gz'
         ];
 
-        (fs.readdir as jest.Mock).mockResolvedValue(mockFiles as any);
+        (fs.readdir as jest.Mock).mockResolvedValue(mockFiles);
 
         const backups = await updateManager.listBackups();
 
@@ -758,7 +758,7 @@ describe('UpdateManager', () => {
 
     describe('Update History Recording', () => {
       it('should record failed updates with error message', async () => {
-        const mockCheckResult: UpdateCheckResult = {
+        const mockCheckResult = {
           hasUpdate: true,
           currentVersion: '2.5.0',
           latestVersion: '3.0.0'
@@ -766,7 +766,7 @@ describe('UpdateManager', () => {
         sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
         const errorMessage = 'Network error occurred';
-        mockExecAsync.mockImplementation((cmd: string) => {
+        mockExecAsync.mockImplementation((cmd) => {
           if (cmd.includes('npm update')) {
             return Promise.reject(new Error(errorMessage));
           }
@@ -796,14 +796,14 @@ describe('UpdateManager', () => {
 
         (fs.readFile as jest.Mock).mockResolvedValue(JSON.stringify(largeHistory));
 
-        const mockCheckResult: UpdateCheckResult = {
+        const mockCheckResult = {
           hasUpdate: true,
           currentVersion: '3.0.0',
           latestVersion: '3.1.0'
         };
         sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-        mockExecAsync.mockImplementation((cmd: string) => {
+        mockExecAsync.mockImplementation((cmd) => {
           if (cmd.includes('npm update')) {
             return Promise.resolve({ stdout: 'Updated', stderr: '' });
           } else if (cmd.includes('versatil --version')) {
@@ -823,14 +823,14 @@ describe('UpdateManager', () => {
       });
 
       it('should not fail update if history recording fails', async () => {
-        const mockCheckResult: UpdateCheckResult = {
+        const mockCheckResult = {
           hasUpdate: true,
           currentVersion: '2.5.0',
           latestVersion: '3.0.0'
         };
         sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-        mockExecAsync.mockImplementation((cmd: string) => {
+        mockExecAsync.mockImplementation((cmd) => {
           if (cmd.includes('npm update')) {
             return Promise.resolve({ stdout: 'Updated', stderr: '' });
           } else if (cmd.includes('versatil --version')) {
@@ -855,7 +855,7 @@ describe('UpdateManager', () => {
 
     describe('No Update Scenario', () => {
       it('should return true and log message when already on latest version', async () => {
-        const mockCheckResult: UpdateCheckResult = {
+        const mockCheckResult = {
           hasUpdate: false,
           currentVersion: '3.0.0',
           latestVersion: '3.0.0'
@@ -871,14 +871,14 @@ describe('UpdateManager', () => {
       });
 
       it('should install specific target version even if no update available', async () => {
-        const mockCheckResult: UpdateCheckResult = {
+        const mockCheckResult = {
           hasUpdate: false,
           currentVersion: '3.0.0',
           latestVersion: '3.0.0'
         };
         sharedMockInstance.checkForUpdate.mockResolvedValue(mockCheckResult);
 
-        mockExecAsync.mockImplementation((cmd: string) => {
+        mockExecAsync.mockImplementation((cmd) => {
           if (cmd.includes('npm update')) {
             return Promise.resolve({ stdout: 'Updated', stderr: '' });
           } else if (cmd.includes('versatil --version')) {

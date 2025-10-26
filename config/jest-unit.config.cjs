@@ -15,21 +15,33 @@ module.exports = {
   // Root directory resolution - set to project root, not config dir
   rootDir: require('path').resolve(__dirname, '..'),
 
-  // Preset and environment
-  preset: 'ts-jest',
+  // NO preset - prevents babel-jest usage (Native SDK requirement)
   testEnvironment: 'node',
 
-  // TypeScript transformation
+  // TypeScript transformation (explicitly defined, NO preset)
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json',
+      tsconfig: {
+        module: 'commonjs',
+        target: 'es2020',
+        esModuleInterop: true,
+        skipLibCheck: true
+      },
       isolatedModules: true,
       useESM: false,
       babelConfig: false,
-      diagnostics: false
+      diagnostics: {
+        warnOnly: true,
+        exclude: ['**/*.spec.ts', '**/*.test.ts']
+      }
     }],
     '^.+\\.(js|jsx)$': ['ts-jest', {
-      tsconfig: 'tsconfig.test.json',
+      tsconfig: {
+        module: 'commonjs',
+        target: 'es2020',
+        esModuleInterop: true,
+        allowJs: true
+      },
       isolatedModules: true,
       useESM: false,
       babelConfig: false
