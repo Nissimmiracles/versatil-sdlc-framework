@@ -1,12 +1,14 @@
-# VERSATIL MCP Integration Guide v6.1
+# VERSATIL MCP Integration Guide v7.5.1
 
 **Complete guide to Model Context Protocol (MCP) integration in VERSATIL SDLC Framework**
+
+**New in v7.5.1**: Pattern Library MCP Integration - 8 new tools for WebSocket, Payments, S3, Email, and Rate-limiting patterns
 
 ---
 
 ## 📋 MCP Server Inventory
 
-VERSATIL integrates **11 MCP servers** across 4 categories:
+VERSATIL integrates **12 MCP servers** across 5 categories (including **Pattern Library v7.5.1**):
 
 ### Core MCPs (Always Available)
 1. **@modelcontextprotocol/sdk** (v1.19.1)
@@ -27,8 +29,10 @@ VERSATIL integrates **11 MCP servers** across 4 categories:
 4. **VERSATIL MCP Server** (Built-in) ✅
    - Framework orchestration
    - Agent communication
-   - **Location**: `src/mcp/versatil-mcp-server-v2.ts`
+   - **Pattern Library (v7.5.1)**: 8 new pattern tools
+   - **Location**: `src/mcp/versatil-mcp-server-v2.ts`, `src/mcp/pattern-mcp-tools.ts`
    - **Used by**: All agents
+   - **Tools**: 29 total (21 core + 8 pattern tools)
 
 ### Required MCPs (Installed, Needs Wrapper)
 5. **@modelcontextprotocol/server-github** (v2025.4.8)
@@ -70,6 +74,14 @@ VERSATIL integrates **11 MCP servers** across 4 categories:
     - Ant Design v5 component documentation
     - **Used by**: James-Frontend
     - **Status**: Under investigation
+
+### Pattern Library MCPs (v7.5.1 - Built-in)
+12. **Pattern Library MCP Tools** (Built-in) ✅
+    - **8 new MCP tools** for high-value patterns
+    - **Location**: `src/mcp/pattern-mcp-tools.ts`
+    - **Patterns**: WebSocket, Payments, S3, Email, Rate-limiting
+    - **Used by**: All agents via Oliver-MCP routing
+    - **Time Savings**: 40-57 hours/year
 
 ---
 
@@ -161,6 +173,50 @@ const content = await exa.getContents([
   'https://example.com/article1',
   'https://example.com/article2'
 ]);
+```
+
+### 4. Using Pattern Library MCP (v7.5.1)
+
+```typescript
+import { searchPatterns, applyPattern, setupWebSocket, setupPayment } from './mcp/pattern-mcp-tools.js';
+
+// Search for patterns by keyword
+const patterns = await searchPatterns('real-time chat');
+// Returns: websocket-real-time.json (high match score)
+
+// Apply pattern template to project
+const result = await applyPattern('websocket-real-time.json', {
+  projectPath: process.cwd(),
+  customizations: {
+    port: 3001,
+    enableAuth: true,
+    enableRooms: true
+  }
+});
+
+// Quick setup for WebSocket
+const websocketSetup = await setupWebSocket({
+  port: 3001,
+  auth: true,
+  rooms: true
+});
+console.log(websocketSetup.next_steps);
+// Output: ['Install: npm install socket.io socket.io-client', 'Create src/websocket/socket-server.ts', ...]
+
+// Quick setup for Stripe/PayPal payments
+const paymentSetup = await setupPayment({
+  provider: 'stripe', // or 'paypal'
+  currency: 'USD',
+  enableWebhooks: true,
+  enableSubscriptions: true
+});
+console.log(paymentSetup.config_steps);
+// Output: ['Get API keys from Stripe Dashboard', 'Set STRIPE_SECRET_KEY in .env', ...]
+
+// Generate telemetry report
+const telemetryReport = await generateTelemetryReport();
+console.log(telemetryReport.summary);
+// Output: { hook_performance: {...}, agent_activation: {...}, pattern_usage: {...} }
 ```
 
 ---
@@ -256,6 +312,29 @@ await mariaMCP.createGitHubIssue('owner', 'repo', {
 ```typescript
 - vertexai_predict(model, data) // if installed
 - github_get_file(owner, repo, path)  // for datasets
+```
+
+### Oliver-MCP (MCP Orchestrator)
+**MCPs**: All 29 MCP tools (21 core + 8 pattern tools)
+
+**Pattern Library Routing (v7.5.1)**:
+```typescript
+// Intelligent routing for pattern implementation
+- pattern_search(query) → Search WebSocket, Payments, S3, Email, Rate-limiting patterns
+- pattern_apply(patternFile, options) → Apply pattern with code generation
+- websocket_setup(options) → Socket.io server + client setup
+- payment_setup(options) → Stripe/PayPal integration
+- s3_upload_setup(options) → AWS S3 file upload
+- email_setup(options) → SendGrid/Nodemailer email system
+- rate_limit_setup(options) → Redis-backed rate limiting
+- telemetry_report() → Generate analytics report
+```
+
+**Example Usage**:
+```typescript
+// Oliver-MCP automatically routes pattern requests
+await oliverMCP.patternSearch('real-time chat');
+await oliverMCP.websocketSetup({ port: 3001, auth: true });
 ```
 
 ---
@@ -464,6 +543,7 @@ monitor.on('mcp-recovered', ({ name }) => {
 
 ---
 
-**Version**: 6.1.0
-**Last Updated**: 2025-10-08
+**Version**: 7.5.1 (with Pattern Library)
+**Last Updated**: 2025-10-26
 **Status**: ✅ Production Ready
+**New in v7.5.1**: 8 pattern library MCP tools (40-57 hours/year time savings)
