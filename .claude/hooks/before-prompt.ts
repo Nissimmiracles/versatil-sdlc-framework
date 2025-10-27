@@ -18,6 +18,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { getMetricsService } from '../../src/telemetry/automation-metrics.js';
+import { detectContextIdentity, type ContextIdentity } from '../../src/isolation/context-identity.js';
 
 interface HookInput {
   prompt?: string;
@@ -405,6 +406,70 @@ function detectLibraryMentions(userMessage: string): LibraryDetection {
   };
 }
 
+/**
+ * Generate context enforcement boundaries for injection
+ * Phase 7.6.0: Context Isolation Enforcement
+ */
+function generateEnforcementContext(identity: ContextIdentity): string {
+  const isFrameworkDev = identity.role === 'framework-developer';
+
+  let content = `# 🔒 ENFORCED CONTEXT ISOLATION\n\n`;
+  content += `**Active Mode**: ${isFrameworkDev ? '🛠️ Framework Development' : '👤 User Project'}\n`;
+  content += `**Role**: ${identity.role}\n`;
+  content += `**Audience**: ${identity.audience}\n`;
+  content += `**Boundary**: ${identity.boundary}\n\n`;
+
+  content += `## MANDATORY BOUNDARIES\n\n`;
+
+  if (isFrameworkDev) {
+    content += `### Framework Development Mode - Full Access\n\n`;
+    content += `✅ **Allowed**:\n`;
+    content += `- Access framework internals (src/agents/, src/mcp/, src/orchestration/)\n`;
+    content += `- Modify agent definitions, hooks, skills\n`;
+    content += `- Create/edit framework components\n`;
+    content += `- RAG namespace: ~/.versatil-global/framework-dev/\n`;
+    content += `- All OPERA agents available (including Sarah-PM)\n\n`;
+
+    content += `❌ **BLOCKED**:\n`;
+    content += `- Customer project data (${identity.isolation.blockedPatterns.slice(0, 2).join(', ')})\n`;
+    content += `- User project learnings\n`;
+    content += `- Customer-specific patterns\n\n`;
+
+    content += `⚠️  **IMPORTANT**: Framework learnings stay in framework-dev namespace. Do NOT mix with customer data.\n`;
+  } else {
+    content += `### User Project Mode - Restricted Access\n\n`;
+    content += `✅ **Allowed**:\n`;
+    content += `- Build features using VERSATIL framework\n`;
+    content += `- Access public APIs and documentation\n`;
+    content += `- Use customer-facing agents: Maria-QA, James-Frontend, Marcus-Backend, Dana-Database, Dr.AI-ML, Alex-BA\n`;
+    content += `- RAG namespace: ${identity.projectPath}/.versatil/\n`;
+    content += `- Shared patterns: ~/.versatil-global/cross-project/\n\n`;
+
+    content += `❌ **BLOCKED**:\n`;
+    content += `- Framework internals (${identity.isolation.blockedPatterns.slice(0, 2).join(', ')})\n`;
+    content += `- Framework source code (src/, .claude/agents/, etc.)\n`;
+    content += `- Sarah-PM agent (framework architecture only)\n`;
+    content += `- Framework development patterns\n\n`;
+
+    content += `⚠️  **IMPORTANT**: You are in user project context. Framework internals are NOT accessible. Use Task tool to invoke agents.\n`;
+  }
+
+  content += `\n## RUNTIME ENFORCEMENT\n\n`;
+  content += `This isolation is **ENFORCED** at runtime by:\n`;
+  content += `1. **BoundaryEnforcementEngine** - Filesystem access control\n`;
+  content += `2. **ZeroTrustProjectIsolation** - Behavioral threat detection\n`;
+  content += `3. **MCP Tool Guards** - Permission validation before tool execution\n`;
+  content += `4. **Skill Filtering** - Framework-only skills don't load in user context\n`;
+  content += `5. **RAG Namespace Isolation** - Queries only search allowed namespaces\n\n`;
+
+  content += `**Attempting to bypass these boundaries will result in:**\n`;
+  content += `- Immediate access denial\n`;
+  content += `- Security violation logging\n`;
+  content += `- User notification of attempted boundary breach\n`;
+
+  return content;
+}
+
 async function main() {
   const hookStartTime = Date.now(); // Track execution time for telemetry
 
@@ -416,6 +481,15 @@ async function main() {
 
     if (!userMessage) {
       process.exit(0);
+    }
+
+    // Phase 7.6.0: Context Identity Detection (FIRST - before all other processing)
+    let contextIdentity: ContextIdentity | null = null;
+    try {
+      contextIdentity = await detectContextIdentity(workingDir);
+      console.error(`\n🔍 [Context] Detected: ${contextIdentity.role === 'framework-developer' ? '🛠️ Framework Development' : '👤 User Project'} Mode`);
+    } catch (error) {
+      console.error(`\n⚠️  [Context] Detection failed - defaulting to user-project mode (safest): ${error instanceof Error ? error.message : String(error)}`);
     }
 
     const matchedFiles = detectMatchingPatterns(userMessage);
@@ -430,9 +504,10 @@ async function main() {
     const hasPatterns = matchedFiles.length > 0;
     const hasIntentSuggestions = intentSuggestions.length > 0;
     const hasLibraryMentions = detectedLibraries.primary.length > 0 || detectedLibraries.related.length > 0;
+    const hasContextEnforcement = contextIdentity !== null;
 
-    // Exit if nothing to inject
-    if (!hasPatterns && !hasIntentSuggestions && !hasLibraryMentions) {
+    // Always inject if context enforcement is active (even if no patterns/libraries)
+    if (!hasPatterns && !hasIntentSuggestions && !hasLibraryMentions && !hasContextEnforcement) {
       process.exit(0);
     }
 
@@ -497,11 +572,19 @@ async function main() {
 
     console.error('');
 
-    // Skills-First Context Injection (Phase 3 Complete, Phase 6 Enhanced)
+    // Skills-First Context Injection (Phase 3 Complete, Phase 6 Enhanced, Phase 7.6.0 Context Enforcement)
     let contextContent = '';
 
-    // Phase 6: Intent-based suggestions (highest priority)
+    // Phase 7.6.0: Context Enforcement Boundaries (HIGHEST PRIORITY)
+    if (contextIdentity) {
+      contextContent += generateEnforcementContext(contextIdentity);
+    }
+
+    // Phase 6: Intent-based suggestions
     if (hasIntentSuggestions) {
+      if (contextContent.length > 0) {
+        contextContent += '\n\n---\n\n';
+      }
       contextContent += intentSuggestions;
     }
 

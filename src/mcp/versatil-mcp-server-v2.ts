@@ -13,6 +13,10 @@ import { SDLCOrchestrator } from '../flywheel/sdlc-orchestrator.js';
 import { VERSATILLogger } from '../utils/logger.js';
 import { PerformanceMonitor } from '../analytics/performance-monitor.js';
 import { chromeMCPExecutor } from './chrome-mcp-executor.js';
+import { type ContextIdentity, validateAccess, validateAgent } from '../isolation/context-identity.js';
+import { type ProjectContext, MultiProjectManager } from '../isolation/multi-project-manager.js';
+import { BoundaryEnforcementEngine } from '../security/boundary-enforcement-engine.js';
+import { ZeroTrustProjectIsolation } from '../security/zero-trust-project-isolation.js';
 import { supabaseMCPExecutor } from './supabase-mcp-executor.js';
 import { GitHubMCPExecutor } from './github-mcp-executor.js';
 import { SemgrepMCPExecutor } from './semgrep-mcp-executor.js';
@@ -46,7 +50,11 @@ export interface VERSATILMCPConfig {
   logger?: VERSATILLogger;
   performanceMonitor?: PerformanceMonitor;
   projectPath?: string;
-  lazyInit?: boolean; // NEW: Enable lazy loading
+  lazyInit?: boolean;
+  // Phase 7.6.0: Context Isolation Enforcement
+  contextIdentity?: ContextIdentity;
+  projectContext?: ProjectContext;
+  projectManager?: MultiProjectManager;
 }
 
 export class VERSATILMCPServerV2 {
@@ -56,10 +64,24 @@ export class VERSATILMCPServerV2 {
   private docsSearchEngine: DocsSearchEngine | null = null;
   private lazyInitialized: boolean = false;
   private eventCallbacks: Map<string, Function[]> = new Map();
+  // Phase 7.6.0: Enforcement infrastructure
+  private boundaryEngine: BoundaryEnforcementEngine | null = null;
+  private zeroTrust: ZeroTrustProjectIsolation | null = null;
 
   constructor(config: VERSATILMCPConfig) {
     this.config = config;
     this.server = new McpServer({ name: config.name, version: config.version });
+
+    // Phase 7.6.0: Initialize enforcement engines (lightweight - no file I/O yet)
+    if (config.contextIdentity) {
+      try {
+        this.boundaryEngine = new BoundaryEnforcementEngine(config.projectPath || process.cwd());
+        this.zeroTrust = new ZeroTrustProjectIsolation(config.projectPath || process.cwd());
+      } catch (error) {
+        // Enforcement initialization failed - log but continue (fail-open)
+        console.error('[MCP] Enforcement engine initialization failed:', error);
+      }
+    }
 
     // Lazy initialization mode - skip heavy setup
     if (config.lazyInit) {
@@ -95,6 +117,51 @@ export class VERSATILMCPServerV2 {
     if (callbacks) {
       callbacks.forEach(cb => cb(data));
     }
+  }
+
+  /**
+   * Phase 7.6.0: Check if file access is allowed based on context identity
+   */
+  private checkFileAccess(targetPath: string): void {
+    if (!this.config.contextIdentity) {
+      // No context identity - allow (backward compatibility)
+      return;
+    }
+
+    const validation = validateAccess(this.config.contextIdentity, targetPath);
+    if (!validation.allowed) {
+      throw new Error(`Context Violation: ${validation.reason}`);
+    }
+  }
+
+  /**
+   * Phase 7.6.0: Check if agent invocation is allowed based on context identity
+   */
+  private checkAgentAccess(agentName: string): void {
+    if (!this.config.contextIdentity) {
+      // No context identity - allow (backward compatibility)
+      return;
+    }
+
+    const validation = validateAgent(this.config.contextIdentity, agentName);
+    if (!validation.allowed) {
+      throw new Error(`Context Violation: ${validation.reason}`);
+    }
+  }
+
+  /**
+   * Phase 7.6.0: Filter RAG results based on context identity
+   */
+  private filterRagResults(results: any[]): any[] {
+    if (!this.config.contextIdentity) {
+      return results;
+    }
+
+    return results.filter(result => {
+      const path = result.path || result.file || result.source || '';
+      const validation = validateAccess(this.config.contextIdentity!, path);
+      return validation.allowed;
+    });
   }
 
   /**

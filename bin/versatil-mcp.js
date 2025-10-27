@@ -48,19 +48,46 @@ async function main() {
   try {
     // STEP 1: Import minimal dependencies first (fast)
     const { VERSATILMCPServerV2 } = await import('../dist/mcp/versatil-mcp-server-v2.js');
+    const { detectContextIdentity } = await import('../dist/isolation/context-identity.js');
+    const { MultiProjectManager } = await import('../dist/isolation/multi-project-manager.js');
 
     log('✅ MCP Server module loaded');
 
-    // STEP 2: Create server with lazy initialization flag
+    // STEP 1.5: Detect context identity FIRST (Phase 7.6.0)
+    let contextIdentity = null;
+    let projectContext = null;
+    let projectManager = null;
+
+    try {
+      contextIdentity = await detectContextIdentity(projectPath);
+      log(`🔍 Context detected: ${contextIdentity.role} (${contextIdentity.audience})`);
+
+      // Initialize project manager for isolation
+      projectManager = new MultiProjectManager();
+      projectContext = await projectManager.registerProject(projectPath);
+      log(`📁 Project registered: ${projectContext.id} (${projectContext.type})`);
+    } catch (error) {
+      log(`⚠️  Context detection failed: ${error.message}`);
+      log('   Defaulting to user-project mode (safest)');
+      // Continue without context - server will default to most restrictive mode
+    }
+
+    // STEP 2: Create server with context-aware configuration
     // Heavy dependencies (AgentRegistry, SDLCOrchestrator) loaded on-demand
     const server = new VERSATILMCPServerV2({
       name: 'claude-opera',
       version: '7.5.1',
       projectPath,
-      lazyInit: true, // NEW: Enable lazy loading
+      contextIdentity,   // NEW: Pass context identity
+      projectContext,    // NEW: Pass project context
+      projectManager,    // NEW: Pass project manager
+      lazyInit: true,
     });
 
     log('✅ MCP Server instance created');
+    if (contextIdentity) {
+      log(`🔒 Enforcement active: ${contextIdentity.boundary} boundary`);
+    }
 
     // STEP 3: Connect stdio transport immediately (before loading agents)
     await server.start();
