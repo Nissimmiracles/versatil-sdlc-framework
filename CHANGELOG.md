@@ -27,9 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - docs/CONTEXT_ENFORCEMENT.md (complete architecture guide)
 
 ### Changed
-- Enhanced .claude/hooks/before-prompt.ts (+150 lines) - Boundary injection and context detection
-- Enhanced bin/versatil-mcp.js (+40 lines) - Context-aware MCP entry point with filesystem guards
-- Enhanced src/mcp/versatil-mcp-server-v2.ts (+200 lines) - Tool permission validation
+- Enhanced .claude/hooks/before-prompt.ts (+88 lines) - Boundary injection and context detection
+- Enhanced bin/versatil-mcp.js (+30 lines) - Context-aware MCP entry point with filesystem guards
+- Enhanced src/mcp/versatil-mcp-server-v2.ts (+69 lines) - Tool permission validation
 - Updated CLAUDE.md (+80 lines) - Context isolation enforcement documentation section
 
 ### Security
@@ -40,15 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ Deterministic detection (working directory + filesystem analysis, no heuristics)
 
 ### Performance
-- Context detection: <10ms per prompt (deterministic path analysis)
-- Enforcement overhead: <50ms total (99th percentile, all 5 layers)
-- Memory footprint: +80MB for isolation tracking
+- Context detection: <10ms per prompt (target, deterministic path analysis)
+- Enforcement overhead: <50ms total (estimated for all 5 layers)
+- Memory footprint: ~80MB for isolation tracking
 - Zero impact on normal operations (guards only activate on policy violations)
-
-### Testing
-- Unit tests: 96%+ coverage for context-identity.ts
-- Integration tests: 12 scenarios (framework-dev, user-project, edge cases)
-- Stress tests: 1,000 prompts/minute with zero false positives
 
 ### Migration
 No breaking changes. Context isolation enforcement activates automatically on upgrade.
