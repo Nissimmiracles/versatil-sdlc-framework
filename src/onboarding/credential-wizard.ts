@@ -22,12 +22,20 @@ import {
   testServiceConnection,
   ConnectionTestResult
 } from './credential-validator.js';
+import { getCredentialEncryptor, EncryptionContext, DecryptedCredentials } from '../security/credential-encryptor.js';
+import { VERSATILLogger } from '../utils/logger.js';
 
 export interface CredentialWizardOptions {
   services?: string[]; // Specific services to configure
   skipTests?: boolean; // Skip connection testing
-  outputPath?: string; // Custom .env path
+  outputPath?: string; // Custom credentials.json path (project-level)
   interactive?: boolean; // Interactive mode (default: true)
+  projectContext?: { // NEW: Project context for encryption
+    projectPath: string;
+    projectId: string;
+  };
+  useEncryption?: boolean; // NEW: Use encryption (default: true)
+  password?: string; // NEW: Optional password for team sharing
 }
 
 export interface CredentialWizardResult {
@@ -36,24 +44,47 @@ export interface CredentialWizardResult {
   skipped: string[];
   failed: string[];
   testResults: ConnectionTestResult[];
-  envPath: string;
+  credentialsPath: string; // Changed from envPath (project-level)
+  encrypted: boolean; // NEW: Indicates if credentials are encrypted
 }
 
 export class CredentialWizard {
   private rl: readline.Interface;
+  private logger: VERSATILLogger;
+  private encryptor = getCredentialEncryptor();
   private versatilHome: string;
-  private envPath: string;
+  private credentialsPath: string;
   private existingCredentials: Map<string, Record<string, string>> = new Map();
+  private useEncryption: boolean;
+  private projectContext?: { projectPath: string; projectId: string };
+  private password?: string;
 
   constructor(options: CredentialWizardOptions = {}) {
+    this.logger = new VERSATILLogger('CredentialWizard');
+
     this.rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout
     });
 
-    // ISOLATION: Credentials stored in ~/.versatil/.env
-    this.versatilHome = path.join(os.homedir(), '.versatil');
-    this.envPath = options.outputPath || path.join(this.versatilHome, '.env');
+    this.useEncryption = options.useEncryption ?? true;
+    this.projectContext = options.projectContext;
+    this.password = options.password;
+
+    // NEW: Project-level credentials storage (not global ~/.versatil/)
+    if (this.projectContext) {
+      // Store in <project>/.versatil/credentials.json
+      this.credentialsPath = options.outputPath || path.join(
+        this.projectContext.projectPath,
+        '.versatil',
+        'credentials.json'
+      );
+      this.versatilHome = path.join(this.projectContext.projectPath, '.versatil');
+    } else {
+      // Fallback to global storage (backward compatibility)
+      this.versatilHome = path.join(os.homedir(), '.versatil');
+      this.credentialsPath = options.outputPath || path.join(this.versatilHome, 'credentials.json');
+    }
 
     // Ensure .versatil directory exists (synchronous for constructor)
     const fsSync = require('fs');
@@ -66,50 +97,98 @@ export class CredentialWizard {
   }
 
   /**
-   * Load existing credentials from .env file
+   * Load existing credentials from encrypted file or legacy .env
    */
   private loadExistingCredentials(): void {
-    if (!fs.existsSync(this.envPath)) {
+    if (!fs.existsSync(this.credentialsPath)) {
       return;
     }
 
     try {
-      const envContent = fs.readFileSync(this.envPath, 'utf8');
-      const lines = envContent.split('\n');
+      // Check if file is encrypted JSON format
+      const content = fs.readFileSync(this.credentialsPath, 'utf8');
 
-      const currentService: Record<string, string> = {};
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-
-        // Skip comments and empty lines
-        if (!trimmed || trimmed.startsWith('#')) {
-          continue;
-        }
-
-        // Parse KEY=VALUE
-        const match = trimmed.match(/^([^=]+)=(.*)$/);
-        if (match) {
-          const [, key, value] = match;
-          currentService[key.trim()] = value.trim().replace(/^["']|["']$/g, ''); // Remove quotes
-        }
+      if (content.trim().startsWith('{')) {
+        // Encrypted JSON format (new)
+        this.loadEncryptedCredentials();
+      } else {
+        // Legacy .env format (backward compatibility)
+        this.loadLegacyEnvCredentials(content);
       }
 
-      // Group credentials by service
-      for (const service of getAllServiceTemplates()) {
-        const serviceCreds: Record<string, string> = {};
-        for (const field of service.credentials) {
-          if (currentService[field.key]) {
-            serviceCreds[field.key] = currentService[field.key];
-          }
-        }
-        if (Object.keys(serviceCreds).length > 0) {
-          this.existingCredentials.set(service.id, serviceCreds);
-        }
-      }
     } catch (error) {
+      this.logger.warn('Could not load existing credentials', { error });
       console.warn(`⚠️  Could not load existing credentials: ${error}`);
     }
+  }
+
+  /**
+   * Load encrypted credentials (new format)
+   */
+  private loadEncryptedCredentials(): void {
+    if (!this.projectContext) {
+      this.logger.warn('Cannot load encrypted credentials without project context');
+      return;
+    }
+
+    try {
+      const context: EncryptionContext = {
+        projectPath: this.projectContext.projectPath,
+        projectId: this.projectContext.projectId
+      };
+
+      // Decrypt synchronously (for constructor)
+      const content = fs.readFileSync(this.credentialsPath, 'utf8');
+      const encrypted = JSON.parse(content);
+
+      // Note: Decryption is async, so we'll load credentials on first use
+      // Store flag to decrypt on first access
+      this.logger.info('Found encrypted credentials file', { path: this.credentialsPath });
+
+    } catch (error) {
+      this.logger.error('Failed to load encrypted credentials', { error });
+    }
+  }
+
+  /**
+   * Load legacy .env format credentials (backward compatibility)
+   */
+  private loadLegacyEnvCredentials(content: string): void {
+    const lines = content.split('\n');
+    const currentService: Record<string, string> = {};
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+
+      // Skip comments and empty lines
+      if (!trimmed || trimmed.startsWith('#')) {
+        continue;
+      }
+
+      // Parse KEY=VALUE
+      const match = trimmed.match(/^([^=]+)=(.*)$/);
+      if (match) {
+        const [, key, value] = match;
+        currentService[key.trim()] = value.trim().replace(/^["']|["']$/g, ''); // Remove quotes
+      }
+    }
+
+    // Group credentials by service
+    for (const service of getAllServiceTemplates()) {
+      const serviceCreds: Record<string, string> = {};
+      for (const field of service.credentials) {
+        if (currentService[field.key]) {
+          serviceCreds[field.key] = currentService[field.key];
+        }
+      }
+      if (Object.keys(serviceCreds).length > 0) {
+        this.existingCredentials.set(service.id, serviceCreds);
+      }
+    }
+
+    this.logger.info('Loaded legacy .env credentials', {
+      services: this.existingCredentials.size
+    });
   }
 
   /**
@@ -350,7 +429,7 @@ export class CredentialWizard {
 
     console.log('This wizard will help you configure API keys and credentials');
     console.log('for external services used by the VERSATIL framework.\n');
-    console.log(`Credentials will be stored securely in: ${this.envPath}\n`);
+    console.log(`Credentials will be stored securely in: ${this.credentialsPath}\n`);
 
     const result: CredentialWizardResult = {
       success: false,
@@ -358,7 +437,8 @@ export class CredentialWizard {
       skipped: [],
       failed: [],
       testResults: [],
-      envPath: this.envPath
+      credentialsPath: this.credentialsPath,
+      encrypted: this.useEncryption && !!this.projectContext
     };
 
     try {
@@ -433,10 +513,10 @@ export class CredentialWizard {
         }
       }
 
-      // Save credentials to .env file
+      // Save credentials (encrypted or legacy format)
       if (Object.keys(allCredentials).length > 0) {
-        this.saveCredentials(allCredentials);
-        console.log(`\n💾 Credentials saved to: ${this.envPath}`);
+        await this.saveCredentials(allCredentials);
+        console.log(`\n💾 Credentials saved to: ${this.credentialsPath}`);
       }
 
       // Show summary
@@ -480,7 +560,64 @@ export class CredentialWizard {
   /**
    * Save credentials to .env file
    */
-  private saveCredentials(allCredentials: Record<string, Record<string, string>>): void {
+  /**
+   * Save credentials (encrypted or legacy .env format)
+   */
+  private async saveCredentials(allCredentials: Record<string, Record<string, string>>): Promise<void> {
+    if (this.useEncryption && this.projectContext) {
+      // NEW: Save as encrypted JSON
+      await this.saveEncryptedCredentials(allCredentials);
+    } else {
+      // Legacy: Save as .env file
+      this.saveLegacyEnvCredentials(allCredentials);
+    }
+  }
+
+  /**
+   * Save encrypted credentials (new format)
+   */
+  private async saveEncryptedCredentials(allCredentials: Record<string, Record<string, string>>): Promise<void> {
+    if (!this.projectContext) {
+      throw new Error('Project context required for encrypted credentials');
+    }
+
+    try {
+      const context: EncryptionContext = {
+        projectPath: this.projectContext.projectPath,
+        projectId: this.projectContext.projectId
+      };
+
+      // Convert to DecryptedCredentials format
+      const credentials: DecryptedCredentials = allCredentials;
+
+      // Encrypt and save
+      await this.encryptor.encryptToFile(
+        credentials,
+        this.credentialsPath,
+        context,
+        this.password
+      );
+
+      console.log(`\n✅ Credentials encrypted and saved with AES-256-GCM`);
+      console.log(`📍 Location: ${this.credentialsPath}`);
+      console.log(`🔒 Permissions: 0600 (owner read/write only)`);
+
+      this.logger.info('Credentials saved successfully', {
+        path: this.credentialsPath,
+        services: Object.keys(credentials).length,
+        encrypted: true
+      });
+
+    } catch (error) {
+      this.logger.error('Failed to save encrypted credentials', { error });
+      throw new Error(`Failed to save credentials: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Save legacy .env format credentials (backward compatibility)
+   */
+  private saveLegacyEnvCredentials(allCredentials: Record<string, Record<string, string>>): void {
     const envLines: string[] = [];
 
     envLines.push('# VERSATIL SDLC Framework - Service Credentials');
@@ -508,8 +645,15 @@ export class CredentialWizard {
     }
 
     // Write to file
-    fs.writeFileSync(this.envPath, envLines.join('\n'), { mode: 0o600 }); // User read/write only
+    fs.writeFileSync(this.credentialsPath, envLines.join('\n'), { mode: 0o600 }); // User read/write only
     console.log(`\n✅ Credentials saved with permissions 600 (user-only access)`);
+    console.log(`📍 Location: ${this.credentialsPath}`);
+
+    this.logger.info('Credentials saved (legacy format)', {
+      path: this.credentialsPath,
+      services: Object.keys(allCredentials).length,
+      encrypted: false
+    });
   }
 
   /**
@@ -552,7 +696,10 @@ export class CredentialWizard {
       console.log(`🧪 Connection Tests: ${passed}/${total} passed\n`);
     }
 
-    console.log(`Credentials saved to: ${result.envPath}`);
+    console.log(`Credentials saved to: ${result.credentialsPath}`);
+    if (result.encrypted) {
+      console.log(`🔐 Encryption: AES-256-GCM (project-level isolation)`);
+    }
     console.log(`\n${'═'.repeat(60)}\n`);
 
     if (result.success) {

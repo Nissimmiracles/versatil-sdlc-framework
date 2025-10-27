@@ -1,0 +1,19 @@
+{
+  "projectType": "enterprise",
+  "teamSize": "solo",
+  "experience": "intermediate",
+  "technologies": [
+    "TypeScript",
+    "Express"
+  ],
+  "priorities": [
+    "Quality"
+  ],
+  "agentCustomizations": {},
+  "mcpPreferences": [
+    "chrome_mcp",
+    "shadcn_mcp",
+    "github_mcp",
+    "playwright_mcp"
+  ]
+}

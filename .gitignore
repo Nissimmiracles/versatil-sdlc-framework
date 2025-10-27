@@ -54,9 +54,20 @@ videos/
 traces/
 
 # VERSATIL Framework Specific
-# ⚠️ CRITICAL: .versatil/ should ONLY exist in ~/.versatil/ (user home)
-# The framework is ISOLATED from user projects
-.versatil/
+# NOTE: .versatil/ is project-specific (v7.6.0+)
+# Ignore all .versatil/ contents EXCEPT config.json
+.versatil/*
+!.versatil/config.json
+
+# NEW v7.6.0: Project-Level Credential Files (NEVER COMMIT!)
+# These contain encrypted credentials with project-specific keys
+.versatil/credentials.json
+.versatil/.credentials-key
+.versatil/credentials-export*.json.enc
+.versatil/credential-backup-*.json.enc
+
+# Credential audit logs (privacy-sensitive)
+.versatil/logs/credential-audit.jsonl
 
 # Chrome MCP Testing
 tests/visual/diffs/
@@ -146,6 +157,15 @@ reports/
 test-reports/
 coverage-reports/
 quality-reports/
+
+# Internal Working Files (v7.5.1+)
+todos/                          # Use GitHub Issues/Projects instead
+releases/archives/              # Use GitHub Releases feature
+test-rag-activation.cjs         # Debug script
+requirements.txt                # Wrong tech stack (TypeScript project)
+
+# External Dependencies
+skills-main/                    # Anthropic's official skills repository (Apache 2.0)
 
 # Performance Monitoring
 performance-reports/

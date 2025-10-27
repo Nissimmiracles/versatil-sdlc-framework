@@ -1212,6 +1212,8 @@ export class IntelligentOnboardingSystem extends EventEmitter {
       console.log('\n📦 Step 5: Service Credentials Setup\n');
       console.log('VERSATIL integrates with external services (Supabase, Vertex AI, etc.)');
       console.log('Let\'s configure your API keys and credentials.\n');
+      console.log('🔐 Credentials will be encrypted with AES-256-GCM and stored at:');
+      console.log(`   ${this.projectRoot}/.versatil/credentials.json\n`);
 
       // Get active agents to determine needed services
       const activeAgents = await this.getActiveAgents();
@@ -1227,16 +1229,46 @@ export class IntelligentOnboardingSystem extends EventEmitter {
         console.log('');
       }
 
-      const wizard = new CredentialWizard();
+      // NEW: Generate project ID for encryption
+      const projectId = await this.generateProjectId();
+
+      // Create credential wizard with project-level context
+      const wizard = new CredentialWizard({
+        interactive: true,
+        projectContext: {
+          projectPath: this.projectRoot,
+          projectId
+        },
+        useEncryption: true // Enable encryption for project-level storage
+      });
+
       const result = await wizard.run({ interactive: true });
+
+      this.logger.info('Credential setup completed', {
+        configured: result.configured.length,
+        encrypted: result.encrypted
+      });
 
       return result;
     } catch (error) {
       this.logger.error('Credential setup failed', { error });
       console.log('\n⚠️  Credential setup can be completed later with:');
-      console.log('   versatil setup credentials\n');
+      console.log('   versatil-credentials setup\n');
       return null;
     }
+  }
+
+  /**
+   * Generate stable project ID for encryption context
+   */
+  private async generateProjectId(): Promise<string> {
+    const crypto = await import('crypto');
+    const projectSignature = crypto.createHash('sha256')
+      .update(this.projectRoot)
+      .digest('hex')
+      .substring(0, 16);
+
+    return `project-${projectSignature}`;
   }
 
   /**

@@ -1,15 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * VERSATIL MCP Server Binary
- * Starts the VERSATIL Model Context Protocol server for full repository access
+ * VERSATIL MCP Server Binary - Lightweight Entry Point
+ * Lazy-loads heavy dependencies after stdio transport connection
  */
 
-import { VERSATILMCPServerV2 } from '../dist/mcp/versatil-mcp-server-v2.js';
-import { AgentRegistry } from '../dist/agents/core/agent-registry.js';
-import { SDLCOrchestrator } from '../dist/flywheel/sdlc-orchestrator.js';
-import { VERSATILLogger } from '../dist/utils/logger.js';
-import { PerformanceMonitor } from '../dist/analytics/performance-monitor.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { appendFileSync, mkdirSync } from 'fs';
@@ -45,52 +40,70 @@ function log(...args) {
 async function main() {
   const projectPath = process.argv[2] || process.cwd();
 
-  log('🚀 Starting VERSATIL MCP Server...');
+  log('🚀 Starting VERSATIL MCP Server (Lightweight)...');
   log(`📁 Project Path: ${projectPath}`);
-  log('🔗 Ready for MCP connections');
+  log('⚡ Using lazy-loading for fast startup');
   log('');
 
   try {
-    // Initialize framework components
-    const logger = new VERSATILLogger({ level: 'info', name: 'mcp-server' });
-    const performanceMonitor = new PerformanceMonitor({ logger });
-    const agents = new AgentRegistry({ logger });
-    const orchestrator = new SDLCOrchestrator({
-      agents,
-      logger,
-      performanceMonitor,
-      projectPath
-    });
+    // STEP 1: Import minimal dependencies first (fast)
+    const { VERSATILMCPServerV2 } = await import('../dist/mcp/versatil-mcp-server-v2.js');
 
-    // Create and start MCP server
+    log('✅ MCP Server module loaded');
+
+    // STEP 2: Create server with lazy initialization flag
+    // Heavy dependencies (AgentRegistry, SDLCOrchestrator) loaded on-demand
     const server = new VERSATILMCPServerV2({
       name: 'claude-opera',
-      version: '1.0.0',
-      agents,
-      orchestrator,
-      logger,
-      performanceMonitor,
+      version: '7.5.1',
+      projectPath,
+      lazyInit: true, // NEW: Enable lazy loading
     });
 
+    log('✅ MCP Server instance created');
+
+    // STEP 3: Connect stdio transport immediately (before loading agents)
     await server.start();
 
     log('✅ VERSATIL MCP Server running');
     log(`📊 Log file: ${LOG_FILE}`);
+    log('⚡ Heavy dependencies will load on first tool use');
     log('');
-    log('MCP Server connected via stdio transport');
-    log('Tools: 65 | Resources: 6 | Prompts: 5');
-    log('');
-    log('MCP Integrations:');
-    log('  Supabase: ' + (process.env.SUPABASE_URL ? '✓ Enabled' : '✗ Disabled'));
-    log('  GitHub: ' + (process.env.GITHUB_TOKEN ? '✓ Enabled' : '✗ Disabled'));
-    log('  Semgrep: ' + (process.env.SEMGREP_API_KEY ? '✓ Cloud' : '✓ Local'));
-    log('  Sentry: ' + (process.env.SENTRY_DSN ? '✓ Enabled' : '✗ Disabled'));
+
+    // Log basic stats (will be updated after lazy init)
+    server.on('lazy:initialized', ({ tools, resources, prompts }) => {
+      log(`📦 Lazy initialization complete: ${tools} tools, ${resources} resources, ${prompts} prompts`);
+      log('');
+      log('MCP Integrations:');
+      log('  Supabase: ' + (process.env.SUPABASE_URL ? '✓ Enabled' : '✗ Disabled'));
+      log('  GitHub: ' + (process.env.GITHUB_TOKEN ? '✓ Enabled' : '✗ Disabled'));
+      log('  Semgrep: ' + (process.env.SEMGREP_API_KEY ? '✓ Cloud' : '✓ Local'));
+      log('  Sentry: ' + (process.env.SENTRY_DSN ? '✓ Enabled' : '✗ Disabled'));
+    });
+
   } catch (error) {
     log('❌ MCP Server failed to start:', error);
-    log(error.stack);
+    log(error.stack || error);
     console.error('❌ MCP Server failed to start:', error.message);
     process.exit(1);
   }
 }
 
-main().catch(console.error);
+// Add timeout guard to prevent infinite hanging
+const STARTUP_TIMEOUT = 10000; // 10 seconds max
+const timeoutHandle = setTimeout(() => {
+  log('⚠️  MCP Server startup timeout (10s exceeded)');
+  console.error('❌ MCP Server startup timeout');
+  process.exit(1);
+}, STARTUP_TIMEOUT);
+
+main()
+  .then(() => {
+    clearTimeout(timeoutHandle);
+  })
+  .catch((error) => {
+    clearTimeout(timeoutHandle);
+    log('❌ Fatal error:', error);
+    console.error('❌ Fatal error:', error.message);
+    process.exit(1);
+  });

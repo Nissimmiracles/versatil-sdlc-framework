@@ -1,5 +1,7 @@
 # 🎭 How VERSATIL Complements AI Coding Tools
 
+> **⚠️ ARCHIVED**: This document is historical. VERSATIL is an AI-native SDLC framework, not an IDE alternative. See [README.md](../../README.md) for current positioning.
+
 **VERSATIL is not a replacement** for GitHub Copilot, Cursor, Windsurf, or other AI assistants. Instead, **VERSATIL is a framework** that adds advanced capabilities these tools don't provide:
 
 - **Context-awareness**: Learns YOUR coding style automatically

@@ -6,6 +6,126 @@
 
 > **36% Faster Development** + **Code That Matches YOUR Style** + **100% Privacy Guaranteed**
 
+---
+
+## 📍 Quick Links
+
+**[📖 Installation](docs/INSTALLATION.md)** • **[🎥 See It In Action](docs/visuals/)** • **[🤖 Agents](docs/agents/README.md)** • **[📚 Documentation](docs/README.md)**
+
+---
+
+## 🎬 See VERSATIL In Action
+
+### The OPERA Workflow: 8 AI Agents Orchestrating
+
+**[→ View full interactive diagram](docs/visuals/opera-workflow-simple.md)**
+
+When you request "Add user authentication", watch 8 specialized agents coordinate like a senior dev team:
+
+```
+YOU: "Add user authentication with JWT"
+   ↓
+Alex-BA (Business Analyst) → Extracts requirements, searches RAG for similar features
+   ↓
+Sarah-PM (Project Manager) → Validates readiness, checks dependencies
+   ↓
+┌──────────────┬───────────────┬──────────────┐
+│ Dana-Database│ Marcus-Backend│ James-Frontend│  ← Parallel execution!
+│ (45 min)     │ (60 min)      │ (50 min)      │
+└──────────────┴───────────────┴──────────────┘
+   ↓
+Maria-QA (Quality Guardian) → 85%+ test coverage, OWASP security scan
+   ↓
+✅ PRODUCTION READY: 125 min (vs 220 min sequential)
+```
+
+**Key Benefits:**
+- ⚡ **43% faster** through parallel execution
+- 🎯 **96% code accuracy** - matches YOUR coding style automatically
+- 🔒 **Built-in quality** - 80%+ coverage, OWASP, WCAG 2.1 AA
+- 🚀 **40% faster by Feature 5** - compounding engineering effect
+
+**[→ See live OPERA dashboard](docs/visuals/opera-dashboard.md)** | **[→ Watch 8-agent coordination](docs/visuals/opera-workflow-simple.md)**
+
+---
+
+### The Context Coding Engine: Learns YOUR Style in 15 Seconds
+
+**[→ View full context engine diagram](docs/visuals/context-engine-diagram.md)**
+
+VERSATIL auto-detects YOUR coding preferences from git history and applies them automatically:
+
+<table>
+<tr>
+<td width="50%">
+
+**❌ Generic AI (No Context)**
+```typescript
+// Doesn't match your style
+function createUser(req, res) {
+  return User.create(req.body)
+    .then(function(user) {
+      return res.json(user);
+    });
+}
+```
+**Problems:**
+- Uses promises (you use async/await)
+- No validation (team requires Zod)
+- No GDPR consent (project needs it)
+- 40 min manual rework needed
+
+</td>
+<td width="50%">
+
+**✅ VERSATIL (YOUR Style)**
+```typescript
+// Matches YOUR + TEAM + PROJECT
+export const createUser = async (req, res) => {
+  const validated = userSchema.parse(req.body);
+  const user = await User.create({
+    ...validated,
+    gdprConsent: validated.gdprConsent,
+  });
+  return res.json({ user });
+};
+```
+**Applied:**
+- ✅ YOUR async/await (auto-detected)
+- ✅ TEAM Zod validation (auto-applied)
+- ✅ PROJECT GDPR (auto-applied)
+- 0 min rework needed
+
+</td>
+</tr>
+</table>
+
+**Result:** 96% accuracy • 88% less rework • 100% privacy guaranteed
+
+**[→ See more before/after examples](docs/visuals/before-after-code.md)** | **[→ How context detection works](docs/visuals/context-engine-diagram.md)**
+
+---
+
+### Compounding Engineering: Each Feature Makes the Next Faster
+
+**[→ View full compounding effect analysis](docs/visuals/compounding-effect.md)**
+
+```
+Feature 1 (User Auth):     125 min ████████████████████ 100% (baseline)
+Feature 2 (Admin Auth):    104 min ████████████████░░░░  83% (17% faster)
+Feature 3 (OAuth Login):    93 min ██████████████░░░░░░  74% (26% faster)
+Feature 4 (MFA Setup):      86 min █████████████░░░░░░░  69% (31% faster)
+Feature 5 (SSO):            75 min ████████████░░░░░░░░  60% (40% faster!) 🎯
+
+Total time saved: 142 minutes (2.4 hours) after just 5 features!
+```
+
+**How it works:** Each feature stores patterns (code, lessons, estimates) → Next similar feature reuses them → Exponential velocity gains
+
+**[→ See pattern reuse in action](docs/visuals/compounding-effect.md)** | **[→ Pattern search service](docs/guides/compounding-engineering.md)**
+
+---
+
 <table>
 <tr>
   <td><b>Quality</b></td>
@@ -277,60 +397,73 @@ graph TB
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Installation
+
+### Choose Your Path
+
+#### 🎯 Path 1: MCP Integration (Claude Desktop)
+**Best for**: Claude Desktop users wanting MCP tool access
+**Time**: 2 minutes
 
 ```bash
-# Install VERSATIL globally
+git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git
+cd versatil-sdlc-framework
+npm install && npm run build
+node scripts/fix-mcp-configs.cjs  # Auto-configures MCP
+# Restart Claude Desktop
+```
+
+**[→ Full MCP Setup Guide](docs/INSTALLATION.md#cursor-mcp-setup)**
+
+---
+
+#### 🖥️ Path 2: CLI/Terminal
+**Best for**: Terminal workflows, CI/CD, other IDEs
+**Time**: 5 minutes
+
+```bash
+# Install globally
 npm install -g @versatil/sdlc-framework
 
-# Initialize in your project (auto-detects YOUR coding style from git!)
+# Initialize in your project (auto-detects YOUR coding style!)
 npx versatil init
 
-# Auto-detection runs automatically:
-🔍 Analyzing your git history (147 commits)...
-✓ Indentation: spaces (2) - 95% confidence
-✓ Quotes: single - 92% confidence
-✓ Async style: async/await - 94% confidence
-✅ Preferences auto-detected in 15 seconds!
-
-# Start the proactive daemon (agents auto-activate on file saves)
+# Start daemon (agents auto-activate on file saves)
 versatil-daemon start
 ```
 
-**That's it!** Now agents generate code matching **YOUR style**:
+**[→ Full CLI Setup Guide](docs/INSTALLATION.md#cli-installation)**
+
+---
+
+**Once installed**, agents generate code matching **YOUR style**:
 - Edit `*.test.ts` → **Maria-QA** validates coverage **using YOUR test patterns**
 - Edit `*.tsx` → **James-Frontend** checks accessibility **matching YOUR component style**
 - Edit `api/*.ts` → **Marcus-Backend** scans security **following YOUR API patterns**
 - Edit `schema.sql` → **Dana-Database** optimizes queries **using YOUR naming conventions**
 
-**[See detailed installation guide →](GET_STARTED.md)**
-
 ---
 
 ## 🎭 What Makes VERSATIL Different?
 
-**VERSATIL is a framework** that works **alongside** AI assistants like Claude, Cursor, and Copilot—adding context-awareness, multi-agent orchestration, and team coordination that these tools don't provide out of the box.
+**VERSATIL is an AI-native SDLC framework** that brings context-awareness, multi-agent orchestration, and team coordination to your development workflow.
 
-### How VERSATIL Complements Your AI Assistant
+### Key Capabilities
 
-| Capability | AI Assistants Alone<br/>(Copilot/Cursor/Windsurf/Cline) | **+ VERSATIL Framework** |
-|------------|----------------------------------------------------------|--------------------------|
-| **Context-Aware Code** | ❌ Generic code suggestions | ✅ **Matches YOUR coding style automatically** |
-| **Auto-Detected Preferences** | ❌ Manual configuration required | ✅ **Learns from git in 15 seconds** |
-| **Privacy-Isolated Learning** | ❌ Shared training data | ✅ **100% private pattern isolation** |
-| **Team Convention Enforcement** | ❌ Manual linting setup | ✅ **Automatic team standard enforcement** |
-| **Compounding Engineering** | ❌ Same speed every time | ✅ **40% faster by Feature 5** |
-| **Multi-Agent Orchestration** | ❌ Single AI context | ✅ **18 specialized agents (BA/QA/Frontend/Backend/DB/PM)** |
-| **Zero Context Loss** | ❌ Resets per session | ✅ **98%+ retention via persistent RAG** |
-| **Proactive Quality Gates** | ❌ Manual testing required | ✅ **80%+ coverage enforced automatically** |
-| **Full-Stack Coordination** | ❌ No cross-concern linking | ✅ **Frontend ↔ Backend ↔ Database ↔ QA** |
-| **Security Scanning** | ❌ Manual audits | ✅ **Automatic OWASP compliance** |
-| **Project Memory** | ❌ None or limited | ✅ **Persistent RAG across all sessions** |
-| **Cost** | $10-20/month subscriptions | **FREE & 100% Open Source** |
-
-> **💡 Best of Both Worlds**: Use VERSATIL **with** your favorite AI assistant (Claude Desktop, Cursor, etc.) to get context-aware, team-coordinated development.
-
-**[See detailed comparison →](docs/COMPARISON.md)**
+| Capability | Description |
+|------------|-------------|
+| **Context-Aware Code** | ✅ Matches YOUR coding style automatically |
+| **Auto-Detected Preferences** | ✅ Learns from git in 15 seconds |
+| **Privacy-Isolated Learning** | ✅ 100% private pattern isolation |
+| **Team Convention Enforcement** | ✅ Automatic team standard enforcement |
+| **Compounding Engineering** | ✅ 40% faster by Feature 5 |
+| **Multi-Agent Orchestration** | ✅ 18 specialized agents (BA/QA/Frontend/Backend/DB/PM) |
+| **Zero Context Loss** | ✅ 98%+ retention via persistent RAG |
+| **Proactive Quality Gates** | ✅ 80%+ coverage enforced automatically |
+| **Full-Stack Coordination** | ✅ Frontend ↔ Backend ↔ Database ↔ QA |
+| **Security Scanning** | ✅ Automatic OWASP compliance |
+| **Project Memory** | ✅ Persistent RAG across all sessions |
+| **Cost** | **FREE & 100% Open Source** |
 
 ---
 
@@ -776,7 +909,7 @@ graph LR
 flowchart TD
     Start(["👤 You edit:<br/><b>src/components/Button.tsx</b>"]) --> Save["💾 File Save Event"]
 
-    Save --> Hook["🪝 Cursor Hook:<br/><b>afterFileEdit</b><br/>⏱️ <50ms"]
+    Save --> Hook["🪝 Framework Hook:<br/><b>afterFileEdit</b><br/>⏱️ <50ms"]
 
     Hook --> Pattern["🔍 Pattern Match:<br/><b>*.tsx</b> detected<br/>⏱️ <500ms"]
 
@@ -915,31 +1048,18 @@ sequenceDiagram
 
 ## 📖 Documentation
 
-- **[Getting Started Guide](GET_STARTED.md)** - 5-minute tutorial
+- **[Installation Guide](docs/INSTALLATION.md)** - MCP or CLI setup
 - **[Agent Reference](docs/agents/README.md)** - All 18 agents explained
 - **[MCP Integration](docs/features/mcp-ecosystem.md)** - 12 production MCPs
-- **[Comparison Guide](docs/COMPARISON.md)** - vs Copilot, Cursor, Windsurf
 - **[Architecture Overview](docs/ARCHITECTURE.md)** - How it works
 - **[Examples & Tutorials](docs/MCP_EXAMPLES.md)** - Real-world use cases
 
 ---
 
-## 🔧 IDE Integration
+## 🔧 MCP Integration
 
-### Cursor IDE ✅
-```json
-// .cursor/mcp_config.json (auto-configured on init)
-{
-  "mcpServers": {
-    "versatil": {
-      "command": "node",
-      "args": ["~/.npm-global/bin/versatil-mcp", "/your/project"]
-    }
-  }
-}
-```
+VERSATIL integrates with Claude Desktop via the Model Context Protocol (MCP):
 
-### Claude Desktop ✅
 ```json
 // ~/Library/Application Support/Claude/claude_desktop_config.json
 {
@@ -952,8 +1072,7 @@ sequenceDiagram
 }
 ```
 
-### VS Code (Coming Soon) 🚧
-Support planned for Q2 2025.
+**[See full installation guide →](docs/INSTALLATION.md)**
 
 ---
 
@@ -1099,6 +1218,6 @@ See [LICENSE](./LICENSE) for full details.
 
 Made with 🎭 by the VERSATIL Team
 
-[Get Started](GET_STARTED.md) • [Documentation](docs/README.md) • [GitHub](https://github.com/Nissimmiracles/versatil-sdlc-framework) • [Report Issue](https://github.com/Nissimmiracles/versatil-sdlc-framework/issues)
+[Installation](docs/INSTALLATION.md) • [Documentation](docs/README.md) • [GitHub](https://github.com/Nissimmiracles/versatil-sdlc-framework) • [Report Issue](https://github.com/Nissimmiracles/versatil-sdlc-framework/issues)
 
 </div>

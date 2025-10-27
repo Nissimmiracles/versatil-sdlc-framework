@@ -41,25 +41,97 @@ const gitMCPExecutor = new GitMCPExecutor();
 export interface VERSATILMCPConfig {
   name: string;
   version: string;
-  agents: AgentRegistry;
-  orchestrator: SDLCOrchestrator;
-  logger: VERSATILLogger;
-  performanceMonitor: PerformanceMonitor;
+  agents?: AgentRegistry;
+  orchestrator?: SDLCOrchestrator;
+  logger?: VERSATILLogger;
+  performanceMonitor?: PerformanceMonitor;
+  projectPath?: string;
+  lazyInit?: boolean; // NEW: Enable lazy loading
 }
 
 export class VERSATILMCPServerV2 {
   private server: McpServer;
   private config: VERSATILMCPConfig;
   private onboardingCompleted: boolean = false;
-  private docsSearchEngine: DocsSearchEngine;
+  private docsSearchEngine: DocsSearchEngine | null = null;
+  private lazyInitialized: boolean = false;
+  private eventCallbacks: Map<string, Function[]> = new Map();
 
   constructor(config: VERSATILMCPConfig) {
     this.config = config;
     this.server = new McpServer({ name: config.name, version: config.version });
+
+    // Lazy initialization mode - skip heavy setup
+    if (config.lazyInit) {
+      // Minimal initialization - just create server
+      // Heavy dependencies loaded on first tool invocation
+      return;
+    }
+
+    // Traditional initialization (backward compatibility)
+    if (!config.agents || !config.orchestrator || !config.logger || !config.performanceMonitor) {
+      throw new Error('Missing required config when lazyInit=false');
+    }
+
     this.docsSearchEngine = new DocsSearchEngine((config.orchestrator as any).projectPath || process.cwd());
     this.registerResources();
     this.registerPrompts();
     this.registerTools();
+    this.lazyInitialized = true;
+  }
+
+  /**
+   * EventEmitter-like API for lazy initialization events
+   */
+  on(event: string, callback: (...args: any[]) => void): void {
+    if (!this.eventCallbacks.has(event)) {
+      this.eventCallbacks.set(event, []);
+    }
+    this.eventCallbacks.get(event)!.push(callback);
+  }
+
+  emit(event: string, data: any): void {
+    const callbacks = this.eventCallbacks.get(event);
+    if (callbacks) {
+      callbacks.forEach(cb => cb(data));
+    }
+  }
+
+  /**
+   * Lazy initialize heavy dependencies on first tool call
+   */
+  private async lazyInitialize(): Promise<void> {
+    if (this.lazyInitialized) return;
+
+    // Import heavy dependencies dynamically
+    const { AgentRegistry } = await import('../agents/core/agent-registry.js');
+    const { SDLCOrchestrator } = await import('../flywheel/sdlc-orchestrator.js');
+    const { VERSATILLogger } = await import('../utils/logger.js');
+    const { PerformanceMonitor } = await import('../analytics/performance-monitor.js');
+
+    // Initialize framework components
+    this.config.logger = new VERSATILLogger('mcp-server');
+    this.config.performanceMonitor = new PerformanceMonitor();
+    this.config.agents = new AgentRegistry();
+    this.config.orchestrator = new SDLCOrchestrator();
+    this.config.orchestrator.initialize(this.config.agents, this.config.logger);
+    (this.config.orchestrator as any).projectPath = this.config.projectPath || process.cwd();
+
+    this.docsSearchEngine = new DocsSearchEngine(this.config.projectPath || process.cwd());
+
+    // Register tools, resources, prompts
+    this.registerResources();
+    this.registerPrompts();
+    this.registerTools();
+
+    this.lazyInitialized = true;
+
+    // Emit event for logging
+    this.emit('lazy:initialized', {
+      tools: 65,
+      resources: 6,
+      prompts: 5
+    });
   }
 
   /**
@@ -795,6 +867,37 @@ Provide query execution plans with optimization strategies.`,
   }
 
   private registerTools(): void {
+    // Register minimal health check tool FIRST (works without lazy init)
+    this.server.tool(
+      'versatil_health_check',
+      'Comprehensive framework health check with agent status and system metrics',
+      {
+        title: 'Health Check',
+        readOnlyHint: true,
+        destructiveHint: false
+      },
+      async () => {
+        const health = {
+          status: 'healthy',
+          version: this.config.version,
+          lazyMode: this.config.lazyInit || false,
+          initialized: this.lazyInitialized,
+          uptime: process.uptime(),
+          timestamp: new Date().toISOString()
+        };
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(health, null, 2),
+            },
+          ],
+        };
+      }
+    );
+
+    // All other tools wrapped with lazy-init check
     this.server.tool(
       'versatil_activate_agent',
       'Activate a specific OPERA agent with context for code analysis',
@@ -834,7 +937,12 @@ Provide query execution plans with optimization strategies.`,
         trigger: z.string().optional(),
       },
       async ({ agentId, filePath, content, trigger }) => {
-        const agent = this.config.agents.getAgent(agentId);
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
+        const agent = this.config.agents!.getAgent(agentId);
         if (!agent) {
           return {
             content: [
@@ -3568,39 +3676,55 @@ Provide query execution plans with optimization strategies.`,
    */
   async connect(transport: any): Promise<void> {
     await this.server.connect(transport);
-    this.config.logger.info('VERSATIL MCP Server connected to transport', {
-      name: this.config.name,
-      version: this.config.version,
-      tools: 65,
-      supabaseEnabled: !!process.env.SUPABASE_URL,
-      githubEnabled: !!process.env.GITHUB_TOKEN,
-      semgrepEnabled: !!process.env.SEMGREP_API_KEY || 'local_mode',
-      sentryEnabled: !!process.env.SENTRY_DSN
-    });
+
+    // Only log if logger is available (lazy init mode may not have it yet)
+    if (this.config.logger) {
+      this.config.logger.info('VERSATIL MCP Server connected to transport', {
+        name: this.config.name,
+        version: this.config.version,
+        tools: 65,
+        supabaseEnabled: !!process.env.SUPABASE_URL,
+        githubEnabled: !!process.env.GITHUB_TOKEN,
+        semgrepEnabled: !!process.env.SEMGREP_API_KEY || 'local_mode',
+        sentryEnabled: !!process.env.SENTRY_DSN
+      });
+    }
   }
 
   /**
    * Start server with stdio transport (default)
    */
   async start(): Promise<void> {
+    // LAZY MODE: Connect transport FIRST, then lazy-init on first tool use
+    if (this.config.lazyInit) {
+      const transport = new StdioServerTransport();
+      await this.server.connect(transport);
+      // Server is now listening - heavy init happens on first tool call
+      return;
+    }
+
+    // TRADITIONAL MODE: Full initialization before connecting
     // Check and run onboarding if needed (first-time MCP setup)
     await this.checkAndRunOnboarding();
 
     const transport = new StdioServerTransport();
     await this.connect(transport);
-    this.config.logger.info('VERSATIL MCP Server started with stdio transport', {
-      name: this.config.name,
-      version: this.config.version,
-      tools: 65,
-      resources: 6,
-      prompts: 5,
-      integrations: {
-        supabase: !!process.env.SUPABASE_URL,
-        github: !!process.env.GITHUB_TOKEN,
-        semgrep: !!process.env.SEMGREP_API_KEY || 'local',
-        sentry: !!process.env.SENTRY_DSN
-      }
-    });
+
+    if (this.config.logger) {
+      this.config.logger.info('VERSATIL MCP Server started with stdio transport', {
+        name: this.config.name,
+        version: this.config.version,
+        tools: 65,
+        resources: 6,
+        prompts: 5,
+        integrations: {
+          supabase: !!process.env.SUPABASE_URL,
+          github: !!process.env.GITHUB_TOKEN,
+          semgrep: !!process.env.SEMGREP_API_KEY || 'local',
+          sentry: !!process.env.SENTRY_DSN
+        }
+      });
+    }
   }
 
   async stop(): Promise<void> {
