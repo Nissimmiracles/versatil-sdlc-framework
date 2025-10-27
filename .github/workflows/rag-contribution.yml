@@ -1,0 +1,94 @@
+name: Public RAG Auto-Contribution
+
+# Automatically contribute framework patterns to Public RAG on PR merge
+# Only runs for framework repository PRs (not user projects)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - '.claude/**'
+      - 'docs/**'
+      - 'scripts/**'
+
+jobs:
+  contribute-patterns:
+    runs-on: ubuntu-latest
+
+    # Only run for framework repository
+    if: github.repository == 'versatil-sdlc-framework/versatil-sdlc-framework' || contains(github.event.head_commit.message, '[rag-contribute]')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need previous commit for diff
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Extract and contribute patterns
+        env:
+          PUBLIC_RAG_PROJECT_ID: ${{ secrets.PUBLIC_RAG_PROJECT_ID }}
+          PUBLIC_RAG_DATABASE: ${{ secrets.PUBLIC_RAG_DATABASE }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          echo "🤖 Extracting patterns from PR merge..."
+          npm run rag:contribute-from-pr
+
+      - name: Upload contribution summary
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rag-contribution-summary
+          path: .versatil/logs/rag-contribution-*.json
+          retention-days: 30
+
+      - name: Comment on PR (if applicable)
+        if: github.event.pull_request.number
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summaryPath = '.versatil/logs/rag-contribution-summary.json';
+
+            if (fs.existsSync(summaryPath)) {
+              const summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+
+              const comment = `## 🌍 Public RAG Contribution
+
+**Patterns Extracted**: ${summary.patternsExtracted}
+**Patterns Stored**: ${summary.patternsStored}
+**Sanitized**: ${summary.sanitized}
+
+### Top Contributions:
+${summary.topPatterns.map((p, i) => `${i + 1}. ${p.pattern} (${p.classification})`).join('\n')}
+
+✅ These patterns are now available to all VERSATIL users via Public RAG!
+
+<details>
+<summary>📊 Full Report</summary>
+
+\`\`\`json
+${JSON.stringify(summary, null, 2)}
+\`\`\`
+</details>`;
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }

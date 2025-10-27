@@ -93,6 +93,11 @@ npm run doctor
   - BoundaryEnforcementEngine: Monitoring filesystem
   - ZeroTrustProjectIsolation: Threat detection active
 
+✅ **RAG Storage**: CONFIGURED
+  - Public RAG: Firestore (versatil-public-rag) ✅ Connected
+  - Private RAG: Not configured (framework patterns only)
+  - Edge Acceleration: Cloud Run (50-100ms avg)
+
 ---
 
 ## Access Permissions (Framework Dev)
@@ -107,6 +112,259 @@ npm run doctor
 - Customer project data
 - User project learnings
 - Customer-specific patterns
+```
+
+**After displaying setup steps, ALWAYS invoke Oliver-MCP + Iris-Guardian for validation:**
+
+```typescript
+await Task({
+  subagent_type: "Oliver-MCP",
+  description: "Validate setup environment",
+  prompt: `
+You are Oliver-MCP, the environment validation and prerequisite checking agent.
+
+## Your Task
+
+Validate the complete setup environment and verify all prerequisites are met.
+
+## Context
+
+Setup mode: [Framework Development / User Project]
+Repository: [insert pwd]
+Dependencies installed: [check node_modules/]
+Configuration files: [check .claude/, .versatil/]
+
+## Steps to Execute
+
+### 1. Environment Validation
+- Node.js version (≥18.0.0 required)
+- npm version (≥9.0.0 recommended)
+- Git installation and configuration
+- Disk space available (≥1GB required)
+- Memory available (≥4GB recommended)
+
+### 2. Dependency Verification
+- All package.json dependencies installed
+- No missing peer dependencies
+- No security vulnerabilities (npm audit)
+- TypeScript compiler available
+- Jest test framework configured
+
+### 3. Configuration Validation
+- .claude/settings.json exists and valid
+- .claude/agents/*.md all present (13 files)
+- .claude/commands/*.md all present (30 files)
+- .claude/hooks/*.ts all present
+- package.json scripts complete
+
+### 4. MCP Integration Check
+- MCP servers configured (if applicable)
+- Supabase MCP (if private RAG)
+- GitHub MCP (if version control)
+- Chrome MCP (if browser automation)
+
+### 5. RAG Storage Validation
+- Public RAG connection (Firestore)
+- Private RAG configured (if applicable)
+- RAG router functional
+- Pattern search working
+
+## Expected Output
+
+\`\`\`typescript
+interface SetupValidationResult {
+  environment: {
+    nodejs_version: string;
+    npm_version: string;
+    git_installed: boolean;
+    disk_space_gb: number;
+    memory_gb: number;
+    issues: string[];
+  };
+
+  dependencies: {
+    total: number;
+    installed: number;
+    missing: string[];
+    vulnerabilities: {
+      critical: number;
+      high: number;
+      medium: number;
+      low: number;
+    };
+    typescript_available: boolean;
+    jest_available: boolean;
+  };
+
+  configuration: {
+    settings_valid: boolean;
+    agents_count: number;  // Should be 13
+    commands_count: number;  // Should be 30
+    hooks_count: number;  // Should be ≥3
+    scripts_complete: boolean;
+    issues: string[];
+  };
+
+  mcp_integration: {
+    servers_configured: number;
+    servers_working: number;
+    server_details: Array<{
+      name: string;
+      status: 'connected' | 'disconnected' | 'error';
+      latency_ms?: number;
+    }>;
+  };
+
+  rag_storage: {
+    public_rag_status: 'connected' | 'disconnected' | 'error';
+    private_rag_status: 'connected' | 'not_configured' | 'error';
+    pattern_search_working: boolean;
+    query_latency_ms: number;
+  };
+
+  overall_assessment: {
+    setup_complete: boolean;
+    readiness_score: number;  // 0-100
+    critical_issues: number;
+    warnings: number;
+    safe_to_proceed: boolean;  // BLOCKING
+    next_steps: string[];
+  };
+}
+\`\`\`
+
+## Example Output
+
+\`\`\`typescript
+{
+  environment: {
+    nodejs_version: "v20.10.0",
+    npm_version: "10.2.3",
+    git_installed: true,
+    disk_space_gb: 45.2,
+    memory_gb: 16,
+    issues: []
+  },
+
+  dependencies: {
+    total: 87,
+    installed: 87,
+    missing: [],
+    vulnerabilities: {
+      critical: 0,
+      high: 0,
+      medium: 2,
+      low: 5
+    },
+    typescript_available: true,
+    jest_available: true
+  },
+
+  configuration: {
+    settings_valid: true,
+    agents_count: 13,
+    commands_count: 30,
+    hooks_count: 3,
+    scripts_complete: true,
+    issues: []
+  },
+
+  mcp_integration: {
+    servers_configured: 2,
+    servers_working: 2,
+    server_details: [
+      {
+        name: "supabase-mcp",
+        status: "connected",
+        latency_ms: 45
+      },
+      {
+        name: "github-mcp",
+        status: "connected",
+        latency_ms: 120
+      }
+    ]
+  },
+
+  rag_storage: {
+    public_rag_status: "connected",
+    private_rag_status: "not_configured",
+    pattern_search_working: true,
+    query_latency_ms: 68
+  },
+
+  overall_assessment: {
+    setup_complete: true,
+    readiness_score: 95,
+    critical_issues: 0,
+    warnings: 2,
+    safe_to_proceed: true,
+    next_steps: [
+      "Run 'npm run build' to compile TypeScript",
+      "Consider configuring Private RAG for proprietary patterns",
+      "Review 2 medium and 5 low security vulnerabilities"
+    ]
+  }
+}
+\`\`\`
+
+Return the complete validation result.
+`
+});
+```
+
+**Display Validation Results**:
+
+```typescript
+// Show readiness score
+console.log(`\n🎯 SETUP READINESS: ${validation.overall_assessment.readiness_score}/100`);
+
+if (validation.overall_assessment.setup_complete) {
+  console.log("✅ Setup is complete and ready!");
+} else {
+  console.log("⚠️  Setup incomplete - address issues below");
+}
+
+// Show critical issues
+if (validation.overall_assessment.critical_issues > 0) {
+  console.log(`\n🚨 CRITICAL ISSUES: ${validation.overall_assessment.critical_issues}`);
+  validation.environment.issues.forEach(issue => console.log(`  - ${issue}`));
+  validation.configuration.issues.forEach(issue => console.log(`  - ${issue}`));
+}
+
+// Show environment status
+console.log(`\n💻 ENVIRONMENT`);
+console.log(`  Node.js: ${validation.environment.nodejs_version}`);
+console.log(`  npm: ${validation.environment.npm_version}`);
+console.log(`  Disk: ${validation.environment.disk_space_gb} GB free`);
+console.log(`  Memory: ${validation.environment.memory_gb} GB`);
+
+// Show dependency status
+console.log(`\n📦 DEPENDENCIES`);
+console.log(`  Installed: ${validation.dependencies.installed}/${validation.dependencies.total}`);
+if (validation.dependencies.missing.length > 0) {
+  console.log(`  Missing: ${validation.dependencies.missing.join(', ')}`);
+}
+if (validation.dependencies.vulnerabilities.critical > 0 ||
+    validation.dependencies.vulnerabilities.high > 0) {
+  console.log(`  ⚠️  Vulnerabilities: ${validation.dependencies.vulnerabilities.critical} critical, ${validation.dependencies.vulnerabilities.high} high`);
+}
+
+// Show RAG status
+console.log(`\n🧠 RAG STORAGE`);
+console.log(`  Public RAG: ${validation.rag_storage.public_rag_status}`);
+console.log(`  Private RAG: ${validation.rag_storage.private_rag_status}`);
+if (validation.rag_storage.pattern_search_working) {
+  console.log(`  Query latency: ${validation.rag_storage.query_latency_ms}ms`);
+}
+
+// Show next steps
+if (validation.overall_assessment.next_steps.length > 0) {
+  console.log(`\n📋 NEXT STEPS`);
+  validation.overall_assessment.next_steps.forEach((step, i) => {
+    console.log(`  ${i+1}. ${step}`);
+  });
+}
 ```
 
 ---
@@ -171,6 +429,16 @@ Use VERSATIL commands to accelerate development:
 ✅ **Enforcement Engines**: INITIALIZED
   - BoundaryEnforcementEngine: Protecting framework files
   - ZeroTrustProjectIsolation: Preventing lateral access
+
+✅ **RAG Storage**: CONFIGURED
+  - Public RAG: Firestore (versatil-public-rag) ✅ Connected
+  - Private RAG: 🔒 Firestore (my-project-rag) ✅ Connected
+    - Backend: firestore
+    - Project: my-google-project-id
+    - Patterns stored: 127
+  - Edge Acceleration: Cloud Run (68ms avg)
+
+**Not using Private RAG?** Run `npm run setup:private-rag` to configure it (2 minutes)
 
 ---
 

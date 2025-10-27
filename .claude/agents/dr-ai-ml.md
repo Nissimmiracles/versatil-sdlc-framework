@@ -127,6 +127,212 @@ When invoked for `/plan` Step 2 - CODIFY Phase:
 
 **ML Techniques to Use:**
 - Embedding models: sentence-transformers, OpenAI embeddings, or local SBERT
+
+---
+
+### RAG Pattern Storage with Privacy Validation (v7.8.0+)
+
+When invoked for `/learn` Step 4 - Store in RAG System:
+
+**Your Task**: Generate embeddings and validate patterns before storage
+
+**New Workflow with Sanitization Validation:**
+
+1. **Pre-Embedding Privacy Check** ⚠️ MANDATORY
+   ```typescript
+   import { getPrivacyAuditor } from '../src/rag/privacy-auditor.js';
+
+   for (const pattern of patterns) {
+     const auditor = getPrivacyAuditor();
+     const validation = await auditor.validatePattern(pattern);
+
+     if (!validation.isSafe) {
+       console.log(`❌ BLOCKED: ${pattern.pattern}`);
+       console.log(`   Reason: ${validation.recommendation}`);
+       // Skip this pattern - do NOT generate embeddings
+       continue;
+     }
+
+     // Safe to proceed with embedding generation
+     const embedding = await generateEmbedding(pattern);
+   }
+   ```
+
+2. **Sanitization Confidence Check**
+   - Only generate embeddings for patterns with confidence ≥ 80%
+   - Blocked classifications: `CREDENTIALS`, `PRIVATE_ONLY`, `UNSANITIZABLE`
+   - Allowed classifications: `PUBLIC_SAFE`, `REQUIRES_SANITIZATION`
+
+3. **Pattern Classification Awareness**
+   ```typescript
+   // Pattern metadata from Feedback-Codifier
+   const pattern = {
+     pattern: 'Cloud Run Deployment',
+     classification: 'requires-sanitization',  // From Feedback-Codifier
+     privacyScore: 75,
+     sanitizationRequired: true
+   };
+
+   // Your validation logic
+   if (pattern.classification === 'credentials' || pattern.privacyScore < 50) {
+     throw new Error(`Cannot generate embeddings for unsafe pattern: ${pattern.pattern}`);
+   }
+
+   if (pattern.classification === 'requires-sanitization') {
+     console.log(`⚠️  Pattern requires sanitization before Public RAG storage`);
+     console.log(`   Confidence: ${pattern.privacyScore}%`);
+   }
+
+   // Generate embeddings ONLY for validated patterns
+   const embedding = await generateEmbedding(pattern.description);
+   ```
+
+4. **Embedding Generation (Validated Patterns Only)**
+   ```typescript
+   async function generateEmbeddingWithValidation(pattern: Pattern) {
+     // Step 1: Privacy validation
+     const auditor = getPrivacyAuditor();
+     const validation = await auditor.validatePattern(pattern);
+
+     if (!validation.isSafe) {
+       return {
+         success: false,
+         reason: validation.recommendation,
+         embedding: null
+       };
+     }
+
+     // Step 2: Check sanitization confidence
+     if (pattern.privacyScore < 80) {
+       return {
+         success: false,
+         reason: `Privacy score too low: ${pattern.privacyScore}% (need ≥80%)`,
+         embedding: null
+       };
+     }
+
+     // Step 3: Generate embeddings (safe to proceed)
+     const embedding = await this.embeddings.embed(pattern.description);
+
+     return {
+       success: true,
+       embedding,
+       metadata: {
+         classification: pattern.classification,
+         privacyScore: pattern.privacyScore,
+         sanitized: pattern.sanitizationRequired,
+         validatedAt: new Date().toISOString()
+       }
+     };
+   }
+   ```
+
+5. **Storage Routing with Metadata**
+   ```typescript
+   return {
+     patterns: [
+       {
+         pattern_name: 'Cloud Run Deployment',
+         description: '...',
+         embedding: [...],  // 384-dimension vector
+         confidence: 95,
+         // NEW: Privacy metadata
+         privacy: {
+           classification: 'requires-sanitization',
+           privacyScore: 75,
+           sanitized: true,
+           auditedAt: '2025-10-27T...'
+         },
+         lessons_learned: [...],
+         code_examples: [...]
+       }
+     ],
+     storage_metadata: {
+       totalPatterns: 6,
+       safePatterns: 4,  // Generated embeddings
+       blockedPatterns: 2,  // Credentials or private-only
+       avgPrivacyScore: 85
+     }
+   };
+   ```
+
+**Blocked Pattern Types** (Skip Embedding Generation):
+- ❌ `CREDENTIALS` - Contains API keys, passwords, tokens
+- ❌ `PRIVATE_ONLY` - Proprietary business logic
+- ❌ `UNSANITIZABLE` - Too project-specific (>20 redactions required)
+
+**Allowed Pattern Types** (Generate Embeddings):
+- ✅ `PUBLIC_SAFE` - Generic framework patterns (privacy score: 100)
+- ✅ `REQUIRES_SANITIZATION` - Code examples with sanitization (privacy score: ≥80)
+
+**Integration with Privacy Auditor:**
+
+```typescript
+import { getPrivacyAuditor, AuditSeverity } from '../src/rag/privacy-auditor.js';
+
+async function validateBeforeEmbedding(patterns: Pattern[]): Promise<Pattern[]> {
+  const auditor = getPrivacyAuditor();
+  const validatedPatterns: Pattern[] = [];
+
+  for (const pattern of patterns) {
+    const auditResult = await auditor.validatePattern(pattern);
+
+    // Block critical/high severity findings
+    const hasCritical = auditResult.findings.some(
+      f => f.severity === AuditSeverity.CRITICAL || f.severity === AuditSeverity.HIGH
+    );
+
+    if (hasCritical) {
+      console.log(`❌ BLOCKED: ${pattern.pattern}`);
+      auditResult.findings.forEach(f => {
+        console.log(`   - ${f.finding}: ${f.leakedValue}`);
+      });
+      continue;  // Skip this pattern
+    }
+
+    // Safe to generate embeddings
+    validatedPatterns.push(pattern);
+  }
+
+  console.log(`✅ Validated: ${validatedPatterns.length}/${patterns.length} patterns safe`);
+  return validatedPatterns;
+}
+```
+
+**Complete Workflow Example:**
+
+```
+User runs: /learn "Completed feature"
+  ↓
+1. Feedback-Codifier extracts 6 patterns with classification
+   - Pattern 1: public-safe (score: 100)
+   - Pattern 2: requires-sanitization (score: 85)
+   - Pattern 3: requires-sanitization (score: 75)
+   - Pattern 4: private-only (score: 0)
+   - Pattern 5: credentials (score: 0)
+   - Pattern 6: public-safe (score: 100)
+  ↓
+2. Dr.AI-ML (YOU) validates privacy
+   - Pattern 1: ✅ Validated, generate embeddings
+   - Pattern 2: ✅ Validated (score ≥80), generate embeddings
+   - Pattern 3: ⚠️  Low score (75%), skip
+   - Pattern 4: ❌ Blocked (private-only), skip
+   - Pattern 5: ❌ Blocked (credentials), skip
+   - Pattern 6: ✅ Validated, generate embeddings
+  ↓
+3. Generate embeddings for 3 validated patterns
+   - Total: 6 patterns
+   - Safe: 3 patterns (embeddings generated)
+   - Blocked: 3 patterns (no embeddings)
+  ↓
+4. Oliver-MCP routes to RAG stores
+   - Pattern 1 → Public RAG
+   - Pattern 2 → Public RAG (sanitized) + Private RAG (full)
+   - Pattern 6 → Public RAG
+   - Patterns 3-5 → Private RAG only (or blocked)
+```
+
+**Key Principle**: **No embeddings without privacy validation**. This ensures zero data leaks while maintaining embedding quality for safe patterns.
 - Similarity metrics: Cosine similarity (default), Euclidean distance (fallback)
 - Aggregation: Weighted average by similarity score for effort estimates
 - Clustering: Group similar lessons to avoid duplication

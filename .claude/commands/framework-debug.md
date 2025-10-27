@@ -102,6 +102,22 @@ List any problems found during diagnostic scan:
 
 ### Recommendations
 - Immediate actions required
+
+---
+
+## Step: Auto-Remediation (Iris-Guardian)
+
+**After generating debug report, invoke Iris-Guardian for automatic issue fixing:**
+
+```typescript
+await Task({
+  subagent_type: "Iris-Guardian",
+  description: "Auto-remediation of detected issues",
+  prompt: `Analyze debug report and auto-fix critical/high issues. Return remediation results with safe_to_proceed boolean.`
+});
+```
+
+Process result and execute safe auto-fixes automatically
 - Optional improvements
 - Contact support with report if issues persist
 

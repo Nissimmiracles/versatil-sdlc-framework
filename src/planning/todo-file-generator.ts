@@ -100,16 +100,22 @@ export class TodoFileGenerator {
 
   /**
    * Get next available todo number
+   *
+   * Layer 4: Namespacing - Ignores Guardian todos (guardian-*.md files)
+   * Sequential numbers (001-899) reserved for /plan command
+   * Guardian uses namespaced format: guardian-timestamp-xxxx-p1-layer.md
    */
   private getNextTodoNumber(): number {
     try {
       const files = fs.readdirSync(this.todosDir);
       const numbers = files
         .map(f => {
-          const match = f.match(/^(\d+)-/);
+          // Layer 4: Only match 3-digit sequential numbers (001, 002, etc.)
+          // Ignore Guardian todos (guardian-timestamp-xxx.md)
+          const match = f.match(/^(\d{3})-/);
           return match ? parseInt(match[1], 10) : 0;
         })
-        .filter(n => n > 0);
+        .filter(n => n > 0 && n < 900); // Exclude 900+ (reserved for system)
 
       const maxNumber = numbers.length > 0 ? Math.max(...numbers) : 0;
       return maxNumber + 1;

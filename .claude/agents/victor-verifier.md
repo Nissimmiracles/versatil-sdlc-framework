@@ -36,6 +36,129 @@ Every factual claim made by any VERSATIL agent must be:
 - **Method**: Execute testing tools (Jest, Semgrep, Lighthouse, axe-core)
 - **Output**: PASS ✓ or FAIL ❌ with quality metrics
 
+---
+
+## Three-Layer Verification System (v7.7.0+)
+
+Guardian integrates Victor-Verifier's CoVe methodology across **three verification layers**:
+
+### Layer 1: Framework (Infrastructure)
+**Verifies**: Build system, agents, hooks, MCP, RAG, orchestration
+
+**Ground Truth Methods**:
+```typescript
+// Build verification
+"TypeScript compiles cleanly" → exec(tsc --noEmit), check exit code 0
+
+// Agent verification
+"Agent definition valid" → Read .claude/agents/[name].md, validate structure
+
+// Hook verification
+"Hook registered" → Parse .claude/settings.json, check hooks array
+
+// MCP verification
+"MCP server responding" → Send test request, expect response <5s
+
+// RAG verification
+"RAG Router healthy" → Call ragRouter.getHealth(), check all stores
+```
+
+**Confidence Scoring**:
+- ✅ 95-100%: Exit code 0 + expected output
+- ✅ 85-94%: Exit code 0 but warnings
+- ⚠️ 70-84%: Non-zero exit but error clear
+- ❌ <70%: Ambiguous errors
+
+### Layer 2: Project (Application Code)
+**Verifies**: Tests, coverage, security, quality, accessibility, performance
+
+**Ground Truth Methods**:
+```typescript
+// Test coverage verification
+"Coverage ≥80%" → exec(npm run test:coverage), parse JSON output
+
+// Security verification
+"No critical vulnerabilities" → exec(npm audit --json), filter severity
+
+// Code quality verification
+"ESLint passes" → exec(npm run lint), check exit code 0
+
+// Accessibility verification
+"WCAG 2.1 AA compliant" → Run Lighthouse + axe-core, check scores
+```
+
+**Confidence Scoring**:
+- ✅ 95-100%: Tool output parseable + clear pass/fail
+- ✅ 85-94%: Tool output parseable + warnings
+- ⚠️ 70-84%: Tool error but manually verifiable
+- ❌ <70%: Tool unavailable or output unparseable
+
+### Layer 3: Context (Preferences & Conventions)
+**Verifies**: User preferences, team conventions, project vision alignment
+
+**Ground Truth Methods**:
+```typescript
+// User preference verification
+"Code uses user's indentation" →
+  1. Load ~/.versatil/users/[id]/preferences.json
+  2. Read generated file, count leading whitespace
+  3. Compare: tabs if preference.indentation === 'tabs'
+
+// Team convention verification
+"Commits follow team style" →
+  1. Load ~/.versatil/teams/[id]/conventions.json
+  2. Parse git log -n 10, check commit message format
+  3. Expect conventional if teamConventions.commitStyle === 'conventional'
+
+// Project vision verification
+"Feature aligns with goals" →
+  1. Load ~/.versatil/projects/[id]/vision.json
+  2. Compare feature description against vision.goals
+  3. Semantic similarity score ≥70%
+```
+
+**Confidence Scoring**:
+- ✅ 95-100%: Preference file exists + code matches exactly
+- ✅ 85-94%: Preference file exists + mostly matches (≥90%)
+- ⚠️ 70-84%: Preference file exists + partially matches (70-89%)
+- ❌ <70%: Preference file missing or code unanalyzable
+
+**Priority Hierarchy**: User > Team > Project > Framework
+
+### Integration with Guardian
+
+Guardian uses three-layer verification for anti-hallucination:
+
+```typescript
+// 1. Issue detected during health check
+const issue = {
+  component: 'test-coverage',
+  description: 'Coverage 72% (below 80% threshold)',
+  severity: 'high'
+};
+
+// 2. Classify into layer
+const layer = classifyIssueLayer(issue); // → 'project'
+
+// 3. Verify using layer-specific ground truth
+const verification = await verifyProjectIssue(issue, workingDir);
+// Executes: npm run test:coverage
+// Parses: coverage-summary.json
+// Confirms: totalCoverage (72%) < threshold (80%)
+// Confidence: 100% (tool output parseable)
+
+// 4. Create verified todo with evidence
+const todo = createVerifiedTodo(issue, verification);
+// Includes: Ground truth evidence, confidence score, recommended fix
+```
+
+**Benefits**:
+- ✅ Zero hallucinations across all three layers
+- ✅ Priority-aware verification (User > Team > Project > Framework)
+- ✅ Appropriate agent routing per layer
+- ✅ Confidence transparency with evidence chains
+- ✅ Learning loop per layer (Framework/Project/Context RAG)
+
 ## Responsibilities
 
 ### 1. Claim Extraction

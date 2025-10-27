@@ -69,42 +69,308 @@ First, determine what work was completed and gather all artifacts (code changes,
 - [ ] Todo completion notes (todos/*.md files)
 - [ ] Time tracking data (estimated vs actual)
 
-### 2. Extract Patterns (Feedback-Codifier Agent)
+### 2. Extract Patterns ⭐ AGENT-DRIVEN (Feedback-Codifier)
 
 <thinking>
-Use the feedback-codifier agent to analyze completed work and extract reusable patterns, successful approaches, and lessons learned.
+Use the Feedback-Codifier agent to systematically analyze completed work and extract reusable patterns, successful approaches, and lessons learned for future use.
 </thinking>
 
-**Pattern Analysis:**
+**⛔ BLOCKING STEP - YOU MUST INVOKE FEEDBACK-CODIFIER USING THE TASK TOOL:**
 
-Run feedback-codifier agent on the completed work:
+**ACTION: Invoke Feedback-Codifier Agent**
+Call the Task tool with:
+- `subagent_type: "Feedback-Codifier"`
+- `description: "Extract patterns from completed work"`
+- `prompt: "Analyze completed work and extract learnings for '${learning_target}'. Input: Git commits (${commit_count}), code changes (${files_changed} files), test coverage (${coverage}%), time spent (estimated: ${estimated_effort}, actual: ${actual_effort}), success indicators (tests passing: ${tests_passing}, deployed: ${deployed}). Your pattern extraction expertise: (1) Identify successful patterns (what worked well), (2) Identify anti-patterns avoided (what was prevented), (3) Calculate effort accuracy (planned vs actual with variance analysis), (4) Extract reusable code snippets with file:line references, (5) Codify lessons learned (key insights, gotchas, best practices), (6) Suggest future improvements (what could be better next time). Pattern categories: Architecture, Security, Performance, Testing, Developer Experience. Return: { successful_patterns: [], anti_patterns_avoided: [], effort_metrics: {}, reusable_code: [{snippet, file, lines, pattern_name}], lessons_learned: [], future_improvements: [], confidence_score: number }"`
 
-```yaml
-Agent: feedback-codifier
-Task: "Analyze completed feature and extract learnings"
-Input:
-  - feature_description: [from commits/todos]
-  - code_changes: [diff output]
-  - test_coverage: [coverage report]
-  - time_spent: [actual effort]
-  - success_indicators: [tests passing, deployed, etc.]
+**STOP AND WAIT for Feedback-Codifier agent to complete before proceeding.**
 
-Output:
-  - successful_patterns: [What worked well]
-  - anti_patterns_avoided: [What was avoided]
-  - effort_accuracy: [estimated vs actual]
-  - reusable_code: [code snippets with file paths]
-  - lessons_learned: [key insights]
-  - future_improvements: [what could be better]
+**⛔ CHECKPOINT: You MUST have Feedback-Codifier's pattern extraction before storing in RAG. Use their systematic analysis to ensure high-quality learnings.**
+
+**Agent-Driven Pattern Analysis:**
+
+Invoke Feedback-Codifier for comprehensive learning extraction:
+
+```typescript
+// Agent Task: Feedback-Codifier analyzes completed work
+Task feedback-codifier: `Extract learnings from completed work: "${learning_target}"
+
+**Completed Work Analysis Data**:
+
+Git History:
+- Commits: ${commit_count}
+- Changed files: ${files_changed}
+- Lines added: ${lines_added}
+- Lines removed: ${lines_removed}
+- Commit messages: ${commit_messages}
+
+Code Changes:
+- Implementation files: ${impl_files}
+- Test files: ${test_files}
+- Documentation: ${doc_files}
+- Migrations: ${migration_files}
+
+Quality Metrics:
+- Test coverage: ${coverage}% (target: 80%+)
+- Tests passing: ${tests_passing}/${tests_total}
+- Security audit: ${security_status}
+- Performance: ${performance_metrics}
+
+Effort Tracking:
+- Estimated effort: ${estimated_effort} hours
+- Actual effort: ${actual_effort} hours
+- Accuracy: ${accuracy}%
+- Variance reason: ${variance_reason}
+
+Success Indicators:
+- Tests passing: ${tests_passing}
+- Deployed: ${deployed}
+- User acceptance: ${user_acceptance}
+
+**Your Pattern Extraction Expertise:**
+
+1. **Identify Successful Patterns** (What worked well):
+   ```typescript
+   // Analyze code changes for patterns that led to success
+   const successfulPatterns = [];
+
+   // Architecture patterns
+   if (has_clean_separation_of_concerns) {
+     successfulPatterns.push({
+       category: 'architecture',
+       pattern: 'Clean database/API/UI separation',
+       evidence: 'Database layer independent, API tested with mocks, UI tested with API mocks',
+       reusability: 'high',
+       files: ['src/database/', 'src/api/', 'src/components/']
+     });
+   }
+
+   // Security patterns
+   if (has_parameterized_queries) {
+     successfulPatterns.push({
+       category: 'security',
+       pattern: 'Parameterized SQL queries prevent injection',
+       evidence: 'All database queries use parameterized statements, 0 SQL injection vulnerabilities',
+       reusability: 'critical',
+       files: ['src/database/queries.ts:42-67']
+     });
+   }
+
+   // Performance patterns
+   if (has_early_indexes) {
+     successfulPatterns.push({
+       category: 'performance',
+       pattern: 'Create indexes BEFORE bulk inserts',
+       evidence: 'Email index created before user data import, no performance degradation',
+       reusability: 'high',
+       files: ['supabase/migrations/001_indexes.sql']
+     });
+   }
+   ```
+
+2. **Identify Anti-Patterns Avoided** (What was prevented):
+   ```typescript
+   // Analyze what mistakes were avoided
+   const antiPatternsAvoided = [];
+
+   if (avoided_string_concatenation_in_sql) {
+     antiPatternsAvoided.push({
+       anti_pattern: 'SQL string concatenation',
+       how_avoided: 'Used parameterized queries from the start',
+       risk_prevented: 'SQL injection vulnerability',
+       evidence: 'Code review flagged concatenation attempt, immediately switched to params'
+     });
+   }
+
+   if (avoided_storing_secrets_in_code) {
+     antiPatternsAvoided.push({
+       anti_pattern: 'Hardcoded secrets',
+       how_avoided: 'Used environment variables for all sensitive data',
+       risk_prevented: 'Credential exposure in git history',
+       evidence: '.env.example provided, .env in .gitignore'
+     });
+   }
+   ```
+
+3. **Calculate Effort Accuracy** (Planned vs actual):
+   ```typescript
+   const effortMetrics = {
+     estimated_hours: 24,
+     actual_hours: 28,
+     accuracy: 86%,  // 24/28 = 0.857
+     variance_hours: +4,  // 28 - 24
+     variance_percentage: +16.7%,
+
+     variance_breakdown: [
+       { reason: 'OAuth2 integration complexity', hours_added: 3, notes: 'Token refresh logic took longer than expected' },
+       { reason: 'Additional security tests', hours_added: 1, notes: 'Added XSS and CSRF tests not in original estimate' }
+     ],
+
+     complexity_factors: {
+       database_tables: 3,
+       api_endpoints: 5,
+       frontend_components: 4,
+       test_files: 8,
+       external_integrations: 2  // OAuth2, email service
+     },
+
+     future_estimate_adjustment: {
+       for_similar_features: '28 hours ± 4 hours',
+       confidence: '95%',
+       reasoning: 'Now have real data for auth features with OAuth'
+     }
+   };
+   ```
+
+4. **Extract Reusable Code** (Snippets with file:line references):
+   ```typescript
+   const reusableCode = [
+     {
+       pattern_name: 'JWT token generation',
+       file: 'src/auth/jwt-service.ts',
+       lines: '42-67',
+       snippet: `
+function generateToken(user: User): string {
+  return jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+}`,
+       reusability: 'high',
+       notes: 'Works for any user authentication, configurable expiry'
+     },
+     {
+       pattern_name: 'RLS policy for multi-tenant data',
+       file: 'supabase/migrations/003_auth_rls.sql',
+       lines: '15-22',
+       snippet: `
+CREATE POLICY users_own_data ON users
+USING (id = auth.uid());`,
+       reusability: 'critical',
+       notes: 'Standard RLS pattern for user data isolation'
+     },
+     {
+       pattern_name: 'React form validation with Zod',
+       file: 'src/components/auth/LoginForm.tsx',
+       lines: '15-45',
+       snippet: `
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8)
+});`,
+       reusability: 'high',
+       notes: 'Zod + React Hook Form integration for client-side validation'
+     }
+   ];
+   ```
+
+5. **Codify Lessons Learned** (Key insights):
+   ```typescript
+   const lessonsLearned = [
+     {
+       lesson: 'Create database indexes BEFORE inserting data',
+       category: 'performance',
+       impact: 'high',
+       evidence: 'Index created after 1000 users → 5s queries. Index created before → 10ms queries.',
+       future_action: 'Always add indexes in initial migration, not later'
+     },
+     {
+       lesson: 'Use httpOnly cookies for JWT tokens, not localStorage',
+       category: 'security',
+       impact: 'critical',
+       evidence: 'OWASP recommends httpOnly cookies to prevent XSS token theft',
+       future_action: 'Default to httpOnly cookies for all sensitive tokens'
+     },
+     {
+       lesson: 'OAuth2 token refresh is complex - estimate 2x time',
+       category: 'estimation',
+       impact: 'medium',
+       evidence: 'Estimated 3h for OAuth, actually took 6h due to token rotation complexity',
+       future_action: 'Add 2x multiplier for OAuth features in estimates'
+     },
+     {
+       lesson: 'Test RLS policies with multiple users, not just one',
+       category: 'testing',
+       impact: 'high',
+       evidence: 'RLS policy worked for admin but failed for regular users',
+       future_action: 'Test RLS with 3+ user roles (admin, user, guest)'
+     }
+   ];
+   ```
+
+6. **Suggest Future Improvements** (What could be better):
+   ```typescript
+   const futureImprovements = [
+     {
+       improvement: 'Add rate limiting to auth endpoints',
+       priority: 'high',
+       reasoning: 'Current implementation has no rate limiting, vulnerable to brute force',
+       estimated_effort: '2 hours',
+       implementation: 'Use express-rate-limit middleware on /auth/login'
+     },
+     {
+       improvement: 'Implement refresh token rotation',
+       priority: 'medium',
+       reasoning: 'Current refresh tokens never expire, security risk',
+       estimated_effort: '4 hours',
+       implementation: 'Generate new refresh token on each refresh, invalidate old one'
+     },
+     {
+       improvement: 'Add email verification',
+       priority: 'medium',
+       reasoning: 'Users can sign up without verifying email',
+       estimated_effort: '6 hours',
+       implementation: 'Send verification email on signup, require verification before login'
+     }
+   ];
+   ```
+
+**Return Format:**
+```typescript
+return {
+  successful_patterns: [
+    { category: 'architecture', pattern: 'Clean separation', evidence: '...', reusability: 'high' },
+    { category: 'security', pattern: 'Parameterized queries', evidence: '...', reusability: 'critical' },
+    { category: 'performance', pattern: 'Early indexes', evidence: '...', reusability: 'high' }
+  ],
+  anti_patterns_avoided: [
+    { anti_pattern: 'SQL concatenation', how_avoided: 'Used params', risk_prevented: 'SQL injection' },
+    { anti_pattern: 'Hardcoded secrets', how_avoided: 'Used env vars', risk_prevented: 'Credential exposure' }
+  ],
+  effort_metrics: {
+    estimated: 24, actual: 28, accuracy: 86%, variance: +4h,
+    variance_breakdown: [{reason: 'OAuth complexity', hours: +3}],
+    future_estimate: '28h ± 4h'
+  },
+  reusable_code: [
+    { pattern: 'JWT generation', file: 'src/auth/jwt-service.ts:42-67', snippet: '...' },
+    { pattern: 'RLS policy', file: 'supabase/migrations/003_rls.sql:15-22', snippet: '...' }
+  ],
+  lessons_learned: [
+    { lesson: 'Create indexes early', impact: 'high', evidence: '5s → 10ms', action: 'Always add indexes first' },
+    { lesson: 'httpOnly cookies > localStorage', impact: 'critical', evidence: 'OWASP rec', action: 'Default to cookies' }
+  ],
+  future_improvements: [
+    { improvement: 'Add rate limiting', priority: 'high', effort: '2h' },
+    { improvement: 'Token rotation', priority: 'medium', effort: '4h' }
+  ],
+  confidence_score: 95  // High confidence due to real evidence from completed work
+}
+```
+`
+
+// Wait for Feedback-Codifier to complete pattern extraction
+const patterns = await waitForAgent('feedback-codifier');
 ```
 
-**Pattern Categories:**
+**Pattern Categories (Enhanced):**
 
-- [ ] **Architecture Patterns**: Component structure, API design, database schema
-- [ ] **Security Patterns**: Auth implementation, input validation, RLS policies
-- [ ] **Performance Patterns**: Query optimization, caching strategies, indexes
-- [ ] **Testing Patterns**: Test organization, coverage strategies, fixtures
-- [ ] **Developer Experience**: Setup ease, documentation quality, debugging
+- [ ] **Architecture Patterns**: Component structure, API design, database schema, separation of concerns
+- [ ] **Security Patterns**: Auth implementation, input validation, RLS policies, OWASP compliance
+- [ ] **Performance Patterns**: Query optimization, caching strategies, indexes, < 200ms response times
+- [ ] **Testing Patterns**: Test organization, coverage strategies (80%+), fixtures, AAA pattern
+- [ ] **Developer Experience**: Setup ease, documentation quality, debugging, onboarding time
 
 ### 3. Calculate Effort Metrics
 
@@ -147,8 +413,114 @@ Feature Metrics:
 ### 4. Store in RAG System
 
 <thinking>
-Embed learnings into vector store for future retrieval during planning phase.
+Embed learnings into vector store for future retrieval during planning phase. Users can choose to store patterns in Public RAG (framework patterns), Private RAG (proprietary learnings), or both.
 </thinking>
+
+**🔒 Storage Selection with Automated Sanitization (v7.8.0+)**
+
+Before storing patterns, determine where to save them. VERSATIL now includes **automated privacy protection** to prevent data leaks.
+
+**Prompt user**:
+```
+Where should these learnings be stored?
+
+1. 🔒 Private RAG (recommended) - Your proprietary patterns, not shared
+   → Full implementation with project-specific details
+   → No sanitization applied (your data stays yours)
+
+2. 🌍 Public RAG - Framework patterns, helps community
+   → Automatic sanitization applied (project IDs → placeholders)
+   → Patterns validated for privacy (no credentials/secrets)
+   → Rejected if proprietary/unsanitizable
+
+3. Both - Store in Private + contribute sanitized version to Public
+   → Private: Complete implementation
+   → Public: Generic framework pattern (auto-sanitized)
+   → Best of both: Keep your specifics + help community
+
+Choose (1/2/3): _
+```
+
+**Default behavior**:
+- If Private RAG configured: Default to option 1 (Private)
+- If Private RAG NOT configured: Suggest setup with `npm run setup:private-rag`, fallback to option 2 (Public)
+- If user says "both": Classify patterns automatically (proprietary → Private, generic → Public)
+
+**Automated Sanitization (v7.8.0)** - Options 2 & 3:
+
+When storing to Public RAG, patterns are automatically:
+1. **Classified**: `public-safe`, `requires-sanitization`, `private-only`, `credentials`, `unsanitizable`
+2. **Sanitized**: Project IDs → `YOUR_PROJECT_ID`, URLs → `https://your-service.run.app`
+3. **Validated**: Pre-storage privacy audit (no leaks)
+4. **Rejected**: If contains credentials, proprietary logic, or unsanitizable data
+
+**Sanitization Preview** (shown for option 2/3):
+
+```typescript
+// BEFORE (your implementation):
+gcloud run deploy versatil-graphrag-query \
+  --project=centering-vine-443902-f1 \
+  --service-account=123456@developer.gserviceaccount.com
+
+// AFTER (sanitized for Public RAG):
+gcloud run deploy versatil-graphrag-query \
+  --project=YOUR_PROJECT_ID \
+  --service-account=YOUR_SERVICE_ACCOUNT@developer.gserviceaccount.com
+
+✅ Sanitization: 2 redactions, 95% confidence
+⚠️  Review changes before confirming storage
+```
+
+**Pattern Classification with Sanitization Policy**:
+
+```typescript
+import { getSanitizationPolicy } from '../src/rag/sanitization-policy.js';
+
+// Auto-classify patterns with sanitization awareness
+const policy = getSanitizationPolicy();
+
+for (const pattern of patterns) {
+  const decision = await policy.evaluatePattern(pattern);
+
+  switch (decision.classification) {
+    case 'PUBLIC_SAFE':
+      // Store in Public RAG as-is
+      console.log(`✅ ${pattern.pattern}: Public-safe (no sanitization needed)`);
+      break;
+
+    case 'REQUIRES_SANITIZATION':
+      // Sanitize then store in Public RAG
+      console.log(`⚠️  ${pattern.pattern}: Sanitization required`);
+      console.log(`   Redactions: ${decision.sanitizationResult.redactions.length}`);
+      console.log(`   Confidence: ${decision.sanitizationResult.confidence}%`);
+      // Show preview, ask user to confirm
+      break;
+
+    case 'PRIVATE_ONLY':
+    case 'CREDENTIALS':
+    case 'UNSANITIZABLE':
+      // Block from Public RAG, only allow Private storage
+      console.log(`❌ ${pattern.pattern}: Cannot be made public`);
+      console.log(`   Reason: ${decision.reasoning.join(', ')}`);
+      // Force Private RAG storage only
+      break;
+  }
+}
+```
+
+**User Confirmation for Sanitized Patterns**:
+
+```
+Pattern: "Cloud Run GraphRAG Deployment"
+Classification: Requires Sanitization
+Confidence: 95%
+
+Sanitization Preview:
+  - Project ID: cent...2-f1 → YOUR_PROJECT_ID
+  - Service Account: 1234...m → YOUR_SERVICE_ACCOUNT@...
+
+Store sanitized version in Public RAG? (y/n):
+```
 
 **⛔ BLOCKING STEP - YOU MUST INVOKE DR.AI-ML AND OLIVER-MCP USING THE TASK TOOL:**
 

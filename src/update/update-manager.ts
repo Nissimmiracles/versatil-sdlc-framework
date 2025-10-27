@@ -259,6 +259,88 @@ export class UpdateManager {
   }
 
   /**
+   * Perform post-update review (v7.7.0+)
+   * Runs comprehensive health check, agent reviews, and todo analysis
+   */
+  async performPostUpdateReview(
+    fromVersion: string,
+    toVersion: string,
+    options: {
+      skipReview?: boolean;
+      fullReview?: boolean;
+      agents?: string[];
+    } = {}
+  ): Promise<any> {
+    try {
+      // Dynamic import to avoid circular dependencies
+      const { PostUpdateReviewer } = await import('./post-update-reviewer.js');
+      const reviewer = new PostUpdateReviewer();
+
+      console.log('\n🔄 Running Post-Update Review...\n');
+
+      const report = await reviewer.performReview(fromVersion, toVersion, options);
+
+      // Display formatted report
+      console.log(reviewer.formatReport(report));
+
+      return report;
+
+    } catch (error) {
+      console.error('⚠️  Post-update review failed:', (error as Error).message);
+      console.log('You can run the review manually later with: /update --review-only\n');
+      return null;
+    }
+  }
+
+  /**
+   * Assess project status (readiness check)
+   */
+  async assessProjectStatus(): Promise<any> {
+    try {
+      const { PostUpdateReviewer } = await import('./post-update-reviewer.js');
+      const reviewer = new PostUpdateReviewer();
+
+      // Run assessment components
+      const assessment = await (reviewer as any).runProjectAssessment();
+
+      return assessment;
+
+    } catch (error) {
+      console.error('Assessment failed:', (error as Error).message);
+      return null;
+    }
+  }
+
+  /**
+   * Scan open todos
+   */
+  async scanOpenTodos(): Promise<any> {
+    try {
+      const { TodoScanner } = await import('./todo-scanner.js');
+      const scanner = new TodoScanner();
+
+      const summary = await scanner.scanTodos(false); // Exclude resolved
+
+      console.log(scanner.formatSummary(summary));
+
+      const recommendations = scanner.formatRecommendations(summary);
+      if (recommendations.length > 0) {
+        console.log('\n## 🎯 Recommendations\n');
+        recommendations.forEach((rec, i) => {
+          console.log(`${i + 1}. ${rec}`);
+        });
+        console.log('');
+      }
+
+      return summary;
+
+    } catch (error) {
+      console.error('Todo scan failed:', (error as Error).message);
+      return null;
+    }
+  }
+
+  /**
    * List available backups
    */
   async listBackups(): Promise<string[]> {

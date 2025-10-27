@@ -250,12 +250,22 @@ Display results based on whether patterns were found:
 ${hasHistoricalContext ? `
 Found **${searchResult.total_found} similar features** via ${searchResult.search_method}
 
+**Pattern Sources:**
+- 🔒 Private patterns: ${searchResult.private_count || 0} (your proprietary learnings)
+- 🌍 Public patterns: ${searchResult.public_count || 0} (framework best practices)
+
+${searchResult.private_count === 0 && searchResult.privateRAGSuggestion ? `
+💡 **Tip:** Configure Private RAG to store YOUR project-specific patterns for even better accuracy!
+   Run: \`npm run setup:private-rag\` (2 minutes)
+` : ''}
+
 **Top Matches:**
-${searchResult.patterns.slice(0, 3).map((p, i) =>
-  `${i + 1}. "${p.feature_name}" (${Math.round(p.similarity_score * 100)}% similar)
+${searchResult.patterns.slice(0, 3).map((p, i) => {
+  const sourceIcon = p.source === 'private' ? '🔒' : '🌍';
+  return `${i + 1}. ${sourceIcon} "${p.feature_name}" (${Math.round(p.similarity_score * 100)}% similar)
    - Effort: ${p.effort_hours}h (range: ${p.effort_range.min}-${p.effort_range.max}h)
-   - Success: ${p.success_score}% | Agent: ${p.agent}`
-).join('\n')}
+   - Success: ${p.success_score}% | Agent: ${p.agent}`;
+}).join('\n')}
 
 **Aggregated Insights:**
 - 📊 Average Effort: ${searchResult.avg_effort || 'N/A'}h across ${searchResult.patterns.length} features
@@ -991,7 +1001,9 @@ const todoResult = JSON.parse(skillOutput);
 
 **Generated Output:**
 
-Display dual todo system results:
+⚠️ **MANDATORY DISPLAY REQUIREMENT - YOU MUST SHOW ALL SECTIONS BELOW:**
+
+Display dual todo system results with ALL sections (including wave information):
 
 ```markdown
 ## Dual Todo System 📝
@@ -1012,10 +1024,12 @@ ${todoResult.files_created.map((file, i) =>
 **Dependency Graph:**
 ${todoResult.dependency_graph}
 
-**Execution Strategy:**
-${todoResult.execution_waves.map(wave =>
-  `Wave ${wave.wave_number} (${wave.can_run_parallel ? 'PARALLEL' : 'SEQUENTIAL'}): ${wave.todos.join(', ')} - ${wave.estimated_hours}h`
-).join('\n')}
+**⚡ Execution Strategy (CRITICAL - MUST DISPLAY):**
+${todoResult.execution_waves && todoResult.execution_waves.length > 0 ?
+  todoResult.execution_waves.map(wave =>
+    `Wave ${wave.wave_number} (${wave.can_run_parallel ? '⚡ PARALLEL' : '➡️ SEQUENTIAL'}): ${wave.todos.join(', ')} - ${wave.estimated_hours}h`
+  ).join('\n')
+  : 'No execution waves detected (all tasks sequential)'}
 
 **Total Estimated Effort:** ${todoResult.total_estimated_hours} hours
 ` : `
@@ -1024,6 +1038,19 @@ ${todoResult.execution_waves.map(wave =>
 ${phases.map((phase, i) => `${i + 1}. ${phase.name} (${phase.agent})`).join('\n')}
 `}
 ```
+
+**📋 DISPLAY CHECKLIST (YOU MUST VERIFY BEFORE SENDING TO USER):**
+- ✅ TodoWrite items listed
+- ✅ Persistent files listed with agents
+- ✅ Dependency graph rendered
+- ✅ **Execution Strategy section MUST be visible with wave information**
+- ✅ Total effort calculated
+
+**If execution_waves is missing from todoResult:**
+1. Check if execute-todo-generator.ts script was called correctly
+2. Verify JSON output includes "execution_waves" field
+3. If missing, re-run script with corrected specs
+4. DO NOT proceed to Step 8 without wave information
 
 **File Naming Convention:**
 ```

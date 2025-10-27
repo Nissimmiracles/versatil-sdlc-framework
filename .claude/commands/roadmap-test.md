@@ -120,6 +120,16 @@ Dry-run is fast (minutes) for validation. Real execution takes actual time (hour
 - **Changes**: Code written, database modified, tests run
 - **Use Case**: Actual implementation with stress testing
 
+**After roadmap execution, invoke Victor-Verifier for result verification:**
+
+```typescript
+await Task({
+  subagent_type: "Victor-Verifier",
+  description: "Verify roadmap execution results",
+  prompt: `Verify all claims from roadmap execution. Check files created, tests passing, quality gates met. Return verification with evidence_score (0-100) and safe_to_proceed boolean.`
+});
+```
+
 **Selection Prompt:**
 ```
 Select execution mode:

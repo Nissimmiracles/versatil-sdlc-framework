@@ -1,0 +1,18 @@
+{
+  "name": "versatil-graphrag-query",
+  "version": "1.0.0",
+  "description": "GraphRAG Query - Cloud Run Edge Function for 2-4x faster RAG queries",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^7.1.0",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "VERSATIL Framework",
+  "license": "MIT"
+}

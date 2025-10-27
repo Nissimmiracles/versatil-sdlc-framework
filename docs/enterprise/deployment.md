@@ -2,7 +2,39 @@
 
 ## Production Deployment Process
 
-This document demonstrates the complete deployment process for VERSATIL SDLC Framework Edge Functions to Supabase.
+**🔄 Architecture Update (v7.7.0)**:
+- **Current (Recommended)**: Google Cloud Run for GraphRAG query acceleration
+- **Legacy**: Supabase Edge Functions for OPERA agent routing
+
+See [Cloud Run Deployment Guide](cloud-run-deployment.md) for the current recommended deployment.
+
+---
+
+## Cloud Run Deployment (v7.7.0+) - RECOMMENDED
+
+**Purpose**: GraphRAG query acceleration with Public/Private RAG architecture
+
+**Quick Start**:
+```bash
+cd cloud-functions/graphrag-query
+./deploy.sh
+```
+
+**Benefits**:
+- ✅ **2-4x Faster**: 200ms → 50-100ms avg query time
+- ✅ **Cheaper**: ~$5-15/month for typical usage
+- ✅ **Simpler**: 1 service vs 7 Supabase functions
+- ✅ **Privacy-First**: Explicit public/private RAG separation
+
+**Complete Guide**: [Cloud Run Deployment Guide](cloud-run-deployment.md)
+
+---
+
+## Supabase Edge Functions (Legacy)
+
+This section documents the legacy Supabase Edge Functions deployment for OPERA agent routing.
+
+**Note**: This architecture is still functional but Cloud Run is now recommended for GraphRAG acceleration.
 
 ## Prerequisites Completed ✅
 

@@ -19,6 +19,8 @@ import { SupabaseVectorStore } from '../lib/supabase-vector-store.js';
 import { supabaseConfig } from '../config/supabase-config.js';
 import { memoryToolHandler } from '../memory/memory-tool-handler.js';
 import { VERSATILLogger } from '../utils/logger.js';
+import { RAGRouter } from '../rag/rag-router.js';
+import { getSanitizationPolicy, PatternClassification, StorageDestination } from '../rag/sanitization-policy.js';
 import * as path from 'path';
 import * as os from 'os';
 
@@ -27,6 +29,9 @@ export interface CodificationResult {
   lessonsStored: number;
   agentMemoriesUpdated: number;
   ragEntriesCreated: number;
+  publicPatternsStored?: number;  // v7.8.0: Public RAG storage count
+  privatePatternsStored?: number; // v7.8.0: Private RAG storage count
+  sanitizedPatterns?: number;     // v7.8.0: Patterns that required sanitization
   success: boolean;
   error?: string;
 }
@@ -34,9 +39,13 @@ export interface CodificationResult {
 export class LearningCodifier {
   private logger: VERSATILLogger;
   private vectorStore: SupabaseVectorStore | null = null;
+  private ragRouter: RAGRouter;  // v7.8.0: Public/Private routing
+  private sanitizationPolicy: ReturnType<typeof getSanitizationPolicy>; // v7.8.0: Auto-sanitization
 
   constructor() {
     this.logger = new VERSATILLogger();
+    this.ragRouter = RAGRouter.getInstance();
+    this.sanitizationPolicy = getSanitizationPolicy();
   }
 
   /**
@@ -70,24 +79,29 @@ export class LearningCodifier {
 
   /**
    * Main entry point: Codify learnings to RAG
+   * v7.8.0: Now supports Public/Private RAG routing with auto-sanitization
    */
-  async codifyLearnings(learnings: ExtractedLearnings): Promise<CodificationResult> {
+  async codifyLearnings(
+    learnings: ExtractedLearnings,
+    storageDestination: StorageDestination = StorageDestination.PRIVATE_ONLY
+  ): Promise<CodificationResult> {
     this.logger.info('Starting learning codification', {
       sessionId: learnings.sessionId,
       patterns: learnings.codePatterns.length,
-      lessons: learnings.lessons.length
+      lessons: learnings.lessons.length,
+      destination: storageDestination
     }, 'learning-codifier');
 
     try {
       await this.initializeVectorStore();
 
       const [
-        patternsStored,
+        { patternsStored, publicStored, privateStored, sanitized },
         lessonsStored,
         agentMemoriesUpdated
       ] = await Promise.all([
-        this.storeCodePatterns(learnings.codePatterns, learnings.sessionId),
-        this.storeLessonsLearned(learnings.lessons, learnings.sessionId),
+        this.storeCodePatterns(learnings.codePatterns, learnings.sessionId, storageDestination),
+        this.storeLessonsLearned(learnings.lessons, learnings.sessionId, storageDestination),
         this.updateAgentMemories(learnings)
       ]);
 
@@ -95,6 +109,9 @@ export class LearningCodifier {
 
       this.logger.info('Learning codification complete', {
         patternsStored,
+        publicPatternsStored: publicStored,
+        privatePatternsStored: privateStored,
+        sanitizedPatterns: sanitized,
         lessonsStored,
         agentMemoriesUpdated,
         ragEntriesCreated
@@ -105,6 +122,9 @@ export class LearningCodifier {
         lessonsStored,
         agentMemoriesUpdated,
         ragEntriesCreated,
+        publicPatternsStored: publicStored,
+        privatePatternsStored: privateStored,
+        sanitizedPatterns: sanitized,
         success: true
       };
     } catch (error) {
@@ -122,14 +142,22 @@ export class LearningCodifier {
 
   /**
    * Store code patterns in RAG
+   * v7.8.0: Now routes to Public/Private RAG with auto-sanitization
    */
-  private async storeCodePatterns(patterns: CodePattern[], sessionId: string): Promise<number> {
-    if (!this.vectorStore) {
-      this.logger.warn('Vector store not available, skipping pattern storage', {}, 'learning-codifier');
-      return 0;
-    }
-
-    let stored = 0;
+  private async storeCodePatterns(
+    patterns: CodePattern[],
+    sessionId: string,
+    storageDestination: StorageDestination
+  ): Promise<{
+    patternsStored: number;
+    publicStored: number;
+    privateStored: number;
+    sanitized: number;
+  }> {
+    let patternsStored = 0;
+    let publicStored = 0;
+    let privateStored = 0;
+    let sanitized = 0;
 
     for (const pattern of patterns) {
       try {
@@ -138,30 +166,124 @@ export class LearningCodifier {
           continue;
         }
 
-        await this.vectorStore.addPattern({
-          agent: this.mapCategoryToAgent(pattern.category),
-          type: pattern.category,
+        // Classify pattern for storage destination
+        const policyDecision = await this.sanitizationPolicy.evaluatePattern({
+          pattern: pattern.pattern,
+          description: pattern.description,
           code: pattern.codeSnippet,
-          filePath: sessionId,
-          language: pattern.language,
-          framework: pattern.framework,
-          score: pattern.effectiveness / 100,
+          agent: this.mapCategoryToAgent(pattern.category),
+          category: pattern.category,
+          tags: pattern.tags
+        });
+
+        // Prepare pattern data
+        const patternData = {
+          pattern: pattern.pattern,
+          description: pattern.description,
+          code: pattern.codeSnippet,
+          agent: this.mapCategoryToAgent(pattern.category),
+          category: pattern.category,
+          effectiveness: pattern.effectiveness,
+          tags: pattern.tags,
           metadata: {
-            description: pattern.description,
-            tags: pattern.tags,
+            language: pattern.language,
+            framework: pattern.framework,
             usageContext: pattern.usageContext,
             recommendations: pattern.recommendations,
             sessionId,
             timestamp: new Date().toISOString()
           }
-        });
+        };
 
-        stored++;
+        // Route to appropriate RAG store(s)
+        if (storageDestination === StorageDestination.BOTH) {
+          // Store in both Private and Public
+          if (policyDecision.classification === PatternClassification.PUBLIC_SAFE ||
+              policyDecision.classification === PatternClassification.REQUIRES_SANITIZATION) {
+            // Store sanitized version in Public RAG
+            await this.ragRouter.storePattern({
+              ...patternData,
+              code: policyDecision.sanitizationResult?.sanitized || patternData.code,
+              description: policyDecision.sanitizationResult?.sanitized || patternData.description
+            }, StorageDestination.PUBLIC_ONLY);
+            publicStored++;
+
+            if (policyDecision.classification === PatternClassification.REQUIRES_SANITIZATION) {
+              sanitized++;
+            }
+          }
+
+          // Store original in Private RAG (if configured)
+          try {
+            await this.ragRouter.storePattern(patternData, StorageDestination.PRIVATE_ONLY);
+            privateStored++;
+          } catch (error) {
+            this.logger.warn('Private RAG not configured, skipping private storage', {}, 'learning-codifier');
+          }
+
+        } else if (storageDestination === StorageDestination.PUBLIC_ONLY) {
+          // Public only - reject if not safe
+          if (policyDecision.classification === PatternClassification.CREDENTIALS ||
+              policyDecision.classification === PatternClassification.PRIVATE_ONLY ||
+              policyDecision.classification === PatternClassification.UNSANITIZABLE) {
+            this.logger.warn('Pattern not suitable for Public RAG', {
+              pattern: pattern.pattern,
+              classification: policyDecision.classification
+            }, 'learning-codifier');
+            continue;
+          }
+
+          // Store sanitized version
+          await this.ragRouter.storePattern({
+            ...patternData,
+            code: policyDecision.sanitizationResult?.sanitized || patternData.code,
+            description: policyDecision.sanitizationResult?.sanitized || patternData.description
+          }, StorageDestination.PUBLIC_ONLY);
+          publicStored++;
+
+          if (policyDecision.classification === PatternClassification.REQUIRES_SANITIZATION) {
+            sanitized++;
+          }
+
+        } else {
+          // Private only (default)
+          try {
+            await this.ragRouter.storePattern(patternData, StorageDestination.PRIVATE_ONLY);
+            privateStored++;
+          } catch (error) {
+            this.logger.warn('Private RAG not configured', {}, 'learning-codifier');
+            // Fallback to old vector store if available
+            if (this.vectorStore) {
+              await this.vectorStore.addPattern({
+                agent: this.mapCategoryToAgent(pattern.category),
+                type: pattern.category,
+                code: pattern.codeSnippet,
+                filePath: sessionId,
+                language: pattern.language,
+                framework: pattern.framework,
+                score: pattern.effectiveness / 100,
+                metadata: {
+                  description: pattern.description,
+                  tags: pattern.tags,
+                  usageContext: pattern.usageContext,
+                  recommendations: pattern.recommendations,
+                  sessionId,
+                  timestamp: new Date().toISOString()
+                }
+              });
+            }
+          }
+        }
+
+        patternsStored++;
         this.logger.debug('Pattern stored in RAG', {
           category: pattern.category,
           language: pattern.language,
-          effectiveness: pattern.effectiveness
+          effectiveness: pattern.effectiveness,
+          destination: storageDestination,
+          classification: policyDecision.classification
         }, 'learning-codifier');
+
       } catch (error) {
         this.logger.warn('Failed to store pattern', {
           pattern: pattern.pattern,
@@ -170,41 +292,102 @@ export class LearningCodifier {
       }
     }
 
-    return stored;
+    return { patternsStored, publicStored, privateStored, sanitized };
   }
 
   /**
    * Store lessons learned in RAG
+   * v7.8.0: Now routes to Public/Private RAG with auto-sanitization
    */
-  private async storeLessonsLearned(lessons: LessonLearned[], sessionId: string): Promise<number> {
-    if (!this.vectorStore) {
-      return 0;
-    }
-
+  private async storeLessonsLearned(
+    lessons: LessonLearned[],
+    sessionId: string,
+    storageDestination: StorageDestination
+  ): Promise<number> {
     let stored = 0;
 
     for (const lesson of lessons) {
       try {
-        // Store as agent solution (knowledge)
-        await this.vectorStore.learnFromInteraction({
+        // Classify lesson for storage destination
+        const policyDecision = await this.sanitizationPolicy.evaluatePattern({
+          pattern: lesson.title,
+          description: `${lesson.context}\n\n${lesson.insight}\n\n${lesson.application}`,
           agent: 'system',
-          problemType: 'lesson-learned',
-          problem: lesson.context,
-          solution: lesson.insight,
-          explanation: `${lesson.application}\n\nEvidence: ${lesson.evidence}`,
-          score: 0.9, // High score for lessons learned
-          context: {
-            title: lesson.title,
+          category: 'lesson-learned'
+        });
+
+        // Prepare lesson data
+        const lessonData = {
+          pattern: lesson.title,
+          description: `${lesson.context}\n\n${lesson.insight}\n\n${lesson.application}`,
+          agent: 'system',
+          category: 'lesson-learned',
+          effectiveness: 90, // High effectiveness for lessons
+          metadata: {
+            evidence: lesson.evidence,
             relatedPatterns: lesson.relatedPatterns,
             sessionId,
             timestamp: new Date().toISOString()
           }
-        });
+        };
+
+        // Route based on destination (same logic as patterns)
+        if (storageDestination === StorageDestination.BOTH) {
+          if (policyDecision.classification === PatternClassification.PUBLIC_SAFE ||
+              policyDecision.classification === PatternClassification.REQUIRES_SANITIZATION) {
+            await this.ragRouter.storePattern({
+              ...lessonData,
+              description: policyDecision.sanitizationResult?.sanitized || lessonData.description
+            }, StorageDestination.PUBLIC_ONLY);
+          }
+
+          try {
+            await this.ragRouter.storePattern(lessonData, StorageDestination.PRIVATE_ONLY);
+          } catch (error) {
+            this.logger.warn('Private RAG not configured', {}, 'learning-codifier');
+          }
+
+        } else if (storageDestination === StorageDestination.PUBLIC_ONLY) {
+          if (policyDecision.classification !== PatternClassification.CREDENTIALS &&
+              policyDecision.classification !== PatternClassification.PRIVATE_ONLY &&
+              policyDecision.classification !== PatternClassification.UNSANITIZABLE) {
+            await this.ragRouter.storePattern({
+              ...lessonData,
+              description: policyDecision.sanitizationResult?.sanitized || lessonData.description
+            }, StorageDestination.PUBLIC_ONLY);
+          }
+
+        } else {
+          // Private only (default) - fallback to vector store if RAG not configured
+          try {
+            await this.ragRouter.storePattern(lessonData, StorageDestination.PRIVATE_ONLY);
+          } catch (error) {
+            if (this.vectorStore) {
+              await this.vectorStore.learnFromInteraction({
+                agent: 'system',
+                problemType: 'lesson-learned',
+                problem: lesson.context,
+                solution: lesson.insight,
+                explanation: `${lesson.application}\n\nEvidence: ${lesson.evidence}`,
+                score: 0.9,
+                context: {
+                  title: lesson.title,
+                  relatedPatterns: lesson.relatedPatterns,
+                  sessionId,
+                  timestamp: new Date().toISOString()
+                }
+              });
+            }
+          }
+        }
 
         stored++;
         this.logger.debug('Lesson stored in RAG', {
-          title: lesson.title
+          title: lesson.title,
+          destination: storageDestination,
+          classification: policyDecision.classification
         }, 'learning-codifier');
+
       } catch (error) {
         this.logger.warn('Failed to store lesson', {
           lesson: lesson.title,

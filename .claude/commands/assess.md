@@ -301,20 +301,162 @@ echo "→ Check DATABASE_URL environment variable"
 echo "→ Ensure database is running: docker-compose up -d"
 ```
 
-### 5. Environment Variables
+### 5. Environment Variables ⭐ AGENT-DRIVEN
 
 <thinking>
-Verify all required environment variables are set.
+Use Oliver-MCP agent to intelligently validate environment configuration and route to appropriate validation tools.
 </thinking>
 
-**Environment Assessment:**
+**⛔ BLOCKING STEP - YOU MUST INVOKE OLIVER-MCP USING THE TASK TOOL:**
+
+**ACTION: Invoke Oliver-MCP Agent**
+Call the Task tool with:
+- `subagent_type: "Oliver-MCP"`
+- `description: "Validate environment configuration"`
+- `prompt: "Validate environment configuration for '${assessment_target}'. Input: .env file status, detected environment variables, project type. Your intelligent routing: (1) Detect project type (Supabase/PostgreSQL/custom), (2) Identify required environment variables based on project dependencies, (3) Validate variable formats (URLs, keys, secrets), (4) Check for placeholder values ('YOUR_KEY_HERE', 'CHANGE_ME'), (5) Test connectivity for external services (database, APIs), (6) Route validation to appropriate MCP tools if available, (7) Provide anti-hallucination check (verify vars actually exist, don't make up missing ones). Return: { env_file_exists: boolean, required_vars: [], vars_set: [], vars_missing: [], format_issues: [], placeholder_issues: [], connectivity_tests: {}, validation_method: 'mcp'|'bash'|'manual', recommendations: [] }"`
+
+**STOP AND WAIT for Oliver-MCP agent to complete before proceeding.**
+
+**⛔ CHECKPOINT: You MUST have Oliver-MCP's validation results before continuing. Use his intelligent routing to perform comprehensive environment checks.**
+
+**Agent-Driven Environment Validation:**
+
+Invoke Oliver-MCP for intelligent environment configuration validation:
+
+```typescript
+// Agent Task: Oliver-MCP validates environment with intelligent routing
+Task oliver-mcp: `Validate environment configuration for: "${assessment_target}"
+
+**Initial Environment Scan**:
+- .env file exists: ${env_file_exists}
+- Project type: ${project_type}  // Detected from package.json
+- Dependencies: ${dependencies}  // Supabase, PostgreSQL, Redis, etc.
+
+**Your Intelligent Routing Strategy:**
+
+1. **Detect Project Type** (auto-detect from dependencies):
+   - Supabase project: package.json has "@supabase/supabase-js"
+   - PostgreSQL: package.json has "pg" or "postgres"
+   - MySQL: package.json has "mysql2"
+   - MongoDB: package.json has "mongodb"
+   - Redis: package.json has "redis" or "ioredis"
+   - Custom: No recognized database library
+
+2. **Identify Required Environment Variables**:
+   ```typescript
+   // Based on detected project type
+   if (has_supabase) {
+     required = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_KEY'];
+   }
+   if (has_postgres) {
+     required = ['DATABASE_URL'];
+   }
+   if (has_jwt_auth) {
+     required = ['JWT_SECRET', 'JWT_EXPIRY'];
+   }
+   if (has_oauth) {
+     required = ['OAUTH_CLIENT_ID', 'OAUTH_CLIENT_SECRET', 'OAUTH_CALLBACK_URL'];
+   }
+   // ... detect from imports and dependencies
+   ```
+
+3. **Validate Variable Formats**:
+   - DATABASE_URL: postgresql://[user]:[pass]@[host]:[port]/[db]
+   - SUPABASE_URL: https://[project].supabase.co
+   - JWT_SECRET: >= 32 characters
+   - API Keys: Match expected format (e.g., eyJ... for JWT)
+
+4. **Check for Placeholder Values**:
+   ```bash
+   grep -r "YOUR_.*_HERE\|CHANGE_ME\|REPLACE_THIS" .env
+   ```
+
+5. **Test Connectivity** (if MCP tools available):
+   - Use Supabase MCP to test SUPABASE_URL connectivity
+   - Use bash to test DATABASE_URL connection
+   - Use curl to test external API endpoints
+
+6. **Route Validation**:
+   ```typescript
+   route_validation():
+     if (has_supabase_mcp):
+       use versatil_mcp_supabase_health_check()
+     else if (has_psql):
+       use bash: psql $DATABASE_URL -c "SELECT 1"
+     else:
+       use manual: Check .env file manually
+   ```
+
+7. **Anti-Hallucination Check**:
+   - Read .env file directly (don't guess variable values)
+   - Verify variables actually exist in process.env
+   - Don't report variables as "set" if you haven't verified them
+   - Flag uncertainty if variable format is unknown
+
+**Return Format:**
+```typescript
+return {
+  env_file_exists: boolean,
+  required_vars: ['DATABASE_URL', 'JWT_SECRET', ...],
+  vars_set: ['DATABASE_URL', 'JWT_SECRET'],
+  vars_missing: ['OAUTH_CLIENT_ID'],  // Actually missing, not hallucinated
+  format_issues: [
+    { var: 'DATABASE_URL', issue: 'Invalid PostgreSQL URL format', expected: 'postgresql://...' }
+  ],
+  placeholder_issues: [
+    { var: 'JWT_SECRET', value_pattern: 'CHANGE_ME', severity: 'critical' }
+  ],
+  connectivity_tests: {
+    database: { tested: true, connected: true, latency_ms: 45 },
+    supabase: { tested: false, reason: 'No Supabase MCP available' }
+  },
+  validation_method: 'mcp' | 'bash' | 'manual',
+  recommendations: [
+    'Replace JWT_SECRET placeholder with secure 64-character string',
+    'Add missing OAUTH_CLIENT_ID for OAuth authentication'
+  ]
+}
+```
+
+**Intelligent Routing Example:**
+```typescript
+// Supabase project detected
+if (has_supabase_dependency && has_supabase_mcp) {
+  // Use MCP for advanced validation
+  const result = await mcp_supabase_health_check({
+    supabase_url: process.env.SUPABASE_URL,
+    anon_key: process.env.SUPABASE_ANON_KEY
+  });
+  return { connectivity_tests: { supabase: result }, validation_method: 'mcp' };
+}
+
+// PostgreSQL detected, no MCP
+else if (has_postgres_dependency) {
+  // Use bash psql command
+  exec(`psql ${process.env.DATABASE_URL} -c "SELECT 1"`);
+  return { validation_method: 'bash' };
+}
+
+// Unknown/custom setup
+else {
+  // Manual verification needed
+  return { validation_method: 'manual', recommendations: ['Manually verify environment setup'] };
+}
+```
+`
+
+// Wait for Oliver-MCP to complete intelligent validation
+const envValidation = await waitForAgent('oliver-mcp');
+```
+
+**Environment Assessment (Enhanced with Oliver-MCP):**
 
 ```bash
 # Check .env file exists
 test -f .env && echo "✅ Present" || echo "❌ Missing"
 
-# Check required variables (without revealing values)
-required_vars="DATABASE_URL SUPABASE_URL SUPABASE_ANON_KEY JWT_SECRET"
+# Check required variables (auto-detected by Oliver-MCP)
+required_vars=$(oliver_detected_vars)  # Intelligent detection based on project type
 for var in $required_vars; do
   if [ -z "${!var}" ]; then
     echo "❌ $var not set"
@@ -327,30 +469,37 @@ done
 **Environment Criteria:**
 
 - [ ] **File Exists**: `.env` file present
-- [ ] **Required Variables**: All critical vars set
-  - `DATABASE_URL`: Database connection string
-  - `SUPABASE_URL`: Supabase project URL (if using)
-  - `SUPABASE_ANON_KEY`: Public API key
-  - `JWT_SECRET`: Token signing secret
-  - (Add project-specific variables)
+- [ ] **Required Variables**: All critical vars set (auto-detected by Oliver-MCP)
+  - Auto-detected from project dependencies
+  - No hardcoded list (intelligent project analysis)
 
-- [ ] **Variable Format**: Proper URL/key formats
-- [ ] **No Placeholders**: No "YOUR_KEY_HERE" values
+- [ ] **Variable Format**: Proper URL/key formats (validated by Oliver-MCP)
+- [ ] **No Placeholders**: No "YOUR_KEY_HERE" values (checked by Oliver-MCP)
+- [ ] **Connectivity**: External services reachable (tested by Oliver-MCP if MCP available)
 
-**Environment Report:**
+**Environment Report (Oliver-MCP Enhanced):**
 
 ```yaml
 Environment Assessment:
   env_file: ✅ present (.env exists)
-  required_vars: 4/4 set (100%)
+  required_vars: 5/5 set (100%)
+  validation_method: mcp  # Oliver-MCP used Supabase MCP for advanced validation
 
 Variables Status:
-  DATABASE_URL: ✅ set (postgresql://...)
-  SUPABASE_URL: ✅ set (https://...)
-  SUPABASE_ANON_KEY: ✅ set (eyJ...)
-  JWT_SECRET: ✅ set (length: 64 chars)
+  DATABASE_URL: ✅ set (postgresql://...) - Format valid, connection tested (45ms)
+  SUPABASE_URL: ✅ set (https://...) - Format valid, MCP health check passed
+  SUPABASE_ANON_KEY: ✅ set (eyJ...) - Format valid (JWT)
+  JWT_SECRET: ✅ set (64 chars) - Strong entropy
+  OAUTH_CLIENT_ID: ⚠️ missing - Required for OAuth (detected from dependencies)
 
-Recommendation: ✅ Environment configured correctly
+Connectivity Tests:
+  database: ✅ connected (45ms latency)
+  supabase: ✅ healthy (MCP health check passed)
+
+Placeholder Issues:
+  None detected ✅
+
+Recommendation: ⚠️ Add missing OAUTH_CLIENT_ID before starting OAuth work
 ```
 
 **Auto-Remediation:**
@@ -360,10 +509,16 @@ Recommendation: ✅ Environment configured correctly
 cp .env.example .env
 echo "⚠️  Created .env from template - CONFIGURE BEFORE PROCEEDING"
 
-# If variables missing:
+# If variables missing (Oliver-MCP detected):
 echo "❌ BLOCKER: Required environment variables not set"
 echo "→ Copy .env.example to .env"
-echo "→ Fill in: DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY, JWT_SECRET"
+echo "→ Oliver-MCP detected missing: OAUTH_CLIENT_ID"
+echo "→ Project dependencies indicate OAuth is used"
+
+# If placeholders detected:
+echo "🔴 CRITICAL: Placeholder values detected"
+echo "→ JWT_SECRET: Replace 'CHANGE_ME' with secure 64-character string"
+echo "→ Generate: openssl rand -hex 32"
 ```
 
 ### 6. Build & Test Status
@@ -464,50 +619,186 @@ Based on assessment target, check domain-specific requirements:
 - [ ] CI/CD pipeline accessible
 - [ ] Test data/fixtures available
 
-### 8. Generate Readiness Score
+### 8. Generate Readiness Score ⭐ AGENT-DRIVEN
 
 <thinking>
-Calculate overall readiness score and provide go/no-go recommendation.
+Use Sarah-PM agent to calculate strategic readiness score and provide go/no-go recommendation based on her project management expertise.
 </thinking>
 
-**Readiness Calculation:**
+**⛔ BLOCKING STEP - YOU MUST INVOKE SARAH-PM USING THE TASK TOOL:**
+
+**ACTION: Invoke Sarah-PM Agent**
+Call the Task tool with:
+- `subagent_type: "Sarah-PM"`
+- `description: "Calculate strategic readiness score"`
+- `prompt: "Calculate readiness score for '${assessment_target}'. Input: Assessment data from Steps 1-7 (framework health, git status, dependencies, database, environment, build/tests, prerequisites). Your strategic PM analysis: (1) Calculate weighted readiness score (0-100%), (2) Identify blockers (issues preventing start), (3) Identify warnings (non-blocking concerns), (4) Provide go/no-go recommendation with reasoning, (5) Suggest mitigation strategies for warnings, (6) Estimate risk level. Return: { overall_score: number, components: {framework_health, git_status, dependencies, database, environment, build_tests, prerequisites}, blockers: [], warnings: [], recommendation: 'GO'|'CAUTION'|'NO-GO', reasoning: string, risk_level: 'LOW'|'MEDIUM'|'HIGH', mitigation_plan: [] }"`
+
+**STOP AND WAIT for Sarah-PM agent to complete before displaying assessment report.**
+
+**⛔ CHECKPOINT: You MUST have Sarah-PM's readiness calculation before proceeding. Use her strategic assessment to generate the final report.**
+
+**Agent-Driven Readiness Calculation:**
+
+Invoke Sarah-PM for strategic project readiness assessment:
 
 ```typescript
-interface ReadinessScore {
-  overall: number;  // 0-100
-  components: {
-    framework_health: number;      // 20% weight
-    git_status: number;            // 15% weight
-    dependencies: number;          // 15% weight
-    database: number;              // 15% weight
-    environment: number;           // 15% weight
-    build_tests: number;           // 10% weight
-    prerequisites: number;         // 10% weight
-  };
-  blockers: string[];
-  warnings: string[];
-  recommendation: 'GO' | 'CAUTION' | 'NO-GO';
-}
+// Agent Task: Sarah-PM calculates readiness with PM expertise
+Task sarah-pm: `Calculate readiness score for: "${assessment_target}"
 
-// Example calculation
-const readiness: ReadinessScore = {
-  overall: 92,
+**Assessment Data from Steps 1-7**:
+
+Framework Health (Step 1):
+- Overall health: ${framework_health}%
+- Agents operational: ${agents_operational}/7
+- Rules enabled: ${rules_enabled}/5
+
+Git Status (Step 2):
+- Working tree: ${working_tree_clean ? 'Clean' : 'Dirty'}
+- Branch: ${current_branch}
+- Up to date: ${up_to_date}
+
+Dependencies (Step 3):
+- Installed: ${deps_installed}
+- Security audit: ${security_vulnerabilities} vulnerabilities
+- Outdated: ${outdated_count} packages
+
+Database (Step 4):
+- Connected: ${db_connected}
+- Migrations: ${pending_migrations} pending
+- Tables: ${table_count}
+
+Environment (Step 5):
+- Variables set: ${required_vars_set}/${required_vars_total}
+- .env file: ${env_file_exists}
+
+Build & Tests (Step 6):
+- Build status: ${build_status}
+- Tests passing: ${tests_passing}/${tests_total}
+- Coverage: ${test_coverage}%
+
+Prerequisites (Step 7):
+- Domain-specific checks: ${prerequisites_met}/${prerequisites_total}
+- Blockers: ${prerequisites_blockers}
+
+**Your Strategic PM Analysis:**
+
+1. **Calculate Weighted Readiness Score** (0-100%):
+   ```typescript
+   readiness = (
+     framework_health * 0.20 +
+     git_status * 0.15 +
+     dependencies * 0.15 +
+     database * 0.15 +
+     environment * 0.15 +
+     build_tests * 0.10 +
+     prerequisites * 0.10
+   )
+   ```
+
+2. **Identify Blockers** (issues preventing start):
+   - Critical: Framework health < 70%
+   - Critical: Build failing
+   - Critical: Database not connected
+   - Critical: Required env vars missing
+
+3. **Identify Warnings** (non-blocking concerns):
+   - Minor: Outdated dependencies
+   - Minor: Flaky tests
+   - Minor: Git branch not up to date
+
+4. **Provide Go/No-Go Recommendation**:
+   - ≥ 90%: GO - Proceed with confidence
+   - 70-89%: CAUTION - Proceed but address warnings
+   - < 70%: NO-GO - Fix blockers first
+
+5. **Suggest Mitigation Strategies**:
+   - For each warning, provide actionable mitigation
+   - Prioritize mitigations by impact
+
+6. **Estimate Risk Level**:
+   - LOW: All checks passing, minor warnings only
+   - MEDIUM: Some warnings, but no blockers
+   - HIGH: Blockers present or many warnings
+
+**Return Format:**
+```typescript
+return {
+  overall_score: number,  // 0-100
   components: {
-    framework_health: 100,  // 20% → 20 points
-    git_status: 100,        // 15% → 15 points
-    dependencies: 90,       // 15% → 13.5 points
-    database: 100,          // 15% → 15 points
-    environment: 100,       // 15% → 15 points
-    build_tests: 85,        // 10% → 8.5 points
-    prerequisites: 95,      // 10% → 9.5 points
+    framework_health: number,  // 0-100
+    git_status: number,        // 0-100
+    dependencies: number,      // 0-100
+    database: number,          // 0-100
+    environment: number,       // 0-100
+    build_tests: number,       // 0-100
+    prerequisites: number      // 0-100
   },
-  blockers: [],  // No blockers = GO
-  warnings: [
-    "3 outdated dependencies (not critical)",
-    "2 flaky tests (known issue)"
+  blockers: [
+    { component: 'database', issue: 'Not connected', severity: 'critical' }
   ],
-  recommendation: 'GO'
-};
+  warnings: [
+    { component: 'dependencies', issue: '3 outdated packages', severity: 'low', mitigation: 'Run npm update' }
+  ],
+  recommendation: 'GO' | 'CAUTION' | 'NO-GO',
+  reasoning: 'Strategic explanation for recommendation',
+  risk_level: 'LOW' | 'MEDIUM' | 'HIGH',
+  mitigation_plan: [
+    { action: 'Update outdated dependencies', priority: 'low', effort: '5 minutes' }
+  ]
+}
+```
+
+**Thresholds:**
+- ≥ 90%: GO - Ready to start work
+- 70-89%: CAUTION - Proceed with warnings addressed
+- < 70%: NO-GO - Fix blockers before proceeding
+`
+
+// Wait for Sarah-PM to complete strategic assessment
+const readinessAssessment = await waitForAgent('sarah-pm');
+```
+
+**Example Sarah-PM Output:**
+
+```yaml
+Readiness Assessment:
+  overall_score: 92
+  recommendation: GO
+  reasoning: "Framework health excellent (100%), all critical systems operational. Minor warnings about outdated dependencies and flaky tests, but neither blocking work. Git status clean, database connected, environment configured. Proceed with high confidence."
+  risk_level: LOW
+
+  components:
+    framework_health: 100  # 20% weight → 20 points
+    git_status: 100        # 15% weight → 15 points
+    dependencies: 90       # 15% weight → 13.5 points
+    database: 100          # 15% weight → 15 points
+    environment: 100       # 15% weight → 15 points
+    build_tests: 85        # 10% weight → 8.5 points
+    prerequisites: 95      # 10% weight → 9.5 points
+
+  blockers: []  # None - ready to proceed
+
+  warnings:
+    - component: dependencies
+      issue: "3 outdated packages (typescript, eslint, jest)"
+      severity: low
+      mitigation: "Run 'npm update' - 5 minute effort"
+
+    - component: build_tests
+      issue: "2 E2E tests flaky (known issue)"
+      severity: low
+      mitigation: "Review __tests__/e2e/auth.test.ts or skip for now"
+
+  mitigation_plan:
+    - action: "Update outdated dependencies"
+      priority: low
+      effort: "5 minutes"
+      command: "npm update"
+
+    - action: "Review flaky tests"
+      priority: low
+      effort: "15 minutes"
+      command: "npm test __tests__/e2e/auth.test.ts"
 ```
 
 **Readiness Thresholds:**

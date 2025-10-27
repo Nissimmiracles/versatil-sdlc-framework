@@ -470,6 +470,46 @@ function generateEnforcementContext(identity: ContextIdentity): string {
   return content;
 }
 
+/**
+ * Check if Guardian full health check should run (throttled to every 5 minutes)
+ * @returns true if should run full check, false otherwise
+ */
+function shouldRunFullHealthCheck(): boolean {
+  const timestampFile = path.join(require('os').homedir(), '.versatil', '.last-guardian-check');
+
+  try {
+    if (!fs.existsSync(timestampFile)) {
+      return true; // First run
+    }
+
+    const lastCheckTime = parseInt(fs.readFileSync(timestampFile, 'utf-8'), 10);
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+    return (now - lastCheckTime) >= fiveMinutes;
+  } catch (error) {
+    return true; // If error reading timestamp, run the check
+  }
+}
+
+/**
+ * Update the timestamp file after running full health check
+ */
+function updateHealthCheckTimestamp(): void {
+  const timestampFile = path.join(require('os').homedir(), '.versatil', '.last-guardian-check');
+
+  try {
+    const versatilDir = path.dirname(timestampFile);
+    if (!fs.existsSync(versatilDir)) {
+      fs.mkdirSync(versatilDir, { recursive: true });
+    }
+    fs.writeFileSync(timestampFile, Date.now().toString(), 'utf-8');
+  } catch (error) {
+    // Non-blocking - don't fail if can't write timestamp
+    console.error(`⚠️  [Guardian] Could not update timestamp: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 async function main() {
   const hookStartTime = Date.now(); // Track execution time for telemetry
 
@@ -490,6 +530,42 @@ async function main() {
       console.error(`\n🔍 [Context] Detected: ${contextIdentity.role === 'framework-developer' ? '🛠️ Framework Development' : '👤 User Project'} Mode`);
     } catch (error) {
       console.error(`\n⚠️  [Context] Detection failed - defaulting to user-project mode (safest): ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    // Phase 7.7.0: Guardian Health Check Integration (Throttled to every 5 minutes)
+    // Run lightweight check on every prompt, but full health check only every 5 minutes
+    let guardianAlerts: string[] = [];
+    const runFullHealthCheck = shouldRunFullHealthCheck();
+
+    if (runFullHealthCheck) {
+      console.error(`\n🔍 [Guardian] Running full health check (5 min interval)...`);
+    }
+
+    try {
+      const { checkGuardianHealth } = await import('../../src/agents/guardian/guardian-health-check.js');
+      const healthStatus = await checkGuardianHealth(
+        workingDir,
+        contextIdentity?.role || 'user',
+        runFullHealthCheck // Pass throttle flag to health check function
+      );
+
+      if (healthStatus.critical_issues.length > 0) {
+        guardianAlerts = healthStatus.critical_issues;
+        console.error(`\n🚨 [Guardian] ${healthStatus.critical_issues.length} critical issue(s) detected:`);
+        healthStatus.critical_issues.forEach((issue, i) => {
+          console.error(`  ${i + 1}. ${issue}`);
+        });
+      } else if (runFullHealthCheck) {
+        console.error(`\n✅ [Guardian] Health check passed (${healthStatus.overall_health}% healthy)`);
+      }
+
+      // Update timestamp after successful full health check
+      if (runFullHealthCheck) {
+        updateHealthCheckTimestamp();
+      }
+    } catch (error) {
+      // Guardian health check is non-blocking - don't fail the hook
+      console.error(`\n⚠️  [Guardian] Health check failed: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     const matchedFiles = detectMatchingPatterns(userMessage);
@@ -578,6 +654,18 @@ async function main() {
     // Phase 7.6.0: Context Enforcement Boundaries (HIGHEST PRIORITY)
     if (contextIdentity) {
       contextContent += generateEnforcementContext(contextIdentity);
+    }
+
+    // Phase 7.7.0: Guardian Critical Alerts (inject before other suggestions)
+    if (guardianAlerts.length > 0) {
+      if (contextContent.length > 0) {
+        contextContent += '\n\n---\n\n';
+      }
+      contextContent += `# 🚨 Guardian Critical Alerts\n\n`;
+      contextContent += `The following critical issues were detected and require immediate attention:\n\n`;
+      contextContent += guardianAlerts.map((alert, i) => `${i + 1}. ${alert}`).join('\n');
+      contextContent += `\n\n**Action Required:** These issues may affect framework/project functionality. Consider fixing before proceeding.\n`;
+      contextContent += `\n**Quick Fix:** Use \`/guardian auto-fix\` to attempt automatic remediation.\n`;
     }
 
     // Phase 6: Intent-based suggestions

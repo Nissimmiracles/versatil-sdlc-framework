@@ -50,6 +50,7 @@ export interface PatternNode extends GraphNode {
     pattern: string;
     description?: string;
     code?: string;
+    examples?: string[];  // Pattern usage examples
     agent: string;
     category: string;
     effectiveness: number;

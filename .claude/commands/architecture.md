@@ -225,6 +225,16 @@ tags: [category1, category2]
 
 **Template**: See `.claude/skills/code-generators/command-creator/assets/command-template.md`
 
+**After displaying architecture, invoke Victor-Verifier for consistency validation:**
+
+```typescript
+await Task({
+  subagent_type: "Victor-Verifier",
+  description: "Validate architecture consistency",
+  prompt: `Verify architecture documentation matches implementation. Check integration points, version compatibility, missing components. Return validation with evidence_score and safe_to_proceed boolean.`
+});
+```
+
 ---
 
 ## 2. Claude Native SDK Integration

@@ -154,6 +154,25 @@ async function installUpdate(targetVersion) {
   const currentVersion = await getCurrentVersion();
   const preferences = await preferenceManager.getPreferences();
 
+  // Parse flags
+  const args = process.argv.slice(2);
+  const skipReview = args.includes('--no-review');
+  const fullReview = args.includes('--full-review');
+  const reviewOnly = args.includes('--review-only');
+  const agentsFlag = args.find(arg => arg.startsWith('--agents='));
+  const selectedAgents = agentsFlag ? agentsFlag.split('=')[1].split(',') : undefined;
+
+  // Handle review-only mode
+  if (reviewOnly) {
+    console.log('🔍 Running review only (no update)...\n');
+    await updateManager.performPostUpdateReview(currentVersion, currentVersion, {
+      skipReview: false,
+      fullReview,
+      agents: selectedAgents,
+    });
+    return;
+  }
+
   // Check for interrupted update
   if (await crashRecovery.hasInterruptedUpdate()) {
     console.log('⚠️  Detected interrupted update. Use "versatil update recover" to resume.');
@@ -239,13 +258,26 @@ async function installUpdate(targetVersion) {
     console.log('\n✅ Update successful!');
     console.log(`Version: ${currentVersion} → ${targetVersion}\n`);
 
-    // Run validation
+    // Run post-update validation
     console.log('Running post-update validation...\n');
     const validationResult = await validator.validatePostUpdate();
 
     if (!validationResult.passed) {
       console.log('⚠️  Validation warnings detected. Run: versatil doctor');
     }
+
+    // Run post-update review (v7.7.0+ - new feature)
+    if (!skipReview) {
+      await updateManager.performPostUpdateReview(currentVersion, targetVersion, {
+        skipReview: false,
+        fullReview,
+        agents: selectedAgents,
+      });
+    } else {
+      console.log('\n⏭️  Skipped post-update review (--no-review flag)\n');
+      console.log('You can run the review later with: versatil update --review-only\n');
+    }
+
   } catch (error) {
     await crashRecovery.failStep('install-package', error.message, true);
     throw error;
@@ -401,13 +433,30 @@ Commands:
   status             Show update status
   help               Show this help message
 
+Post-Update Review Options (v7.7.0+):
+  --no-review        Skip post-update review (fast update only)
+  --full-review      Comprehensive review with stress tests
+  --agents=LIST      Run review with specific agents (comma-separated)
+  --review-only      Run health check + review without updating
+
 Examples:
   versatil update check
   versatil update install
+  versatil update install --no-review
+  versatil update install --full-review
+  versatil update install --agents="Maria-QA,Victor-Verifier"
+  versatil update --review-only
   versatil update install 3.0.1
   versatil update changelog 3.0.1
   versatil update lock 3.0.0
   versatil update unlock
+
+Post-Update Review Features:
+  • Framework health check (agents, build, tests, integrity)
+  • Multi-agent review (Maria-QA, Marcus-Backend, Victor-Verifier)
+  • Project assessment (git, dependencies, environment)
+  • Open todos analysis (categorized by priority, identifies stale items)
+  • Actionable recommendations
 
 For more information: https://github.com/MiraclesGIT/versatil-sdlc-framework
   `);

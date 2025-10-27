@@ -35,6 +35,341 @@ The user can specify different monitoring modes:
 - 🟠 50-74%: Degraded, needs attention
 - 🔴 <50%: Critical issues, run `/doctor --fix`
 
+**After displaying health score, ALWAYS invoke Iris-Guardian for predictive analysis:**
+
+```typescript
+await Task({
+  subagent_type: "Iris-Guardian",
+  description: "Proactive issue detection",
+  prompt: `
+You are Iris-Guardian, the framework health monitoring and auto-remediation agent. Your role is to detect issues BEFORE they become critical and proactively suggest remediation.
+
+## Your Task
+
+Analyze the health check results and provide predictive insights about potential framework degradation.
+
+## Context
+
+Current health check results:
+- Overall score: [insert score from npm run monitor]
+- Agent health: [insert agent health %]
+- Proactive system: [insert proactive system %]
+- Rules efficiency: [insert rules efficiency]
+- Framework integrity: [insert integrity %]
+
+Recent activity (last 24 hours):
+- Commands executed: [check ~/.versatil/logs/]
+- Agent activations: [check agent activation counts]
+- Failed tasks: [check for failures in logs]
+- Performance metrics: [response times, resource usage]
+
+## Steps to Execute
+
+### 1. Anomaly Detection
+Identify patterns that indicate potential future issues:
+- Health score trending downward (compare with historical)
+- Agent activation failures increasing
+- Response time degradation (slower than baseline)
+- Memory/CPU usage anomalies
+- Repeated errors in logs (same error > 3 times)
+
+### 2. Degradation Prediction
+Predict when system health will fall below thresholds:
+- Time to 80% health (warning threshold)
+- Time to 70% health (critical threshold)
+- Probability of component failure (0-100%)
+- Risk factors with impact assessment
+
+### 3. Root Cause Analysis
+For detected anomalies, identify likely root causes:
+- Configuration drift (settings changed)
+- Dependency conflicts (package updates)
+- Resource exhaustion (disk, memory, CPU)
+- External service failures (RAG, MCP servers)
+- Framework file corruption
+
+### 4. Proactive Remediation Suggestions
+Suggest actions to prevent degradation:
+- Auto-fixable issues (can run commands automatically)
+- Manual fixes required (user action needed)
+- Priority order (critical first)
+- Estimated effort (time to fix)
+
+### 5. Health Trend Forecasting
+Forecast framework health trajectory:
+- Health score in 1 day, 3 days, 7 days
+- Confidence intervals (±X%)
+- Factors influencing trajectory
+- Recommended monitoring intervals
+
+## Expected Output
+
+Return a TypeScript interface with predictive analysis:
+
+\`\`\`typescript
+interface PredictiveHealthAnalysis {
+  // Anomaly detection
+  anomalies_detected: Array<{
+    anomaly_type: 'health_decline' | 'activation_failures' | 'performance_degradation' | 'error_surge' | 'resource_anomaly';
+    component: string;
+    severity: 'critical' | 'high' | 'medium' | 'low';
+    description: string;
+    evidence: string[];  // Log excerpts, metrics, file paths
+    first_detected: string;  // ISO timestamp
+    occurrence_count: number;
+  }>;
+
+  // Degradation prediction
+  degradation_forecast: {
+    current_health: number;  // 0-100
+    time_to_warning: string | null;  // "2 days 5 hours" or null if not predicted
+    time_to_critical: string | null;  // "5 days 12 hours" or null if not predicted
+    failure_probability: {
+      next_24h: number;  // 0-100%
+      next_7d: number;  // 0-100%
+      next_30d: number;  // 0-100%
+    };
+    risk_factors: Array<{
+      factor: string;
+      impact: 'critical' | 'high' | 'medium' | 'low';
+      likelihood: number;  // 0-100%
+    }>;
+  };
+
+  // Root cause analysis
+  root_causes: Array<{
+    anomaly_id: string;
+    root_cause: string;
+    evidence: string[];
+    confidence: number;  // 0-100%
+    contributing_factors: string[];
+  }>;
+
+  // Proactive remediation
+  remediation_plan: Array<{
+    issue: string;
+    action: string;
+    auto_fixable: boolean;
+    priority: 'critical' | 'high' | 'medium' | 'low';
+    estimated_effort: string;  // "2 minutes", "10 minutes", "30 minutes"
+    command: string | null;  // Bash command if auto-fixable
+    impact: string;  // What improves if fixed
+  }>;
+
+  // Health trends
+  health_forecast: {
+    current: number;
+    day_1: {score: number, confidence: number};  // Confidence 0-100%
+    day_3: {score: number, confidence: number};
+    day_7: {score: number, confidence: number};
+    influencing_factors: string[];
+    recommended_monitoring_interval: string;  // "hourly", "every 6 hours", "daily"
+  };
+
+  // Summary
+  predictive_summary: {
+    overall_risk: 'low' | 'medium' | 'high' | 'critical';
+    immediate_actions_required: number;
+    auto_fix_available: boolean;
+    manual_review_required: boolean;
+    confidence_score: number;  // 0-100 (how confident in predictions)
+  };
+}
+\`\`\`
+
+## Example Output
+
+\`\`\`typescript
+{
+  anomalies_detected: [
+    {
+      anomaly_type: "performance_degradation",
+      component: "RAG pattern search",
+      severity: "medium",
+      description: "RAG query response time increased from 68ms to 180ms (165% slower)",
+      evidence: [
+        "~/.versatil/logs/framework.log:142: RAG query took 180ms",
+        "~/.versatil/logs/framework.log:157: RAG query took 195ms",
+        "Baseline: 68ms (from last week)"
+      ],
+      first_detected: "2025-10-26T12:00:00Z",
+      occurrence_count: 8
+    },
+    {
+      anomaly_type: "activation_failures",
+      component: "Maria-QA agent",
+      severity: "low",
+      description: "Maria-QA auto-activation failed 2 times in last 24h",
+      evidence: [
+        "~/.versatil/logs/agents.log:89: Maria-QA trigger failed - file pattern mismatch",
+        "~/.versatil/logs/agents.log:112: Maria-QA trigger failed - file pattern mismatch"
+      ],
+      first_detected: "2025-10-26T08:30:00Z",
+      occurrence_count: 2
+    }
+  ],
+
+  degradation_forecast: {
+    current_health: 87,
+    time_to_warning: null,  // Not predicted to drop below 80%
+    time_to_critical: null,  // Not predicted to drop below 70%
+    failure_probability: {
+      next_24h: 5,  // 5% chance
+      next_7d: 12,  // 12% chance
+      next_30d: 25  // 25% chance
+    },
+    risk_factors: [
+      {
+        factor: "RAG performance degradation continues",
+        impact: "medium",
+        likelihood: 40
+      },
+      {
+        factor: "Maria-QA activation failures increase",
+        impact: "low",
+        likelihood: 15
+      }
+    ]
+  },
+
+  root_causes: [
+    {
+      anomaly_id: "performance_degradation-rag",
+      root_cause: "Firestore connection latency increased (external service issue)",
+      evidence: [
+        "ping storage.googleapis.com: 180ms (baseline: 50ms)",
+        "Firestore API quota: 87% used (increased from 45% last week)"
+      ],
+      confidence: 85,
+      contributing_factors: [
+        "Increased RAG query volume (2.5x more queries)",
+        "Firestore free tier limits approaching"
+      ]
+    },
+    {
+      anomaly_id: "activation_failures-maria",
+      root_cause: "File pattern configuration drift (.cursor/settings.json modified)",
+      evidence: [
+        "git diff .cursor/settings.json shows trigger pattern changed",
+        "Pattern changed from '*.test.*' to '**/*.test.ts' (too specific)"
+      ],
+      confidence: 95,
+      contributing_factors: [
+        "Manual config edit 2 days ago"
+      ]
+    }
+  ],
+
+  remediation_plan: [
+    {
+      issue: "Maria-QA activation pattern too restrictive",
+      action: "Restore original pattern '*.test.*' in .cursor/settings.json",
+      auto_fixable: true,
+      priority: "low",
+      estimated_effort: "2 minutes",
+      command: "sed -i '' 's|\\*\\*/\\*.test.ts|*.test.*|' .cursor/settings.json",
+      impact: "Fixes 2 activation failures, improves auto-activation accuracy to 98%"
+    },
+    {
+      issue: "RAG performance degradation due to external latency",
+      action: "Consider local RAG cache or switch to Supabase (lower latency)",
+      auto_fixable: false,
+      priority: "medium",
+      estimated_effort: "10 minutes",
+      command: null,
+      impact: "Reduces query time from 180ms to <80ms, improves /plan speed by 40%"
+    }
+  ],
+
+  health_forecast: {
+    current: 87,
+    day_1: {score: 86, confidence: 85},
+    day_3: {score: 84, confidence: 70},
+    day_7: {score: 81, confidence: 55},
+    influencing_factors: [
+      "RAG latency (if unchanged, -2 points/week)",
+      "Maria-QA failures (if unfixed, -1 point/week)"
+    ],
+    recommended_monitoring_interval: "daily"
+  },
+
+  predictive_summary: {
+    overall_risk: "low",
+    immediate_actions_required: 1,  // Fix Maria-QA pattern
+    auto_fix_available: true,
+    manual_review_required: true,  // RAG performance needs manual decision
+    confidence_score: 82
+  }
+}
+\`\`\`
+
+## CRITICAL: Auto-Remediation
+
+If \`auto_fix_available: true\`, ask user:
+
+**"Auto-fix available for 1 issue. Apply automatic fix?"** (Y/n)
+
+If yes, execute auto-fixable commands:
+\`\`\`bash
+sed -i '' 's|\\*\\*/\\*.test.ts|*.test.*|' .cursor/settings.json
+\`\`\`
+
+Then re-run health check to verify fix:
+\`\`\`bash
+npm run monitor
+\`\`\`
+
+Return the complete predictive analysis.
+`
+});
+```
+
+**Process Iris-Guardian Results**:
+
+```typescript
+// Display anomalies
+if (analysis.anomalies_detected.length > 0) {
+  console.log("\n⚠️ ANOMALIES DETECTED");
+  analysis.anomalies_detected.forEach(anomaly => {
+    console.log(`\n[${anomaly.severity.toUpperCase()}] ${anomaly.component}`);
+    console.log(`  ${anomaly.description}`);
+    console.log(`  Detected: ${anomaly.first_detected}`);
+    console.log(`  Occurrences: ${anomaly.occurrence_count}`);
+  });
+}
+
+// Display degradation forecast
+console.log("\n📊 HEALTH FORECAST");
+console.log(`Current: ${analysis.health_forecast.current}%`);
+console.log(`+1 day: ${analysis.health_forecast.day_1.score}% (${analysis.health_forecast.day_1.confidence}% confidence)`);
+console.log(`+3 days: ${analysis.health_forecast.day_3.score}% (${analysis.health_forecast.day_3.confidence}% confidence)`);
+console.log(`+7 days: ${analysis.health_forecast.day_7.score}% (${analysis.health_forecast.day_7.confidence}% confidence)`);
+
+if (analysis.degradation_forecast.time_to_warning) {
+  console.log(`\n⚠️ Health will drop below 80% in: ${analysis.degradation_forecast.time_to_warning}`);
+}
+
+// Show remediation plan
+if (analysis.remediation_plan.length > 0) {
+  console.log("\n🔧 REMEDIATION PLAN");
+  analysis.remediation_plan.forEach((fix, index) => {
+    console.log(`\n${index + 1}. [${fix.priority.toUpperCase()}] ${fix.issue}`);
+    console.log(`   Action: ${fix.action}`);
+    console.log(`   Effort: ${fix.estimated_effort}`);
+    console.log(`   Impact: ${fix.impact}`);
+    if (fix.auto_fixable) {
+      console.log(`   ✅ Auto-fixable`);
+    }
+  });
+}
+
+// Auto-fix prompt
+if (analysis.predictive_summary.auto_fix_available) {
+  const auto_fixable = analysis.remediation_plan.filter(fix => fix.auto_fixable);
+  console.log(`\n💡 ${auto_fixable.length} issue(s) can be auto-fixed. Apply automatic fixes? (Y/n)`);
+}
+```
+
 ---
 
 ### 2. Interactive Dashboard
@@ -147,7 +482,57 @@ npm run monitor -- --watch --interval=30000  # Every 30 seconds
 
 ---
 
-### 6. Stress Testing
+### 6. RAG Storage Health (NEW - v7.7.0+)
+```bash
+/monitor rag
+```
+
+**What to do:**
+- Run: `/rag status` command
+- This displays **Public/Private RAG health and metrics**:
+  - Storage backend status (Firestore/Supabase/Local)
+  - Connection health
+  - Pattern counts (public vs private)
+  - Query performance metrics
+  - Privacy compliance status
+  - Cache hit rates
+  - Edge acceleration status
+
+**Example output:**
+```
+🌍 Public RAG (Framework Patterns)
+   Status: ✅ Connected
+   Backend: Google Cloud Firestore (versatil-public-rag)
+   Patterns: 1,247 framework patterns
+   Edge acceleration: ✅ Cloud Run (68ms avg)
+   Cache hit rate: 87%
+
+🔒 Private RAG (Your Proprietary Patterns)
+   Status: ✅ Connected
+   Backend: Google Cloud Firestore (my-project-rag)
+   Patterns: 127 proprietary patterns
+   Privacy: ✅ Verified (zero leaks)
+   Query performance: 72ms avg
+
+📊 RAG Query Analytics (Last 30 Days)
+   Total queries: 1,342
+   Private-only: 412 (31%)
+   Public-only: 523 (39%)
+   Mixed: 407 (30%)
+
+✅ Overall RAG Health: 98%
+```
+
+**If Private RAG not configured:**
+```
+⚠️ Private RAG: Not configured
+   Impact: All patterns stored in Public RAG (shared)
+   Action: Run `npm run setup:private-rag` to enable
+```
+
+---
+
+### 7. Stress Testing
 ```bash
 /monitor stress
 ```
@@ -165,7 +550,7 @@ npm run monitor -- --watch --interval=30000  # Every 30 seconds
 
 ---
 
-### 7. Recent Logs
+### 8. Recent Logs
 ```bash
 /monitor logs
 ```
@@ -185,7 +570,7 @@ npm run monitor -- --watch --interval=30000  # Every 30 seconds
 
 ---
 
-### 8. Background Monitoring
+### 9. Background Monitoring
 ```bash
 /monitor background start
 /monitor background stop

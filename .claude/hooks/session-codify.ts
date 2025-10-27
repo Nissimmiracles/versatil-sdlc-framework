@@ -197,4 +197,118 @@ console.log('\n' + '─'.repeat(60));
 console.log('💡 "Each feature makes the next one easier - that\'s compounding engineering"');
 console.log('─'.repeat(60) + '\n');
 
+/**
+ * Phase 7.7.0: Store Guardian learnings in RAG
+ * If Guardian was involved (health checks, auto-remediation), store learnings
+ */
+(async () => {
+  try {
+    const { storeGuardianLearnings } = await import('../../src/agents/guardian/guardian-learning-store.js');
+
+    // Extract Guardian-related patterns from session
+    const guardianPatterns = {
+      healthChecks: commandsRun.filter(cmd => cmd.includes('guardian') || cmd.includes('health')),
+      autoFixes: learnings.filter(l => l.includes('auto-fix') || l.includes('remediation')),
+      criticalIssues: decisions.filter(d => d.includes('critical') || d.includes('issue')),
+      sessionId,
+      timestamp: new Date().toISOString(),
+      filesEdited,
+      agentsUsed
+    };
+
+    if (guardianPatterns.healthChecks.length > 0 || guardianPatterns.autoFixes.length > 0) {
+      await storeGuardianLearnings(guardianPatterns, workingDirectory);
+      console.log('   ✅ Guardian learnings stored in RAG');
+    }
+  } catch (error) {
+    // Non-blocking - don't fail hook if Guardian learning storage fails
+    console.error(`   ⚠️  Guardian learning storage failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+})();
+
+/**
+ * Phase 7.8.0: Auto-Learning with Public/Private RAG Separation
+ * Automatically store session patterns in RAG with user choice
+ */
+(async () => {
+  try {
+    // Only trigger if meaningful patterns were detected
+    if (patterns.length === 0 && learnings.length === 0) {
+      process.exit(0);
+      return;
+    }
+
+    const { RAGRouter } = await import('../../src/rag/rag-router.js');
+    const { getSanitizationPolicy } = await import('../../src/rag/sanitization-policy.js');
+
+    const ragRouter = RAGRouter.getInstance();
+    const sanitizationPolicy = getSanitizationPolicy();
+
+    // Classify each pattern for storage destination
+    const classifiedPatterns = await Promise.all(
+      patterns.map(async (pattern) => {
+        const policyDecision = await sanitizationPolicy.evaluatePattern({
+          pattern,
+          description: pattern,
+          agent: agentsUsed[0] || 'system',
+          category: 'session-learning'
+        });
+
+        return {
+          pattern,
+          classification: policyDecision.classification,
+          destination: policyDecision.destination,
+          sanitized: policyDecision.sanitizationResult?.sanitized || pattern,
+          confidence: policyDecision.sanitizationResult?.confidence || 0
+        };
+      })
+    );
+
+    // Count patterns by classification
+    const publicSafe = classifiedPatterns.filter(p => p.classification === 'public_safe').length;
+    const requiresSanitization = classifiedPatterns.filter(p => p.classification === 'requires_sanitization').length;
+    const privateOnly = classifiedPatterns.filter(p =>
+      p.classification === 'private_only' ||
+      p.classification === 'credentials' ||
+      p.classification === 'unsanitizable'
+    ).length;
+
+    // Display storage destination prompt
+    console.log(`\n📊 Session Patterns Detected: ${patterns.length}`);
+    console.log(`   🌍 Public-safe: ${publicSafe}`);
+    console.log(`   ⚙️  Requires sanitization: ${requiresSanitization}`);
+    console.log(`   🔒 Private-only: ${privateOnly}`);
+
+    if (publicSafe > 0 || requiresSanitization > 0) {
+      console.log(`\n💡 Contribute to Public RAG?`);
+      console.log(`   These learnings could help other VERSATIL users:`);
+
+      // Show preview of public-safe patterns
+      classifiedPatterns
+        .filter(p => p.classification === 'public_safe' || p.classification === 'requires_sanitization')
+        .slice(0, 3)
+        .forEach((p, i) => {
+          console.log(`   ${i + 1}. ${p.pattern}`);
+          if (p.classification === 'requires_sanitization') {
+            console.log(`      → Will be sanitized (${p.confidence}% confidence)`);
+          }
+        });
+
+      console.log(`\n   Storage options:`);
+      console.log(`   1. 🔒 Private only (default) - Your patterns stay private`);
+      console.log(`   2. 🌍 Public only - Share sanitized patterns with community`);
+      console.log(`   3. Both - Best of both worlds (private priority + public contribution)`);
+      console.log(`\n   💡 Tip: Run /learn command to review and store these patterns`);
+      console.log(`   💡 Configure Private RAG: npm run setup:private-rag`);
+    } else {
+      console.log(`\n🔒 All patterns are private-only - will store in Private RAG when configured`);
+      console.log(`   💡 Configure Private RAG: npm run setup:private-rag`);
+    }
+
+  } catch (error) {
+    // Non-blocking - don't fail hook if auto-learning fails
+    console.error(`   ⚠️  Auto-learning failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+})();
+
 process.exit(0);

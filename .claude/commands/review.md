@@ -242,10 +242,349 @@ Each agent reports findings with:
 - [ ] ✅ APPROVED - No blocking issues found
 ```
 
-### 5. Synthesis & Final Review Report
+### 5. Verify Findings Authenticity ⭐ AGENT-DRIVEN (Victor-Verifier)
 
 <thinking>
-Combine all agent findings into a unified, actionable review report with clear next steps.
+Before synthesizing findings, use Victor-Verifier to validate finding authenticity, deduplicate across agents, correct severity ratings, and detect false positives.
+</thinking>
+
+**⛔ BLOCKING STEP - YOU MUST INVOKE VICTOR-VERIFIER USING THE TASK TOOL:**
+
+**ACTION: Invoke Victor-Verifier Agent**
+Call the Task tool with:
+- `subagent_type: "Victor-Verifier"`
+- `description: "Verify review findings authenticity"`
+- `prompt: "Verify findings authenticity from ${agent_count} OPERA agents (Marcus-Backend, James-Frontend, Maria-QA, Alex-BA, Sarah-PM). Input: Agent review reports with findings (critical/high/recommendations), file paths, line numbers, severity ratings. Your anti-hallucination verification: (1) Extract factual claims from findings ('SQL injection in src/api/auth.ts:42', 'Test coverage is 65%', 'Missing ARIA labels in LoginForm.tsx'), (2) Verify claims against actual code (read src/api/auth.ts line 42 to confirm SQL injection exists, run coverage to verify 65% claim, check LoginForm.tsx for ARIA attributes), (3) Deduplicate findings (Marcus and Maria both found same SQL injection - consolidate into one finding with both agents credited), (4) Validate severity ratings (is SQL injection really P0? is missing semicolon really P0 or should be P3?), (5) Detect false positives (finding claims XSS vulnerability but code already sanitizes input, finding claims missing tests but tests exist in different location), (6) Cross-check file references (finding references src/components/Login.tsx but file is actually src/pages/Login/index.tsx), (7) Verify fix recommendations (recommended fix would actually break code or introduce new bugs). Return: { verified_findings: [{finding_id, agents: [], severity, verified: true|false, evidence_score: 0-100}], duplicate_findings: [{original_finding_id, duplicate_of: finding_id}], severity_corrections: [{finding_id, wrong_severity, correct_severity, justification}], false_positives: [{finding_id, reason}], invalid_file_references: [{finding_id, claimed_file, actual_file}], overall_verification_score: number, safe_to_present: boolean }"`
+
+**Expected Victor-Verifier Output:**
+
+```typescript
+interface FindingsVerificationResult {
+  verified_findings: Array<{
+    finding_id: string;                   // e.g., "marcus-001", "james-002"
+    finding_title: string;                // e.g., "SQL Injection in Auth API"
+    agents: string[];                     // Agents who found this (after deduplication)
+    severity: 'critical' | 'high' | 'medium' | 'low';
+    category: string;                     // e.g., "security", "performance", "accessibility"
+    file_path: string;                    // e.g., "src/api/auth.ts:42"
+    verified: boolean;                    // true = evidence confirmed
+    evidence_score: number;               // 0-100 (confidence in finding)
+    fix_validated: boolean;               // true = recommended fix is safe and correct
+  }>;
+
+  duplicate_findings: Array<{
+    finding_id: string;                   // Duplicate finding ID
+    duplicate_of: string;                 // Original finding ID
+    agents: string[];                     // All agents who found this
+    consolidation_note: string;           // How findings were merged
+  }>;
+
+  severity_corrections: Array<{
+    finding_id: string;
+    wrong_severity: string;               // Original severity from agent
+    correct_severity: string;             // Corrected severity
+    justification: string;                // Why severity was changed
+  }>;
+
+  false_positives: Array<{
+    finding_id: string;
+    claimed_issue: string;
+    reality: string;                      // Why it's not actually an issue
+    reason: string;                       // Category of false positive
+  }>;
+
+  invalid_file_references: Array<{
+    finding_id: string;
+    claimed_file: string;                 // File path from finding
+    actual_file: string;                  // Corrected file path
+    line_number_adjusted: boolean;        // true if line number also corrected
+  }>;
+
+  overall_verification_score: number;     // 0-100 (quality of review findings)
+  safe_to_present: boolean;               // true = proceed with report, false = re-review needed
+}
+```
+
+**Chain-of-Verification (CoVe) Example:**
+
+Victor-Verifier applies CoVe to each finding across all agents:
+
+```typescript
+// Finding from Marcus-Backend
+const marcus_finding = {
+  finding_id: "marcus-001",
+  title: "SQL Injection in User Search",
+  severity: "critical",
+  file: "src/api/users/search.ts:42",
+  problem: "Uses string interpolation in SQL query",
+  fix: "Replace with parameterized query"
+};
+
+// Finding from Maria-QA
+const maria_finding = {
+  finding_id: "maria-003",
+  title: "Security vulnerability in search endpoint",
+  severity: "high",
+  file: "src/api/users/search.ts:42",
+  problem: "SQL query allows injection",
+  fix: "Use prepared statements"
+};
+
+// Step 1: Extract factual claims
+const claims = [
+  { claim: "File src/api/users/search.ts exists", verifiable: true },
+  { claim: "Line 42 contains SQL query", verifiable: true },
+  { claim: "Query uses string interpolation", verifiable: true },
+  { claim: "Query is vulnerable to SQL injection", verifiable: true }
+];
+
+// Step 2: Verify claims against code
+const file_content = fs.readFileSync('src/api/users/search.ts', 'utf-8');
+const lines = file_content.split('\n');
+const line_42 = lines[41]; // 0-indexed
+
+// Verify line 42 has SQL query
+const has_sql_query = line_42.includes('SELECT') ||
+                     line_42.includes('INSERT') ||
+                     line_42.includes('UPDATE') ||
+                     line_42.includes('DELETE');
+
+if (!has_sql_query) {
+  invalid_file_references.push({
+    finding_id: "marcus-001",
+    claimed_file: "src/api/users/search.ts:42",
+    actual_file: findActualSqlLine(file_content), // Returns "src/api/users/search.ts:57"
+    line_number_adjusted: true
+  });
+}
+
+// Verify string interpolation (vulnerable pattern)
+const has_string_interpolation = line_42.includes('${') || line_42.includes('`SELECT');
+const has_parameterized = line_42.includes('?') || line_42.includes('$1') || line_42.includes('prepared');
+
+if (!has_string_interpolation && has_parameterized) {
+  // Code already uses parameterized queries - false positive
+  false_positives.push({
+    finding_id: "marcus-001",
+    claimed_issue: "SQL injection vulnerability",
+    reality: "Code already uses parameterized queries at line 42",
+    reason: "Incorrect vulnerability assessment - security control already present"
+  });
+  return { verified: false };
+}
+
+// Step 3: Deduplicate findings
+// Marcus and Maria found the same issue
+if (marcus_finding.file === maria_finding.file &&
+    Math.abs(extractLineNumber(marcus_finding.file) - extractLineNumber(maria_finding.file)) < 5) {
+  duplicate_findings.push({
+    finding_id: "maria-003",
+    duplicate_of: "marcus-001",
+    agents: ["Marcus-Backend", "Maria-QA"],
+    consolidation_note: "Both agents identified same SQL injection vulnerability. Consolidated into single finding credited to both agents."
+  });
+
+  // Update verified finding with both agents
+  verified_findings.push({
+    finding_id: "marcus-001",
+    finding_title: "SQL Injection in User Search",
+    agents: ["Marcus-Backend", "Maria-QA"],  // Both credited
+    severity: "critical",
+    category: "security",
+    file_path: "src/api/users/search.ts:42",
+    verified: true,
+    evidence_score: 98,
+    fix_validated: true
+  });
+}
+
+// Step 4: Validate severity rating
+// SQL injection should always be critical
+if (marcus_finding.severity === "critical") {
+  // Correct - SQL injection is critical
+} else if (marcus_finding.severity === "medium") {
+  severity_corrections.push({
+    finding_id: "marcus-001",
+    wrong_severity: "medium",
+    correct_severity: "critical",
+    justification: "SQL injection is always critical severity per OWASP. Allows data exfiltration and unauthorized access."
+  });
+}
+
+// Step 5: Verify fix recommendation
+const recommended_fix = "Replace with parameterized query";
+const fix_safe = validateFixRecommendation(file_content, line_42, recommended_fix);
+
+if (!fix_safe) {
+  verified_findings[0].fix_validated = false;
+  verified_findings[0].fix_warning = "Recommended fix may break existing functionality. Review carefully.";
+}
+```
+
+**Deduplication Examples:**
+
+```typescript
+// Example 1: Same issue found by multiple agents
+const duplicates = [
+  {
+    finding_id: "marcus-002",
+    title: "Missing rate limiting on /api/auth/login",
+    agents: ["Marcus-Backend"]
+  },
+  {
+    finding_id: "maria-007",
+    title: "No throttling on login endpoint",
+    agents: ["Maria-QA"]
+  },
+  {
+    finding_id: "alex-004",
+    title: "Brute force vulnerability in authentication",
+    agents: ["Alex-BA"]
+  }
+];
+
+// After deduplication:
+const consolidated = {
+  finding_id: "marcus-002",  // Keep first ID
+  title: "Missing Rate Limiting on /api/auth/login",
+  agents: ["Marcus-Backend", "Maria-QA", "Alex-BA"],  // All credited
+  severity: "high",
+  evidence_score: 95  // Higher confidence with 3 agents finding it
+};
+
+// Example 2: Related but different issues (NOT duplicates)
+const not_duplicates = [
+  {
+    finding_id: "james-005",
+    title: "Missing ARIA label on email input",
+    file: "src/components/LoginForm.tsx:25"
+  },
+  {
+    finding_id: "james-006",
+    title: "Missing ARIA label on password input",
+    file: "src/components/LoginForm.tsx:30"
+  }
+];
+// These are separate findings (different inputs) - do NOT consolidate
+```
+
+**False Positive Detection Examples:**
+
+```typescript
+// Example 1: Security control already present
+{
+  finding_id: "marcus-015",
+  claimed_issue: "Missing CORS headers - allows any origin",
+  reality: "CORS headers configured in src/middleware/cors.ts:12 with whitelist",
+  reason: "Security control exists but agent didn't check middleware"
+}
+
+// Example 2: Tests exist in different location
+{
+  finding_id: "maria-012",
+  claimed_issue: "Missing tests for UserController.create()",
+  reality: "Tests exist at __tests__/controllers/UserController.test.ts:45-67",
+  reason: "Agent checked wrong test file location"
+}
+
+// Example 3: Breaking change is intentional
+{
+  finding_id: "sarah-008",
+  claimed_issue: "Breaking API change not documented",
+  reality: "Breaking change documented in CHANGELOG.md:23 and MIGRATION.md",
+  reason: "Agent didn't check all documentation files"
+}
+
+// Example 4: Performance "issue" is acceptable
+{
+  finding_id: "marcus-022",
+  claimed_issue: "API response time 250ms exceeds 200ms target",
+  reality: "250ms is acceptable for this complex aggregation query. Not a real issue.",
+  reason: "Overly strict threshold for complex operation"
+}
+```
+
+**Severity Correction Examples:**
+
+```typescript
+// Example 1: Under-severity (should be higher)
+{
+  finding_id: "marcus-018",
+  wrong_severity: "medium",
+  correct_severity: "critical",
+  justification: "Authentication bypass allows unauthorized admin access. This is critical, not medium."
+}
+
+// Example 2: Over-severity (should be lower)
+{
+  finding_id: "james-011",
+  wrong_severity: "high",
+  correct_severity: "low",
+  justification: "Missing console.log removal is code cleanliness, not a functional or security issue. Should be low priority."
+}
+
+// Example 3: Correct severity (no change)
+{
+  finding_id: "maria-015",
+  wrong_severity: "high",
+  correct_severity: "high",
+  justification: "Test coverage 65% (below 80% target) is correctly rated as high priority."
+}
+```
+
+**Verification Results Processing:**
+
+After Victor-Verifier completes, process results:
+
+```typescript
+if (verification.safe_to_present === false) {
+  console.log("❌ VERIFICATION FAILED - Review findings quality too poor\n");
+  console.log(`Overall verification score: ${verification.overall_verification_score}/100`);
+  console.log(`False positives: ${verification.false_positives.length}`);
+  console.log(`Invalid file references: ${verification.invalid_file_references.length}\n`);
+
+  console.log("🔴 Critical Issues with Review:\n");
+  verification.false_positives.forEach(fp => {
+    console.log(`- Finding ${fp.finding_id}:`);
+    console.log(`  Claimed: ${fp.claimed_issue}`);
+    console.log(`  Reality: ${fp.reality}\n`);
+  });
+
+  console.log("⚠️ Recommendation: Re-run review with corrected agent prompts");
+  return; // BLOCK review report - findings not reliable
+}
+
+// All verifications passed - apply corrections and consolidate
+console.log(`✅ Verification Complete: ${verification.verified_findings.length} findings verified\n`);
+
+// Apply deduplication
+console.log(`🔀 Deduplicated: ${verification.duplicate_findings.length} duplicate findings consolidated\n`);
+verification.duplicate_findings.forEach(dup => {
+  console.log(`- ${dup.finding_id} merged into ${dup.duplicate_of}`);
+  console.log(`  Agents: ${dup.agents.join(', ')}\n`);
+});
+
+// Apply severity corrections
+if (verification.severity_corrections.length > 0) {
+  console.log(`✏️ Severity Corrections: ${verification.severity_corrections.length} findings adjusted\n`);
+  verification.severity_corrections.forEach(corr => {
+    console.log(`- Finding ${corr.finding_id}:`);
+    console.log(`  ${corr.wrong_severity} → ${corr.correct_severity}`);
+    console.log(`  Reason: ${corr.justification}\n`);
+  });
+}
+
+// Remove false positives
+const valid_findings = verification.verified_findings.filter(f => f.verified);
+console.log(`📊 Final Findings: ${valid_findings.length} (removed ${verification.false_positives.length} false positives)`);
+```
+
+---
+
+### 6. Synthesis & Final Review Report
+
+<thinking>
+After Victor-Verifier validation, combine verified findings into a unified, actionable review report with clear next steps.
 </thinking>
 
 **Synthesis Process:**

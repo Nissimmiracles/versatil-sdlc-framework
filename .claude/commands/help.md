@@ -70,6 +70,350 @@ npm run dashboard            # Real-time monitoring (TUI)
 - `/help monitoring` - Framework health checks
 - `/help context` - Context management & memory
 - `/help isolation` - Framework-project separation
+- `/help rag` - RAG storage & privacy (Public/Private patterns)
+
+### RAG Storage & Privacy
+- `/help rag-overview` - Public vs Private RAG architecture
+- `/help rag-setup` - Configure Private RAG storage
+- `/help rag-migration` - Migrate patterns to Public/Private
+- `/help rag-privacy` - Privacy verification & compliance
+
+---
+
+## Step: Intelligent Help Routing (MANDATORY)
+
+**After user selects topic, ALWAYS invoke Oliver-MCP + Sarah-PM for context-aware help routing:**
+
+```typescript
+await Task({
+  subagent_type: "Oliver-MCP",
+  description: "Intelligent help routing",
+  prompt: `
+You are Oliver-MCP, the intelligent routing and context-aware help agent. Your role is to understand the user's question intent and route them to the most relevant documentation, agent, or learning resource.
+
+## Your Task
+
+Analyze the user's help request and provide intelligent routing with context-aware recommendations.
+
+## Context
+
+User's help request: [insert user's /help query or topic]
+User's project context:
+- Framework version: [check package.json]
+- Active agents: [check .cursor/settings.json]
+- Recent activity: [check ~/.versatil/logs/ last 24h]
+- Failed commands: [check for errors in logs]
+
+## Steps to Execute
+
+### 1. Question Intent Detection
+Classify the user's question into one of these intents:
+- **Getting Started** - User is new, needs onboarding
+- **Troubleshooting** - User has a specific error or issue
+- **Feature Learning** - User wants to learn about a specific capability
+- **Agent Usage** - User wants to understand/activate an agent
+- **Workflow Guidance** - User needs help with EVERY/Three-Tier workflows
+- **Configuration** - User wants to configure settings
+- **RAG/Memory** - User has questions about patterns/storage
+
+### 2. Agent Recommendation
+Based on intent, recommend which agent can best help:
+- Getting Started → Sarah-PM (project planning)
+- Troubleshooting → Iris-Guardian (diagnostics)
+- Feature Learning → Victor-Verifier (pattern search)
+- Agent Usage → Specific agent (Maria-QA, Marcus, James, etc.)
+- Workflow Guidance → Sarah-PM + Oliver-MCP
+- Configuration → Oliver-MCP (MCP setup)
+- RAG/Memory → Victor-Verifier (pattern quality)
+
+### 3. Documentation Routing
+Point to most relevant docs (relative paths):
+- docs/VERSATIL_ARCHITECTURE.md - Framework architecture
+- docs/guides/compounding-engineering.md - EVERY workflow
+- docs/THREE_LAYER_CONTEXT_SYSTEM.md - Context management
+- docs/CONTEXT_ENFORCEMENT.md - Isolation
+- docs/guides/PRIVATE_RAG_SETUP.md - RAG configuration
+- .claude/agents/*.md - Agent-specific docs
+- .claude/commands/*.md - Command references
+
+### 4. Learning Resource Suggestions
+Suggest interactive learning paths:
+- **Hands-on**: Commands to run right now
+- **Reading**: Docs to read (15-30 min)
+- **Video**: Tutorial videos (if available)
+- **Example**: Real code examples with file:line references
+
+### 5. Quick Win Identification
+Identify immediate actionable steps (< 5 minutes) that will help user:
+- Run health check: npm run monitor
+- Fix issues: npm run doctor
+- View dashboard: npm run dashboard
+- Activate agent: /[agent-name] [task]
+
+## Expected Output
+
+Return a TypeScript interface with intelligent routing:
+
+\`\`\`typescript
+interface IntelligentHelpRouting {
+  // Intent analysis
+  intent_analysis: {
+    detected_intent: 'getting_started' | 'troubleshooting' | 'feature_learning' | 'agent_usage' | 'workflow_guidance' | 'configuration' | 'rag_memory';
+    confidence: number;  // 0-100%
+    keywords_detected: string[];
+    context_clues: string[];  // Recent activity, errors, patterns
+  };
+
+  // Agent recommendation
+  recommended_agent: {
+    agent_name: string;
+    reason: string;
+    activation_command: string;  // e.g., "/sarah-pm plan auth system"
+    expected_help: string;
+    estimated_time: string;  // "5 minutes", "15 minutes", etc.
+  } | null;
+
+  // Documentation routing
+  documentation: Array<{
+    doc_path: string;
+    doc_title: string;
+    relevance: number;  // 0-100%
+    estimated_reading_time: string;
+    key_sections: string[];
+    why_relevant: string;
+  }>;
+
+  // Learning resources
+  learning_path: {
+    hands_on: Array<{
+      step: string;
+      command: string;
+      expected_outcome: string;
+      duration: string;
+    }>;
+    reading: Array<{
+      resource: string;
+      why: string;
+      duration: string;
+    }>;
+    examples: Array<{
+      example_title: string;
+      file_path: string;
+      line_numbers: string;
+      description: string;
+    }>;
+  };
+
+  // Quick wins
+  quick_wins: Array<{
+    action: string;
+    command: string | null;
+    impact: string;
+    duration: string;
+    priority: 'high' | 'medium' | 'low';
+  }>;
+
+  // Related topics
+  related_topics: Array<{
+    topic: string;
+    help_command: string;
+    why_related: string;
+  }>;
+
+  // Summary
+  routing_summary: {
+    primary_recommendation: string;
+    confidence_score: number;  // 0-100%
+    alternative_paths: string[];
+    estimated_resolution_time: string;
+  };
+}
+\`\`\`
+
+## Example Output
+
+\`\`\`typescript
+{
+  intent_analysis: {
+    detected_intent: "troubleshooting",
+    confidence: 92,
+    keywords_detected: ["error", "failing", "tests"],
+    context_clues: [
+      "Recent log shows Maria-QA activation failed 3 times",
+      "Test coverage dropped from 85% to 62%",
+      "User ran 'npm run test' 5 times in last hour"
+    ]
+  },
+
+  recommended_agent: {
+    agent_name: "Maria-QA",
+    reason: "User has test failures and coverage issues - Maria-QA specializes in test quality validation",
+    activation_command: "/maria-qa validate test coverage and fix failing tests",
+    expected_help: "Identify root cause of test failures, suggest fixes, restore 80%+ coverage",
+    estimated_time: "10-15 minutes"
+  },
+
+  documentation: [
+    {
+      doc_path: ".claude/agents/maria-qa.md",
+      doc_title: "Maria-QA Agent Documentation",
+      relevance: 95,
+      estimated_reading_time: "5 minutes",
+      key_sections: ["Auto-Activation Triggers", "Test Coverage Validation", "Common Fixes"],
+      why_relevant: "Direct documentation for Maria-QA agent, includes troubleshooting section"
+    },
+    {
+      doc_path: "docs/guides/compounding-engineering.md",
+      doc_title: "Compounding Engineering Guide",
+      relevance: 60,
+      estimated_reading_time: "10 minutes",
+      key_sections: ["Pattern Search for Test Failures"],
+      why_relevant: "Shows how to leverage historical test fix patterns"
+    }
+  ],
+
+  learning_path: {
+    hands_on: [
+      {
+        step: "1. Check test health",
+        command: "npm run test:coverage",
+        expected_outcome: "See which tests are failing and coverage percentage",
+        duration: "2 minutes"
+      },
+      {
+        step: "2. Activate Maria-QA for diagnosis",
+        command: "/maria-qa analyze test failures and suggest fixes",
+        expected_outcome: "Maria-QA identifies root causes and provides fix recommendations",
+        duration: "5 minutes"
+      },
+      {
+        step: "3. Apply fixes and re-run",
+        command: "npm run test:coverage",
+        expected_outcome: "Tests pass, coverage restored to 80%+",
+        duration: "5 minutes"
+      }
+    ],
+    reading: [
+      {
+        resource: ".claude/agents/maria-qa.md",
+        why: "Understand Maria-QA's capabilities and when to activate",
+        duration: "5 minutes"
+      }
+    ],
+    examples: [
+      {
+        example_title: "Test coverage validation pattern",
+        file_path: "src/testing/coverage-validator.ts",
+        line_numbers: "142-187",
+        description: "Real implementation of 80%+ coverage enforcement"
+      }
+    ]
+  },
+
+  quick_wins: [
+    {
+      action: "Run test coverage check",
+      command: "npm run test:coverage",
+      impact: "See exact failing tests and coverage gaps",
+      duration: "2 minutes",
+      priority: "high"
+    },
+    {
+      action: "Activate Maria-QA",
+      command: "/maria-qa fix test coverage",
+      impact: "Auto-diagnosis and fix suggestions",
+      duration: "5 minutes",
+      priority: "high"
+    }
+  ],
+
+  related_topics: [
+    {
+      topic: "Instinctive Testing",
+      help_command: "/help instinctive-testing",
+      why_related: "Understanding automated test quality patterns"
+    },
+    {
+      topic: "Maria-QA Agent",
+      help_command: "/help maria-qa",
+      why_related: "Deep dive into testing agent capabilities"
+    }
+  ],
+
+  routing_summary: {
+    primary_recommendation: "Activate Maria-QA agent to diagnose and fix test failures",
+    confidence_score: 92,
+    alternative_paths: [
+      "Read Maria-QA documentation first if unfamiliar",
+      "Run framework health check if issue is broader"
+    ],
+    estimated_resolution_time: "10-15 minutes"
+  }
+}
+\`\`\`
+
+Return the complete intelligent routing result.
+`
+});
+```
+
+**Display Routing Results**:
+
+```typescript
+// Show intent detection
+console.log("\n🎯 INTENT DETECTED");
+console.log(`  ${routing.intent_analysis.detected_intent.replace('_', ' ').toUpperCase()}`);
+console.log(`  Confidence: ${routing.intent_analysis.confidence}%`);
+
+// Show primary recommendation
+console.log(`\n✨ PRIMARY RECOMMENDATION`);
+console.log(`  ${routing.routing_summary.primary_recommendation}`);
+console.log(`  Estimated time: ${routing.routing_summary.estimated_resolution_time}`);
+
+// Show recommended agent
+if (routing.recommended_agent) {
+  console.log(`\n🤖 RECOMMENDED AGENT: ${routing.recommended_agent.agent_name}`);
+  console.log(`  ${routing.recommended_agent.reason}`);
+  console.log(`\n  ▶ Activate now:`);
+  console.log(`    ${routing.recommended_agent.activation_command}`);
+  console.log(`\n  Expected help: ${routing.recommended_agent.expected_help}`);
+}
+
+// Show quick wins
+if (routing.quick_wins.length > 0) {
+  console.log(`\n⚡ QUICK WINS (< 5 minutes)`);
+  routing.quick_wins
+    .filter(win => win.priority === 'high')
+    .forEach((win, index) => {
+      console.log(`\n  ${index + 1}. ${win.action} (${win.duration})`);
+      if (win.command) {
+        console.log(`     Command: ${win.command}`);
+      }
+      console.log(`     Impact: ${win.impact}`);
+    });
+}
+
+// Show top documentation
+if (routing.documentation.length > 0) {
+  console.log(`\n📚 RECOMMENDED READING`);
+  routing.documentation
+    .filter(doc => doc.relevance >= 80)
+    .slice(0, 2)
+    .forEach(doc => {
+      console.log(`\n  - ${doc.doc_title} (${doc.estimated_reading_time})`);
+      console.log(`    Path: ${doc.doc_path}`);
+      console.log(`    Why: ${doc.why_relevant}`);
+    });
+}
+
+// Show related topics
+if (routing.related_topics.length > 0) {
+  console.log(`\n🔗 RELATED TOPICS`);
+  routing.related_topics.forEach(topic => {
+    console.log(`  - ${topic.topic}: ${topic.help_command}`);
+  });
+}
+```
 
 ---
 
@@ -95,6 +439,14 @@ npm run test:stress          # Run stress tests (Rule 2)
 /delegate "task pattern"     # Phase 3: Distribute work
 /work "work target"          # Phase 4: Execute with tracking
 /learn "feature branch"      # Phase 5: Codify learnings
+
+# RAG Storage & Privacy
+/rag status                  # View RAG configuration
+/rag configure               # Setup Private RAG storage
+/rag migrate                 # Migrate patterns to Public/Private
+/rag verify                  # Verify privacy separation
+/rag query "auth"            # Test pattern search
+npm run setup:private-rag    # Interactive setup wizard
 
 # Agent Manual Activation (Fallback)
 /maria review test coverage

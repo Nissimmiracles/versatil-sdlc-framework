@@ -1,0 +1,73 @@
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#e8f5e9','primaryTextColor':'#000','primaryBorderColor':'#4caf50'}}}%%
+flowchart TD
+    Start[User starts session in working directory] --> Detect{Context Detection<br/>before-prompt.ts}
+
+    Detect -->|Check git remote| GitCheck{Git remote URL contains<br/>'versatil-sdlc-framework'?}
+    GitCheck -->|Yes| FrameworkDev[🛠️ Framework Development Mode]
+    GitCheck -->|No| PackageCheck
+
+    PackageCheck{package.json has dependency<br/>'@versatil/sdlc-framework'?} -->|Yes| UserProject[👤 User Project Mode]
+    PackageCheck -->|No| DefaultUser[👤 Default: User Project Mode<br/>Safety first]
+    DefaultUser --> UserProject
+
+    FrameworkDev --> FrameworkRules[Apply Framework Rules]
+    UserProject --> UserRules[Apply User Rules]
+
+    FrameworkRules --> FrameworkAllow[✅ ALLOWED ACCESS]
+    FrameworkRules --> FrameworkBlock[❌ BLOCKED ACCESS]
+
+    UserRules --> UserAllow[✅ ALLOWED ACCESS]
+    UserRules --> UserBlock[❌ BLOCKED ACCESS]
+
+    FrameworkAllow --> FrameworkFeatures["<b>Framework Dev Can Access:</b><br/><br/>• Framework source code<br/>(src/, .claude/agents/, .claude/commands/)<br/><br/>• All 18 OPERA agents<br/>(including Sarah-PM, Victor, Iris)<br/><br/>• Framework development patterns<br/>(RAG: ~/.versatil-global/framework-dev/)<br/><br/>• Internal architecture docs<br/>(Implementation guides)"]
+
+    FrameworkBlock --> FrameworkRestrict["<b>Framework Dev CANNOT Access:</b><br/><br/>• Customer project data<br/>(User codebases, business logic)<br/><br/>• User project RAG stores<br/>(/project/.versatil/)<br/><br/>• Private customer patterns<br/>(Company-specific learnings)"]
+
+    UserAllow --> UserFeatures["<b>User Project Can Access:</b><br/><br/>• Public APIs and documentation<br/>(CLAUDE.md, README.md, docs/)<br/><br/>• 15 customer-facing agents<br/>(Maria, Marcus, James, Dana,<br/>Alex, Dr.AI, Oliver + sub-agents)<br/><br/>• User project RAG store<br/>(RAG: /project/.versatil/)<br/><br/>• Slash commands for workflows<br/>(30 commands available)"]
+
+    UserBlock --> UserRestrict["<b>User Project CANNOT Access:</b><br/><br/>• Framework source code<br/>(src/ internals, implementation)<br/><br/>• Sarah-PM agent<br/>(Framework orchestration only)<br/><br/>• Framework development patterns<br/>(RAG: ~/.versatil-global/)<br/><br/>• Internal architecture details<br/>(How framework is built)"]
+
+    FrameworkFeatures --> Enforcement[Boundary Enforcement Engine]
+    UserFeatures --> Enforcement
+
+    Enforcement --> Runtime[Runtime Request]
+    Runtime --> FileAccess{File Access Request}
+    Runtime --> AgentInvoke{Agent Invocation}
+    Runtime --> RAGQuery{RAG Query}
+
+    FileAccess -->|Path validation| PathCheck{Path allowed<br/>in current context?}
+    PathCheck -->|Yes| AllowFile[✅ Allow File Access]
+    PathCheck -->|No| BlockFile[❌ Block + Log Violation<br/>Context Violation Error]
+
+    AgentInvoke -->|Agent permission check| AgentCheck{Agent available<br/>in current context?}
+    AgentCheck -->|Yes| AllowAgent[✅ Allow Agent Invocation]
+    AgentCheck -->|No| BlockAgent[❌ Block + Suggest Alternative<br/>Agent Not Available]
+
+    RAGQuery -->|RAG namespace check| RAGCheck{RAG namespace<br/>matches context?}
+    RAGCheck -->|Yes| AllowRAG[✅ Allow RAG Query]
+    RAGCheck -->|No| BlockRAG[❌ Block + Route to Correct Store<br/>Privacy Violation]
+
+    BlockFile --> AuditLog[Audit Log<br/>~/.versatil/logs/violations.log]
+    BlockAgent --> AuditLog
+    BlockRAG --> AuditLog
+
+    AuditLog --> SecurityMonitor[Iris-Guardian<br/>Security Monitoring]
+    SecurityMonitor --> ThreatDetect{Suspicious pattern?<br/>Repeated violations?}
+    ThreatDetect -->|Yes| Alert[🚨 Alert User<br/>Possible Attack]
+    ThreatDetect -->|No| Continue[Continue Normal Operation]
+
+    classDef detect fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    classDef framework fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
+    classDef user fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    classDef enforce fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    classDef allow fill:#c8e6c9,stroke:#4caf50,stroke-width:3px
+    classDef block fill:#ffccbc,stroke:#ff5722,stroke-width:3px
+    classDef security fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
+
+    class Start,Detect,GitCheck,PackageCheck,DefaultUser detect
+    class FrameworkDev,FrameworkRules,FrameworkAllow,FrameworkFeatures framework
+    class UserProject,UserRules,UserAllow,UserFeatures user
+    class Enforcement,Runtime,FileAccess,AgentInvoke,RAGQuery,PathCheck,AgentCheck,RAGCheck enforce
+    class AllowFile,AllowAgent,AllowRAG allow
+    class FrameworkBlock,UserBlock,FrameworkRestrict,UserRestrict,BlockFile,BlockAgent,BlockRAG block
+    class AuditLog,SecurityMonitor,ThreatDetect,Alert security

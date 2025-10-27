@@ -268,10 +268,345 @@ After_Wave_2:
   Overall_Wave_2: ✅ PASSED - Proceed to Wave 3
 ```
 
-### 6. Update Persistent Todos
+### 6. Verify Completion Authenticity ⭐ AGENT-DRIVEN (Victor-Verifier)
 
 <thinking>
-As each todo completes, update its todos/*.md file with work log and rename to completed status.
+After parallel execution waves complete, use Victor-Verifier to validate todos were actually completed (not hallucinated) and acceptance criteria were met.
+</thinking>
+
+**⛔ BLOCKING STEP - YOU MUST INVOKE VICTOR-VERIFIER USING THE TASK TOOL:**
+
+**ACTION: Invoke Victor-Verifier Agent**
+Call the Task tool with:
+- `subagent_type: "Victor-Verifier"`
+- `description: "Verify todo completion authenticity"`
+- `prompt: "Verify completion authenticity for ${completed_todos_count} todos from parallel execution. Input: Completed todo IDs (e.g., '001-auth-api', '004-documentation'), agent completion claims (what agents say they completed), TodoWrite status (shows completed). Your anti-hallucination verification: (1) Extract factual claims from completion reports ('Created file src/api/auth.ts', 'Test coverage is 85%', 'All acceptance criteria met'), (2) Verify claims against actual filesystem (check if src/api/auth.ts exists, read file to confirm it has auth logic, not empty stub), (3) Cross-check acceptance criteria (read todo file acceptance criteria, verify each criterion actually met with evidence), (4) Validate quality gates (run tests to confirm coverage >= 80%, check security scan results exist, verify performance benchmarks met), (5) Identify false completions (todo marked complete but files don't exist, tests don't pass, acceptance criteria not met, code is placeholder/stub), (6) Check work log accuracy (claimed duration vs actual effort, learned lessons are specific vs generic, next steps align with actual state), (7) Detect hallucinated evidence (fabricated test results, made-up file paths, phantom quality metrics). Return: { verified_completions: [{todo_id, completed: true|false, evidence_score: 0-100, acceptance_criteria_met: boolean, quality_gates_passed: boolean}], false_completions: [{todo_id, claim: string, reality: string}], incomplete_work: [{todo_id, missing_criteria: []}], overall_verification_score: number, safe_to_mark_complete: boolean }"`
+
+**Expected Victor-Verifier Output:**
+
+```typescript
+interface CompletionVerificationResult {
+  verified_completions: Array<{
+    todo_id: string;                      // e.g., "001-auth-api"
+    todo_title: string;                   // e.g., "Implement Auth API"
+    assigned_agent: string;               // e.g., "Marcus-Backend"
+    completed: boolean;                   // true = verified complete, false = incomplete or hallucinated
+    evidence_score: number;               // 0-100 (confidence in completion evidence)
+    acceptance_criteria_met: boolean;     // true = all criteria verified
+    acceptance_criteria_details: Array<{
+      criterion: string;
+      met: boolean;
+      evidence: string;
+    }>;
+    quality_gates_passed: boolean;        // true = all quality gates verified
+    quality_gate_results: {
+      test_coverage: { target: string, actual: string, passed: boolean };
+      security_scan: { expected: string, result: string, passed: boolean };
+      performance: { target: string, actual: string, passed: boolean };
+      linting: { expected: string, result: string, passed: boolean };
+    };
+  }>;
+
+  false_completions: Array<{
+    todo_id: string;
+    claim: string;                        // What agent claimed
+    reality: string;                      // Actual truth
+    severity: 'critical' | 'high' | 'medium' | 'low';
+  }>;
+
+  incomplete_work: Array<{
+    todo_id: string;
+    completion_percentage: number;        // 0-100
+    missing_criteria: string[];           // Acceptance criteria not met
+    missing_files: string[];              // Files claimed but don't exist
+    failing_tests: string[];              // Tests that don't pass
+  }>;
+
+  overall_verification_score: number;     // 0-100 (0 = all hallucinated, 100 = all verified)
+  safe_to_mark_complete: boolean;         // true = proceed with completion, false = review required
+}
+```
+
+**Chain-of-Verification (CoVe) Example:**
+
+Victor-Verifier applies CoVe to each completed todo:
+
+```typescript
+// Todo: 001-pending-p1-auth-api.md
+const completion_claim = {
+  todo_id: "001-auth-api",
+  agent: "Marcus-Backend",
+  status: "completed",
+  work_log: {
+    files_created: ["src/api/auth.ts", "src/middleware/authentication.ts"],
+    tests_added: ["__tests__/api/auth.test.ts"],
+    test_coverage: "85%",
+    security_scan: "OWASP compliant",
+    api_response_time: "180ms"
+  },
+  acceptance_criteria: [
+    "Implement /api/auth/login endpoint",
+    "Implement /api/auth/refresh endpoint",
+    "Add authentication middleware",
+    "Test coverage >= 80%",
+    "OWASP Top 10 compliant"
+  ]
+};
+
+// Step 1: Extract factual claims
+const claims = [
+  { claim: "File src/api/auth.ts exists", verifiable: true },
+  { claim: "File contains /api/auth/login endpoint", verifiable: true },
+  { claim: "File contains /api/auth/refresh endpoint", verifiable: true },
+  { claim: "Test file __tests__/api/auth.test.ts exists", verifiable: true },
+  { claim: "Test coverage is 85%", verifiable: true },
+  { claim: "Security scan shows OWASP compliant", verifiable: true },
+  { claim: "API response time is 180ms", verifiable: true }
+];
+
+// Step 2: Verify claims against filesystem
+const file_exists = fs.existsSync('src/api/auth.ts');
+if (!file_exists) {
+  false_completions.push({
+    todo_id: "001-auth-api",
+    claim: "Created file src/api/auth.ts",
+    reality: "File does not exist in src/api/",
+    severity: "critical"  // Todo marked complete but files missing
+  });
+  return { completed: false, evidence_score: 0 };
+}
+
+const file_content = fs.readFileSync('src/api/auth.ts', 'utf-8');
+
+// Check for /api/auth/login endpoint
+const has_login_endpoint = file_content.includes('/api/auth/login') ||
+                           file_content.includes('router.post(\'/login\'') ||
+                           file_content.includes('app.post(\'/api/auth/login\'');
+
+if (!has_login_endpoint) {
+  incomplete_work.push({
+    todo_id: "001-auth-api",
+    completion_percentage: 50,
+    missing_criteria: ["Implement /api/auth/login endpoint"],
+    missing_files: [],
+    failing_tests: []
+  });
+}
+
+// Check for /api/auth/refresh endpoint
+const has_refresh_endpoint = file_content.includes('/api/auth/refresh') ||
+                             file_content.includes('router.post(\'/refresh\'');
+
+if (!has_refresh_endpoint) {
+  incomplete_work.push({
+    todo_id: "001-auth-api",
+    completion_percentage: 75,
+    missing_criteria: ["Implement /api/auth/refresh endpoint"],
+    missing_files: [],
+    failing_tests: []
+  });
+}
+
+// Step 3: Verify acceptance criteria
+const acceptance_criteria_details = [];
+
+// Criterion 1: /api/auth/login endpoint
+acceptance_criteria_details.push({
+  criterion: "Implement /api/auth/login endpoint",
+  met: has_login_endpoint,
+  evidence: has_login_endpoint ?
+    `Found in src/api/auth.ts:42-67 with JWT token generation` :
+    `Not found in src/api/auth.ts`
+});
+
+// Criterion 2: Test coverage >= 80%
+let test_coverage_met = false;
+let actual_coverage = 0;
+
+try {
+  // Run coverage command
+  const coverage_output = execSync('npm run test:coverage --silent', { encoding: 'utf-8' });
+  const coverage_match = coverage_output.match(/Statements\s+:\s+([\d.]+)%/);
+
+  if (coverage_match) {
+    actual_coverage = parseFloat(coverage_match[1]);
+    test_coverage_met = actual_coverage >= 80;
+  }
+} catch (error) {
+  // Tests failed - criterion not met
+  test_coverage_met = false;
+}
+
+acceptance_criteria_details.push({
+  criterion: "Test coverage >= 80%",
+  met: test_coverage_met,
+  evidence: test_coverage_met ?
+    `Actual coverage: ${actual_coverage}% (target: 80%)` :
+    `Tests failed or coverage below 80% (actual: ${actual_coverage}%)`
+});
+
+// Step 4: Validate quality gates
+let security_scan_passed = false;
+
+try {
+  const scan_output = execSync('npm run security:scan --silent', { encoding: 'utf-8' });
+  security_scan_passed = !scan_output.includes('CRITICAL') && !scan_output.includes('HIGH');
+} catch (error) {
+  security_scan_passed = false;
+}
+
+const quality_gate_results = {
+  test_coverage: {
+    target: ">=80%",
+    actual: `${actual_coverage}%`,
+    passed: test_coverage_met
+  },
+  security_scan: {
+    expected: "No critical/high vulnerabilities",
+    result: security_scan_passed ? "PASSED" : "FAILED",
+    passed: security_scan_passed
+  },
+  performance: {
+    target: "<200ms",
+    actual: "180ms",  // Would need actual benchmark
+    passed: true
+  },
+  linting: {
+    expected: "No errors",
+    result: "PASSED",
+    passed: true
+  }
+};
+
+// Step 5: Calculate evidence score
+let evidence_score = 100;
+
+if (!file_exists) evidence_score -= 50;
+if (!has_login_endpoint) evidence_score -= 15;
+if (!has_refresh_endpoint) evidence_score -= 15;
+if (!test_coverage_met) evidence_score -= 10;
+if (!security_scan_passed) evidence_score -= 10;
+
+evidence_score = Math.max(0, evidence_score);
+
+// Step 6: Determine if truly complete
+const all_criteria_met = acceptance_criteria_details.every(c => c.met);
+const all_quality_gates_passed = Object.values(quality_gate_results).every(gate => gate.passed);
+
+verified_completions.push({
+  todo_id: "001-auth-api",
+  todo_title: "Implement Auth API",
+  assigned_agent: "Marcus-Backend",
+  completed: all_criteria_met && all_quality_gates_passed,
+  evidence_score,
+  acceptance_criteria_met: all_criteria_met,
+  acceptance_criteria_details,
+  quality_gates_passed: all_quality_gates_passed,
+  quality_gate_results
+});
+```
+
+**False Completion Detection Examples:**
+
+```typescript
+// Example 1: Files claimed but don't exist
+{
+  todo_id: "002-login-ui",
+  claim: "Created components: LoginForm.tsx, LoginButton.tsx, LoginHeader.tsx",
+  reality: "Only LoginForm.tsx exists. LoginButton.tsx and LoginHeader.tsx missing.",
+  severity: "high"  // Partial completion claimed as full
+}
+
+// Example 2: Tests don't pass
+{
+  todo_id: "003-test-coverage",
+  claim: "Test coverage is 85%",
+  reality: "Tests fail with 3 errors. Actual coverage unknown because tests don't run.",
+  severity: "critical"  // Fabricated metric
+}
+
+// Example 3: Placeholder code
+{
+  todo_id: "004-documentation",
+  claim: "Created comprehensive API documentation in docs/api/auth.md",
+  reality: "File exists but contains only TODO comments: '// TODO: Document login endpoint'",
+  severity: "high"  // Stub passed off as complete
+}
+
+// Example 4: Hallucinated acceptance criteria
+{
+  todo_id: "005-deployment",
+  claim: "All 8 acceptance criteria met",
+  reality: "Todo file only lists 6 acceptance criteria. Agent invented 2 extra criteria.",
+  severity: "medium"  // False reporting
+}
+```
+
+**Verification Results Processing:**
+
+After Victor-Verifier completes, process results:
+
+```typescript
+if (verification.safe_to_mark_complete === false) {
+  console.log("❌ VERIFICATION FAILED - Completion claims don't match reality\n");
+  console.log(`Overall verification score: ${verification.overall_verification_score}/100`);
+  console.log(`False completions: ${verification.false_completions.length}`);
+  console.log(`Incomplete work: ${verification.incomplete_work.length}\n`);
+
+  console.log("🔴 Critical Issues:\n");
+  verification.false_completions
+    .filter(fc => fc.severity === 'critical')
+    .forEach(fc => {
+      console.log(`- Todo ${fc.todo_id}:`);
+      console.log(`  Claim: ${fc.claim}`);
+      console.log(`  Reality: ${fc.reality}\n`);
+    });
+
+  console.log("⚠️ Incomplete Work:\n");
+  verification.incomplete_work.forEach(iw => {
+    console.log(`- Todo ${iw.todo_id} (${iw.completion_percentage}% complete):`);
+    console.log(`  Missing criteria: ${iw.missing_criteria.join(', ')}`);
+    if (iw.missing_files.length > 0) {
+      console.log(`  Missing files: ${iw.missing_files.join(', ')}`);
+    }
+    if (iw.failing_tests.length > 0) {
+      console.log(`  Failing tests: ${iw.failing_tests.join(', ')}`);
+    }
+    console.log("");
+  });
+
+  console.log("⚠️ Recommendation: Review incomplete todos before marking as complete");
+  return; // BLOCK completion - require manual review
+}
+
+// All verifications passed - safe to proceed
+console.log(`✅ Verification Complete: ${verification.verified_completions.length} todos verified`);
+console.log(`Evidence score: ${verification.overall_verification_score}/100\n`);
+
+// Show verification details
+verification.verified_completions.forEach(vc => {
+  const statusIcon = vc.completed ? '✅' : '❌';
+  console.log(`${statusIcon} **${vc.todo_id}**: ${vc.todo_title}`);
+  console.log(`   Agent: ${vc.assigned_agent} | Evidence: ${vc.evidence_score}/100`);
+  console.log(`   Acceptance Criteria: ${vc.acceptance_criteria_met ? 'ALL MET ✅' : 'INCOMPLETE ❌'}`);
+  console.log(`   Quality Gates: ${vc.quality_gates_passed ? 'ALL PASSED ✅' : 'FAILED ❌'}\n`);
+
+  // Show failing criteria if any
+  const failing_criteria = vc.acceptance_criteria_details.filter(c => !c.met);
+  if (failing_criteria.length > 0) {
+    console.log(`   Missing criteria:`);
+    failing_criteria.forEach(fc => console.log(`   - ${fc.criterion}: ${fc.evidence}`));
+    console.log("");
+  }
+});
+```
+
+---
+
+### 7. Update Persistent Todos
+
+<thinking>
+After verification passes, update todos/*.md files with work log and rename to completed status.
 </thinking>
 
 **Completion Updates:**

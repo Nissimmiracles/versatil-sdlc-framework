@@ -123,6 +123,16 @@ If feature description provided (e.g., "Add user authentication"):
 # Fall back to /plan command to generate plan
 ```
 
+**After workflow simulation, invoke Victor-Verifier + Sarah-PM for quality gate validation:**
+
+```typescript
+await Task({
+  subagent_type: "Victor-Verifier",
+  description: "Validate quality gates",
+  prompt: `Verify all quality gates passed. Check blocking checkpoints, dependencies verified, acceptance criteria met. Return validation with confidence_score and safe_to_proceed boolean.`
+});
+```
+
 **Simulation Steps:**
 
 1. **Plan Generation**

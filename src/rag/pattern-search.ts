@@ -1,10 +1,15 @@
 /**
  * Pattern Search Service - CODIFY Phase Integration
  *
- * Queries historical feature implementations from RAG storage (GraphRAG + Supabase Vector Store)
+ * Queries historical feature implementations from RAG storage using RAGRouter.
+ * Routes queries to Public RAG (framework patterns) and Private RAG (user patterns).
  * to provide historical context, effort estimates, and lessons learned for feature planning.
  *
  * This enables the CODIFY phase of the Compounding Engineering workflow.
+ *
+ * **v7.7.0 Update**: Now uses RAGRouter for public/private separation
+ * - Private patterns: YOUR project memory (highest priority)
+ * - Public patterns: Framework knowledge (fallback)
  *
  * @example
  * ```typescript
@@ -17,11 +22,13 @@
  *
  * console.log(`Found ${result.patterns.length} similar features`);
  * console.log(`Average effort: ${result.avg_effort} hours`);
+ * console.log(`Sources: ${result.sources}`);  // NEW: 'private', 'public', or 'both'
  * ```
  */
 
-import { graphRAGStore, GraphRAGQuery, GraphRAGResult } from '../lib/graphrag-store.js';
+import { GraphRAGQuery, GraphRAGResult } from '../lib/graphrag-store.js';
 import { EnhancedVectorMemoryStore, RAGQuery, RAGResult } from './enhanced-vector-memory-store.js';
+import { RAGRouter, getRAGRouter, RAGSearchResult } from './rag-router.js';
 
 /**
  * Historical pattern from past feature implementation
@@ -68,42 +75,45 @@ export interface PatternSearchResult {
   patterns: HistoricalPattern[];
   total_found: number;
   search_method: 'graphrag' | 'vector' | 'local' | 'none';
+  sources: 'private' | 'public' | 'both' | 'none';  // NEW: Pattern sources
+  private_count: number;  // NEW: Count of private patterns
+  public_count: number;  // NEW: Count of public patterns
   avg_effort: number | null;
   avg_confidence: number | null;
   consolidated_lessons: string[];
   recommended_approach: string | null;
+  privateRAGSuggestion?: string;  // NEW: Suggestion to configure Private RAG
 }
 
 /**
  * Pattern Search Service
  *
- * Searches historical patterns using GraphRAG (preferred) with Vector store fallback.
+ * Searches historical patterns using RAGRouter (public + private).
  * Provides effort estimates, consolidated lessons, and recommendations.
+ *
+ * v7.7.0: Now routes to Public RAG (framework) and Private RAG (user)
  */
 export class PatternSearchService {
-  private graphRAG: typeof graphRAGStore | null = null;
+  private ragRouter: RAGRouter;
   private vectorStore: EnhancedVectorMemoryStore | null = null;
   private initialized = false;
 
+  constructor() {
+    // Initialize RAG Router (handles public/private routing)
+    this.ragRouter = getRAGRouter();
+  }
+
   /**
-   * Lazy initialization - only load stores when first search is performed
+   * Lazy initialization - only load fallback stores when first search is performed
    */
   private async initialize(): Promise<void> {
     if (this.initialized) return;
 
     try {
-      // Try GraphRAG first (preferred - no API quota, works offline)
-      this.graphRAG = graphRAGStore;
-      await this.graphRAG.initialize();
-    } catch (error) {
-      console.warn('GraphRAG initialization failed, will use Vector store fallback');
-    }
-
-    try {
-      // Initialize Vector store as fallback
+      // Initialize Vector store as fallback (if RAG Router fails)
       this.vectorStore = new EnhancedVectorMemoryStore();
     } catch (error) {
-      console.warn('Vector store initialization failed, will use local fallback');
+      console.warn('Vector store initialization failed, will use RAG Router only');
     }
 
     this.initialized = true;
@@ -113,7 +123,7 @@ export class PatternSearchService {
    * Search for similar historical features
    *
    * @param query - Search query with description and filters
-   * @returns Patterns with aggregated insights
+   * @returns Patterns with aggregated insights (from public + private RAG)
    */
   async searchSimilarFeatures(query: PatternSearchQuery): Promise<PatternSearchResult> {
     await this.initialize();
@@ -121,38 +131,34 @@ export class PatternSearchService {
     const limit = query.limit ?? 5;
     const min_similarity = query.min_similarity ?? 0.75;
 
-    // Try GraphRAG first (preferred)
+    // Use RAG Router (public + private RAG)
     let patterns: HistoricalPattern[] = [];
+    let ragResults: RAGSearchResult[] = [];
     let searchMethod: 'graphrag' | 'vector' | 'local' | 'none' = 'none';
 
-    if (this.graphRAG) {
-      try {
-        patterns = await this.searchFromGraphRAG(query, limit, min_similarity);
-        if (patterns.length > 0) {
-          searchMethod = 'graphrag';
-        }
-      } catch (error) {
-        console.warn('GraphRAG search failed:', error);
-      }
-    }
+    try {
+      // Query through RAG Router
+      ragResults = await this.ragRouter.query({
+        query: query.description,
+        limit,
+        minRelevance: min_similarity,
+        agent: query.agent,
+        category: query.category
+      });
 
-    // Fallback to Vector store
-    if (patterns.length === 0 && this.vectorStore) {
-      try {
-        patterns = await this.searchFromVectorStore(query, limit, min_similarity);
-        if (patterns.length > 0) {
+      patterns = ragResults.map(result => this.convertRAGResult(result));
+      searchMethod = 'graphrag';  // RAG Router uses GraphRAG internally
+    } catch (error) {
+      console.warn('RAG Router search failed:', error);
+
+      // Fallback to Vector store
+      if (this.vectorStore) {
+        try {
+          patterns = await this.searchFromVectorStore(query, limit, min_similarity);
           searchMethod = 'vector';
+        } catch (vectorError) {
+          console.warn('Vector store search failed:', vectorError);
         }
-      } catch (error) {
-        console.warn('Vector store search failed:', error);
-      }
-    }
-
-    // Last resort: local in-memory search (empty for now, could add bootstrap data)
-    if (patterns.length === 0) {
-      patterns = await this.searchLocal(query, limit, min_similarity);
-      if (patterns.length > 0) {
-        searchMethod = 'local';
       }
     }
 
@@ -162,14 +168,28 @@ export class PatternSearchService {
     const consolidated_lessons = this.consolidateLessons(patterns);
     const recommended_approach = this.generateRecommendation(patterns);
 
+    // Calculate source statistics
+    const private_count = ragResults.filter(r => r.source === 'private').length;
+    const public_count = ragResults.filter(r => r.source === 'public').length;
+    const sources = this.determineSources(private_count, public_count);
+
+    // Check if Private RAG suggestion should be shown
+    const privateRAGSuggestion = this.ragRouter.shouldSuggestPrivateRAG(ragResults)
+      ? this.ragRouter.getPrivateRAGSuggestion()
+      : undefined;
+
     return {
       patterns,
       total_found: patterns.length,
       search_method: searchMethod,
+      sources,
+      private_count,
+      public_count,
       avg_effort,
       avg_confidence,
       consolidated_lessons,
-      recommended_approach
+      recommended_approach,
+      privateRAGSuggestion
     };
   }
 
@@ -181,7 +201,7 @@ export class PatternSearchService {
     limit: number,
     min_similarity: number
   ): Promise<HistoricalPattern[]> {
-    if (!this.graphRAG) return [];
+    if (!this.ragRouter) return [];
 
     const graphQuery: GraphRAGQuery = {
       query: query.description,
@@ -192,7 +212,7 @@ export class PatternSearchService {
       includePublic: true
     };
 
-    const results: GraphRAGResult[] = await this.graphRAG.query(graphQuery);
+    const results: GraphRAGResult[] = await this.ragRouter.query(graphQuery);
 
     return results.map(result => this.convertGraphRAGResult(result));
   }
@@ -354,6 +374,43 @@ export class PatternSearchService {
     return `Based on ${patterns.length} similar implementations (avg ${avgEffort}h), ` +
            `recommend following the approach from ${topPattern.feature_name} ` +
            `(${topPattern.similarity_score.toFixed(0)}% similar, ${topPattern.effort_hours}h effort)`;
+  }
+
+  /**
+   * Convert RAG Router result to HistoricalPattern
+   */
+  private convertRAGResult(result: RAGSearchResult): HistoricalPattern {
+    const pattern = result.pattern;
+
+    return {
+      feature_name: pattern.properties.pattern || 'Unknown',
+      implementation_path: result.source === 'private' ? '🔒 Private Pattern' : '🌐 Public Pattern',
+      effort_hours: pattern.properties.timeSaved || 0,
+      effort_range: { min: 0, max: pattern.properties.timeSaved || 0 },
+      confidence: Math.round(result.relevanceScore * 100),
+      success_score: Math.round(pattern.properties.effectiveness || 0.8) * 100,
+      lessons_learned: [],
+      code_examples: pattern.properties.code ? [{
+        file: result.source,
+        lines: '1-10',
+        description: pattern.properties.description || ''
+      }] : [],
+      risks: { high: [], medium: [], low: [] },
+      agent: pattern.properties.agent || 'unknown',
+      category: pattern.properties.category || 'general',
+      timestamp: new Date(pattern.properties.lastUsed).getTime(),
+      similarity_score: result.relevanceScore
+    };
+  }
+
+  /**
+   * Determine sources for result
+   */
+  private determineSources(privateCount: number, publicCount: number): 'private' | 'public' | 'both' | 'none' {
+    if (privateCount > 0 && publicCount > 0) return 'both';
+    if (privateCount > 0) return 'private';
+    if (publicCount > 0) return 'public';
+    return 'none';
   }
 }
 

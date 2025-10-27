@@ -23,7 +23,7 @@ This directory contains all available slash commands for the VERSATIL SDLC Frame
 
 ---
 
-## 📋 All Available Commands (25 Total)
+## 📋 All Available Commands (26 Total)
 
 ### Setup & Configuration (3 commands) 🆕
 - **`/onboard`** - Interactive onboarding wizard (NEW in v7.3.0)
@@ -47,7 +47,8 @@ This directory contains all available slash commands for the VERSATIL SDLC Frame
 - **`/dr-ai-ml`** - AI/ML Specialist (models, optimization)
 - **`/oliver-mcp`** - MCP Orchestrator (intelligent routing)
 
-### Utilities (9 commands)
+### Utilities (10 commands)
+- **`/architecture`** - Complete VERSATIL architecture (commands, SDK, agents, skills, hooks, MCP) 🆕
 - **`/help`** - Get help with framework features
 - **`/monitor`** - Framework health checks
 - **`/framework-debug`** - Debug framework issues
@@ -165,10 +166,11 @@ Both work, just different interfaces.
 
 ## 🎉 Summary
 
-- ✅ **25 slash commands** available (3 new in v7.3.0)
+- ✅ **26 slash commands** available (4 new in v7.3.0+)
 - ✅ **Chat-based GUI** wizards for onboarding, updates, config
+- ✅ **Architecture guide** explaining entire framework (`/architecture`)
 - ✅ **One-time reload** required for new commands
 - ✅ **Terminal commands** still work as fallback
 - ✅ **Custom commands** easy to create
 
-**Get Started**: Reload Cursor (`Cmd+Shift+P` → "Developer: Reload Window"), then try `/onboard`!
+**Get Started**: Reload Cursor (`Cmd+Shift+P` → "Developer: Reload Window"), then try `/onboard` or `/architecture`!

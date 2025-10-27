@@ -309,5 +309,22 @@ if (relativePath.match(/\/(requirements|specs|stories|features)\//)) {
   process.exit(0);
 }
 
+// Phase 7.7.0: Guardian Integration - Track file edits for agent failure detection
+// This runs asynchronously and doesn't block hook execution
+(async () => {
+  try {
+    const { trackFileEditForGuardian } = await import('../../src/agents/guardian/guardian-file-tracker.js');
+    await trackFileEditForGuardian({
+      filePath,
+      relativePath,
+      toolName,
+      workingDirectory,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    // Non-blocking - don't fail hook if Guardian tracking fails
+  }
+})();
+
 // Default: No specific agent activation
 process.exit(0);

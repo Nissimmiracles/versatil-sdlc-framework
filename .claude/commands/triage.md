@@ -83,10 +83,292 @@ Manual_Observations: (From developer notes)
   - Enhanced documentation
 ```
 
-### 2. Present Findings One by One
+### 2. Validate Findings Authenticity ⭐ AGENT-DRIVEN (Victor-Verifier)
 
 <thinking>
-Go through each finding systematically, presenting details and waiting for user decision.
+Before presenting findings to user, use Victor-Verifier to validate finding authenticity and prevent hallucinated security issues from becoming todos.
+</thinking>
+
+**⛔ BLOCKING STEP - YOU MUST INVOKE VICTOR-VERIFIER USING THE TASK TOOL:**
+
+**ACTION: Invoke Victor-Verifier Agent**
+Call the Task tool with:
+- `subagent_type: "Victor-Verifier"`
+- `description: "Validate finding authenticity and evidence"`
+- `prompt: "Verify findings authenticity using Chain-of-Verification (CoVe) before presenting to user. Input: ${findings_count} findings from '${triage_target}' source (code review/security scan/performance analysis/manual observations). Your anti-hallucination verification: (1) Extract factual claims from each finding ('SQL injection exists in src/api/users/search.ts:42', 'CVSS score is 9.1', 'Attack uses OR 1=1 pattern'), (2) Verify claims against actual source files (read src/api/users/search.ts and confirm vulnerable code exists at line 42, check if string interpolation is used, validate claim accuracy), (3) Cross-check severity ratings (is P0 justified? does code actually allow injection? is CVSS score calculation correct?), (4) Identify hallucinations (finding references non-existent files, fabricated vulnerability types, inflated severity ratings, made-up OWASP categories, phantom attack scenarios), (5) Validate evidence (code examples match actual files, line numbers are accurate, proposed solutions are technically sound), (6) Flag suspicious findings (generic findings with no file references, copy-pasted findings from different projects, findings that don't match project tech stack), (7) Check for false positives (parameterized queries incorrectly flagged as vulnerable, security headers already present but finding claims missing, rate limiting exists but finding says it's absent). Return: { verified_findings: [{finding_id, severity, verified: true|false, evidence_score: 0-100, authenticity_issues: []}], hallucinations_found: [{finding_id, claim: string, reality: string, severity: 'critical'|'high'|'medium'|'low'}], corrections_needed: [{finding_id, wrong_severity, correct_severity, proof: string}], false_positives: [{finding_id, reason: string}], overall_verification_score: number, safe_to_present: boolean }"`
+
+**Expected Victor-Verifier Output:**
+
+```typescript
+interface FindingVerificationResult {
+  verified_findings: Array<{
+    finding_id: string;              // e.g., "001", "002"
+    title: string;                    // e.g., "SQL Injection in User Search"
+    severity: 'p0' | 'p1' | 'p2' | 'p3';
+    verified: boolean;                // true = evidence confirmed, false = hallucination
+    evidence_score: number;           // 0-100 (confidence in evidence)
+    authenticity_issues: string[];    // Issues found during verification
+  }>;
+
+  hallucinations_found: Array<{
+    finding_id: string;
+    claim: string;                    // Claimed fact
+    reality: string;                  // Actual truth
+    severity: 'critical' | 'high' | 'medium' | 'low';
+  }>;
+
+  corrections_needed: Array<{
+    finding_id: string;
+    wrong_severity: string;           // Original severity rating
+    correct_severity: string;         // Corrected severity
+    proof: string;                    // Evidence for correction
+  }>;
+
+  false_positives: Array<{
+    finding_id: string;
+    reason: string;                   // Why this is a false positive
+  }>;
+
+  overall_verification_score: number; // 0-100 (0 = all hallucinations, 100 = all verified)
+  safe_to_present: boolean;           // true = proceed with triage, false = re-run scan
+}
+```
+
+**Chain-of-Verification (CoVe) Example:**
+
+Victor-Verifier applies CoVe method to each finding:
+
+```typescript
+// Finding #1: "SQL Injection in User Search"
+const finding = {
+  id: "001",
+  title: "SQL Injection Risk in User Search",
+  severity: "p0",
+  location: "src/api/users/search.ts:42",
+  claim: "Uses string interpolation in SQL query",
+  attack_scenario: "Attacker inputs: admin' OR '1'='1",
+  cvss_score: 9.1
+};
+
+// Step 1: Extract factual claims
+const claims = [
+  { claim: "File src/api/users/search.ts exists", verifiable: true },
+  { claim: "Vulnerable code at line 42", verifiable: true },
+  { claim: "Uses string interpolation", verifiable: true },
+  { claim: "CVSS score is 9.1", verifiable: true },
+  { claim: "Attack pattern OR 1=1 works", verifiable: false } // requires testing
+];
+
+// Step 2: Verify claims against actual code
+const file_content = readFile('src/api/users/search.ts');
+const line_42 = file_content.split('\n')[41]; // line 42 (0-indexed)
+
+// Claim 1: File exists
+if (file_content) {
+  claims[0].verified = true;
+  claims[0].evidence = "File successfully read";
+} else {
+  hallucinations_found.push({
+    finding_id: "001",
+    claim: "File src/api/users/search.ts exists",
+    reality: "File does not exist in codebase",
+    severity: "critical" // Finding references non-existent file
+  });
+  return { verified: false };
+}
+
+// Claim 2: Vulnerable code at line 42
+if (line_42.includes('${') || line_42.includes('`SELECT')) {
+  claims[1].verified = true;
+  claims[1].evidence = `Line 42: ${line_42}`;
+} else {
+  corrections_needed.push({
+    finding_id: "001",
+    wrong_line: 42,
+    correct_line: findActualVulnerableLine(file_content),
+    proof: "Line 42 uses parameterized query, but line 57 has string interpolation"
+  });
+}
+
+// Claim 3: Uses string interpolation
+const has_string_interpolation = line_42.includes('`SELECT') && line_42.includes('${');
+const has_parameterized = line_42.includes('?') || line_42.includes('$1');
+
+if (has_string_interpolation && !has_parameterized) {
+  claims[2].verified = true;
+  claims[2].evidence = "String interpolation detected: `SELECT * FROM users WHERE name='${req.query.name}'`";
+} else if (has_parameterized) {
+  false_positives.push({
+    finding_id: "001",
+    reason: "Code already uses parameterized queries - finding is outdated or incorrect"
+  });
+  return { verified: false };
+}
+
+// Claim 4: CVSS score accuracy
+const cvss_factors = {
+  attack_vector: 'network',        // AV:N
+  attack_complexity: 'low',         // AC:L
+  privileges_required: 'none',      // PR:N
+  user_interaction: 'none',         // UI:N
+  confidentiality_impact: 'high',   // C:H
+  integrity_impact: 'high',         // I:H
+  availability_impact: 'high'       // A:H
+};
+
+const calculated_cvss = calculateCVSS(cvss_factors); // Returns 9.8
+if (Math.abs(calculated_cvss - finding.cvss_score) > 1.0) {
+  corrections_needed.push({
+    finding_id: "001",
+    wrong_cvss: 9.1,
+    correct_cvss: 9.8,
+    proof: "CVSS v3.1 calculator shows 9.8 for SQL injection with no authentication required"
+  });
+}
+
+// Step 3: Cross-check severity rating
+if (has_string_interpolation && finding.severity === 'p0') {
+  verified_findings.push({
+    finding_id: "001",
+    title: "SQL Injection Risk in User Search",
+    severity: "p0",
+    verified: true,
+    evidence_score: 95, // High confidence
+    authenticity_issues: [] // No issues
+  });
+} else if (has_string_interpolation && finding.severity === 'p3') {
+  corrections_needed.push({
+    finding_id: "001",
+    wrong_severity: "p3",
+    correct_severity: "p0",
+    proof: "SQL injection is always P0 (critical) per OWASP, not P3 (low)"
+  });
+}
+```
+
+**Hallucination Detection Examples:**
+
+```typescript
+// Hallucination Type 1: Non-existent file
+{
+  finding_id: "005",
+  claim: "XSS vulnerability in src/frontend/AdminPanel.jsx",
+  reality: "File src/frontend/AdminPanel.jsx does not exist (project uses TypeScript, all files are .tsx)",
+  severity: "critical" // Finding is completely fabricated
+}
+
+// Hallucination Type 2: False vulnerability
+{
+  finding_id: "008",
+  claim: "Missing CORS headers - server allows all origins",
+  reality: "CORS headers properly configured at src/middleware/cors.ts:12 with whitelist",
+  severity: "high" // False positive - security control already exists
+}
+
+// Hallucination Type 3: Inflated severity
+{
+  finding_id: "012",
+  claim: "Missing semicolon in config.js (P0 - Critical)",
+  reality: "Missing semicolon is a code style issue, not a security vulnerability",
+  severity: "medium" // Severity drastically inflated (should be P3)
+}
+
+// Hallucination Type 4: Wrong tech stack
+{
+  finding_id: "015",
+  claim: "SQL injection in MongoDB query using string concatenation",
+  reality: "Project uses PostgreSQL, not MongoDB. Claim doesn't match tech stack.",
+  severity: "critical" // Finding copied from different project
+}
+
+// Hallucination Type 5: Phantom attack scenario
+{
+  finding_id: "018",
+  claim: "JWT token stored in localStorage allows XSS token theft",
+  reality: "JWT tokens stored in httpOnly cookies (secure), not localStorage",
+  severity: "high" // Attack scenario doesn't apply to current implementation
+}
+```
+
+**Verification Quality Gates:**
+
+```yaml
+HIGH_CONFIDENCE: (Proceed with triage)
+  - evidence_score >= 90
+  - authenticity_issues: 0-1 minor issues
+  - hallucinations_found: 0
+  - false_positives: 0-1
+  - overall_verification_score >= 85
+
+MEDIUM_CONFIDENCE: (Proceed with warnings)
+  - evidence_score: 70-89
+  - authenticity_issues: 2-3 issues
+  - hallucinations_found: 1-2 non-critical
+  - false_positives: 2-3
+  - overall_verification_score: 70-84
+  - ⚠️ Present findings but flag uncertain ones
+
+LOW_CONFIDENCE: (Re-run scan)
+  - evidence_score < 70
+  - authenticity_issues >= 4
+  - hallucinations_found >= 3 OR any critical
+  - false_positives >= 4
+  - overall_verification_score < 70
+  - ❌ Do NOT present findings - scan quality too poor
+```
+
+**Verification Results Processing:**
+
+After Victor-Verifier completes, process results:
+
+```typescript
+if (verification.safe_to_present === false) {
+  console.log("❌ VERIFICATION FAILED - Findings quality too poor to present");
+  console.log(`Overall verification score: ${verification.overall_verification_score}/100`);
+  console.log(`Hallucinations found: ${verification.hallucinations_found.length}`);
+  console.log(`False positives: ${verification.false_positives.length}`);
+
+  console.log("\n🔴 Critical Issues:");
+  verification.hallucinations_found
+    .filter(h => h.severity === 'critical')
+    .forEach(h => {
+      console.log(`- Finding ${h.finding_id}: ${h.claim}`);
+      console.log(`  Reality: ${h.reality}`);
+    });
+
+  console.log("\n⚠️ Recommendation: Re-run security scan with proper configuration");
+  return; // BLOCK TRIAGE - do not present unreliable findings
+}
+
+// Filter out hallucinated and false positive findings
+const safe_findings = findings.filter(f => {
+  const verified = verification.verified_findings.find(v => v.finding_id === f.id);
+  const is_hallucination = verification.hallucinations_found.some(h => h.finding_id === f.id);
+  const is_false_positive = verification.false_positives.some(fp => fp.finding_id === f.id);
+
+  return verified && verified.verified && !is_hallucination && !is_false_positive;
+});
+
+// Apply severity corrections
+safe_findings.forEach(f => {
+  const correction = verification.corrections_needed.find(c => c.finding_id === f.id);
+  if (correction) {
+    console.log(`✏️ Correcting Finding ${f.id} severity: ${correction.wrong_severity} → ${correction.correct_severity}`);
+    console.log(`  Reason: ${correction.proof}`);
+    f.severity = correction.correct_severity;
+  }
+});
+
+console.log(`✅ Verification Complete: ${safe_findings.length}/${findings.length} findings verified`);
+console.log(`Evidence score: ${verification.overall_verification_score}/100`);
+```
+
+---
+
+### 3. Present Findings One by One
+
+<thinking>
+After Victor-Verifier validation, present only verified findings systematically with user decision prompts.
 </thinking>
 
 **Presentation Format:**

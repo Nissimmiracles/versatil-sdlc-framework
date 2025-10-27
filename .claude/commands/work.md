@@ -139,29 +139,438 @@ TodoWrite Example for 001-pending-p1-implement-auth-api.md:
 - [ ] Start with first task as in_progress
 - [ ] Keep other tasks as pending
 
-### 3. Execute Implementation Loop
+### 3. Plan Execution Waves ⭐ AGENT-DRIVEN (Sarah-PM)
 
 <thinking>
-Systematically work through each subtask, updating both TodoWrite (in-session) and todos/*.md (persistent) as progress is made.
+Before executing implementation, use Sarah-PM to analyze dependencies and design optimal execution waves (parallel vs sequential).
+</thinking>
+
+**⛔ BLOCKING STEP - YOU MUST INVOKE SARAH-PM USING THE TASK TOOL:**
+
+**ACTION: Invoke Sarah-PM Agent**
+Call the Task tool with:
+- `subagent_type: "Sarah-PM"`
+- `description: "Design execution wave orchestration"`
+- `prompt: "Design execution waves for '${work_target}' from loaded todo analysis. Input: Todo file details (priority, dependencies, assigned agent, effort, acceptance criteria), dependency graph (what depends on what, what blocks what). Your strategic PM orchestration: (1) Analyze dependency chains (identify critical path, find independent tasks that can run parallel), (2) Design execution waves (group tasks into waves 1-N, wave 1 = no dependencies, wave 2 = depends only on wave 1, etc.), (3) Determine wave parallelism (which tasks within wave can run concurrently, which must run sequentially), (4) Calculate wave duration estimates (sum parallel tasks by max duration, sum sequential tasks by total duration), (5) Define coordination checkpoints (after each wave, what quality gates must pass before next wave), (6) Identify orchestration risks (agent overload, handoff complexity, dependency bottlenecks), (7) Create agent handoff contracts (what context each agent needs from previous agent). Return: { execution_waves: [{wave_number, wave_name, tasks: [{task, agent, parallel: boolean, depends_on: [], duration_estimate}], wave_duration_estimate, dependencies: []}], coordination_checkpoints: [{checkpoint_name, location, blocking: boolean, quality_gates: [], handoff_agents: [{from, to, context}]}], critical_path: [], total_duration_estimate, orchestration_risks: [], recommendations: [] }"`
+
+**Expected Sarah-PM Output:**
+
+```typescript
+interface ExecutionOrchestrationPlan {
+  execution_waves: Array<{
+    wave_number: number;               // 1, 2, 3, 4
+    wave_name: string;                 // e.g., "Foundation Setup"
+    tasks: Array<{
+      task_id: string;                 // e.g., "001-subtask-1"
+      task_title: string;              // e.g., "Implement /api/auth/login"
+      assigned_agent: string;          // e.g., "Marcus-Backend"
+      parallel: boolean;               // true = can run concurrently with other tasks in this wave
+      depends_on: string[];            // Task IDs this depends on
+      duration_estimate: string;       // e.g., "30 minutes", "2 hours"
+      priority: 'p0' | 'p1' | 'p2' | 'p3';
+    }>;
+    wave_duration_estimate: string;    // e.g., "2 hours" (max of parallel tasks)
+    dependencies: string[];            // Previous waves this depends on (e.g., ["wave_1", "wave_2"])
+    parallel_execution: boolean;       // true = all tasks in wave run concurrently
+  }>;
+
+  coordination_checkpoints: Array<{
+    checkpoint_name: string;           // e.g., "API Endpoints Complete"
+    location: string;                  // e.g., "After Wave 1", "Before Wave 3"
+    blocking: boolean;                 // true = MUST complete before next wave
+    quality_gates: string[];           // e.g., ["All tests passing", "Coverage >= 80%", "OWASP scan clean"]
+    handoff_agents: Array<{
+      from: string;                    // e.g., "Marcus-Backend"
+      to: string;                      // e.g., "James-Frontend"
+      context: string;                 // e.g., "API endpoint documentation, example requests"
+    }>;
+    validation_steps: string[];        // Manual or automated validation required
+  }>;
+
+  critical_path: Array<{
+    task_id: string;
+    task_title: string;
+    duration: string;
+  }>;  // Longest dependency chain determining minimum completion time
+
+  total_duration_estimate: string;     // e.g., "6 hours" (sum of wave durations)
+  buffer_recommendation: string;       // e.g., "+1 hour (15% buffer for unknowns)"
+
+  orchestration_risks: Array<{
+    risk: string;
+    likelihood: 'low' | 'medium' | 'high';
+    impact: 'low' | 'medium' | 'high';
+    affected_waves: number[];
+    mitigation: string;
+  }>;
+
+  recommendations: string[];           // Strategic recommendations for optimal execution
+}
+```
+
+**Execution Wave Design Examples:**
+
+```typescript
+// Example 1: Authentication Feature Implementation
+const work_target = "todos/001-pending-p1-implement-auth-api.md";
+
+// Sarah-PM's orchestration:
+const orchestration = {
+  execution_waves: [
+    {
+      wave_number: 1,
+      wave_name: "Foundation Setup (Database + Core API)",
+      tasks: [
+        {
+          task_id: "001-subtask-1",
+          task_title: "Create users table schema",
+          assigned_agent: "Dana-Database",
+          parallel: false,  // Must complete first - others depend on it
+          depends_on: [],
+          duration_estimate: "20 minutes",
+          priority: "p1"
+        }
+      ],
+      wave_duration_estimate: "20 minutes",
+      dependencies: [],
+      parallel_execution: false
+    },
+    {
+      wave_number: 2,
+      wave_name: "API Endpoints (Parallel Implementation)",
+      tasks: [
+        {
+          task_id: "001-subtask-2",
+          task_title: "Implement /api/auth/login endpoint",
+          assigned_agent: "Marcus-Backend",
+          parallel: true,  // Can run with subtask-3
+          depends_on: ["001-subtask-1"],  // Needs database schema
+          duration_estimate: "45 minutes",
+          priority: "p1"
+        },
+        {
+          task_id: "001-subtask-3",
+          task_title: "Implement /api/auth/refresh endpoint",
+          assigned_agent: "Marcus-Backend",
+          parallel: true,  // Can run with subtask-2
+          depends_on: ["001-subtask-1"],
+          duration_estimate: "30 minutes",
+          priority: "p1"
+        }
+      ],
+      wave_duration_estimate: "45 minutes",  // Max of parallel tasks
+      dependencies: ["wave_1"],
+      parallel_execution: true
+    },
+    {
+      wave_number: 3,
+      wave_name: "Security & Testing (Parallel Validation)",
+      tasks: [
+        {
+          task_id: "001-subtask-4",
+          task_title: "Add security features (rate limiting, OWASP)",
+          assigned_agent: "Marcus-Backend",
+          parallel: true,
+          depends_on: ["001-subtask-2", "001-subtask-3"],
+          duration_estimate: "30 minutes",
+          priority: "p1"
+        },
+        {
+          task_id: "001-subtask-5",
+          task_title: "Create test suite (80%+ coverage)",
+          assigned_agent: "Maria-QA",
+          parallel: true,
+          depends_on: ["001-subtask-2", "001-subtask-3"],
+          duration_estimate: "40 minutes",
+          priority: "p1"
+        }
+      ],
+      wave_duration_estimate: "40 minutes",
+      dependencies: ["wave_2"],
+      parallel_execution: true
+    },
+    {
+      wave_number: 4,
+      wave_name: "Documentation & Finalization",
+      tasks: [
+        {
+          task_id: "001-subtask-6",
+          task_title: "Update API documentation and CHANGELOG",
+          assigned_agent: "Sarah-PM",
+          parallel: false,
+          depends_on: ["001-subtask-4", "001-subtask-5"],
+          duration_estimate: "15 minutes",
+          priority: "p2"
+        }
+      ],
+      wave_duration_estimate: "15 minutes",
+      dependencies: ["wave_3"],
+      parallel_execution: false
+    }
+  ],
+
+  coordination_checkpoints: [
+    {
+      checkpoint_name: "Database Schema Ready",
+      location: "After Wave 1",
+      blocking: true,  // MUST complete before Wave 2
+      quality_gates: [
+        "Users table created successfully",
+        "RLS policies tested",
+        "Indexes verified (EXPLAIN ANALYZE)",
+        "Migration applied to dev environment"
+      ],
+      handoff_agents: [
+        {
+          from: "Dana-Database",
+          to: "Marcus-Backend",
+          context: "Database connection string, table schema documentation, example queries"
+        }
+      ],
+      validation_steps: [
+        "Run migration: npm run migrate:dev",
+        "Verify table exists: SELECT * FROM users LIMIT 1",
+        "Test RLS policy: attempt unauthorized access"
+      ]
+    },
+    {
+      checkpoint_name: "API Endpoints Functional",
+      location: "After Wave 2",
+      blocking: true,
+      quality_gates: [
+        "Both endpoints return 200 OK on valid input",
+        "JWT tokens generated correctly",
+        "Input validation prevents invalid requests",
+        "Error handling returns proper status codes"
+      ],
+      handoff_agents: [
+        {
+          from: "Marcus-Backend",
+          to: "Marcus-Backend + Maria-QA",
+          context: "API endpoint documentation, cURL examples, expected responses"
+        }
+      ],
+      validation_steps: [
+        "Test login: curl -X POST /api/auth/login -d '{\"email\":\"test@example.com\",\"password\":\"test123\"}'",
+        "Test refresh: curl -X POST /api/auth/refresh -H 'Authorization: Bearer <token>'"
+      ]
+    },
+    {
+      checkpoint_name: "Security & Quality Validated",
+      location: "After Wave 3",
+      blocking: true,
+      quality_gates: [
+        "Test coverage >= 80%",
+        "OWASP scan shows no critical vulnerabilities",
+        "Rate limiting blocks > 10 requests/minute",
+        "All security tests passing"
+      ],
+      handoff_agents: [
+        {
+          from: "Marcus-Backend + Maria-QA",
+          to: "Sarah-PM",
+          context: "Test coverage report, security scan results, performance metrics"
+        }
+      ],
+      validation_steps: [
+        "Run tests: npm run test:coverage",
+        "Security scan: npm run security:scan",
+        "Load test: npm run load:test"
+      ]
+    }
+  ],
+
+  critical_path: [
+    { task_id: "001-subtask-1", task_title: "Create users table schema", duration: "20 minutes" },
+    { task_id: "001-subtask-2", task_title: "Implement /api/auth/login endpoint", duration: "45 minutes" },
+    { task_id: "001-subtask-5", task_title: "Create test suite", duration: "40 minutes" },
+    { task_id: "001-subtask-6", task_title: "Update documentation", duration: "15 minutes" }
+  ],  // Total: 2 hours (minimum possible completion time)
+
+  total_duration_estimate: "2 hours",
+  buffer_recommendation: "+20 minutes (15% buffer for unknowns, context switching)",
+
+  orchestration_risks: [
+    {
+      risk: "Wave 2 parallel execution (2 endpoints) may conflict if both modify shared middleware",
+      likelihood: "low",
+      impact: "medium",
+      affected_waves: [2],
+      mitigation: "Ensure login and refresh endpoints use separate middleware, or coordinate Marcus-Backend work sequentially"
+    },
+    {
+      risk: "Maria-QA in Wave 3 may start testing before Marcus completes security features in same wave",
+      likelihood: "medium",
+      impact: "high",
+      affected_waves: [3],
+      mitigation: "Add sub-checkpoint: Marcus completes security → Maria can start testing"
+    }
+  ],
+
+  recommendations: [
+    "Add sub-checkpoint in Wave 3: Marcus finishes security features → Maria starts tests",
+    "Consider splitting Wave 2 if middleware conflicts emerge during implementation",
+    "Total time estimate: 2h 20min (2h waves + 20min buffer)",
+    "Critical path tasks must complete on time - no delays allowed"
+  ]
+};
+```
+
+**After Sarah-PM Orchestration, Process the Execution Plan:**
+
+```typescript
+// Display execution plan to user
+console.log("📋 Execution Plan Generated by Sarah-PM\n");
+
+console.log(`**Total Duration Estimate**: ${orchestration.total_duration_estimate} (${orchestration.buffer_recommendation})`);
+console.log(`**Number of Waves**: ${orchestration.execution_waves.length}`);
+console.log(`**Critical Path**: ${orchestration.critical_path.length} tasks\n`);
+
+// Show waves
+orchestration.execution_waves.forEach(wave => {
+  console.log(`\n## Wave ${wave.wave_number}: ${wave.wave_name}`);
+  console.log(`Duration: ${wave.wave_duration_estimate}`);
+  console.log(`Parallel Execution: ${wave.parallel_execution ? '✅ Yes' : '❌ No (sequential)'}`);
+  console.log(`Dependencies: ${wave.dependencies.length > 0 ? wave.dependencies.join(', ') : 'None'}\n`);
+
+  console.log("**Tasks:**");
+  wave.tasks.forEach(task => {
+    const parallelIcon = task.parallel ? '🔀' : '➡️';
+    console.log(`${parallelIcon} ${task.task_title}`);
+    console.log(`   Agent: ${task.assigned_agent} | Duration: ${task.duration_estimate} | Priority: ${task.priority.toUpperCase()}`);
+    if (task.depends_on.length > 0) {
+      console.log(`   Depends on: ${task.depends_on.join(', ')}`);
+    }
+  });
+});
+
+// Show checkpoints
+console.log("\n## Coordination Checkpoints\n");
+orchestration.coordination_checkpoints.forEach(cp => {
+  const blockingIcon = cp.blocking ? '⛔' : '⚠️';
+  console.log(`${blockingIcon} **${cp.checkpoint_name}** (${cp.location})`);
+  console.log(`   Quality Gates: ${cp.quality_gates.length} checks`);
+  cp.quality_gates.forEach(gate => console.log(`   - ${gate}`));
+  console.log("");
+});
+
+// Show risks
+if (orchestration.orchestration_risks.length > 0) {
+  console.log("\n## Orchestration Risks\n");
+  orchestration.orchestration_risks.forEach(risk => {
+    console.log(`⚠️ **${risk.risk}**`);
+    console.log(`   Likelihood: ${risk.likelihood} | Impact: ${risk.impact}`);
+    console.log(`   Mitigation: ${risk.mitigation}\n`);
+  });
+}
+
+// Show recommendations
+console.log("\n## Recommendations\n");
+orchestration.recommendations.forEach(rec => console.log(`💡 ${rec}`));
+```
+
+---
+
+### 4. Execute Implementation Loop
+
+<thinking>
+Systematically work through each wave and subtask, updating both TodoWrite (in-session) and todos/*.md (persistent) as progress is made.
 </thinking>
 
 **⛔ BLOCKING STEP - YOU MUST INVOKE ASSIGNED AGENTS USING THE TASK TOOL:**
 
-For each subtask, follow this workflow:
+For each subtask in the implementation plan, you MUST follow this mandatory workflow:
 
-1. **Read todo file** to identify `assigned_agent` (e.g., "Marcus-Backend", "James-Frontend")
-2. **Invoke agent via Task tool**:
-   - `subagent_type: [assigned_agent from file]`
-   - `description: "Implement [task title]"`
-   - `prompt: "Implement [task description from todo file]. Context: [historical patterns, acceptance criteria, files involved]. Return: { implementation_summary, files_modified, tests_added, lessons_learned }"`
+1. **Read todo file** to identify `assigned_agent` field (e.g., "Marcus-Backend", "James-Frontend", "Dana-Database")
+
+2. **Invoke agent via Task tool** - This is MANDATORY, not optional:
+
+**Call the Task tool with these exact parameters:**
+- `subagent_type: "[assigned_agent from todo file]"` (e.g., "Marcus-Backend", "James-Frontend")
+- `description: "Implement [task title from todo]"`
+- `prompt:` (detailed prompt below)
+
+**Prompt Template:**
+```
+Implement [task description from todo file].
+
+**Context from Todo File**:
+- Priority: [P0/P1/P2/P3]
+- Estimated Effort: [Small/Medium/Large]
+- Historical Patterns: [from RAG if available]
+- Acceptance Criteria: [from todo file]
+- Files Involved: [from todo file]
+- Dependencies: [what this task depends on]
+
+**Quality Gates**:
+- Test Coverage: 80%+ required
+- Security: OWASP compliant
+- Performance: < 200ms API response (backend), < 2.5s LCP (frontend)
+- Accessibility: WCAG 2.1 AA compliant (frontend)
+- Documentation: Code comments + API docs
+
+**Your Implementation Task**:
+[Copy detailed implementation steps from todo file]
+
+**Expected Output Format**:
+{
+  implementation_summary: "Brief description of what was implemented",
+  files_modified: ["path/to/file1.ts", "path/to/file2.tsx"],
+  files_created: ["path/to/new-file.ts"],
+  tests_added: ["path/to/test-file.test.ts"],
+  quality_validation: {
+    test_coverage: "XX%",
+    security_scan: "passed/failed",
+    performance: "XXXms",
+    accessibility: "passed/failed"
+  },
+  lessons_learned: ["Key insight 1", "Key insight 2"],
+  next_steps: ["What should happen after this task"]
+}
+```
+
 3. **STOP AND WAIT** for agent to complete work
-4. **Update both systems**:
-   - TodoWrite: Mark task as completed
-   - todos/*.md: Update status, add agent's implementation notes
+   - Do NOT proceed to next task
+   - Do NOT execute work yourself
+   - Do NOT skip agent invocation
+   - Wait for agent's structured output
 
-**Do NOT execute work directly - ALWAYS route to the assigned agent via Task tool.**
+4. **Validate agent output** before marking complete:
+   - ✅ Check implementation_summary is detailed (not vague)
+   - ✅ Verify files_modified/created list is complete
+   - ✅ Confirm quality_validation passed all gates
+   - ✅ Ensure tests_added meet 80%+ coverage requirement
+   - ✅ Review lessons_learned for future improvements
+
+5. **Update both tracking systems**:
+   - **TodoWrite**: Mark current task as completed (`status: "completed"`)
+   - **todos/*.md**: Add work log entry with:
+     ```markdown
+     ### [Date] - [Task Title] Completed
+     **By:** [Agent Name] (invoked via Task tool)
+     **Actions:** [implementation_summary from agent output]
+     **Files Changed:** [files_modified + files_created]
+     **Quality Metrics:** [quality_validation results]
+     **Learnings:** [lessons_learned from agent output]
+     **Next:** [next_steps from agent output]
+     ```
+
+**⚡ CRITICAL RULES (NEVER VIOLATE):**
+- **Do NOT execute work directly** - ALWAYS route to the assigned agent via Task tool
+- **Do NOT skip agent invocation** - Even for "simple" or "trivial" tasks
+- **Do NOT batch multiple tasks** to one agent call - Invoke Task tool once per subtask for granular tracking
+- **Do NOT proceed** if agent invocation fails - Stop, report error, wait for user intervention
+- **Do NOT make up agent output** - Wait for actual agent response with real data
 
 **⛔ CHECKPOINT: Each task MUST be completed by its assigned agent before proceeding to the next task.**
+
+**Why Mandatory Agent Invocation Matters:**
+1. **Domain Expertise**: Marcus knows backend security (OWASP), James knows accessibility (WCAG 2.1 AA)
+2. **Quality Gates**: Agents enforce 80%+ coverage, security scans, performance benchmarks
+3. **Sub-Agent Routing**: Marcus detects Node.js → routes to marcus-node-backend automatically
+4. **Learning Codification**: Agent outputs feed into RAG for compounding engineering (next feature 40% faster)
+5. **Consistent Format**: Structured output enables automation, reporting, and quality tracking
+6. **Tool Integration**: Agents use MCP tools (65 available) - direct execution can't access these
 
 **Implementation Workflow:**
 

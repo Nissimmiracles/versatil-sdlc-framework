@@ -35,6 +35,12 @@ export { DrAiMl } from './agents/opera/dr-ai-ml/dr-ai-ml.js';
 export { IntrospectiveMetaAgent as IntrospectiveAgent } from './agents/meta/introspective-meta-agent.js';
 export { AgentRegistry } from './agents/core/agent-registry.js';
 
+// Export framework agents (v7.7.0+)
+export { VictorVerifier, victorVerifier } from './agents/victor-verifier.js';
+export { OliverMCP, oliverMCP } from './agents/oliver-mcp.js';
+export { SarahPM, sarahPM } from './agents/sarah-pm.js';
+export { IrisGuardian, getGuardian, initializeGuardian } from './agents/guardian/iris-guardian.js';
+
 // Export orchestration
 export { ProactiveAgentOrchestrator } from './orchestration/proactive-agent-orchestrator.js';
 

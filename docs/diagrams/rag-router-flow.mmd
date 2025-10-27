@@ -1,0 +1,101 @@
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#fce4ec','primaryTextColor':'#000','primaryBorderColor':'#e91e63'}}}%%
+sequenceDiagram
+    actor User
+    participant Claude
+    participant RAGRouter as RAG Router<br/>(rag-router.ts)
+    participant PrivateRAG as 🔒 Private RAG<br/>(Your Patterns)
+    participant PublicRAG as 🌍 Public RAG<br/>(Framework Patterns)
+    participant CloudRun as Cloud Run Edge<br/>(Cache + Acceleration)
+    participant Firestore as Google Firestore<br/>(Pattern Storage)
+
+    %% Planning workflow
+    Note over User,Firestore: Example: User runs /plan "Add OAuth2 authentication"
+
+    User->>Claude: /plan "Add OAuth2 authentication"
+    Claude->>RAGRouter: searchSimilarFeatures({<br/>  description: "OAuth2 authentication",<br/>  min_similarity: 0.75,<br/>  limit: 10<br/>})
+
+    Note over RAGRouter: Priority: Private First → Public Fallback
+
+    %% Private RAG Query
+    rect rgb(255, 245, 238)
+        Note over RAGRouter,PrivateRAG: Step 1: Query Private RAG (if configured)
+        RAGRouter->>PrivateRAG: Query: "OAuth2 authentication"<br/>Similarity threshold: ≥75%
+        PrivateRAG->>PrivateRAG: Vector similarity search<br/>(Your historical patterns)
+
+        alt Private RAG Configured
+            PrivateRAG-->>RAGRouter: Found 3 patterns:<br/>• "Company SSO OAuth" (92% similar)<br/>• "Client OAuth integration" (88% similar)<br/>• "Internal LDAP + OAuth" (81% similar)
+            Note over RAGRouter: 🔒 Private patterns ranked FIRST
+        else Private RAG Not Configured
+            PrivateRAG-->>RAGRouter: Empty results (not configured)
+            Note over RAGRouter: Skip to Public RAG
+        end
+    end
+
+    %% Public RAG Query
+    rect rgb(232, 245, 233)
+        Note over RAGRouter,CloudRun: Step 2: Query Public RAG (always)
+
+        alt Cloud Run Available
+            RAGRouter->>CloudRun: Query: "OAuth2 authentication"<br/>Cache key: hash(query + threshold)
+            CloudRun->>CloudRun: Check 15min cache
+
+            alt Cache Hit (87% hit rate)
+                CloudRun-->>RAGRouter: ✅ Cache Hit (12ms)<br/>7 framework patterns
+                Note over CloudRun: Edge cache return<br/>No Firestore query needed
+            else Cache Miss
+                CloudRun->>Firestore: Vector search query
+                Firestore-->>CloudRun: 7 patterns (120ms)
+                CloudRun->>CloudRun: Store in cache (15min TTL)
+                CloudRun-->>RAGRouter: 7 framework patterns (132ms total)
+            end
+        else Cloud Run Not Available
+            RAGRouter->>PublicRAG: Direct query to Firestore
+            PublicRAG->>Firestore: Vector search
+            Firestore-->>PublicRAG: 7 patterns (180ms)
+            PublicRAG-->>RAGRouter: 7 framework patterns
+        end
+
+        Note over RAGRouter: 🌍 Public patterns ranked SECOND
+    end
+
+    %% Pattern Ranking & Deduplication
+    rect rgb(243, 229, 245)
+        Note over RAGRouter: Step 3: Rank & Deduplicate
+
+        RAGRouter->>RAGRouter: Combine results:<br/>• 3 Private patterns (🔒)<br/>• 7 Public patterns (🌍)
+
+        RAGRouter->>RAGRouter: Priority Ranking:<br/>1. Private patterns (always first)<br/>2. Public patterns (by similarity)<br/>3. Deduplicate (≥80% overlap)
+
+        RAGRouter->>RAGRouter: Top 10 patterns:<br/>1. 🔒 "Company SSO OAuth" (92%)<br/>2. 🔒 "Client OAuth integration" (88%)<br/>3. 🌍 "JWT + OAuth2 best practices" (86%)<br/>4. 🔒 "Internal LDAP + OAuth" (81%)<br/>5. 🌍 "OAuth2 flow implementation" (84%)<br/>6. 🌍 "Google OAuth setup guide" (82%)<br/>...(4 more patterns)
+    end
+
+    %% Result Return
+    RAGRouter-->>Claude: PatternSearchResult {<br/>  patterns: 10 total,<br/>  private_count: 3,<br/>  public_count: 7,<br/>  search_method: "graphrag",<br/>  query_time_ms: 68,<br/>  effort_estimate: {<br/>    average_hours: 22,<br/>    confidence_interval: [20, 24],<br/>    confidence_level: 0.96<br/>  }<br/>}
+
+    Claude->>Claude: Generate plan using:<br/>• Private patterns (YOUR experience)<br/>• Public patterns (framework knowledge)<br/>• Combined effort: 22h ± 2h (96% confidence)
+
+    Claude-->>User: 📋 Implementation Plan<br/><br/>## Historical Context<br/>🔒 Private: 3 patterns (your learnings)<br/>🌍 Public: 7 patterns (framework)<br/><br/>Combined estimate: 22h ± 2h<br/>Confidence: 96% (very high)<br/><br/>[Detailed plan follows...]
+
+    %% Storage Selection (Future /learn)
+    Note over User,Firestore: Later: After completing OAuth2, user runs /learn
+
+    User->>Claude: /learn "Completed OAuth2 in 21h..."
+    Claude->>User: Where to store learnings?<br/>1. 🔒 Private RAG (recommended)<br/>2. 🌍 Public RAG<br/>3. Both
+    User->>Claude: 1 (Private)
+
+    Claude->>PrivateRAG: Store pattern {<br/>  title: "OAuth2 with Google",<br/>  effort_hours: 21,<br/>  success_rate: 1.0,<br/>  code_examples: [...],<br/>  lessons_learned: [...]<br/>}
+
+    PrivateRAG-->>Claude: ✅ Stored in Private RAG<br/>Pattern count: 4 → 5
+    Claude-->>User: ✅ Pattern stored in Private RAG<br/><br/>Next time you plan OAuth2,<br/>this pattern will be retrieved first!
+
+    Note over RAGRouter: Compounding Effect: Each feature improves estimates
+
+    %% Performance Metrics Box
+    rect rgb(255, 249, 196)
+        Note over CloudRun,Firestore: <b>Performance Metrics</b><br/><br/>• Cloud Run (cached): 12ms<br/>• Cloud Run (uncached): 132ms<br/>• Direct Firestore: 180ms<br/>• GraphRAG (offline): 45ms<br/><br/>Cache hit rate: 87%<br/>Cache TTL: 15 minutes<br/>Edge locations: Global
+    end
+
+    %% Privacy Box
+    rect rgb(255, 235, 238)
+        Note over PrivateRAG: <b>Privacy Guarantees</b><br/><br/>✅ Zero private data in Public RAG<br/>✅ Private patterns ranked first<br/>✅ 100% isolation (verified daily)<br/>✅ User-controlled storage<br/>(Firestore/Supabase/Local)
+    end
