@@ -75,7 +75,8 @@ tests/visual/screenshots/
 chrome-mcp-cache/
 
 # Build Outputs
-dist/
+# NOTE: dist/ is COMMITTED to repo (users install via git URL, need compiled code)
+# dist/ should be rebuilt before each release via `npm run build`
 build/
 out/
 

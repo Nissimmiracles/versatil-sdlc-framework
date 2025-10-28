@@ -1,0 +1,31 @@
+import { OperaOrchestrator } from './opera-orchestrator.js';
+import { VERSATILLogger } from '../utils/logger.js';
+export declare class EnhancedOperaOrchestrator extends OperaOrchestrator {
+    private logger;
+    private activeGoals;
+    private executionPlans;
+    private decisionHistory;
+    private learningInsights;
+    private performanceMetrics;
+    constructor(logger?: VERSATILLogger);
+    initialize(): Promise<void>;
+    analyzeProject(depth: string): Promise<any>;
+    getState(): Promise<any>;
+    getMetrics(): Promise<any>;
+    updateEnvironmentContext(context: any): Promise<void>;
+    getActiveGoals(): Promise<any[]>;
+    getExecutionPlans(): Promise<any[]>;
+    executePlan(planId: string, options?: any): Promise<any>;
+    getGoalStatus(goalId: string): Promise<any>;
+    getAllGoalsStatus(): Promise<any[]>;
+    getDecisionHistory(): Promise<any[]>;
+    getLearningInsights(): Promise<any>;
+    overrideGoal(options: any): Promise<void>;
+    getCurrentContext(): Promise<any>;
+    getPerformanceMetrics(): Promise<any>;
+    reloadWithVersion(version: string): Promise<void>;
+    registerMCP(mcpDef: any): Promise<void>;
+    addLearnedPattern(pattern: any): Promise<void>;
+    removePattern(patternId: string): Promise<void>;
+    updateMCP(mcp: any): Promise<void>;
+}

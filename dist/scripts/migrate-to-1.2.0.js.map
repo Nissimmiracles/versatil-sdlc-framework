@@ -1,0 +1,1 @@
+{"version":3,"file":"migrate-to-1.2.0.js","sourceRoot":"","sources":["../../src/scripts/migrate-to-1.2.0.ts"],"names":[],"mappings":"AACA,MAAM,CAAC,KAAK,UAAU,OAAO;IAC3B,OAAO,CAAC,GAAG,CAAC,uBAAuB,CAAC,CAAC;AACvC,CAAC;AACD,MAAM,OAAO,iBAAiB;IAC5B,KAAK,CAAC,GAAG,KAAK,MAAM,OAAO,EAAE,CAAC,CAAC,CAAC;CACjC"}
