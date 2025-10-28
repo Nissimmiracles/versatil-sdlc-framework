@@ -5,6 +5,36 @@ All notable changes to the VERSATIL SDLC Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.10.1] - 2025-10-28
+
+### Fixed - Critical Update Detection Bug
+
+**CRITICAL FIX**: `/update` command was unable to detect v7.10.0 release
+
+#### Problem
+- `GitHubReleaseChecker` defaulted to non-existent repo owner `'MiraclesGIT'`
+- Actual repository owner is `'Nissimmiracles'`
+- `/update` command failed to find v7.10.0 on GitHub
+- Users stuck on v7.9.0 unable to upgrade
+
+#### Solution
+- Corrected default `repoOwner` parameter to `'Nissimmiracles'`
+- Updated source: `src/update/github-release-checker.ts:50`
+- Updated compiled: `dist/update/github-release-checker.js:13` (manual update, gitignored)
+
+#### Impact
+- ✅ `/update` now correctly detects latest releases
+- ✅ Users can upgrade from v7.9.0 → v7.10.1
+- ✅ Guardian TODO generation accessible to all users
+- ✅ Release URL: https://github.com/Nissimmiracles/versatil-sdlc-framework/releases/tag/v7.10.1
+
+#### Files Changed
+- `src/update/github-release-checker.ts` (1 line)
+- `package.json` (version bump to 7.10.1)
+- `CHANGELOG.md` (this entry)
+
+---
+
 ## [7.10.0] - 2025-10-28
 
 ### Added - Guardian Automatic TODO Generation
