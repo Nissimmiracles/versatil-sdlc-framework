@@ -1,1007 +1,902 @@
 # VERSATIL Framework Troubleshooting Guide
 
-**Version**: 7.7.0+
-**Last Updated**: 2025-10-27
+**Version**: 7.9.0
+**Last Updated**: 2025-10-28
 
-Comprehensive troubleshooting guide for VERSATIL OPERA Framework covering common issues, error messages, and solutions.
+## Overview
+
+This guide provides detailed troubleshooting steps for common VERSATIL framework issues. Use this when:
+- Health checks report issues
+- Framework features not working as expected
+- Installation or configuration problems
+- Performance degradation
 
 ---
 
 ## Table of Contents
 
 1. [Installation Issues](#installation-issues)
-2. [Build & Compilation](#build--compilation)
-3. [Agent Activation](#agent-activation)
-4. [RAG Storage](#rag-storage)
-5. [Context Enforcement](#context-enforcement)
-6. [MCP Integration](#mcp-integration)
-7. [Hooks](#hooks)
-8. [Performance](#performance)
-9. [Quality Gates](#quality-gates)
-10. [Common Error Messages](#common-error-messages)
+2. [Version & Update Issues](#version--update-issues)
+3. [Agent Issues](#agent-issues)
+4. [RAG Connectivity Issues](#rag-connectivity-issues)
+5. [MCP Server Issues](#mcp-server-issues)
+6. [Dependency Issues](#dependency-issues)
+7. [Context & Configuration Issues](#context--configuration-issues)
+8. [Performance Issues](#performance-issues)
+9. [Build & Compilation Issues](#build--compilation-issues)
+10. [Emergency Recovery](#emergency-recovery)
 
 ---
 
 ## Installation Issues
 
-### npm install fails with peer dependency errors
+### Issue: Framework Not Installed
 
-**Symptom**:
-```
-npm ERR! peer dependency missing: @anthropic-ai/sdk@^0.30.0
+**Symptoms**:
+```bash
+npx versatil doctor
+# Error: command not found
 ```
 
 **Solution**:
 ```bash
-# Use --legacy-peer-deps flag
-npm install --legacy-peer-deps
-
-# Or update npm to latest
-npm install -g npm@latest
-npm install
-```
-
----
-
-### TypeScript compilation errors after install
-
-**Symptom**:
-```
-node_modules/@types/node/index.d.ts(37,13): error TS2403: Subsequent variable declarations must have the same type.
-```
-
-**Solution**:
-```bash
-# Clear TypeScript cache
-rm -rf node_modules
-rm package-lock.json
-npm cache clean --force
-npm install
-
-# Or update TypeScript
-npm install typescript@latest --save-dev
-```
-
----
-
-### "Command not found: versatil" after installation
-
-**Symptom**:
-```bash
-$ versatil
--bash: versatil: command not found
-```
-
-**Solution**:
-VERSATIL is a chat-based framework, not a CLI tool. Use slash commands in Claude Desktop:
-```bash
-/plan "Add feature"
-/work todos/001-pending-p1-feature.md
-```
-
-**Alternative**: If you want CLI access, add npm bin to PATH:
-```bash
-export PATH="$PATH:./node_modules/.bin"
-```
-
----
-
-## Build & Compilation
-
-### Build hangs indefinitely after TypeScript compilation
-
-**Symptom**:
-```bash
-$ npm run build
-> tsc
-[build continues indefinitely without completing]
-```
-
-**Root Cause**: `afterBuild.sh` hook runs full test suite (slow)
-
-**Solution** (FIXED in v7.7.0):
-Hook now has QUICK_MODE flag that skips tests during build. Update hook:
-```bash
-npm run build  # Should complete in <10 seconds now
-```
-
-**Manual verification**:
-```bash
-# Run tests separately if needed
-npm test
-npm run test:coverage
-```
-
----
-
-### "Cannot find module" errors after build
-
-**Symptom**:
-```
-Error: Cannot find module './dist/index.js'
-```
-
-**Solution**:
-```bash
-# Verify build artifacts exist
-ls dist/
-
-# If missing, check tsconfig.json
-cat tsconfig.json | grep outDir  # Should be "dist"
-
-# Rebuild
-rm -rf dist/
-npm run build
-```
-
----
-
-### Build succeeds but dist/ is empty
-
-**Symptom**:
-```bash
-$ npm run build
-# No errors, but dist/ is empty
-```
-
-**Solution**:
-```bash
-# Check tsconfig.json includes
-cat tsconfig.json
-
-# Should have:
-{
-  "include": ["src/**/*", ".claude/**/*"],
-  "exclude": ["node_modules", "dist"]
-}
-
-# If wrong, fix and rebuild
-npm run build
-```
-
----
-
-## Agent Activation
-
-### Agent not auto-activating on file edit
-
-**Symptom**: Edit `*.test.ts` file but Maria-QA doesn't activate
-
-**Diagnosis**:
-```bash
-# Check hook is installed
-cat .claude/settings.json | grep UserPromptSubmit
-
-# Check hook compiled
-ls .claude/hooks/dist/before-prompt.cjs
-```
-
-**Solution 1**: Recompile hooks
-```bash
-npm run build
-# Hooks should compile to .claude/hooks/dist/
-```
-
-**Solution 2**: Verify hook triggers
-```bash
-# Check hook logs
-tail -f ~/.versatil/logs/hooks/before-prompt.log
-```
-
-**Solution 3**: Manual activation
-```bash
-# Use slash command directly
-/maria-qa "Validate test coverage for src/auth.test.ts"
-```
-
----
-
-### "Agent not available in this context" error
-
-**Symptom**:
-```
-Error: Sarah-PM agent is not available in user project context
-```
-
-**Root Cause**: Sarah-PM is framework-only agent, blocked in user projects
-
-**Solution**:
-This is **intentional** - Sarah-PM is for framework development only. Use appropriate agents:
-- **User projects**: Maria-QA, Marcus-Backend, James-Frontend, Dana-Database, Alex-BA, Dr.AI-ML
-- **Framework dev**: All agents including Sarah-PM
-
-**Verify context**:
-```bash
-/setup --verify
-# Shows current context and allowed agents
-```
-
----
-
-### Agent invocation returns no output
-
-**Symptom**: Agent task completes but returns empty result
-
-**Diagnosis**:
-```typescript
-await Task({
-  subagent_type: "Maria-QA",
-  description: "Validate coverage",
-  prompt: "Check test coverage"  // Too vague!
-});
-// Returns: {}
-```
-
-**Solution**: Provide detailed structured prompts
-```typescript
-await Task({
-  subagent_type: "Maria-QA",
-  description: "Validate test coverage",
-  prompt: `
-    Analyze test coverage for src/auth.ts.
-
-    Requirements:
-    - Check coverage is ≥80% (lines, statements, branches, functions)
-    - Verify AAA pattern compliance
-    - Identify untested edge cases
-
-    Return structured result with:
-    - coverage_percentage: number
-    - issues: string[]
-    - recommendations: string[]
-    - safe_to_proceed: boolean
-  `
-});
-```
-
----
-
-## RAG Storage
-
-### "RAG_CONNECTION_ERROR: Unable to connect to Public RAG"
-
-**Symptom**:
-```
-Error: RAG_CONNECTION_ERROR: Unable to connect to Public RAG
-Code: unavailable
-```
-
-**Root Cause**: Firestore connection failure (network, credentials, quota)
-
-**Solution 1**: Check network
-```bash
-# Test Firestore connectivity
-curl -I https://firestore.googleapis.com
-```
-
-**Solution 2**: Check credentials
-```bash
-# Verify Google Cloud credentials
-cat ~/.versatil/.env | grep GOOGLE_APPLICATION_CREDENTIALS
-
-# If missing, authenticate
-gcloud auth application-default login
-```
-
-**Solution 3**: Check quota
-```bash
-# Check Firestore quota usage
-gcloud firestore operations list --project=centering-vine-454613-b3
-```
-
-**Fallback**: Use local RAG (no network required)
-```bash
-# Configure local RAG
-npm run setup:private-rag
-# Choose "Local JSON" option
-```
-
----
-
-### Private RAG not storing patterns
-
-**Symptom**: Run `/learn` but patterns don't appear in Private RAG
-
-**Diagnosis**:
-```bash
-/rag status
-# Shows Private RAG: "Not configured"
-```
-
-**Solution**:
-```bash
-# Configure Private RAG
-npm run setup:private-rag
-
-# Follow wizard steps:
-# 1. Choose storage backend (Firestore/Supabase/Local)
-# 2. Enter credentials
-# 3. Test connection
-# 4. Verify storage
-
-# Then retry
-/learn "Completed auth in 24h"
-/rag status  # Should show pattern count increased
-```
-
----
-
-### "Pattern classification accuracy below 70%"
-
-**Symptom**: `/rag verify` shows classification accuracy <70%
-
-**Root Cause**: Ambiguous pattern descriptions, missing keywords
-
-**Solution**:
-```bash
-# Re-classify patterns manually
-/rag migrate --dry-run  # Preview classification
-
-# Add explicit keywords to pattern descriptions
-# GOOD: "Company-specific OAuth2 integration with internal LDAP"
-# BAD:  "Auth workflow"
-
-# Then migrate
-/rag migrate --force
-```
-
----
-
-### RAG query returns no results
-
-**Symptom**:
-```bash
-/rag query "authentication"
-# Returns: "No patterns found"
-```
-
-**Diagnosis**:
-```bash
-# Check RAG has patterns
-/rag status
-# Shows: "Public RAG: 1,247 patterns"
-
-# Check similarity threshold
-/rag query "authentication" --min-similarity=0.5  # Lower threshold
-```
-
-**Solution**:
-- **Too specific query**: Broaden search term
-  - Bad: "OAuth2 with Google and GitHub using Passport.js"
-  - Good: "OAuth2 authentication"
-
-- **Typos**: Check spelling
-  - Bad: "authentcation"
-  - Good: "authentication"
-
-- **Empty RAG**: Add patterns via `/learn`
-
----
-
-## Context Enforcement
-
-### "Context violation: Framework internals blocked"
-
-**Symptom**:
-```
-Error: Context violation: Access to src/agents/core/agent-registry.ts blocked in user project context
-```
-
-**Root Cause**: Attempting to access framework source from user project
-
-**Solution**: This is **intentional** - framework internals are blocked in user projects for privacy isolation.
-
-**Workaround**: If you need framework functionality, use public APIs:
-- ❌ Read `src/agents/core/agent-registry.ts` (blocked)
-- ✅ Use `/help agents` (allowed)
-- ✅ Use agent slash commands (allowed)
-
----
-
-### Context detection wrong (framework detected as user project)
-
-**Symptom**: `/setup` shows "User Project Mode" but this is the framework repo
-
-**Diagnosis**:
-```bash
-# Check git remote
-git remote -v
-# Should show: versatil-sdlc-framework.git
-
-# Check package.json name
-cat package.json | grep '"name"'
-# Should show: "@versatil/sdlc-framework"
-```
-
-**Solution**:
-```bash
-# Reset context detection
-/setup --reset
-
-# Manual verification
-/setup --verify
-# Should show: "Framework Development Mode"
-```
-
----
-
-### Hook not injecting context boundaries
-
-**Symptom**: No context enforcement shown in prompt
-
-**Diagnosis**:
-```bash
-# Check hook output
-tail -f ~/.versatil/logs/hooks/before-prompt.log
-
-# Should show:
-# [2025-10-27] Context detected: user-project
-# [2025-10-27] Injecting boundaries...
-```
-
-**Solution 1**: Recompile hooks
-```bash
-npm run build
-# Check hook exists
-ls .claude/hooks/dist/before-prompt.cjs
-```
-
-**Solution 2**: Verify hook configured
-```bash
-cat .claude/settings.json
-
-# Should have:
-{
-  "hooks": {
-    "UserPromptSubmit": {
-      "command": ".claude/hooks/dist/before-prompt.cjs"
-    }
-  }
-}
-```
-
-**Solution 3**: Check hook permissions
-```bash
-chmod +x .claude/hooks/dist/before-prompt.cjs
-```
-
----
-
-## MCP Integration
-
-### Supabase MCP not connecting
-
-**Symptom**:
-```
-Error: Supabase MCP server connection failed
-```
-
-**Diagnosis**:
-```bash
-# Check MCP configuration
-cat ~/.claude/claude_desktop_config.json | grep supabase
-
-# Should show:
-{
-  "mcpServers": {
-    "supabase": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-supabase"],
-      "env": {
-        "SUPABASE_URL": "https://xxx.supabase.co",
-        "SUPABASE_SERVICE_ROLE_KEY": "eyJxxx..."
-      }
-    }
-  }
-}
-```
-
-**Solution 1**: Verify credentials
-```bash
-# Test Supabase connection
-curl -H "apikey: YOUR_SERVICE_ROLE_KEY" \
-     https://xxx.supabase.co/rest/v1/
-
-# Should return 200 OK
-```
-
-**Solution 2**: Restart Claude Desktop
-```bash
-# Kill Claude Desktop
-pkill -9 "Claude"
-
-# Restart and retry
-```
-
-**Solution 3**: Check MCP server logs
-```bash
-# MCP logs location (macOS)
-tail -f ~/Library/Logs/Claude/mcp*.log
-```
-
----
-
-### GitHub MCP returning 401 Unauthorized
-
-**Symptom**:
-```
-Error: GitHub API returned 401 Unauthorized
-```
-
-**Root Cause**: Invalid or expired GitHub token
-
-**Solution**:
-```bash
-# Generate new GitHub token
-# Go to: https://github.com/settings/tokens
-# Scopes needed: repo, read:org
-
-# Update MCP config
-vi ~/.claude/claude_desktop_config.json
-
-# Add token:
-{
-  "mcpServers": {
-    "github": {
-      "env": {
-        "GITHUB_TOKEN": "ghp_NEW_TOKEN_HERE"
-      }
-    }
-  }
-}
-
-# Restart Claude Desktop
-```
-
----
-
-### "MCP server not responding" timeout
-
-**Symptom**:
-```
-Error: MCP server timed out after 30s
-```
-
-**Solution 1**: Check server health
-```bash
-# List running MCP servers
-ps aux | grep mcp
-
-# Kill stuck servers
-pkill -f "server-supabase"
-pkill -f "server-github"
-
-# Restart Claude Desktop
-```
-
-**Solution 2**: Increase timeout (if slow network)
-```bash
-# Edit MCP config
-vi ~/.claude/claude_desktop_config.json
-
-# Add timeout:
-{
-  "mcpServers": {
-    "supabase": {
-      "timeout": 60000  // 60 seconds
-    }
-  }
-}
-```
-
----
-
-## Hooks
-
-### Hook not firing on expected trigger
-
-**Symptom**: Edit file but `post-file-edit.ts` doesn't fire
-
-**Diagnosis**:
-```bash
-# Check hook is registered
-cat .claude/settings.json | grep AfterToolCall
-
-# Check hook compiled
-ls .claude/hooks/dist/post-file-edit.cjs
-```
-
-**Solution**:
-```bash
-# Recompile hooks
-npm run build
-
-# Check hook logs
-tail -f ~/.versatil/logs/hooks/post-file-edit.log
-
-# Should show:
-# [2025-10-27] File edited: src/auth.test.ts
-# [2025-10-27] Suggesting agent: Maria-QA
-```
-
----
-
-### "Hook failed with exit code 1"
-
-**Symptom**:
-```
-Error: Hook before-prompt.ts failed with exit code 1
-```
-
-**Diagnosis**:
-```bash
-# Check hook logs for error
-tail -50 ~/.versatil/logs/hooks/before-prompt.log
-
-# Common errors:
-# - Module not found (missing dependency)
-# - JSON parse error (malformed config)
-# - Permission denied (wrong chmod)
-```
-
-**Solution 1**: Install dependencies
-```bash
-npm install
-npm run build
-```
-
-**Solution 2**: Fix permissions
-```bash
-chmod +x .claude/hooks/dist/*.cjs
-```
-
-**Solution 3**: Check Node.js version
-```bash
-node --version
-# Should be ≥18.0.0
-
-# Update if needed
-nvm install 18
-nvm use 18
-```
-
----
-
-### Hook output not appearing in context
-
-**Symptom**: Hook executes but output not visible to Claude
-
-**Root Cause**: Hook outputting JSON instead of plain text
-
-**Solution** (FIXED in v7.1.1):
-Hooks must output plain text to stdout, not JSON:
-
-```typescript
-// ❌ WRONG (JSON wrapper)
-console.log(JSON.stringify({
-  role: "system",
-  content: "Context enforcement text"
-}));
-
-// ✅ CORRECT (plain text)
-console.log("Context enforcement text");
-```
-
-**Verify fix**:
-```bash
-# Run hook manually
-.claude/hooks/dist/before-prompt.cjs <<< '{"working_dir": "."}'
-
-# Should output plain text, not JSON
-```
-
----
-
-## Performance
-
-### RAG queries taking >5 seconds
-
-**Symptom**: `/plan` command hangs for 5-10 seconds
-
-**Diagnosis**:
-```bash
-# Check RAG backend
-/rag status
-
-# If using direct Firestore (no Cloud Run):
-# Query time: 2,000-5,000ms (slow)
-
-# If using Cloud Run:
-# Query time: 50-100ms (fast)
-```
-
-**Solution**: Enable Cloud Run edge acceleration
-```bash
-# Check Cloud Run status
-gcloud run services list --project=centering-vine-454613-b3
-
-# Should show:
-# NAME                    URL
-# versatil-rag-cloudrun   https://versatil-rag-xxx.run.app
-
-# If not deployed, deploy:
-./scripts/deploy-cloudrun.sh
-```
-
-**Alternative**: Use GraphRAG (offline, no network)
-```bash
-# GraphRAG is automatic fallback if Firestore slow
-# Check logs:
-tail -f ~/.versatil/logs/rag.log
-
-# Should show:
-# [2025-10-27] Search method: graphrag (68ms)
-```
-
----
-
-### Agent invocations slow (>60s per agent)
-
-**Symptom**: `/work` takes 10+ minutes for simple tasks
-
-**Root Cause**: Over-detailed agent prompts, redundant invocations
-
-**Solution 1**: Optimize prompts
-```typescript
-// ❌ TOO DETAILED (sends entire codebase)
-await Task({
-  subagent_type: "Maria-QA",
-  prompt: `
-    Here's the entire 10,000-line codebase...
-    [massive context dump]
-    Please validate coverage.
-  `
-});
-
-// ✅ CONCISE (targeted context)
-await Task({
-  subagent_type: "Maria-QA",
-  prompt: `
-    Validate test coverage for src/auth.ts.
-    Current coverage: 65% (need 80%+).
-    Generate missing tests.
-  `
-});
-```
-
-**Solution 2**: Reduce redundant calls
-```typescript
-// ❌ BAD (3 sequential calls)
-await Task({ subagent_type: "Maria-QA", prompt: "Check coverage" });
-await Task({ subagent_type: "Maria-QA", prompt: "Generate tests" });
-await Task({ subagent_type: "Maria-QA", prompt: "Run tests" });
-
-// ✅ GOOD (1 call)
-await Task({
-  subagent_type: "Maria-QA",
-  prompt: `
-    1. Check coverage for src/auth.ts
-    2. Generate missing tests if <80%
-    3. Run tests and report results
-  `
-});
-```
-
----
-
-### Build taking >5 minutes
-
-**Symptom**: `npm run build` extremely slow
-
-**Root Cause**: Running full test suite during build
-
-**Solution** (FIXED in v7.7.0):
-```bash
-# Verify QUICK_MODE enabled in afterBuild.sh
-grep "QUICK_MODE" ~/.versatil/hooks/afterBuild.sh
-
-# Should show:
-# QUICK_MODE=false
-# if [ "$BUILD_COMMAND" = "npm run build" ] && [ -z "$CI" ]; then
-#   QUICK_MODE=true
-# fi
-
-# Build should complete in <10 seconds now
-npm run build
-```
-
----
-
-## Quality Gates
-
-### "Quality gate failed: Test coverage below 80%"
-
-**Symptom**:
-```
-Error: Quality gate failed
-Reason: Test coverage 65% (requires 80%+)
-```
-
-**Solution**:
-```bash
-# Check current coverage
-npm run test:coverage
-
-# Coverage report:
-# Statements   : 65% ( 130/200 )
-# Branches     : 58% ( 23/40 )
-# Functions    : 70% ( 14/20 )
-# Lines        : 65% ( 128/197 )
-
-# Identify untested files
-# (Files with 0% coverage)
-
-# Generate tests
-/maria-qa "Generate tests for src/utils/crypto.ts to reach 80%+ coverage"
+# Install framework
+npm install @versatil/sdlc-framework
 
 # Verify
-npm run test:coverage
+npx versatil doctor --quick
 ```
 
 ---
 
-### "OWASP compliance failed: SQL injection vulnerability"
+### Issue: Corrupted Installation
 
-**Symptom**:
+**Symptoms**:
+- Health check reports missing files
+- Commands not working
+- Import errors
+
+**Health Check Output**:
 ```
-Error: Quality gate failed
-Reason: OWASP Top 10 violation - SQL injection in src/api/users.ts:42
+📁 Installation Integrity
+  Files:     600/1,247 present
+  Structure: ✗ Invalid
+  Status:    Corrupted
 ```
 
 **Solution**:
 ```bash
-# Review finding
-cat src/api/users.ts | sed -n '40,45p'
+# Remove existing installation
+npm uninstall @versatil/sdlc-framework
 
-# Fix SQL injection (use parameterized queries)
-# ❌ BAD:
-db.query(`SELECT * FROM users WHERE id = ${userId}`)
+# Clear npm cache
+npm cache clean --force
 
-# ✅ GOOD:
-db.query('SELECT * FROM users WHERE id = $1', [userId])
+# Reinstall
+npm install @versatil/sdlc-framework
 
-# Re-scan
-npm run security:scan
-
-# Or use agent
-/marcus-backend "Fix SQL injection vulnerability in src/api/users.ts:42"
+# Verify
+npx versatil doctor
 ```
 
 ---
 
-### "API response time exceeds 200ms threshold"
+### Issue: Partial Installation
 
-**Symptom**:
-```
-Error: Quality gate failed
-Reason: API response time 450ms (requires <200ms)
-```
+**Symptoms**:
+- Some features work, others don't
+- Health check reports <90% files present
 
 **Solution**:
 ```bash
-# Profile endpoint
-/marcus-backend "Optimize API response time for POST /api/auth/login (currently 450ms, target <200ms)"
+# Reinstall without removing
+npm install @versatil/sdlc-framework --force
 
-# Common optimizations:
-# 1. Add database indexes
-# 2. Cache frequent queries (Redis)
-# 3. Reduce N+1 queries
-# 4. Use connection pooling
-# 5. Compress responses (gzip)
+# Verify
+npx versatil doctor
 ```
 
 ---
 
-## Common Error Messages
+## Version & Update Issues
 
-### "Module not found: Cannot resolve '@anthropic-ai/sdk'"
+### Issue: Framework Version Outdated
+
+**Symptoms**:
+- Health check shows "major/minor update available"
+- Missing new features from documentation
 
 **Solution**:
 ```bash
-npm install @anthropic-ai/sdk
+# Check current version
+npm list @versatil/sdlc-framework
+
+# Check latest version
+npm view @versatil/sdlc-framework version
+
+# Update (patch/minor - safe)
+npm update @versatil/sdlc-framework
+
+# Update (major - review breaking changes first)
+npm view @versatil/sdlc-framework@8.0.0  # Review changes
+npm install @versatil/sdlc-framework@latest
+
+# Verify
+npx versatil doctor
 ```
 
 ---
 
-### "TS2339: Property 'getInstance' does not exist"
+### Issue: Update Failed or Incomplete
 
-**Root Cause**: TypeScript compilation error (false alarm)
+**Symptoms**:
+- Update command succeeded but version unchanged
+- Post-update health check fails
 
 **Solution**:
 ```bash
-# Clean rebuild
-rm -rf dist/ node_modules/
+# Clear npm cache
+npm cache clean --force
+
+# Remove node_modules
+rm -rf node_modules
+
+# Remove package-lock.json
+rm package-lock.json
+
+# Reinstall all dependencies
+npm install
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Breaking Changes After Update
+
+**Symptoms**:
+- Framework not working after major update
+- Import errors or API changes
+
+**Solution**:
+```bash
+# Rollback to previous version
+npm install @versatil/sdlc-framework@7.8.0
+
+# Or fix breaking changes (check CHANGELOG)
+# https://github.com/Nissimmiracles/versatil-sdlc-framework/blob/main/CHANGELOG.md
+
+# View migration guide
+cat node_modules/@versatil/sdlc-framework/docs/MIGRATION_*.md
+```
+
+---
+
+## Agent Issues
+
+### Issue: No Agents Operational
+
+**Symptoms**:
+- Health check shows 0/18 agents operational
+- Agent commands not working
+
+**Health Check Output**:
+```
+🤖 Agent Configuration
+  Agents:    0/18 operational
+  Status:    Failed
+```
+
+**Solution**:
+```bash
+# Check if agents directory exists
+ls node_modules/@versatil/sdlc-framework/.claude/agents/
+
+# If missing, reinstall
+npm install @versatil/sdlc-framework --force
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Some Agents Not Working
+
+**Symptoms**:
+- Health check shows <18 agents operational
+- Specific agents fail when invoked
+
+**Solution**:
+```bash
+# Check agent definitions for syntax errors
+cat node_modules/@versatil/sdlc-framework/.claude/agents/*.md
+
+# Look for:
+# - Missing required fields (role, context, tools)
+# - Malformed markdown
+# - Invalid YAML frontmatter
+
+# If found, report issue on GitHub
+# For now, reinstall
+npm install @versatil/sdlc-framework --force
+```
+
+---
+
+### Issue: Agent Auto-Activation Not Working
+
+**Symptoms**:
+- Agents don't activate automatically on file edits
+- Must manually invoke agents with slash commands
+
+**Solution**:
+```bash
+# Check if AGENT_TRIGGERS.md exists
+cat node_modules/@versatil/sdlc-framework/.claude/AGENT_TRIGGERS.md
+
+# Check if hooks are installed
+ls node_modules/@versatil/sdlc-framework/.claude/hooks/
+
+# Reinstall if missing
+npm install @versatil/sdlc-framework --force
+
+# Verify auto-activation configuration
+npx versatil doctor
+```
+
+---
+
+## RAG Connectivity Issues
+
+### Issue: GraphRAG Connection Timeout
+
+**Symptoms**:
+- Health check shows GraphRAG timeout/failed
+- Pattern search slower than expected
+
+**Health Check Output**:
+```
+🧠 RAG Connectivity
+  GraphRAG:  ✗ Timeout
+  Vector:    ✓ Connected
+  Router:    ✓ Operational (fallback to vector)
+```
+
+**Solution**:
+```bash
+# Auto-fix (recommended)
+npx versatil doctor --fix
+
+# Or manually restart GraphRAG
+npm run rag:start
+
+# Check Neo4j container status
+docker ps | grep neo4j
+
+# If container not running, start it
+docker start versatil-neo4j
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Vector Store Connection Failed
+
+**Symptoms**:
+- Health check shows vector store failed
+- RAG operations completely broken
+
+**Solution**:
+```bash
+# Check Supabase configuration
+cat .env | grep SUPABASE
+
+# Verify credentials
+# SUPABASE_URL=https://...
+# SUPABASE_KEY=...
+
+# Test connection manually
+curl -H "apikey: YOUR_KEY" YOUR_SUPABASE_URL/rest/v1/
+
+# If credentials invalid, update .env
+# Then restart
+npm run rag:restart
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Both GraphRAG and Vector Store Failed
+
+**Symptoms**:
+- All RAG operations fail
+- Pattern search unavailable
+
+**Solution**:
+```bash
+# Check RAG configuration
+cat .versatil/config/rag.json
+
+# Reset RAG system
+npm run rag:reset
+
+# Reinitialize
+npm run rag:init
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+## MCP Server Issues
+
+### Issue: Some MCP Tools Unavailable
+
+**Symptoms**:
+- Health check shows <29 tools accessible
+- Specific MCP operations fail
+
+**Solution**:
+```bash
+# List MCP servers
+cat .claude/mcp.json
+
+# Check server status
+# (depends on your MCP server implementation)
+
+# Restart MCP servers
+# (depends on your MCP server implementation)
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: High MCP Connection Latency
+
+**Symptoms**:
+- Health check shows latency >100ms
+- Slow MCP operations
+
+**Solution**:
+```bash
+# Check network connectivity
+ping your-mcp-server-host
+
+# Check MCP server load
+# (depends on your MCP server implementation)
+
+# Restart MCP servers if needed
+# (depends on your MCP server implementation)
+
+# Consider using local MCP servers instead of remote
+```
+
+---
+
+## Dependency Issues
+
+### Issue: Critical Security Vulnerabilities
+
+**Symptoms**:
+- Health check shows critical vulnerabilities
+- npm audit reports issues
+
+**Health Check Output**:
+```
+📦 Dependencies
+  Security:  ✗ 3 critical
+  Health:    ████░░░░░░░░░░░░░░░░ 30/100
+```
+
+**Solution**:
+```bash
+# Auto-fix (recommended)
+npx versatil doctor --fix
+
+# Or manually
+npm audit fix
+
+# If force needed
+npm audit fix --force
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Peer Dependency Warnings
+
+**Symptoms**:
+- npm warnings about peer dependencies
+- Some features not working
+
+**Solution**:
+```bash
+# Install peer dependencies
+npm install --save-dev @types/node typescript
+
+# For specific warnings
+npm install <missing-peer-dependency>
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Version Compatibility Issues
+
+**Symptoms**:
+- Health check shows version incompatibility
+- TypeScript or Node.js version errors
+
+**Solution**:
+```bash
+# Check current versions
+node --version   # Should be ≥18.0.0
+npx tsc --version  # Should be ≥5.0.0
+
+# Update Node.js (if needed)
+# Use nvm:
+nvm install 20
+nvm use 20
+
+# Or download from: https://nodejs.org/
+
+# Update TypeScript
+npm install --save-dev typescript@latest
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+## Context & Configuration Issues
+
+### Issue: Context Not Detected
+
+**Symptoms**:
+- Health check shows "unknown" context
+- Framework features behave incorrectly
+
+**Solution**:
+```bash
+# Check package.json for framework dependency
+cat package.json | grep @versatil/sdlc-framework
+
+# If missing, install it
+npm install @versatil/sdlc-framework
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Context Isolation Not Enforced
+
+**Symptoms**:
+- Health check shows isolation not enforced
+- Unexpected framework behavior
+
+**Solution**:
+```bash
+# Check if hooks exist
+ls node_modules/@versatil/sdlc-framework/.claude/hooks/
+
+# Reinstall if missing
+npm install @versatil/sdlc-framework --force
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Configuration Not Loaded
+
+**Symptoms**:
+- Health check shows config not loaded
+- Custom settings not applied
+
+**Solution**:
+```bash
+# Check if CLAUDE.md exists in project root
+ls CLAUDE.md
+
+# If missing, create it
+cat > CLAUDE.md << 'EOF'
+# Your Project Configuration
+
+## Agents
+- Maria-QA: Enabled
+- James-Frontend: Enabled
+...
+EOF
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Context Mixing Detected
+
+**Symptoms**:
+- Health check shows context mixing
+- Framework source code in user project
+
+**Solution**:
+```bash
+# This is critical - remove framework source files
+# Check what's detected:
+find . -name "guardian" -type d
+
+# If you see:
+# ./src/agents/guardian/  ← This should NOT be in user project
+
+# Remove it (BE CAREFUL - only remove if you're in user project)
+rm -rf src/agents/guardian/
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+## Performance Issues
+
+### Issue: Slow Health Checks
+
+**Symptoms**:
+- `npx versatil doctor` takes >30 seconds
+- Health checks timeout
+
+**Solution**:
+```bash
+# Use quick check instead
+npx versatil doctor --quick
+
+# Or check specific components:
+# - Version check only: <5s
+# - Installation check: <10s
+# - Full check: <15s expected
+
+# If still slow, check:
+# 1. Network connectivity (npm registry, RAG servers)
+# 2. Disk I/O (SSD recommended)
+# 3. System resources (CPU, memory)
+```
+
+---
+
+### Issue: Slow RAG Operations
+
+**Symptoms**:
+- Pattern search takes >5 seconds
+- `/plan` command very slow
+
+**Solution**:
+```bash
+# Check RAG connectivity
+npx versatil doctor
+
+# If GraphRAG timeout, restart it
+npm run rag:start
+
+# If Vector store slow, check Supabase status
+# https://status.supabase.com/
+
+# Consider using GraphRAG only (faster, offline)
+# Edit .versatil/config/rag.json:
+{
+  "primary_store": "graphrag",
+  "fallback_enabled": false
+}
+```
+
+---
+
+### Issue: High Memory Usage
+
+**Symptoms**:
+- System running out of memory
+- Framework consuming >2GB RAM
+
+**Solution**:
+```bash
+# Check memory usage
+ps aux | grep node
+
+# Reduce RAG cache size
+# Edit .versatil/config/rag.json:
+{
+  "cache_size_mb": 256  # Default: 512
+}
+
+# Disable trend analysis if not needed
+# Edit .versatil/config/guardian.json:
+{
+  "user_coherence": {
+    "enable_trend_analysis": false
+  }
+}
+```
+
+---
+
+## Build & Compilation Issues
+
+### Issue: Outdated Build Files
+
+**Symptoms**:
+- Health check shows "outdated" compilation
+- Runtime errors from stale code
+
+**Solution**:
+```bash
+# Auto-fix (recommended)
+npx versatil doctor --fix
+
+# Or manually rebuild
+cd node_modules/@versatil/sdlc-framework
+npm run build
+
+# Verify
+npx versatil doctor
+```
+
+---
+
+### Issue: Build Missing Entirely
+
+**Symptoms**:
+- Health check shows "missing" compilation
+- Import errors for dist/ files
+
+**Solution**:
+```bash
+# Rebuild framework
+cd node_modules/@versatil/sdlc-framework
 npm install
 npm run build
+
+# Verify
+npx versatil doctor
 ```
 
 ---
 
-### "EACCES: permission denied"
+### Issue: TypeScript Compilation Errors
+
+**Symptoms**:
+- Build fails with TypeScript errors
+- Cannot rebuild framework
 
 **Solution**:
 ```bash
-# Fix file permissions
-chmod -R 755 .claude/hooks/
-chmod +x .claude/hooks/dist/*.cjs
+# Check TypeScript version
+npx tsc --version  # Should be ≥5.0.0
+
+# Update TypeScript if needed
+npm install --save-dev typescript@latest
+
+# Retry build
+cd node_modules/@versatil/sdlc-framework
+npm run build
+
+# If still failing, report issue on GitHub
 ```
 
 ---
 
-### "Context violation: Sarah-PM blocked in user project"
+## Emergency Recovery
 
-**Solution**: This is **intentional**. Use alternative agents:
-- Sarah-PM → Use `/plan` + `/work` (automated orchestration)
-- For manual coordination, use individual agents
+### Full Framework Reset
+
+**When to use**:
+- Multiple critical issues detected
+- Framework completely non-functional
+- All other troubleshooting failed
+
+**Steps**:
+```bash
+# 1. Backup your project (important!)
+cp -r . ../my-project-backup
+
+# 2. Remove framework completely
+npm uninstall @versatil/sdlc-framework
+
+# 3. Clear all caches
+npm cache clean --force
+rm -rf node_modules
+rm package-lock.json
+
+# 4. Clear VERSATIL state
+rm -rf .versatil/
+
+# 5. Reinstall from scratch
+npm install
+
+# 6. Verify
+npx versatil doctor
+
+# 7. If still broken, report issue on GitHub
+```
 
 ---
 
-### "RAG pattern not found for query: [X]"
+### Rollback to Last Known Good Version
 
-**Solution**:
+**When to use**:
+- Recent update broke framework
+- Need to quickly restore functionality
+
+**Steps**:
 ```bash
-# Add pattern manually
-/learn "Implemented [X] feature. Effort: [Y]h. Key insights: [Z]"
+# 1. Check current version
+npm list @versatil/sdlc-framework
 
-# Or adjust similarity threshold
-/rag query "[X]" --min-similarity=0.5
+# 2. Install previous version
+npm install @versatil/sdlc-framework@7.8.0
+
+# 3. Verify
+npx versatil doctor
+
+# 4. Report update issue on GitHub
+```
+
+---
+
+### Clean Slate Installation
+
+**When to use**:
+- Starting new project
+- Setting up VERSATIL for first time
+
+**Steps**:
+```bash
+# 1. Create new project
+mkdir my-project
+cd my-project
+npm init -y
+
+# 2. Install VERSATIL
+npm install @versatil/sdlc-framework
+
+# 3. Initialize configuration
+cat > CLAUDE.md << 'EOF'
+# My Project
+
+Generated by VERSATIL Onboarding Wizard
+EOF
+
+# 4. Verify
+npx versatil doctor
+
+# 5. All checks should pass with 100% health
 ```
 
 ---
 
 ## Getting Help
 
-### Check framework health
+### Before Asking for Help
 
+1. **Run health check**:
+   ```bash
+   npx versatil doctor > health-report.txt
+   ```
+
+2. **Check logs**:
+   ```bash
+   cat ~/.versatil/logs/guardian/user-coherence-*.log
+   ```
+
+3. **Gather system info**:
+   ```bash
+   node --version
+   npm --version
+   npx tsc --version
+   uname -a
+   ```
+
+### Where to Get Help
+
+**GitHub Issues** (preferred):
+- Bug reports: https://github.com/Nissimmiracles/versatil-sdlc-framework/issues
+- Feature requests: https://github.com/Nissimmiracles/versatil-sdlc-framework/issues
+- Questions: https://github.com/Nissimmiracles/versatil-sdlc-framework/discussions
+
+**Include in Your Report**:
+- Health check output (`npx versatil doctor`)
+- Error messages (full stack trace)
+- Steps to reproduce
+- System information (Node.js version, OS)
+- Framework version
+
+---
+
+## Common Error Messages
+
+### "Cannot find module '@versatil/sdlc-framework'"
+
+**Cause**: Framework not installed or corrupted
+
+**Solution**: Reinstall framework
 ```bash
-/monitor
-# Shows comprehensive health dashboard
+npm install @versatil/sdlc-framework
 ```
 
 ---
 
-### Run diagnostics
+### "ECONNREFUSED" or "Connection timeout"
 
+**Cause**: RAG servers (Neo4j, Supabase) not accessible
+
+**Solution**: Restart RAG services
 ```bash
-/framework-debug
-# Collects diagnostic information automatically
+npm run rag:start
+npx versatil doctor
 ```
 
 ---
 
-### View logs
+### "Permission denied"
 
+**Cause**: Insufficient permissions to access files
+
+**Solution**: Check file permissions
 ```bash
-# Hook logs
-tail -f ~/.versatil/logs/hooks/*.log
-
-# Guardian logs
-/guardian-logs all --follow
-
-# Build logs
-tail -f ~/.versatil/logs/build.log
+chmod -R 755 node_modules/@versatil/sdlc-framework
 ```
 
 ---
 
-### Contact support
+### "Out of memory"
 
-- **GitHub Issues**: [anthropics/claude-code/issues](https://github.com/anthropics/claude-code/issues)
-- **Documentation**: [docs/README.md](./README.md)
-- **Help Command**: `/help [issue description]`
+**Cause**: Framework consuming too much memory
+
+**Solution**: Reduce cache sizes, disable features
+```bash
+# Edit .versatil/config/rag.json
+{ "cache_size_mb": 256 }
+
+# Edit .versatil/config/guardian.json
+{ "user_coherence": { "enable_trend_analysis": false } }
+```
+
+---
+
+## Prevention Best Practices
+
+1. **Regular health checks** - Run `npx versatil doctor` weekly
+2. **Keep updated** - Stay within 1 minor version of latest
+3. **Monitor trends** - Review `npx versatil doctor --trends` monthly
+4. **Enable auto-fix** - Let Guardian automatically fix issues
+5. **Backup before updates** - Always backup before major updates
 
 ---
 
 ## Related Documentation
 
-- [Installation Guide](./getting-started/installation.md)
-- [Quick Start](./getting-started/quick-start.md)
-- [MCP Troubleshooting](./mcp/MCP_TROUBLESHOOTING.md)
-- [Agent Troubleshooting](./guides/agent-troubleshooting.md)
-- [API Reference](./API_REFERENCE.md)
+- [User Coherence Guide](./USER_COHERENCE_GUIDE.md)
+- [Guardian Integration](./GUARDIAN_INTEGRATION.md)
+- [Framework Architecture](./VERSATIL_ARCHITECTURE.md)
+- [Changelog](../CHANGELOG.md)
 
 ---
 
-**Last Updated**: 2025-10-27
-**Version**: 7.7.0+
-**Status**: ✅ Production Ready
+**Last Updated**: 2025-10-28
+**Version**: 7.9.0

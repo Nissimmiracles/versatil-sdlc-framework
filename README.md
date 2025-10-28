@@ -138,7 +138,7 @@ Total time saved: 142 minutes (2.4 hours) after just 5 features!
 <tr>
   <td><b>Version</b></td>
   <td>
-    <img src="https://img.shields.io/badge/version-6.6.0-blue.svg" alt="Version 6.6.0">
+    <img src="https://img.shields.io/badge/version-7.9.0-blue.svg" alt="Version 7.9.0">
     <img src="https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg" alt="Node >=18.0.0">
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License">
     <img src="https://img.shields.io/badge/100%25-Open%20Source-brightgreen.svg" alt="100% Open Source">
@@ -615,6 +615,15 @@ Every agent now generates code matching YOUR style while respecting TEAM convent
 - **Quality Enforcement**: 80%+ test coverage, WCAG 2.1 AA accessibility
 - **Isolated Framework**: Zero pollution of user projects
 - **Privacy Guarantee**: User/team/project patterns 100% isolated
+
+### 🏥 User Coherence & Health Monitoring (v7.9.0+)
+- **Automatic Health Checks**: Daily framework health validation
+- **Version Coherence**: Ensures installation up-to-date and properly configured
+- **7-Component Validation**: Version, installation, agents, MCP, RAG, dependencies, context
+- **Auto-Fix System**: 90%+ confidence fixes applied automatically
+- **CLI & In-Session**: `npx versatil doctor` or `/coherence` command
+- **Trend Analysis**: Track framework health over time (7-day, 30-day averages)
+- **Proactive Notifications**: Update reminders, issue warnings, health alerts
 
 ---
 
