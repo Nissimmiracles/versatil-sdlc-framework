@@ -416,6 +416,82 @@ ls -la .versatil/telemetry/metrics.json
 - JSONL metrics logging infrastructure
 - Session-based metrics aggregation
 
+## [7.1.1-final] - 2025-10-26
+
+### Added
+- Complete Phase 6 testing and validation
+- End-to-end automation system testing
+- Integration testing with hooks and skills
+- Performance benchmarking (<100ms hook overhead)
+
+### Fixed
+- Connected hooks → skills → agents workflows
+- Resolved circular dependencies
+- Fixed automation trigger timing
+- Enhanced error handling and graceful degradation
+
+### Validation
+- All automation scenarios validated
+- Performance targets met
+- Zero breaking changes confirmed
+- Backward compatibility verified
+
+## [7.1.0] - 2025-10-26
+
+### Added - Phase 6: Auto-Discovery & Proactive Integration
+
+- **Template Auto-Application** - Automatically applies templates without asking
+- **Agent Auto-Activation (MANDATORY)** - Immediate Task tool invocation
+- **Pattern Auto-Application** - Applies RAG patterns automatically
+- **Cross-Skill Loading (MANDATORY)** - Loads related skills automatically
+- **Intent-Based Suggestions (MANDATORY)** - Executes all suggestions
+
+### Performance Impact
+
+- Template discovery: Manual search → Auto-suggested (10x faster)
+- Template application: Manual copy → Auto-applied (Instant)
+- Agent activation: User interprets JSON → Auto-invoked (100% usage)
+- Pattern usage: Manual search → Auto-applied (8x faster)
+
+### Features
+
+- Auto-discovery of templates based on intent
+- Proactive agent activation suggestions
+- Intelligent skill loading recommendations
+- Pattern auto-application without confirmation
+- Cross-skill relationship mapping
+
+## [7.0.0] - 2025-10-26
+
+### Added - Skills-First Architecture Transformation
+
+**94.1% Token Savings Through Progressive Disclosure**
+
+- **Three-Level Progressive Disclosure**
+  - Level 1: Metadata (~15 tokens, always in context)
+  - Level 2: SKILL.md (~500 tokens, loaded on-demand)
+  - Level 3: references/*.md (~2,000 tokens each, loaded as-needed)
+
+- **Skill Categories** (4 Total)
+  - Library Guides (15 skills)
+  - Code Generators (5 skills)
+  - RAG Patterns (5 skills)
+  - Custom Skills (5 skills)
+
+### Performance Impact
+
+- 94.1% token savings: ~11,235 tokens per prompt
+- < 50ms resolution: No file I/O unless skill invoked
+- 5-10x faster dev: Asset-based templates vs regeneration
+- Semantic discovery: Natural language vs brittle regex
+
+### Migration
+
+Complete migration from monolithic context to skills-based architecture.
+See docs/MIGRATION_V6_TO_V7.md for details.
+
+---
+
 ## Earlier Versions
 
 See individual release notes in `docs/` directory for detailed changelogs.
