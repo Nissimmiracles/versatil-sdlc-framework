@@ -505,7 +505,27 @@ Claude: [Loads agents-library skill automatically for conventions]
 
 **Automatic Error Detection & TODO Creation**
 
-VERSATIL v7.10.0 enables Guardian to automatically create **combined TODO files** for errors and gaps detected during health checks. Issues are grouped by assigned agent to reduce TODO spam while maintaining actionable tracking.
+VERSATIL v7.10.0 enables Guardian (Iris-Guardian) to automatically create **combined TODO files** for errors and gaps detected during health checks. Issues are grouped by assigned agent to reduce TODO spam while maintaining actionable tracking.
+
+### 🆕 What Changed in v7.10.0
+
+**BREAKING CHANGE**: Guardian TODO creation is now **ENABLED by default**.
+
+| Version | Guardian TODO Behavior | Default Setting |
+|---------|----------------------|-----------------|
+| v7.7.0 - v7.9.0 | ❌ No TODOs created | `GUARDIAN_CREATE_TODOS=false` |
+| **v7.10.0+** | ✅ **Creates combined TODOs automatically** | `GUARDIAN_CREATE_TODOS=true` |
+
+**What This Means**:
+- Guardian health checks (every 5 minutes) now create actual TODO files in `todos/`
+- Issues are grouped by agent to reduce clutter (10 issues → 2 files)
+- Each TODO includes verification evidence and recommended fixes
+- **You will see `guardian-combined-*.md` files appear automatically**
+
+**To disable** (revert to v7.9.0 behavior):
+```bash
+export GUARDIAN_CREATE_TODOS=false
+```
 
 ### How It Works
 
