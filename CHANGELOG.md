@@ -5,6 +5,52 @@ All notable changes to the VERSATIL SDLC Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.10.2] - 2025-10-28
+
+### Fixed - dist/ Directory Missing from Repository
+
+**CRITICAL FIX**: Users installing via git URL had no compiled code to run
+
+#### Problem
+- `dist/` was excluded from both `.gitignore` and `.npmignore`
+- Users installing via `git+https://github.com/...` URLs got source TypeScript only
+- Framework unusable without compiled JavaScript files
+- `/update` command couldn't execute (`dist/update/github-release-checker.js` missing)
+- npm postinstall can't compile without devDependencies
+
+#### Solution
+1. **Removed `dist/` from `.gitignore`** - Now committed to repository
+2. **Removed `dist/` from `.npmignore`** - Included in npm packages
+3. **Added 1,313 compiled files** to git repository (+251,159 lines)
+
+#### Why Commit Compiled Code?
+- Users install VERSATIL via git URLs (not npm registry)
+- Git clones don't run build scripts automatically
+- Users would need to manually run `npm install && npm run build`
+- Framework should work immediately after git clone
+
+#### Trade-offs
+- ✅ Users get working code immediately (no build step)
+- ✅ `/update` command functional (compiled code present)
+- ✅ All 33 slash commands work out-of-the-box
+- ⚠️  Repository size increased by ~5-10 MB
+- ⚠️  Must run `npm run build` before each release
+
+#### Impact
+- ✅ v7.10.2 includes working compiled code in git repository
+- ✅ GitHub repo owner fix (Nissimmiracles) is in `dist/update/github-release-checker.js`
+- ✅ Users can clone and use framework immediately
+- ✅ `/update` command now detects v7.10.2 as latest
+
+#### Files Changed
+- `.gitignore` (removed dist/ exclusion, added comment)
+- `.npmignore` (removed dist/ exclusion, added comment)
+- `dist/**/*.{js,d.ts,js.map}` (1,313 compiled files added)
+- `package.json` (version bump to 7.10.2)
+- `CHANGELOG.md` (this entry)
+
+---
+
 ## [7.10.1] - 2025-10-28
 
 ### Fixed - Critical Update Detection Bug
