@@ -47,7 +47,7 @@ export class GitHubReleaseChecker {
   private readonly cacheTTL: number = 60 * 60 * 1000; // 1 hour
 
   constructor(
-    repoOwner: string = 'MiraclesGIT',
+    repoOwner: string = 'Nissimmiracles',
     repoName: string = 'versatil-sdlc-framework'
   ) {
     this.repoOwner = repoOwner;
