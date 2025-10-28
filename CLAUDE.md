@@ -501,6 +501,142 @@ Claude: [Loads agents-library skill automatically for conventions]
 
 ---
 
+## 🛡️ Guardian Automatic TODO Generation (v7.10.0+)
+
+**Automatic Error Detection & TODO Creation**
+
+VERSATIL v7.10.0 enables Guardian to automatically create **combined TODO files** for errors and gaps detected during health checks. Issues are grouped by assigned agent to reduce TODO spam while maintaining actionable tracking.
+
+### How It Works
+
+```
+Health Check (Every 5 Minutes)
+    ↓
+Detect issues (test coverage, TypeScript errors, security vulnerabilities)
+    ↓
+Verify with Chain-of-Verification (CoVe) methodology
+    ↓
+Group related issues (by agent, priority, or layer)
+    ↓
+Create combined TODO files in todos/
+```
+
+### Key Features
+
+✅ **Automatic Detection**: Health checks run every 5 minutes (configurable)
+✅ **Smart Grouping**: Related issues combined into single TODO files (5-10x reduction)
+✅ **Anti-Duplication**: Content-based fingerprinting prevents duplicate TODOs
+✅ **Agent Assignment**: Issues automatically routed to specialized agents (Maria-QA, Marcus-Backend, etc.)
+✅ **Auto-Apply Detection**: High-confidence issues (≥90%) marked for automatic remediation
+
+### Configuration
+
+```bash
+# .env or environment
+
+# Enable TODO creation (default: true)
+GUARDIAN_CREATE_TODOS=true
+
+# Group related issues (default: true, recommended)
+GUARDIAN_GROUP_TODOS=true
+
+# Grouping strategy: 'agent', 'priority', or 'layer'
+GUARDIAN_GROUP_BY=agent
+
+# Max issues per combined TODO
+GUARDIAN_MAX_ISSUES_PER_TODO=10
+```
+
+### Example Output
+
+**Before (10 separate files)**:
+```
+guardian-12345-critical-project.md
+guardian-12346-critical-project.md
+guardian-12347-high-project.md
+... (7 more)
+```
+
+**After (2 combined files)**:
+```
+guardian-combined-maria-qa-critical-12345-ab3f.md (6 issues)
+guardian-combined-marcus-backend-high-12346-cd4g.md (4 issues)
+```
+
+### Combined TODO Format
+
+Each combined TODO includes:
+- **Summary**: Issue count, average confidence, auto-apply vs manual review
+- **Issues Detected**: Detailed breakdown with verification evidence
+- **Recommended Actions**: Priority-ordered fix list
+- **Execution Strategy**: Auto-apply vs manual review guidance
+- **Learning Opportunity**: How to codify fixes for future compounding
+
+### Agent Assignment
+
+| Agent | Handles | Example Issues |
+|-------|---------|---------------|
+| **Maria-QA** | Testing, coverage, quality | Test coverage <80%, ESLint errors |
+| **Marcus-Backend** | API, database, security | API failures, OWASP vulnerabilities |
+| **James-Frontend** | UI, performance, accessibility | Bundle size, WCAG violations |
+| **Dana-Database** | Database, migrations, RLS | RLS policy errors, migration failures |
+
+### Configuration Scenarios
+
+**Scenario 1: Default (Recommended)**
+```bash
+GUARDIAN_CREATE_TODOS=true
+GUARDIAN_GROUP_TODOS=true
+GUARDIAN_GROUP_BY=agent
+```
+Result: 10 issues → 2-3 combined TODOs (by agent)
+
+**Scenario 2: Individual TODOs**
+```bash
+GUARDIAN_CREATE_TODOS=true
+GUARDIAN_GROUP_TODOS=false
+```
+Result: 10 issues → 10 individual TODOs
+
+**Scenario 3: Telemetry Only**
+```bash
+GUARDIAN_CREATE_TODOS=false
+```
+Result: 10 issues → 0 TODOs, view in `~/.versatil/logs/guardian-telemetry.log`
+
+### Performance Impact
+
+- **Health Check Duration**: 2-5 seconds (depends on project size)
+- **TODO Generation Overhead**: <100ms per group of 10 issues
+- **Total Impact**: <200ms (negligible for 5-minute intervals)
+
+### Quick Start
+
+```bash
+# 1. Guardian runs automatically every 5 minutes (default)
+# No configuration needed - TODOs appear in todos/ directory
+
+# 2. Manual trigger (optional)
+npm run guardian:health-check
+
+# 3. Review generated TODOs
+ls todos/guardian-combined-*
+
+# 4. Work on issues
+/work todos/guardian-combined-maria-qa-critical-*.md
+
+# 5. After completion - store learnings
+/learn "Resolved 3 critical issues in project layer"
+```
+
+### Documentation
+
+- **Complete Guide**: [docs/guardian/GUARDIAN_TODO_SYSTEM.md](docs/guardian/GUARDIAN_TODO_SYSTEM.md)
+- **Health System**: [docs/guardian/GUARDIAN_HEALTH_SYSTEM.md](docs/guardian/GUARDIAN_HEALTH_SYSTEM.md)
+- **Chain-of-Verification**: [docs/architecture/VICTOR_VERIFIER.md](docs/architecture/VICTOR_VERIFIER.md)
+
+---
+
 ## 🤖 Auto-Learning with Public/Private RAG (v7.8.0+)
 
 **Automatic Pattern Enrichment at Session End**

@@ -1,0 +1,50 @@
+```mermaid
+flowchart TB
+    Start([User: Task Marcus-Backend<br/>'Create FastAPI auth endpoint'])
+
+    Start --> Marcus[Marcus-Backend<br/>Parent Agent]
+
+    Marcus --> Detect[Framework Detection]
+
+    Detect --> ReadFile[Read File:<br/>src/api/auth.py]
+    ReadFile --> Patterns[Analyze Patterns]
+
+    Patterns --> Check1{Has 'from fastapi import'?}
+    Check1 -->|Yes +0.4| Score1[Confidence: 0.4]
+    Check1 -->|No| Score1
+
+    Score1 --> Check2{Has 'async def'?}
+    Check2 -->|Yes +0.3| Score2[Confidence: 0.7]
+    Check2 -->|No| Score2
+
+    Score2 --> Check3{Has Pydantic models?}
+    Check3 -->|Yes +0.3| Score3[Confidence: 1.0]
+    Check3 -->|No| Score3
+
+    Score3 --> ConfidenceCheck{Confidence >= 0.8?}
+
+    ConfidenceCheck -->|YES: 1.0 >= 0.8| AutoRoute[AUTO-ROUTE<br/>to marcus-python-backend]
+    ConfidenceCheck -->|0.5-0.79| Suggest[Suggest sub-agent,<br/>ask for confirmation]
+    ConfidenceCheck -->|< 0.5| StayParent[Stay as Marcus-Backend<br/>Use general knowledge]
+
+    AutoRoute --> PythonAgent[marcus-python-backend<br/>Sub-Agent]
+
+    PythonAgent --> Apply[Apply FastAPI Patterns:<br/>- Pydantic validation<br/>- async/await<br/>- SQLAlchemy ORM<br/>- FastAPI decorators]
+
+    Apply --> Code[Generated Code:<br/>OAuth2PasswordBearer<br/>JWTPayload model<br/>async dependencies]
+
+    Code --> End([Complete: FastAPI-specific<br/>implementation])
+
+    style Start fill:#e1f5ff
+    style End fill:#d4edda
+    style Marcus fill:#fff3cd
+    style AutoRoute fill:#d4edda
+    style PythonAgent fill:#f8d7da
+    style ConfidenceCheck fill:#fff3cd
+
+    Note1[Framework Expertise<br/>React vs Vue vs FastAPI]
+    Note1 -.-> PythonAgent
+
+    Accuracy[Accuracy: 96%<br/>vs General: 75%]
+    Accuracy -.-> End
+```

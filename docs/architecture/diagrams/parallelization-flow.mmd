@@ -1,0 +1,39 @@
+```mermaid
+flowchart TB
+    Start([User: Execute 3 agents in parallel])
+
+    Start --> SingleMessage[Single Message with<br/>3 Task Calls]
+
+    SingleMessage --> PromiseAll[Promise.all]
+
+    PromiseAll --> Maria[Task: Maria-QA<br/>Test Coverage Validation]
+    PromiseAll --> James[Task: James-Frontend<br/>UI Accessibility Audit]
+    PromiseAll --> Marcus[Task: Marcus-Backend<br/>API Security Scan]
+
+    Maria --> MariaWork[Maria: Run<br/>- Coverage analysis<br/>- Quality gates<br/>- 80%+ enforcement]
+    James --> JamesWork[James: Run<br/>- WCAG 2.1 AA audit<br/>- Component validation<br/>- axe-core scan]
+    Marcus --> MarcusWork[Marcus: Run<br/>- OWASP Top 10 check<br/>- API security audit<br/>- Response time validation]
+
+    MariaWork --> MariaResult[Result: Coverage 85%]
+    JamesWork --> JamesResult[Result: 3 WCAG violations]
+    MarcusWork --> MarcusResult[Result: 2 security warnings]
+
+    MariaResult --> Collect[Collect All Results]
+    JamesResult --> Collect
+    MarcusResult --> Collect
+
+    Collect --> End([Complete: 3 agents<br/>executed concurrently])
+
+    style Start fill:#e1f5ff
+    style End fill:#d4edda
+    style PromiseAll fill:#fff3cd
+    style Maria fill:#f8d7da
+    style James fill:#d1ecf1
+    style Marcus fill:#d4edda
+
+    Note1[No Sub-Agents Needed!<br/>SDK handles concurrency]
+    Note1 -.->|Native SDK| PromiseAll
+
+    Timing[Total Time: ~30-40s<br/>vs Sequential: ~90-120s<br/>3x FASTER]
+    Timing -.-> End
+```

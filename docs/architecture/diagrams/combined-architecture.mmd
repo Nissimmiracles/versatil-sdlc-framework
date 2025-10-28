@@ -1,0 +1,67 @@
+```mermaid
+flowchart TB
+    Start([User: Build full-stack<br/>authentication<br/>React + FastAPI])
+
+    Start --> Parallel[PARALLELIZATION:<br/>Promise.all]
+
+    Parallel --> Frontend[Task: James-Frontend<br/>'Build React login form']
+    Parallel --> Backend[Task: Marcus-Backend<br/>'Create FastAPI auth endpoint']
+
+    %% Frontend Flow
+    Frontend --> JamesDetect[James: Detect React<br/>Confidence: 0.95]
+    JamesDetect --> ReactSub[SUB-AGENT:<br/>james-react-frontend]
+
+    ReactSub --> JamesSkills[SKILLS Load:]
+    JamesSkills --> AuthSkill1[auth-security<br/>JWT client-side<br/>~300 tokens]
+    JamesSkills --> StateSkill[state-management<br/>Zustand auth state<br/>~300 tokens]
+
+    AuthSkill1 --> JamesCode[Generate React Code:<br/>- Login form with validation<br/>- JWT storage in httpOnly cookies<br/>- Zustand auth store<br/>- Protected route wrapper]
+    StateSkill --> JamesCode
+
+    JamesCode --> FrontendDone([Frontend Complete:<br/>React login form])
+
+    %% Backend Flow
+    Backend --> MarcusDetect[Marcus: Detect FastAPI<br/>Confidence: 0.91]
+    MarcusDetect --> PythonSub[SUB-AGENT:<br/>marcus-python-backend]
+
+    PythonSub --> MarcusSkills[SKILLS Load:]
+    MarcusSkills --> AuthSkill2[auth-security<br/>OAuth2/JWT server<br/>~400 tokens]
+    MarcusSkills --> APISkill[api-design<br/>REST patterns<br/>~200 tokens]
+
+    AuthSkill2 --> MarcusCode[Generate FastAPI Code:<br/>- POST /auth/signup<br/>- POST /auth/login<br/>- Pydantic models<br/>- bcrypt password hashing]
+    APISkill --> MarcusCode
+
+    MarcusCode --> BackendDone([Backend Complete:<br/>FastAPI auth endpoints])
+
+    %% Results Collection
+    FrontendDone --> Collect[Collect Parallel Results]
+    BackendDone --> Collect
+
+    Collect --> Integration[Integration Ready:<br/>- React form calls FastAPI<br/>- JWT flows end-to-end<br/>- Consistent auth state]
+
+    Integration --> End([Complete: Full-Stack Auth<br/>All 3 Patterns Used])
+
+    style Start fill:#e1f5ff
+    style End fill:#d4edda
+    style Parallel fill:#fff3cd
+    style ReactSub fill:#f8d7da
+    style PythonSub fill:#f8d7da
+    style AuthSkill1 fill:#d1ecf1
+    style AuthSkill2 fill:#d1ecf1
+    style StateSkill fill:#d1ecf1
+    style APISkill fill:#d1ecf1
+
+    Summary[RESULTS:<br/>- 2 parent agents (parallel)<br/>- 2 sub-agents (React, FastAPI)<br/>- 4 skills (auth x2, state, API)<br/>- Total: 8 specialists<br/><br/>Token Cost: ~2,200<br/>vs Without Skills: ~5,000<br/>Savings: 56%<br/><br/>Accuracy: 93.5%<br/>Time: ~22 seconds]
+    Summary -.-> End
+
+    Pattern1[PARALLELIZATION:<br/>SDK Task tool<br/>2 agents concurrently]
+    Pattern1 -.-> Parallel
+
+    Pattern2[SPECIALIZATION:<br/>Sub-agents for<br/>framework expertise]
+    Pattern2 -.-> ReactSub
+    Pattern2 -.-> PythonSub
+
+    Pattern3[AD-HOC SKILLS:<br/>Progressive disclosure<br/>capability enhancement]
+    Pattern3 -.-> AuthSkill1
+    Pattern3 -.-> AuthSkill2
+```

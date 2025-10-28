@@ -1,0 +1,56 @@
+```mermaid
+flowchart TB
+    Start([User: 'Add authentication<br/>to my API'])
+
+    Start --> Hook[before-prompt.ts Hook]
+
+    Hook --> KeywordDetect[Detect Keyword:<br/>'authentication']
+
+    KeywordDetect --> Level1[LEVEL 1: Metadata<br/>auth-security skill exists]
+
+    Level1 --> Notify[Inject Notification:<br/>'auth-security skill available'<br/>~15 tokens]
+
+    Notify --> Claude1[Claude sees:<br/>auth-security skill description]
+
+    Claude1 --> UserAsk1{User provides<br/>more details?}
+
+    UserAsk1 -->|Yes| Level2[LEVEL 2: Load SKILL.md<br/>~500 tokens]
+
+    Level2 --> Content2[Content Loaded:<br/>- When to use<br/>- OAuth2/JWT patterns<br/>- Quick start examples<br/>- Trigger phrases]
+
+    Content2 --> Claude2[Claude applies:<br/>Basic auth patterns]
+
+    Claude2 --> UserAsk2{User asks:<br/>'Show OAuth2 flow'?}
+
+    UserAsk2 -->|Yes| Level3A[LEVEL 3: Load<br/>references/oauth2-flow.md<br/>~800 tokens]
+
+    Level3A --> OAuth2Details[Detailed OAuth2:<br/>- Authorization Code flow<br/>- PKCE extension<br/>- Token refresh<br/>- Complete code example]
+
+    OAuth2Details --> End1([Complete: OAuth2<br/>implementation])
+
+    UserAsk2 -->|User asks:<br/>'JWT not validating'| Level3B[LEVEL 3: Load<br/>references/troubleshooting.md<br/>~1500 tokens]
+
+    Level3B --> TroubleshootDetails[Troubleshooting:<br/>- 10 common JWT issues<br/>- Verification failures<br/>- Expiry handling<br/>- Secret rotation]
+
+    TroubleshootDetails --> End2([Complete: Issue<br/>resolved])
+
+    UserAsk1 -->|No, basic<br/>implementation| End3([Complete: Basic auth<br/>with Level 2 only])
+
+    style Start fill:#e1f5ff
+    style End1 fill:#d4edda
+    style End2 fill:#d4edda
+    style End3 fill:#d4edda
+    style Level1 fill:#fff3cd
+    style Level2 fill:#f8d7da
+    style Level3A fill:#d1ecf1
+    style Level3B fill:#d1ecf1
+
+    TokenCount1[Total Tokens:<br/>Level 1 only: ~15<br/>Level 1+2: ~515<br/>Level 1+2+3: ~2,315]
+    TokenCount1 -.-> End2
+
+    Efficiency[Token Savings:<br/>94.1% vs full context<br/>(~5,000 tokens)]
+    Efficiency -.-> End3
+
+    Note1[Progressive Disclosure:<br/>Load only what's needed,<br/>when it's needed]
+    Note1 -.-> Level2
+```

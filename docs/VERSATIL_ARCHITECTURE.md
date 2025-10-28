@@ -137,6 +137,11 @@ contextContent += `See rag-library skill for conventions`; // ~10 tokens
 
 ## OPERA Methodology
 
+**📚 Specialized Architecture Guides**:
+- [Architecture Quick Reference](architecture/ARCHITECTURE_QUICK_REFERENCE.md) - Single-page decision tree for developers
+- [Parallelization vs Specialization](architecture/PARALLELIZATION_VS_SPECIALIZATION.md) - Concurrency vs sub-agents deep dive
+- [Skills vs Sub-Agents Comparison](architecture/SKILLS_VS_SUBAGENTS_COMPARISON.md) - Ad-hoc vs framework specialization efficiency
+
 ### Six Phases
 
 ```

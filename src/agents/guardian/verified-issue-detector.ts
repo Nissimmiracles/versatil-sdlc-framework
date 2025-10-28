@@ -362,22 +362,98 @@ function todoAlreadyExists(verifiedIssue: VerifiedIssue, todosDir: string): bool
 }
 
 /**
+ * Grouped issues for combined TODO generation
+ */
+export interface GroupedIssues {
+  group_key: string;          // "Maria-QA-critical"
+  issues: VerifiedIssue[];
+  assigned_agent: string;
+  priority: string;
+  layer: string;
+}
+
+/**
+ * Group verified issues by configured strategy (agent, priority, or layer)
+ */
+function groupVerifiedIssues(
+  verifiedIssues: VerifiedIssue[],
+  groupBy: 'agent' | 'priority' | 'layer' = 'agent',
+  maxIssuesPerGroup: number = 10
+): GroupedIssues[] {
+  const groups = new Map<string, VerifiedIssue[]>();
+
+  for (const issue of verifiedIssues) {
+    let key: string;
+
+    // Generate group key based on strategy
+    switch (groupBy) {
+      case 'agent':
+        key = `${issue.assigned_agent}-${issue.priority}`;
+        break;
+      case 'priority':
+        key = `${issue.priority}-${issue.layer}`;
+        break;
+      case 'layer':
+        key = `${issue.layer}-${issue.assigned_agent}`;
+        break;
+      default:
+        key = `${issue.assigned_agent}-${issue.priority}`;
+    }
+
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+    groups.get(key)!.push(issue);
+  }
+
+  // Convert to GroupedIssues array and enforce max size
+  const result: GroupedIssues[] = [];
+
+  for (const [key, issues] of groups.entries()) {
+    // Split large groups into multiple TODOs
+    if (issues.length > maxIssuesPerGroup) {
+      for (let i = 0; i < issues.length; i += maxIssuesPerGroup) {
+        const chunk = issues.slice(i, i + maxIssuesPerGroup);
+        result.push({
+          group_key: `${key}-part${Math.floor(i / maxIssuesPerGroup) + 1}`,
+          issues: chunk,
+          assigned_agent: chunk[0].assigned_agent,
+          priority: chunk[0].priority,
+          layer: chunk[0].layer
+        });
+      }
+    } else {
+      result.push({
+        group_key: key,
+        issues,
+        assigned_agent: issues[0].assigned_agent,
+        priority: issues[0].priority,
+        layer: issues[0].layer
+      });
+    }
+  }
+
+  return result;
+}
+
+/**
  * Create verified todos from verified issues
  *
- * NOTE: Todo file creation disabled by default (v7.7.0+)
- * Health check issues are tracked via Guardian telemetry instead.
- * To re-enable: set GUARDIAN_CREATE_TODOS=true environment variable
+ * NOTE: Todo file creation now ENABLED by default (v7.10.0+)
+ * Supports both individual and combined (grouped) TODO generation.
+ * To disable: set GUARDIAN_CREATE_TODOS=false environment variable
  *
  * Anti-recursion protections (v7.10.0+):
  * - Layer 1: Content-based deduplication (todoAlreadyExists)
  * - Layer 2: Namespaced filenames (guardian- prefix)
+ * - Layer 3: TODO grouping (reduces file count by 5-10x)
  */
 export async function createVerifiedTodos(
   verifiedIssues: VerifiedIssue[],
   outputDir?: string
 ): Promise<string[]> {
-  // Check if todo creation is enabled (disabled by default)
-  const createTodos = process.env.GUARDIAN_CREATE_TODOS === 'true';
+  // Check if todo creation is enabled (now enabled by default)
+  const createTodos = process.env.GUARDIAN_CREATE_TODOS !== 'false'; // Changed: default true
 
   if (!createTodos) {
     console.log(`  ℹ️  Guardian todo creation disabled (tracking via telemetry). Set GUARDIAN_CREATE_TODOS=true to enable.`);
@@ -387,28 +463,72 @@ export async function createVerifiedTodos(
   const todosDir = outputDir || join(process.cwd(), 'todos');
   const createdFiles: string[] = [];
 
-  for (const verifiedIssue of verifiedIssues) {
-    // Layer 1: Check for duplicates BEFORE creating
-    const duplicateDetectionEnabled = process.env.GUARDIAN_DUPLICATE_DETECTION !== 'false'; // Default: true
-    if (duplicateDetectionEnabled && todoAlreadyExists(verifiedIssue, todosDir)) {
-      console.log(`  ⏭️  Skipped duplicate: ${verifiedIssue.issue_id}`);
-      continue;
+  // Check if grouping is enabled (default: true)
+  const groupTodos = process.env.GUARDIAN_GROUP_TODOS !== 'false';
+  const groupBy = (process.env.GUARDIAN_GROUP_BY as 'agent' | 'priority' | 'layer') || 'agent';
+  const maxIssuesPerTodo = parseInt(process.env.GUARDIAN_MAX_ISSUES_PER_TODO || '10', 10);
+
+  if (groupTodos) {
+    // NEW: Combined TODO generation
+    const groups = groupVerifiedIssues(verifiedIssues, groupBy, maxIssuesPerTodo);
+
+    console.log(`  📦 Grouping ${verifiedIssues.length} issues into ${groups.length} combined TODO(s) (strategy: ${groupBy})`);
+
+    for (const group of groups) {
+      // Layer 1: Check for duplicates BEFORE creating
+      const duplicateDetectionEnabled = process.env.GUARDIAN_DUPLICATE_DETECTION !== 'false';
+      const hasDuplicate = duplicateDetectionEnabled &&
+        group.issues.some(issue => todoAlreadyExists(issue, todosDir));
+
+      if (hasDuplicate) {
+        console.log(`  ⏭️  Skipped duplicate group: ${group.group_key}`);
+        continue;
+      }
+
+      const todoContent = formatCombinedTodoMarkdown(group);
+
+      // Layer 2: Namespaced filename for combined TODOs
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(2, 6);
+      const agentSlug = group.assigned_agent.toLowerCase().replace(/[^a-z0-9]/g, '-');
+      const todoFilename = `guardian-combined-${agentSlug}-${group.priority}-${timestamp}-${randomSuffix}.md`;
+      const todoPath = join(todosDir, todoFilename);
+
+      try {
+        writeFileSync(todoPath, todoContent, 'utf-8');
+        createdFiles.push(todoPath);
+        console.log(`  📝 Created combined todo: ${todoFilename} (${group.issues.length} issues)`);
+      } catch (error: any) {
+        console.error(`  ⚠️  Failed to create combined todo ${todoFilename}: ${error.message}`);
+      }
     }
+  } else {
+    // OLD: Individual TODO generation (original behavior)
+    console.log(`  📄 Creating ${verifiedIssues.length} individual TODO(s)...`);
 
-    const todoContent = formatVerifiedTodoMarkdown(verifiedIssue);
+    for (const verifiedIssue of verifiedIssues) {
+      // Layer 1: Check for duplicates BEFORE creating
+      const duplicateDetectionEnabled = process.env.GUARDIAN_DUPLICATE_DETECTION !== 'false';
+      if (duplicateDetectionEnabled && todoAlreadyExists(verifiedIssue, todosDir)) {
+        console.log(`  ⏭️  Skipped duplicate: ${verifiedIssue.issue_id}`);
+        continue;
+      }
 
-    // Layer 2: Namespaced filename to prevent collisions with /plan command
-    const timestamp = Date.now();
-    const randomSuffix = Math.random().toString(36).substring(2, 6); // 4 random chars
-    const todoFilename = `guardian-${timestamp}-${randomSuffix}-${verifiedIssue.priority}-${verifiedIssue.layer}.md`;
-    const todoPath = join(todosDir, todoFilename);
+      const todoContent = formatVerifiedTodoMarkdown(verifiedIssue);
 
-    try {
-      writeFileSync(todoPath, todoContent, 'utf-8');
-      createdFiles.push(todoPath);
-      console.log(`  📝 Created todo: ${todoFilename}`);
-    } catch (error: any) {
-      console.error(`  ⚠️  Failed to create todo ${todoFilename}: ${error.message}`);
+      // Layer 2: Namespaced filename to prevent collisions with /plan command
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(2, 6);
+      const todoFilename = `guardian-${timestamp}-${randomSuffix}-${verifiedIssue.priority}-${verifiedIssue.layer}.md`;
+      const todoPath = join(todosDir, todoFilename);
+
+      try {
+        writeFileSync(todoPath, todoContent, 'utf-8');
+        createdFiles.push(todoPath);
+        console.log(`  📝 Created todo: ${todoFilename}`);
+      } catch (error: any) {
+        console.error(`  ⚠️  Failed to create todo ${todoFilename}: ${error.message}`);
+      }
     }
   }
 
@@ -614,6 +734,135 @@ ${verifiedIssue.auto_apply ? 'Auto-applied fix will be stored in RAG for future 
 **Generated by Guardian Verified Issue Detector**
 **Verification Pipeline**: Layer Classification → Ground Truth Verification → Agent Assignment
 **Anti-Hallucination**: Chain-of-Verification (CoVe) methodology
+`;
+}
+
+/**
+ * Format combined TODO markdown for grouped issues
+ */
+function formatCombinedTodoMarkdown(group: GroupedIssues): string {
+  const layerEmoji = {
+    framework: '🏗️',
+    project: '📦',
+    context: '👤'
+  };
+
+  const timestamp = new Date().toISOString();
+  const avgConfidence = Math.round(
+    group.issues.reduce((sum, issue) => sum + issue.confidence, 0) / group.issues.length
+  );
+
+  // Count auto-apply vs manual review
+  const autoApplyCount = group.issues.filter(i => i.auto_apply).length;
+  const manualReviewCount = group.issues.length - autoApplyCount;
+
+  // Format individual issue summaries
+  const issuesList = group.issues
+    .map((issue, index) => {
+      const verification = issue.verification_details;
+      const evidencePreview = verification.verifications
+        .slice(0, 2) // Show first 2 verifications
+        .map(v => `${v.verified ? '✓' : '❌'} ${v.claim} (${v.confidence}%)`)
+        .join(', ');
+
+      return `### ${index + 1}. ${issue.original_issue.component}
+
+**Issue**: ${issue.original_issue.description}
+
+**Details**:
+- **Priority**: ${issue.priority}
+- **Confidence**: ${issue.confidence}%
+- **Auto-Apply**: ${issue.auto_apply ? 'YES ✅' : 'NO (manual review required)'}
+- **Layer**: ${layerEmoji[issue.layer]} ${issue.layer}
+
+**Evidence Summary**: ${evidencePreview}${verification.verifications.length > 2 ? ` (+${verification.verifications.length - 2} more)` : ''}
+
+**Recommended Fix**: ${verification.recommended_fix || 'See verification evidence for details'}
+
+---`;
+    })
+    .join('\n\n');
+
+  // Format combined recommended actions
+  const combinedActions = group.issues
+    .map((issue, i) => `${i + 1}. ${issue.verification_details.recommended_fix || 'Manual investigation required'}`)
+    .join('\n');
+
+  return `---
+id: "${group.group_key}-${Date.now()}"
+created: "${timestamp}"
+type: "guardian-combined"
+assigned_agent: "${group.assigned_agent}"
+priority: "${group.priority}"
+issue_count: ${group.issues.length}
+avg_confidence: ${avgConfidence}
+auto_apply_count: ${autoApplyCount}
+manual_review_count: ${manualReviewCount}
+grouping_strategy: "${process.env.GUARDIAN_GROUP_BY || 'agent'}"
+verified_by: "Victor-Verifier (Guardian Health Check)"
+---
+
+# 🛡️ Guardian Health Check - ${group.assigned_agent}
+
+**Combined TODO**: ${group.issues.length} related ${group.issues.length === 1 ? 'issue' : 'issues'} detected
+
+## Summary
+
+- **Assigned Agent**: **${group.assigned_agent}**
+- **Priority**: **${group.priority.toUpperCase()}**
+- **Total Issues**: ${group.issues.length}
+- **Average Confidence**: ${avgConfidence}%
+- **Auto-Apply Eligible**: ${autoApplyCount}
+- **Manual Review Required**: ${manualReviewCount}
+- **Detection Layer**: ${layerEmoji[group.layer]} ${group.layer.charAt(0).toUpperCase() + group.layer.slice(1)}
+
+## Issues Detected
+
+${issuesList}
+
+## 🎯 Recommended Actions (Priority Order)
+
+${combinedActions}
+
+## 📊 Execution Strategy
+
+**Suggested Approach**:
+${autoApplyCount > 0 ? `
+1. **Auto-Apply (${autoApplyCount} issues)**: Guardian can automatically remediate these high-confidence issues
+   - Review auto-fix logs after execution
+   - Verify changes before committing
+` : ''}${manualReviewCount > 0 ? `
+${autoApplyCount > 0 ? '2' : '1'}. **Manual Review (${manualReviewCount} issues)**: These require human judgment
+   - Investigate root causes using verification evidence
+   - Apply fixes with proper testing
+   - Codify learnings in RAG for future pattern matching
+` : ''}
+
+**Estimated Effort**: ${group.issues.length * 15}-${group.issues.length * 30} minutes (depending on complexity)
+
+## 🧠 Learning Opportunity
+
+After resolving these issues:
+1. Run \`/learn "Resolved ${group.issues.length} ${group.priority} issues in ${group.layer} layer"\`
+2. Guardian will store fix patterns in RAG
+3. Similar issues will be auto-remediable in the future (compounding engineering)
+
+## 🔍 Verification Details
+
+All issues verified using Chain-of-Verification (CoVe) methodology:
+- Layer Classification (framework/project/context)
+- Ground Truth Verification (file system, git, logs)
+- Agent Assignment (based on specialization)
+- Confidence Scoring (0-100%)
+
+**Full verification evidence available in individual issue sections above.**
+
+---
+
+**Generated by Guardian Verified Issue Detector**
+**Verification Pipeline**: Health Check → Layer Classification → Ground Truth Verification → TODO Grouping
+**Anti-Hallucination**: Chain-of-Verification (CoVe) methodology
+**Grouping Strategy**: ${process.env.GUARDIAN_GROUP_BY || 'agent'} (configurable via GUARDIAN_GROUP_BY env var)
 `;
 }
 

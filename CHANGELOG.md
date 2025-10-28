@@ -5,6 +5,62 @@ All notable changes to the VERSATIL SDLC Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.10.0] - 2025-10-28
+
+### Added - Guardian Automatic TODO Generation
+
+**Automatic Error Detection & Combined TODO Creation**
+
+Guardian now automatically creates combined TODO files for errors and gaps detected during health checks, grouped by assigned agent to reduce TODO spam.
+
+#### Key Features
+- **Automatic Detection**: Health checks run every 5 minutes, create TODOs immediately
+- **Smart Grouping**: Related issues combined into single files (5-10x reduction)
+- **Three-Layer Anti-Duplication**: Content fingerprinting + namespacing + grouping
+- **Agent Assignment**: Issues routed to specialized agents (Maria-QA, Marcus-Backend, etc.)
+- **Auto-Apply Detection**: High-confidence issues (≥90%) marked for automatic remediation
+
+#### New Environment Variables
+- `GUARDIAN_CREATE_TODOS=true` (default: enabled)
+- `GUARDIAN_GROUP_TODOS=true` (default: group by agent)
+- `GUARDIAN_GROUP_BY=agent` (strategy: agent/priority/layer)
+- `GUARDIAN_MAX_ISSUES_PER_TODO=10` (max issues per combined file)
+
+#### New Documentation
+- `docs/guardian/GUARDIAN_TODO_SYSTEM.md` (551 lines, complete user guide)
+- CLAUDE.md section: "Guardian Automatic TODO Generation (v7.10.0+)"
+
+#### Example Output
+**Before**: 10 issues → 10 individual TODO files
+**After**: 10 issues → 2 combined TODO files (grouped by agent)
+
+```
+todos/guardian-combined-maria-qa-critical-*.md (6 issues)
+todos/guardian-combined-marcus-backend-high-*.md (4 issues)
+```
+
+#### Breaking Change
+**GUARDIAN_CREATE_TODOS now defaults to `true`** (was `false` in v7.7.0)
+
+Users who prefer telemetry-only tracking can disable:
+```bash
+GUARDIAN_CREATE_TODOS=false
+```
+
+### Changed
+- `.env.example`: GUARDIAN_CREATE_TODOS default changed from `false` to `true`
+- `verified-issue-detector.ts`: TODO creation now enabled by default
+- Combined TODO generation reduces file spam by 5-10x
+
+### Documentation
+- Added: `docs/guardian/GUARDIAN_TODO_SYSTEM.md` (complete guide with configuration scenarios)
+- Updated: `CLAUDE.md` (Guardian TODO generation section)
+- Added: Architecture comparison docs (PARALLELIZATION_VS_SPECIALIZATION, SKILLS_VS_SUBAGENTS_COMPARISON, VERSATIL_VS_CLAUDE_SDK_CURSOR)
+- Added: `docs/architecture/ARCHITECTURE_QUICK_REFERENCE.md` (single-page decision tree)
+- Added: 4 Mermaid diagrams in `docs/architecture/diagrams/`
+
+---
+
 ## [7.9.0] - 2025-10-28
 
 ### Added - User Version Coherence System
