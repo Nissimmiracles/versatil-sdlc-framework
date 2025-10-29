@@ -228,6 +228,41 @@ Guardian automatically triggers proactive answers after:
 3. **Feature completion detected** (via git commits)
 4. **Learning patterns established** (≥3 occurrences)
 
+### Auto-Start on Session (v7.13.0+)
+
+**Guardian now starts automatically** when you begin a Claude Code session:
+
+```
+Session Starts (startup)
+    ↓
+SessionStart hook fires
+    ↓
+Guardian background monitoring starts
+    ↓
+Health checks run every 5 minutes
+    ↓
+Proactive answers appear automatically
+```
+
+**Configuration**: `.claude/hooks/session-start.ts` + `.claude/settings.json`
+
+**Manual Control**:
+```bash
+# Start Guardian manually
+npm run guardian:start
+
+# Stop Guardian
+npm run guardian:stop
+
+# Check status
+npm run guardian:status
+
+# One-time health check
+npm run guardian:health-check
+```
+
+**Logs**: `~/.versatil/logs/guardian/session-start.log`
+
 ### Learning Progression
 
 **First time you ask "documented or built?"**:

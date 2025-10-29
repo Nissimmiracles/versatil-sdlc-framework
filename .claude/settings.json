@@ -65,6 +65,17 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dist/session-start.cjs"
+          }
+        ]
+      }
     ]
   },
   "permissions": {
