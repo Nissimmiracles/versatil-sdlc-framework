@@ -489,7 +489,7 @@ export class EnhancementDetector {
   private calculateROI(
     pattern: RootCausePattern,
     estimatedEffortHours: number
-  ): { hours_saved_per_week: number; manual_interventions_eliminated: number; reliability_improvement_percent: number } {
+  ): { hours_saved_per_week: number; manual_interventions_eliminated: number; reliability_improvement_percent: number; roi_ratio: number } {
     // Calculate occurrences per week
     const occurrencesPerWeek = (pattern.occurrences / pattern.timespan_hours) * (24 * 7);
 
@@ -614,7 +614,7 @@ export class EnhancementDetector {
     pattern: RootCausePattern,
     verificationConfidence: number,
     successRate: number,
-    roi: { hours_saved_per_week: number; roi_ratio: number },
+    roi: { hours_saved_per_week: number; manual_interventions_eliminated: number; reliability_improvement_percent: number; roi_ratio: number },
     estimatedEffortHours: number
   ): { approvalTier: 1 | 2 | 3; approvalRequired: boolean; approvalRequiredReason: string } {
     // Get thresholds from environment (with defaults)

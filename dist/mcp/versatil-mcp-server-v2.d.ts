@@ -34,6 +34,10 @@ export declare class VERSATILMCPServerV2 {
     private zeroTrust;
     constructor(config: VERSATILMCPConfig);
     /**
+     * Lazy initialize ShadcnMCPExecutor with correct projectPath
+     */
+    private ensureShadcnInitialized;
+    /**
      * EventEmitter-like API for lazy initialization events
      */
     on(event: string, callback: (...args: any[]) => void): void;

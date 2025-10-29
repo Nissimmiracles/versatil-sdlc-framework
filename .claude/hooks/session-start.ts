@@ -71,7 +71,7 @@ async function main() {
           execSync('npm run guardian:health-check', {
             cwd,
             stdio: 'ignore',
-            timeout: 30000
+            timeout: 180000 // 3min - allows for slow builds/tests
           });
           fs.appendFileSync(logFile, `[${timestamp}] Health check completed\n`);
         } catch (healthCheckError) {
@@ -84,24 +84,27 @@ async function main() {
       // Guardian not running, proceed to start it
     }
 
-    // Start Guardian background monitoring
-    fs.appendFileSync(logFile, `[${timestamp}] Session ${hookData.session_id}: Starting Guardian background monitoring...\n`);
+    // Start Guardian background monitoring (async, don't wait)
+    fs.appendFileSync(logFile, `[${timestamp}] Session ${hookData.session_id}: Starting Guardian background monitoring (async)...\n`);
 
     try {
-      execSync('npm run guardian:start', {
+      // Start Guardian in background without waiting
+      execSync('npm run guardian:start > /dev/null 2>&1 &', {
         cwd,
-        stdio: 'pipe',
-        timeout: 30000
+        shell: '/bin/bash',
+        stdio: 'ignore',
+        timeout: 15000 // 15s - allow GraphRAG initialization
       });
 
-      fs.appendFileSync(logFile, `[${timestamp}] ✅ Guardian started successfully\n`);
+      fs.appendFileSync(logFile, `[${timestamp}] ✅ Guardian start initiated (running in background)\n`);
       fs.appendFileSync(logFile, `[${timestamp}] - Health checks: Every 5 minutes\n`);
       fs.appendFileSync(logFile, `[${timestamp}] - Proactive answers: Enabled (v7.13.0+)\n`);
       fs.appendFileSync(logFile, `[${timestamp}] - TODO generation: Enabled (v7.10.0+)\n`);
       fs.appendFileSync(logFile, `[${timestamp}] - Enhancement detection: Enabled (v7.12.0+)\n`);
+      fs.appendFileSync(logFile, `[${timestamp}] - IDE crash prevention: Enabled (v7.15.0+)\n`);
 
       // Output a brief notification to Claude (will be injected into context)
-      console.log('🛡️  Guardian background monitoring started (5-minute health checks)');
+      console.log('🛡️  Guardian background monitoring initiated');
 
     } catch (error) {
       const errorMsg = (error as Error).message;

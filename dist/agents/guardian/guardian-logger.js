@@ -395,6 +395,45 @@ export class GuardianLogger {
         }
     }
     /**
+     * Generic info logging (delegates to system category)
+     */
+    info(message, data) {
+        this.writeLog({
+            timestamp: new Date().toISOString(),
+            level: 'info',
+            category: 'system',
+            context: this.context,
+            message,
+            data
+        });
+    }
+    /**
+     * Generic error logging (delegates to system category)
+     */
+    error(message, data) {
+        this.writeLog({
+            timestamp: new Date().toISOString(),
+            level: 'error',
+            category: 'system',
+            context: this.context,
+            message,
+            data
+        });
+    }
+    /**
+     * Generic warning logging (delegates to system category)
+     */
+    warn(message, data) {
+        this.writeLog({
+            timestamp: new Date().toISOString(),
+            level: 'warn',
+            category: 'system',
+            context: this.context,
+            message,
+            data
+        });
+    }
+    /**
      * Rotate old logs (keep last 30 days)
      */
     rotateOldLogs() {

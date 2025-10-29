@@ -12,7 +12,7 @@
  * - Context-aware proactive monitoring
  * - Version management and evolution tracking (framework context only)
  *
- * @version 7.8.0
+ * @version 7.11.0
  */
 /**
  * Execution context for Guardian
@@ -139,6 +139,10 @@ export declare class IrisGuardian {
      * Check alert thresholds
      */
     private checkAlertThresholds;
+    /**
+     * Detect recent git changes for context (v7.13.0+)
+     */
+    private detectRecentGitChanges;
     /**
      * Attempt auto-remediation for detected issues
      */

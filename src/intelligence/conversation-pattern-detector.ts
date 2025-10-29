@@ -238,7 +238,7 @@ export class ConversationPatternDetector {
   /**
    * Get all patterns for category
    */
-  public getPatternsBy Category(category: QuestionCategory): ConversationPattern[] {
+  public getPatternsByCategory(category: QuestionCategory): ConversationPattern[] {
     return Array.from(this.patternsCache.values())
       .filter(p => p.question_category === category)
       .sort((a, b) => b.occurrences - a.occurrences);

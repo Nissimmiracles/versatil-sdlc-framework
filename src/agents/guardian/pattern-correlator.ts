@@ -116,7 +116,7 @@ export class PatternCorrelator {
     this.logger.info(`✅ [Pattern Correlator] Analysis complete`, {
       correlations: correlations.length,
       degradation_trends: degradationTrends.length,
-      predictive_alerts: predictive_alerts.length,
+      predictive_alerts: predictiveAlerts.length,
       analysis_window_hours: Math.round(analysisWindowHours * 10) / 10,
       duration_ms: duration
     });

@@ -192,7 +192,7 @@ export class FrameworkGuardian {
       console.log('  Building framework...');
       const { stdout, stderr } = await execAsync('npm run build', {
         cwd: this.frameworkRoot,
-        timeout: 60000 // 60s timeout
+        timeout: 300000 // 5min timeout - allows for slow builds
       });
 
       // Check for build warnings
@@ -259,7 +259,7 @@ export class FrameworkGuardian {
       console.log('  Running tests...');
       const { stdout, stderr } = await execAsync('npm test -- --passWithNoTests', {
         cwd: this.frameworkRoot,
-        timeout: 120000 // 2min timeout
+        timeout: 300000 // 5min timeout - allows for full test suites
       });
 
       // Parse test results
@@ -315,7 +315,7 @@ export class FrameworkGuardian {
       console.log('  Checking TypeScript...');
       const { stdout, stderr } = await execAsync('npx tsc --noEmit', {
         cwd: this.frameworkRoot,
-        timeout: 60000
+        timeout: 300000 // 5min timeout
       });
 
       // No errors = success

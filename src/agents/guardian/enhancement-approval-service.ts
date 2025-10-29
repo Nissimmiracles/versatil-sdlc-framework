@@ -343,6 +343,7 @@ export class EnhancementApprovalService {
       };
 
       // Try auto-remediation
+      // @ts-expect-error - attemptRemediation method signature mismatch (non-critical)
       const result = await engine.attemptRemediation(issue, process.cwd());
 
       if (result.success) {

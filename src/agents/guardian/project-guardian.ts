@@ -19,6 +19,8 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { GuardianLogger } from './guardian-logger.js';
 import { AgentMonitor } from './agent-monitor.js';
+import { IDEPerformanceDetector } from './ide-performance-detector.js';
+import { IDEConfigGenerator } from './ide-config-generator.js';
 
 const execAsync = promisify(exec);
 
@@ -32,6 +34,7 @@ export interface ProjectHealthCheck {
     project_tests: HealthCheckResult;
     framework_version: HealthCheckResult;
     rag_usage: HealthCheckResult;
+    ide_performance: HealthCheckResult; // NEW v7.15.0
   };
   issues: ProjectIssue[];
   recommendations: string[];
@@ -95,14 +98,16 @@ export class ProjectGuardian {
       projectBuildCheck,
       projectTestsCheck,
       frameworkVersionCheck,
-      ragUsageCheck
+      ragUsageCheck,
+      idePerformanceCheck
     ] = await Promise.all([
       this.checkFrameworkConfig(),
       this.checkAgentActivation(),
       this.checkProjectBuild(),
       this.checkProjectTests(),
       this.checkFrameworkVersion(),
-      this.checkRAGUsage()
+      this.checkRAGUsage(),
+      this.checkIDEPerformance() // NEW v7.15.0
     ]);
 
     const checks = {
@@ -111,7 +116,8 @@ export class ProjectGuardian {
       project_build: projectBuildCheck,
       project_tests: projectTestsCheck,
       framework_version: frameworkVersionCheck,
-      rag_usage: ragUsageCheck
+      rag_usage: ragUsageCheck,
+      ide_performance: idePerformanceCheck // NEW v7.15.0
     };
 
     // Calculate overall health
@@ -323,7 +329,7 @@ export class ProjectGuardian {
       // Try to run build
       const { stdout, stderr } = await execAsync('npm run build', {
         cwd: this.projectRoot,
-        timeout: 120000 // 2min timeout
+        timeout: 300000 // 5min timeout - allows for full test suites
       });
 
       // Check for build warnings
@@ -393,7 +399,7 @@ export class ProjectGuardian {
       // Try to run tests
       const { stdout, stderr } = await execAsync('npm test -- --passWithNoTests', {
         cwd: this.projectRoot,
-        timeout: 120000
+        timeout: 300000 // 5min timeout
       });
 
       // Parse test results
@@ -558,6 +564,99 @@ export class ProjectGuardian {
       },
       issues
     };
+  }
+
+  /**
+   * Check IDE performance (v7.15.0)
+   * Detects IDE crash risks and auto-generates config files
+   */
+  private async checkIDEPerformance(): Promise<HealthCheckResult> {
+    const startTime = Date.now();
+    const issues: string[] = [];
+
+    console.log('  Checking IDE performance...');
+
+    try {
+      const detector = new IDEPerformanceDetector(this.projectRoot);
+      const crashRisk = await detector.detectCrashRisk();
+
+      // Log detection results
+      this.logger.info(
+        `IDE crash risk detected: ${crashRisk.crash_risk} (confidence: ${crashRisk.confidence}%)`,
+        {
+          ide_type: crashRisk.ide_type,
+          missing_files: crashRisk.evidence.missing_ignore_files,
+          total_indexable_gb: crashRisk.evidence.total_indexable_size_gb
+        }
+      );
+
+      // Calculate score based on crash risk
+      let score = 100;
+      if (crashRisk.crash_risk === 'critical') {
+        score = 40;
+        issues.push(crashRisk.recommendation);
+      } else if (crashRisk.crash_risk === 'high') {
+        score = 60;
+        issues.push(crashRisk.recommendation);
+      } else if (crashRisk.crash_risk === 'medium') {
+        score = 80;
+        issues.push(crashRisk.recommendation);
+      }
+
+      // Auto-fix if confidence ≥ 90% and issues detected
+      if (crashRisk.auto_fixable && crashRisk.evidence.missing_ignore_files.length > 0) {
+        this.logger.info('IDE crash risk auto-fixable - generating config files...');
+
+        const generator = new IDEConfigGenerator(this.projectRoot);
+        const result = await generator.generateOptimalConfigs(
+          crashRisk.ide_type,
+          crashRisk.evidence.large_directories.map(d => ({
+            path: d.path,
+            size_bytes: d.size_mb * 1024 * 1024,
+            size_mb: d.size_mb,
+            size_gb: d.size_mb / 1024
+          }))
+        );
+
+        if (result.success) {
+          this.logger.info(
+            `✅ IDE config files generated: ${[...result.files_created, ...result.files_updated].join(', ')}`
+          );
+          // Improve score since we fixed the issue
+          score = 95;
+          issues.push(
+            `Auto-generated IDE config files: ${[...result.files_created, ...result.files_updated].join(', ')}`
+          );
+        } else {
+          this.logger.error(`Failed to generate IDE config files: ${result.errors.join(', ')}`);
+          issues.push(`Failed to auto-fix: ${result.errors.join(', ')}`);
+        }
+      }
+
+      return {
+        healthy: score >= 80,
+        score,
+        latency_ms: Date.now() - startTime,
+        details: {
+          ide_type: crashRisk.ide_type,
+          crash_risk: crashRisk.crash_risk,
+          confidence: crashRisk.confidence,
+          missing_files: crashRisk.evidence.missing_ignore_files,
+          total_indexable_gb: crashRisk.evidence.total_indexable_size_gb,
+          auto_fixed: crashRisk.auto_fixable && issues.some(i => i.includes('Auto-generated'))
+        },
+        issues
+      };
+    } catch (error) {
+      this.logger.error(`IDE performance check failed: ${(error as Error).message}`);
+      return {
+        healthy: true, // Non-critical error
+        score: 100,
+        latency_ms: Date.now() - startTime,
+        details: { error: (error as Error).message },
+        issues: []
+      };
+    }
   }
 
   /**

@@ -59,7 +59,8 @@ async function main() {
           (0, import_child_process.execSync)("npm run guardian:health-check", {
             cwd,
             stdio: "ignore",
-            timeout: 3e4
+            timeout: 18e4
+            // 3min - allows for slow builds/tests
           });
           fs.appendFileSync(logFile, `[${timestamp}] Health check completed
 `);
@@ -71,15 +72,17 @@ async function main() {
       }
     } catch {
     }
-    fs.appendFileSync(logFile, `[${timestamp}] Session ${hookData.session_id}: Starting Guardian background monitoring...
+    fs.appendFileSync(logFile, `[${timestamp}] Session ${hookData.session_id}: Starting Guardian background monitoring (async)...
 `);
     try {
-      (0, import_child_process.execSync)("npm run guardian:start", {
+      (0, import_child_process.execSync)("npm run guardian:start > /dev/null 2>&1 &", {
         cwd,
-        stdio: "pipe",
-        timeout: 3e4
+        shell: "/bin/bash",
+        stdio: "ignore",
+        timeout: 15e3
+        // 15s - allow GraphRAG initialization
       });
-      fs.appendFileSync(logFile, `[${timestamp}] \u2705 Guardian started successfully
+      fs.appendFileSync(logFile, `[${timestamp}] \u2705 Guardian start initiated (running in background)
 `);
       fs.appendFileSync(logFile, `[${timestamp}] - Health checks: Every 5 minutes
 `);
@@ -89,7 +92,7 @@ async function main() {
 `);
       fs.appendFileSync(logFile, `[${timestamp}] - Enhancement detection: Enabled (v7.12.0+)
 `);
-      console.log("\u{1F6E1}\uFE0F  Guardian background monitoring started (5-minute health checks)");
+      console.log("\u{1F6E1}\uFE0F  Guardian background monitoring initiated");
     } catch (error) {
       const errorMsg = error.message;
       fs.appendFileSync(logFile, `[${timestamp}] \u274C Failed to start Guardian: ${errorMsg}

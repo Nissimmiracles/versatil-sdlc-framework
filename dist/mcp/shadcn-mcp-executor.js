@@ -9,11 +9,20 @@ import * as fs from 'fs';
 import { DEFAULT_SHADCN_MCP_CONFIG } from './shadcn-mcp-config.js';
 export class ShadcnMCPExecutor {
     constructor(config = {}) {
+        this.project = null;
         this.config = { ...DEFAULT_SHADCN_MCP_CONFIG, ...config };
-        this.project = new Project({
-            tsConfigFilePath: path.join(this.config.projectPath, 'tsconfig.json'),
-            skipAddingFilesFromTsConfig: true
-        });
+        // Lazy init - don't create Project until first use
+    }
+    /**
+     * Ensure Project is initialized (lazy loading)
+     */
+    ensureProject() {
+        if (!this.project) {
+            this.project = new Project({
+                tsConfigFilePath: path.join(this.config.projectPath, 'tsconfig.json'),
+                skipAddingFilesFromTsConfig: true
+            });
+        }
     }
     /**
      * Execute Shadcn MCP action
@@ -50,6 +59,8 @@ export class ShadcnMCPExecutor {
         const startTime = Date.now();
         try {
             console.log(`🔍 Scanning project for Shadcn components...`);
+            // Ensure Project is initialized (lazy loading)
+            this.ensureProject();
             // Find all installed components
             const componentsDir = path.join(this.config.projectPath, this.config.componentsPath);
             const installed = this.findInstalledComponents(componentsDir);
@@ -104,6 +115,8 @@ export class ShadcnMCPExecutor {
         const startTime = Date.now();
         try {
             console.log(`📊 Analyzing usage of ${componentName}...`);
+            // Ensure Project is initialized (lazy loading)
+            this.ensureProject();
             const usage = [];
             const propsMap = {};
             for (const sourceFile of this.project.getSourceFiles()) {
@@ -202,6 +215,8 @@ export class ShadcnMCPExecutor {
         const startTime = Date.now();
         try {
             console.log(`♿ Validating accessibility for ${componentName}...`);
+            // Ensure Project is initialized (lazy loading)
+            this.ensureProject();
             const issues = [];
             for (const sourceFile of this.project.getSourceFiles()) {
                 const jsxElements = sourceFile.getDescendantsOfKind(SyntaxKind.JsxOpeningElement);
@@ -262,6 +277,8 @@ export class ShadcnMCPExecutor {
      * Helper: Analyze component usage across project
      */
     analyzeUsage(installed) {
+        // Ensure Project is initialized (lazy loading)
+        this.ensureProject();
         const usageMap = new Map();
         for (const { name } of installed) {
             const usage = { files: new Set(), variants: new Set() };

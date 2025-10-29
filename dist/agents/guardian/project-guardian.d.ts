@@ -22,6 +22,7 @@ export interface ProjectHealthCheck {
         project_tests: HealthCheckResult;
         framework_version: HealthCheckResult;
         rag_usage: HealthCheckResult;
+        ide_performance: HealthCheckResult;
     };
     issues: ProjectIssue[];
     recommendations: string[];
@@ -88,6 +89,11 @@ export declare class ProjectGuardian {
      * Check RAG usage
      */
     private checkRAGUsage;
+    /**
+     * Check IDE performance (v7.15.0)
+     * Detects IDE crash risks and auto-generates config files
+     */
+    private checkIDEPerformance;
     /**
      * Helper methods
      */

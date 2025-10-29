@@ -166,6 +166,18 @@ export declare class GuardianLogger {
      */
     getActivityTimeline(limit?: number): ActivityEntry[];
     /**
+     * Generic info logging (delegates to system category)
+     */
+    info(message: string, data?: Record<string, any>): void;
+    /**
+     * Generic error logging (delegates to system category)
+     */
+    error(message: string, data?: Record<string, any>): void;
+    /**
+     * Generic warning logging (delegates to system category)
+     */
+    warn(message: string, data?: Record<string, any>): void;
+    /**
      * Rotate old logs (keep last 30 days)
      */
     private rotateOldLogs;

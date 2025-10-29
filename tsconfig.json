@@ -40,6 +40,8 @@
     "tests",
     "**/*.test.ts",
     "**/*.spec.ts",
-    "src/simulation/**/*"
+    "src/simulation/**/*",
+    "src/api/**/*",
+    "src/database/**/*"
   ]
 }

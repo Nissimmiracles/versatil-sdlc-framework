@@ -14,6 +14,10 @@ export declare class ShadcnMCPExecutor {
     private project;
     constructor(config?: Partial<ShadcnMCPConfig>);
     /**
+     * Ensure Project is initialized (lazy loading)
+     */
+    private ensureProject;
+    /**
      * Execute Shadcn MCP action
      */
     executeShadcnMCP(action: string, params?: any): Promise<MCPExecutionResult>;

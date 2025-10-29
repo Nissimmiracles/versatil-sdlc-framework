@@ -24,12 +24,13 @@ import { getMCPOnboarding } from './mcp-onboarding.js';
 import { DocsSearchEngine } from './docs-search-engine.js';
 import { DocsFormatter } from './docs-formatter.js';
 // Initialize MCP executors
+// MCP executors will be initialized lazily with correct projectPath
 const githubMCPExecutor = new GitHubMCPExecutor();
 const semgrepMCPExecutor = new SemgrepMCPExecutor();
 const sentryMCPExecutor = new SentryMCPExecutor();
 const exaMCPExecutor = new ExaMCPExecutor();
 const n8nMCPExecutor = new N8nMCPExecutor();
-const shadcnMCPExecutor = new ShadcnMCPExecutor();
+let shadcnMCPExecutor = null; // Lazy init with projectPath
 const vertexAIMCPExecutor = new VertexAIMCPExecutor();
 const playwrightMCPExecutor = new PlaywrightMCPExecutor();
 const gitMCPExecutor = new GitMCPExecutor();
@@ -70,6 +71,16 @@ export class VERSATILMCPServerV2 {
         this.registerPrompts();
         this.registerTools();
         this.lazyInitialized = true;
+    }
+    /**
+     * Lazy initialize ShadcnMCPExecutor with correct projectPath
+     */
+    ensureShadcnInitialized() {
+        if (!shadcnMCPExecutor) {
+            shadcnMCPExecutor = new ShadcnMCPExecutor({
+                projectPath: this.config.projectPath || process.cwd()
+            });
+        }
     }
     /**
      * EventEmitter-like API for lazy initialization events
@@ -2759,6 +2770,7 @@ Provide query execution plans with optimization strategies.`,
             readOnlyHint: true,
             destructiveHint: false
         }, async () => {
+            this.ensureShadcnInitialized();
             const result = await shadcnMCPExecutor.executeShadcnMCP('component_analysis');
             return {
                 content: [
@@ -2775,6 +2787,7 @@ Provide query execution plans with optimization strategies.`,
             destructiveHint: false,
             componentName: z.string().describe('Component name to analyze')
         }, async ({ componentName }) => {
+            this.ensureShadcnInitialized();
             const result = await shadcnMCPExecutor.executeShadcnMCP('component_usage', {
                 componentName
             });
@@ -2792,6 +2805,7 @@ Provide query execution plans with optimization strategies.`,
             readOnlyHint: true,
             destructiveHint: false
         }, async () => {
+            this.ensureShadcnInitialized();
             const result = await shadcnMCPExecutor.executeShadcnMCP('unused_components');
             return {
                 content: [
@@ -2808,6 +2822,7 @@ Provide query execution plans with optimization strategies.`,
             destructiveHint: false,
             componentName: z.string().describe('Component name to validate')
         }, async ({ componentName }) => {
+            this.ensureShadcnInitialized();
             const result = await shadcnMCPExecutor.executeShadcnMCP('accessibility_check', {
                 componentName
             });
