@@ -12,7 +12,7 @@
  * - Context-aware proactive monitoring
  * - Version management and evolution tracking (framework context only)
  *
- * @version 7.8.0
+ * @version 7.11.0
  */
 
 import * as fs from 'fs';
@@ -445,12 +445,192 @@ export class IrisGuardian {
         }
       }
 
+      // NEW: Root Cause Learning & Enhancement Detection (v7.11.0+)
+      // Analyze health check history for recurring patterns and suggest enhancements
+      if (process.env.GUARDIAN_LEARN_FROM_ISSUES !== 'false' && this.healthHistory.length >= 3) {
+        try {
+          this.logger.info('🧠 Starting root cause learning analysis...');
+
+          const { RootCauseLearner } = await import('./root-cause-learner.js');
+          const { EnhancementDetector } = await import('./enhancement-detector.js');
+          const { EnhancementTodoGenerator } = await import('./enhancement-todo-generator.js');
+
+          // Step 1: Learn from recurring patterns
+          const rootCauseLearner = new RootCauseLearner();
+          const learningResult = await rootCauseLearner.analyzeHealthCheckHistory(
+            this.healthHistory,
+            this.contextDetection.paths.current_working_directory
+          );
+
+          this.logger.info(`✅ Root cause learning complete: ${learningResult.patterns_detected.length} patterns detected`, {
+            new_patterns: learningResult.new_patterns,
+            updated_patterns: learningResult.updated_patterns,
+            enhancement_candidates: learningResult.enhancement_candidates,
+            confidence_avg: learningResult.confidence_avg
+          });
+
+          // Step 2: Detect enhancement opportunities
+          if (learningResult.enhancement_candidates > 0 &&
+              process.env.GUARDIAN_CREATE_ENHANCEMENT_TODOS !== 'false') {
+
+            const enhancementDetector = new EnhancementDetector();
+            const enhancementResult = await enhancementDetector.detectEnhancements(
+              learningResult.patterns_detected
+            );
+
+            this.logger.info(`💡 Enhancement detection complete: ${enhancementResult.enhancements_suggested.length} suggestions`, {
+              high_priority: enhancementResult.high_priority_count,
+              total_roi_hours_per_week: enhancementResult.total_roi_hours_per_week,
+              avg_confidence: enhancementResult.avg_confidence
+            });
+
+            // Step 3: Handle enhancements based on approval tier (v7.12.0+)
+            if (enhancementResult.enhancements_suggested.length > 0) {
+              const { EnhancementApprovalService } = await import('./enhancement-approval-service.js');
+              const approvalService = new EnhancementApprovalService();
+              const approvalMode = approvalService.getApprovalMode();
+
+              this.logger.info(`🔐 [Guardian] Approval mode: ${approvalMode}`);
+
+              // Separate enhancements by tier
+              const tier1 = enhancementResult.enhancements_suggested.filter(s => s.approval_tier === 1);
+              const tier2 = enhancementResult.enhancements_suggested.filter(s => s.approval_tier === 2);
+              const tier3 = enhancementResult.enhancements_suggested.filter(s => s.approval_tier === 3);
+
+              this.logger.info(`📊 Enhancement tiers: Tier 1 (${tier1.length}), Tier 2 (${tier2.length}), Tier 3 (${tier3.length})`);
+
+              // TIER 1: Auto-apply
+              for (const suggestion of tier1) {
+                this.logger.info(`🚀 [Guardian] Auto-applying Tier 1 enhancement: ${suggestion.title}`);
+                const result = await approvalService.executeEnhancement(suggestion);
+
+                if (result.success) {
+                  console.log(`\n✅ Guardian Auto-Applied: ${suggestion.title}`);
+                  console.log(`   ${result.message}`);
+                  console.log(`   ROI: ${suggestion.roi.hours_saved_per_week}h/week saved\n`);
+                } else {
+                  console.log(`\n⚠️  Guardian Auto-Apply Failed: ${suggestion.title}`);
+                  console.log(`   ${result.message}\n`);
+                  // Fallback: Create TODO
+                  tier3.push(suggestion);
+                }
+              }
+
+              // TIER 2: Prompt for approval (interactive mode only)
+              const tier2Approved: typeof tier2 = [];
+              const tier2Deferred: typeof tier2 = [];
+
+              if (approvalMode === 'interactive' && tier2.length > 0) {
+                for (const suggestion of tier2) {
+                  const approvalResult = await approvalService.promptForApproval(suggestion);
+
+                  if (approvalResult.decision === 'approved') {
+                    tier2Approved.push(suggestion);
+                    const result = await approvalService.executeEnhancement(suggestion);
+
+                    if (!result.success) {
+                      // Execution failed, create TODO
+                      tier2Deferred.push(suggestion);
+                    }
+                  } else if (approvalResult.decision === 'rejected') {
+                    console.log(`❌ Enhancement rejected: ${suggestion.title}`);
+                    if (approvalResult.reason) {
+                      console.log(`   Reason: ${approvalResult.reason}`);
+                    }
+                  } else {
+                    // Deferred
+                    tier2Deferred.push(suggestion);
+                  }
+                }
+              } else if (approvalMode === 'auto') {
+                // Auto mode: Treat Tier 2 as Tier 1
+                for (const suggestion of tier2) {
+                  const result = await approvalService.executeEnhancement(suggestion);
+
+                  if (!result.success) {
+                    tier2Deferred.push(suggestion);
+                  }
+                }
+              } else {
+                // Manual mode: All Tier 2 become TODOs
+                tier2Deferred.push(...tier2);
+              }
+
+              // TIER 3 + Deferred: Create TODO files
+              const todosToCreate = [...tier3, ...tier2Deferred];
+
+              if (todosToCreate.length > 0) {
+                const todosDir = path.join(this.contextDetection.paths.current_working_directory, 'todos');
+                const todoGenerator = new EnhancementTodoGenerator(todosDir);
+                const todoResult = await todoGenerator.generateTodos(todosToCreate);
+
+                this.logger.info(`📝 Enhancement TODOs generated: ${todoResult.todos_created} created, ${todoResult.todos_skipped} skipped`);
+
+                if (todoResult.todos_created > 0) {
+                  console.log(`\n📝 Created ${todoResult.todos_created} enhancement TODO(s) for manual review`);
+                  console.log(`   Location: todos/enhancement-*.md`);
+                  console.log(`   Use /work <todo-file> to implement\n`);
+                }
+              }
+            }
+          }
+
+        } catch (learningError) {
+          this.logger.error('Root cause learning failed', {
+            error: (learningError as Error).message
+          });
+          // Continue without failing health check
+        }
+      }
+
       const duration = Date.now() - startTime;
       this.logger.info(`Health check completed (${duration}ms)`, {
         overall_health: result.overall_health,
         status: result.status,
         issues: result.issues.length,
       });
+
+      // NEW: User Interaction Learning (v7.13.0+)
+      // Generate proactive answers for anticipated user questions
+      if (process.env.GUARDIAN_LEARN_USER_PATTERNS !== 'false') {
+        try {
+          const { ProactiveAnswerGenerator } = await import('../../intelligence/proactive-answer-generator.js');
+          const generator = new ProactiveAnswerGenerator();
+
+          // Detect recent code changes for context
+          const gitChanges = await this.detectRecentGitChanges();
+
+          const context = {
+            feature_name: 'Guardian Health Check',
+            files_created: gitChanges.created,
+            files_modified: gitChanges.modified,
+            total_lines: gitChanges.total_lines,
+            documentation_files: gitChanges.documentation,
+            git_status: {
+              uncommitted: gitChanges.uncommitted,
+              files_count: gitChanges.files_count,
+              branch: gitChanges.branch,
+              commits_ahead: gitChanges.commits_ahead
+            }
+          };
+
+          const proactiveAnswer = await generator.generateForFeatureCompletion(context);
+
+          if (proactiveAnswer?.should_show_proactively) {
+            const formattedAnswer = generator.formatProactiveAnswer(proactiveAnswer, context);
+            console.log('\n' + formattedAnswer + '\n');
+            this.logger.info('📊 Proactive answer generated based on learned patterns', {
+              anticipated_questions: proactiveAnswer.anticipated_questions.length,
+              confidence: proactiveAnswer.confidence
+            });
+          }
+        } catch (learningError) {
+          this.logger.debug('Proactive answer generation skipped', {
+            error: (learningError as Error).message
+          });
+          // Continue without failing health check
+        }
+      }
 
       return result;
     } catch (error) {
@@ -514,6 +694,97 @@ export class IrisGuardian {
         threshold: WARNING_THRESHOLD,
         issues: result.issues.length,
       });
+    }
+  }
+
+  /**
+   * Detect recent git changes for context (v7.13.0+)
+   */
+  private async detectRecentGitChanges(): Promise<{
+    created: string[];
+    modified: string[];
+    total_lines: number;
+    documentation: string[];
+    uncommitted: boolean;
+    files_count: number;
+    branch: string;
+    commits_ahead: number;
+  }> {
+    try {
+      const { execSync } = await import('child_process');
+      const cwd = this.contextDetection.paths.current_working_directory;
+
+      // Get current branch
+      const branch = execSync('git branch --show-current', { cwd, encoding: 'utf-8' }).trim();
+
+      // Get uncommitted files
+      const statusOutput = execSync('git status --porcelain', { cwd, encoding: 'utf-8' });
+      const statusLines = statusOutput.trim().split('\n').filter(Boolean);
+
+      const created: string[] = [];
+      const modified: string[] = [];
+      const documentation: string[] = [];
+
+      for (const line of statusLines) {
+        const status = line.substring(0, 2).trim();
+        const filepath = line.substring(3);
+
+        if (status === 'A' || status === '??') {
+          created.push(filepath);
+        } else if (status === 'M') {
+          modified.push(filepath);
+        }
+
+        if (filepath.endsWith('.md') || filepath.includes('docs/')) {
+          documentation.push(filepath);
+        }
+      }
+
+      // Count total lines added (approximate)
+      let total_lines = 0;
+      try {
+        const diffOutput = execSync('git diff --stat', { cwd, encoding: 'utf-8' });
+        const match = diffOutput.match(/(\d+) insertions?/);
+        if (match) {
+          total_lines = parseInt(match[1], 10);
+        }
+      } catch {
+        // If diff fails, estimate from file count
+        total_lines = (created.length + modified.length) * 50;
+      }
+
+      // Check commits ahead of origin
+      let commits_ahead = 0;
+      try {
+        const aheadOutput = execSync(`git rev-list --count origin/${branch}..HEAD`, { cwd, encoding: 'utf-8' });
+        commits_ahead = parseInt(aheadOutput.trim(), 10);
+      } catch {
+        // Branch might not have upstream
+        commits_ahead = 0;
+      }
+
+      return {
+        created,
+        modified,
+        total_lines,
+        documentation,
+        uncommitted: statusLines.length > 0,
+        files_count: statusLines.length,
+        branch,
+        commits_ahead
+      };
+    } catch (error) {
+      this.logger.debug('Git change detection failed', { error: (error as Error).message });
+      return {
+        created: [],
+        modified: [],
+        total_lines: 0,
+        documentation: [],
+        uncommitted: false,
+        files_count: 0,
+        branch: 'main',
+        commits_ahead: 0
+      };
     }
   }
 
