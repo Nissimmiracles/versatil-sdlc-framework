@@ -1,0 +1,563 @@
+// Prisma schema for VERSATIL ML Workflow Automation
+// Database: PostgreSQL with pgvector extension
+// Generated: 2025-10-29
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+// ============================================================================
+// WORKFLOWS
+// ============================================================================
+
+model Workflow {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      WorkflowStatus @default(DRAFT)
+  config      Json // Workflow configuration (n8n nodes, etc.)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String // User ID
+
+  // Relations
+  datasets    Dataset[]
+  models      Model[]
+  experiments Experiment[]
+
+  @@index([status])
+  @@index([createdBy])
+  @@index([createdAt])
+  @@map("workflows")
+}
+
+enum WorkflowStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  FAILED
+  ARCHIVED
+}
+
+// ============================================================================
+// DATASETS
+// ============================================================================
+
+model Dataset {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        DatasetType
+  size        BigInt // Size in bytes
+  rowCount    Int? // Number of rows (if applicable)
+
+  // Storage
+  storagePath String // GCS path
+  format      String // parquet, csv, tfrecord, etc.
+
+  // Metadata
+  schema      Json? // Dataset schema
+  stats       Json? // Statistics (mean, std, etc.)
+  tags        String[] // Searchable tags
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  workflowId  String?
+  workflow    Workflow? @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  versions    DatasetVersion[]
+  trainingJobs TrainingJob[]
+
+  @@index([type])
+  @@index([workflowId])
+  @@index([createdAt])
+  @@map("datasets")
+}
+
+enum DatasetType {
+  IMAGE
+  TEXT
+  TABULAR
+  TIME_SERIES
+  AUDIO
+  VIDEO
+  MULTIMODAL
+}
+
+model DatasetVersion {
+  id          String   @id @default(cuid())
+  version     Int
+  description String?
+  storagePath String // GCS path for this version
+  size        BigInt
+  checksum    String // SHA-256 checksum
+
+  // Changes
+  changes     Json? // What changed from previous version
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+
+  // Relations
+  datasetId   String
+  dataset     Dataset @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+
+  @@unique([datasetId, version])
+  @@index([datasetId])
+  @@map("dataset_versions")
+}
+
+// ============================================================================
+// MODELS
+// ============================================================================
+
+model Model {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        ModelType
+  framework   String // TensorFlow, PyTorch, scikit-learn, etc.
+
+  // Metadata
+  architecture Json? // Model architecture details
+  hyperparameters Json? // Hyperparameters used
+  tags        String[]
+
+  // Performance
+  metrics     Json? // Evaluation metrics
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  workflowId  String?
+  workflow    Workflow? @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  versions    ModelVersion[]
+  endpoints   Endpoint[]
+
+  @@index([type])
+  @@index([framework])
+  @@index([workflowId])
+  @@map("models")
+}
+
+enum ModelType {
+  CLASSIFICATION
+  REGRESSION
+  CLUSTERING
+  ANOMALY_DETECTION
+  OBJECT_DETECTION
+  SEGMENTATION
+  NLP
+  RECOMMENDATION
+  FORECASTING
+  GENERATIVE
+}
+
+model ModelVersion {
+  id          String   @id @default(cuid())
+  version     Int
+  description String?
+
+  // Storage
+  storagePath String // GCS path to model artifacts
+  artifactUri String // Vertex AI artifact URI
+  size        BigInt
+  checksum    String
+
+  // Performance
+  metrics     Json // Evaluation metrics for this version
+  trainingDuration Int? // Training duration in seconds
+
+  // Status
+  status      ModelVersionStatus @default(PENDING)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  deployedAt  DateTime?
+
+  // Relations
+  modelId     String
+  model       Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  trainingJobId String? @unique
+  trainingJob TrainingJob? @relation(fields: [trainingJobId], references: [id], onDelete: SetNull)
+  deployments Deployment[]
+  predictions Prediction[]
+
+  @@unique([modelId, version])
+  @@index([modelId])
+  @@index([status])
+  @@map("model_versions")
+}
+
+enum ModelVersionStatus {
+  PENDING
+  TRAINING
+  TRAINED
+  EVALUATING
+  VALIDATED
+  DEPLOYED
+  FAILED
+  ARCHIVED
+}
+
+// ============================================================================
+// TRAINING
+// ============================================================================
+
+model Experiment {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+
+  // Configuration
+  config      Json // Experiment configuration
+
+  // Status
+  status      ExperimentStatus @default(RUNNING)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+
+  // Relations
+  workflowId  String?
+  workflow    Workflow? @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  trainingJobs TrainingJob[]
+
+  @@index([status])
+  @@index([workflowId])
+  @@map("experiments")
+}
+
+enum ExperimentStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model TrainingJob {
+  id          String   @id @default(cuid())
+  displayName String
+
+  // Configuration
+  trainingInput Json // Training configuration
+  containerSpec Json // Container specification
+
+  // Resources
+  machineType String
+  acceleratorType String?
+  acceleratorCount Int?
+
+  // Status
+  status      TrainingJobStatus @default(PENDING)
+  errorMessage String?
+
+  // Progress
+  startTime   DateTime?
+  endTime     DateTime?
+  duration    Int? // Duration in seconds
+
+  // Vertex AI
+  vertexJobId String? @unique
+  vertexJobName String?
+
+  // Logs and artifacts
+  logsPath    String?
+  artifactsPath String?
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  experimentId String?
+  experiment  Experiment? @relation(fields: [experimentId], references: [id], onDelete: SetNull)
+  datasetId   String?
+  dataset     Dataset? @relation(fields: [datasetId], references: [id], onDelete: SetNull)
+  modelVersion ModelVersion?
+
+  @@index([status])
+  @@index([experimentId])
+  @@index([datasetId])
+  @@index([createdAt])
+  @@map("training_jobs")
+}
+
+enum TrainingJobStatus {
+  PENDING
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  CANCELLING
+}
+
+// ============================================================================
+// DEPLOYMENT & PREDICTION
+// ============================================================================
+
+model Endpoint {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+
+  // Vertex AI
+  vertexEndpointId String? @unique
+  vertexEndpointName String?
+
+  // Configuration
+  region      String
+
+  // Status
+  status      EndpointStatus @default(CREATING)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  modelId     String
+  model       Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  deployments Deployment[]
+  predictions Prediction[]
+
+  @@index([status])
+  @@index([modelId])
+  @@map("endpoints")
+}
+
+enum EndpointStatus {
+  CREATING
+  ACTIVE
+  UPDATING
+  FAILED
+  DELETING
+}
+
+model Deployment {
+  id          String   @id @default(cuid())
+
+  // Traffic split
+  trafficSplit Int @default(100) // Percentage of traffic (0-100)
+
+  // Resources
+  minReplicas Int @default(1)
+  maxReplicas Int @default(10)
+  machineType String
+  acceleratorType String?
+  acceleratorCount Int?
+
+  // Status
+  status      DeploymentStatus @default(DEPLOYING)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  endpointId  String
+  endpoint    Endpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  modelVersionId String
+  modelVersion ModelVersion @relation(fields: [modelVersionId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([endpointId])
+  @@index([modelVersionId])
+  @@map("deployments")
+}
+
+enum DeploymentStatus {
+  DEPLOYING
+  DEPLOYED
+  UNDEPLOYING
+  FAILED
+}
+
+model Prediction {
+  id          String   @id @default(cuid())
+
+  // Input/Output
+  input       Json // Prediction input
+  output      Json? // Prediction output
+
+  // Metadata
+  latency     Int? // Latency in milliseconds
+  confidence  Float?
+
+  // Status
+  status      PredictionStatus @default(PENDING)
+  errorMessage String?
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+
+  // Relations
+  endpointId  String
+  endpoint    Endpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  modelVersionId String
+  modelVersion ModelVersion @relation(fields: [modelVersionId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([endpointId])
+  @@index([modelVersionId])
+  @@index([createdAt])
+  @@map("predictions")
+}
+
+enum PredictionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+// ============================================================================
+// PATTERN RECOGNITION
+// ============================================================================
+
+model PatternRecognitionJob {
+  id          String   @id @default(cuid())
+  name        String
+  type        PatternType
+
+  // Configuration
+  config      Json // Pattern recognition configuration
+
+  // Input
+  inputPath   String // GCS path to input data
+
+  // Output
+  outputPath  String? // GCS path to results
+  results     Json? // Pattern recognition results
+
+  // Status
+  status      PatternJobStatus @default(PENDING)
+  errorMessage String?
+
+  // Progress
+  startTime   DateTime?
+  endTime     DateTime?
+  duration    Int?
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+  @@map("pattern_recognition_jobs")
+}
+
+enum PatternType {
+  VISION
+  TEXT
+  TIME_SERIES
+  ANOMALY
+  CLUSTERING
+  CLASSIFICATION
+}
+
+enum PatternJobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+// ============================================================================
+// CLOUD RUN SERVICES
+// ============================================================================
+
+model CloudRunService {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+
+  // Configuration
+  image       String // Container image
+  region      String
+
+  // Resources
+  cpu         String // e.g., "1000m"
+  memory      String // e.g., "512Mi"
+
+  // Environment
+  envVars     Json? // Environment variables
+  secrets     Json? // Secret references
+
+  // Status
+  status      ServiceStatus @default(CREATING)
+  url         String? // Service URL
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  deployments ServiceDeployment[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("cloud_run_services")
+}
+
+enum ServiceStatus {
+  CREATING
+  ACTIVE
+  UPDATING
+  FAILED
+  DELETING
+}
+
+model ServiceDeployment {
+  id          String   @id @default(cuid())
+  revision    String // Cloud Run revision ID
+
+  // Traffic
+  trafficPercent Int @default(100)
+
+  // Metadata
+  image       String
+  tag         String?
+
+  // Status
+  status      ServiceDeploymentStatus @default(DEPLOYING)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  deployedAt  DateTime?
+
+  // Relations
+  serviceId   String
+  service     CloudRunService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([serviceId])
+  @@map("service_deployments")
+}
+
+enum ServiceDeploymentStatus {
+  DEPLOYING
+  DEPLOYED
+  FAILED
+  RETIRED
+}

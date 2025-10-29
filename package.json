@@ -1,6 +1,6 @@
 {
   "name": "@versatil/sdlc-framework",
-  "version": "7.13.1",
+  "version": "7.14.0",
   "type": "module",
   "description": "AI-Native SDLC Framework for Claude with 18 specialized agents (BA, Database, Backend, Frontend, QA, PM, AI/ML, MCP), 98%+ context retention via RAG memory, automatic quality gates (80%+ coverage, OWASP, WCAG 2.1 AA), and 12 production MCPs. Free & open source alternative to Copilot/Cursor with full-stack coordination and proactive intelligence.",
   "main": "dist/index.js",
@@ -91,6 +91,9 @@
     "guardian:stop": "node dist/agents/guardian/iris-guardian-cli.js stop",
     "guardian:health-check": "node dist/agents/guardian/iris-guardian-cli.js health-check",
     "guardian:status": "node dist/agents/guardian/iris-guardian-cli.js status",
+    "release:check": "npx tsx src/cli/release-cli.ts check",
+    "release:prepare": "npx tsx src/cli/release-cli.ts prepare",
+    "release:execute": "npx tsx src/cli/release-cli.ts execute",
     "validate:commands": "node scripts/validate-slash-commands.cjs",
     "validate:commands:verbose": "node scripts/validate-slash-commands.cjs --verbose",
     "validate:commands:fix": "node scripts/validate-slash-commands.cjs --fix",

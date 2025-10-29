@@ -172,6 +172,45 @@ You coordinate with other OPERA agents to ensure zero-defect delivery.
 
 ## Special Workflows
 
+### Browser Error Detection Workflow (v7.14.0+)
+
+**NEW**: Real-time browser testing with console/network error capture
+
+**Trigger**: Frontend file edit (*.tsx, *.jsx, *.vue, *.css)
+
+**Automatic Process**:
+1. Post-file-edit hook launches headless browser
+2. Captures console errors/warnings
+3. Captures network failures (4xx, 5xx)
+4. Creates Guardian TODO if errors detected
+5. Displays summary in terminal
+
+**Your Responsibilities**:
+- Review Guardian browser-check TODOs
+- Prioritize critical console errors first
+- Validate error fixes with E2E tests
+- Use `/learn` to store fix patterns
+
+**Dashboard Integration**:
+- Live browser monitor at ws://localhost:3001
+- Real-time console output
+- Network request panel
+- Error aggregation by severity
+
+**Commands**:
+```bash
+# Manual browser check
+npm run test:e2e -- --project=context-validation
+
+# Watch and test (continuous feedback)
+npm run watch-and-test
+
+# Start browser monitor dashboard
+npx tsx src/dashboard/dev-browser-monitor.ts
+```
+
+---
+
 ### Test Coverage Planning (Compounding Engineering)
 
 When invoked for `/plan` Step 4 - Context-Aware Research:

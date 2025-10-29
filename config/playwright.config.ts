@@ -97,6 +97,28 @@ export default defineConfig({
       ]
     },
 
+    // Context Validation - User flow testing with real-time error capture
+    {
+      name: 'context-validation',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1920, height: 1080 },
+        // Console error capture
+        launchOptions: {
+          args: [
+            '--disable-dev-shm-usage',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--enable-logging',
+            '--log-level=0'
+          ]
+        }
+      },
+      testMatch: [
+        '**/tests/e2e/context-validation/**/*.{ts,js,spec.ts}'
+      ]
+    },
+
     // Chrome Mobile - Mobile testing
     {
       name: 'chromium-mobile',
