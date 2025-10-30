@@ -92,6 +92,7 @@ export declare class IrisGuardian {
     private context;
     private contextDetection;
     private monitoringInterval?;
+    private cleanupInterval?;
     private healthHistory;
     constructor();
     /**
@@ -121,10 +122,17 @@ export declare class IrisGuardian {
     private loadProjectMetadata;
     /**
      * Start background monitoring
+     * v7.16.0: Added 30-minute todo cleanup cycle
      */
     startMonitoring(intervalMinutes?: number): Promise<void>;
     /**
+     * Start todo cleanup cycle (v7.16.0+)
+     * Automatically archives resolved and stale todos every N minutes
+     */
+    private startTodoCleanup;
+    /**
      * Stop background monitoring
+     * v7.16.0: Also stops cleanup interval
      */
     stopMonitoring(): void;
     /**
@@ -166,5 +174,6 @@ export declare class IrisGuardian {
 export declare function getGuardian(): IrisGuardian;
 /**
  * Initialize and start Guardian monitoring
+ * v7.16.0: Changed default from 5min to 30min to reduce duplicate todo creation
  */
 export declare function initializeGuardian(intervalMinutes?: number): Promise<IrisGuardian>;

@@ -80,7 +80,9 @@ export class BoundaryEnforcementEngine extends EventEmitter {
                 path.join(this.frameworkRoot, '*.md'),
                 path.join(this.frameworkRoot, '*.json'),
                 path.join(this.frameworkRoot, '*.js'),
-                path.join(this.frameworkRoot, '*.ts')
+                path.join(this.frameworkRoot, '*.ts'),
+                path.join(this.versatilHome, '**'),
+                path.join(os.homedir(), '.versatil-cursor/**')
             ],
             forbidden_paths: [
                 path.join(this.frameworkRoot, '.versatil/**'),
@@ -208,6 +210,30 @@ export class BoundaryEnforcementEngine extends EventEmitter {
                 path.join(this.versatilHome, 'framework-data/**')
             ],
             access_rules: [
+                {
+                    rule_id: 'shared_allow_mcp_logs',
+                    name: 'Allow MCP Server Logs',
+                    description: 'Allow MCP server to write log files to .versatil/logs',
+                    source_pattern: this.frameworkRoot + '/**',
+                    target_pattern: this.versatilHome + '/logs/**',
+                    action: 'allow',
+                    enforcement_level: 'advisory',
+                    conditions: ['write_operation'],
+                    enabled: true,
+                    priority: 1
+                },
+                {
+                    rule_id: 'shared_allow_mcp_server_log',
+                    name: 'Allow MCP Server Log File',
+                    description: 'Allow MCP server to write mcp-server.log',
+                    source_pattern: this.frameworkRoot + '/**',
+                    target_pattern: this.versatilHome + '/mcp-server.log',
+                    action: 'allow',
+                    enforcement_level: 'advisory',
+                    conditions: ['write_operation'],
+                    enabled: true,
+                    priority: 1
+                },
                 {
                     rule_id: 'shared_read_only',
                     name: 'Shared Resource Read-Only',

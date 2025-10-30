@@ -15,6 +15,7 @@
  */
 import { writeFileSync } from 'fs';
 import { join } from 'path';
+import { checkDuplicate } from './todo-deduplicator.js';
 // ============================================================================
 // Layer 3: Recursion Guard - Prevents infinite verification loops
 // ============================================================================
@@ -334,13 +335,19 @@ export async function createVerifiedTodos(verifiedIssues, outputDir) {
         const groups = groupVerifiedIssues(verifiedIssues, groupBy, maxIssuesPerTodo);
         console.log(`  📦 Grouping ${verifiedIssues.length} issues into ${groups.length} combined TODO(s) (strategy: ${groupBy})`);
         for (const group of groups) {
-            // Layer 1: Check for duplicates BEFORE creating
+            // Layer 1: Enhanced time-based duplicate detection (v7.16.0+)
             const duplicateDetectionEnabled = process.env.GUARDIAN_DUPLICATE_DETECTION !== 'false';
-            const hasDuplicate = duplicateDetectionEnabled &&
-                group.issues.some(issue => todoAlreadyExists(issue, todosDir));
-            if (hasDuplicate) {
-                console.log(`  ⏭️  Skipped duplicate group: ${group.group_key}`);
-                continue;
+            const maxAgeHours = parseInt(process.env.GUARDIAN_MAX_TODO_AGE_HOURS || '24', 10);
+            if (duplicateDetectionEnabled && group.issues.length > 0) {
+                const dedupResult = checkDuplicate(group.issues[0], todosDir, maxAgeHours);
+                if (dedupResult.is_duplicate) {
+                    console.log(`  ⏭️  Skipped duplicate group: ${group.group_key} (${dedupResult.reason})`);
+                    continue;
+                }
+                else if (dedupResult.existing_todo) {
+                    console.log(`  🔄 Refreshing stale todo: ${dedupResult.existing_todo.filename} (${dedupResult.reason})`);
+                    // Continue to create new todo (old one will be archived by cleanup cycle)
+                }
             }
             const todoContent = formatCombinedTodoMarkdown(group);
             // Layer 2: Namespaced filename for combined TODOs

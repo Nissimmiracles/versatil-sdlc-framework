@@ -821,6 +821,246 @@ export const SERVICE_TEMPLATES = {
         fallbackAvailable: true,
         fallbackDescription: 'Local JSON logs and TensorBoard',
         usedByAgents: ['dr-ai-ml']
+    },
+    'aws-credentials': {
+        id: 'aws-credentials',
+        name: 'AWS Credentials',
+        category: 'infrastructure',
+        description: 'AWS access credentials for RDS, SageMaker, and other services',
+        required: false,
+        useCase: 'Deploy ML workflows on AWS with RDS PostgreSQL, SageMaker, Lambda, ECS',
+        credentials: [
+            {
+                key: 'AWS_REGION',
+                label: 'AWS Region',
+                type: 'text',
+                required: true,
+                default: 'us-east-1',
+                placeholder: 'us-east-1',
+                validation: (value) => {
+                    const validRegions = ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'eu-west-1', 'eu-central-1', 'ap-southeast-1', 'ap-northeast-1'];
+                    if (!validRegions.includes(value)) {
+                        return `Must be one of: ${validRegions.join(', ')}`;
+                    }
+                    return true;
+                },
+                helpText: 'AWS region for your resources (us-east-1, eu-west-1, etc.)'
+            },
+            {
+                key: 'AWS_ACCESS_KEY_ID',
+                label: 'AWS Access Key ID',
+                type: 'text',
+                required: true,
+                placeholder: 'AKIAIOSFODNN7EXAMPLE',
+                validation: (value) => {
+                    if (!value)
+                        return 'Access Key ID is required';
+                    if (!/^AKIA[0-9A-Z]{16}$/.test(value)) {
+                        return 'Invalid Access Key ID format (should start with AKIA)';
+                    }
+                    return true;
+                },
+                helpText: 'AWS IAM Access Key ID from AWS Console → IAM → Users → Security credentials'
+            },
+            {
+                key: 'AWS_SECRET_ACCESS_KEY',
+                label: 'AWS Secret Access Key',
+                type: 'password',
+                required: true,
+                placeholder: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+                validation: (value) => {
+                    if (!value)
+                        return 'Secret Access Key is required';
+                    if (value.length !== 40) {
+                        return 'Invalid Secret Access Key length (should be 40 characters)';
+                    }
+                    return true;
+                },
+                helpText: 'AWS IAM Secret Access Key (only shown once when created)'
+            },
+            {
+                key: 'AWS_ACCOUNT_ID',
+                label: 'AWS Account ID (Optional)',
+                type: 'text',
+                required: false,
+                placeholder: '123456789012',
+                validation: (value) => {
+                    if (!value)
+                        return true;
+                    if (!/^\d{12}$/.test(value)) {
+                        return 'Invalid Account ID format (should be 12 digits)';
+                    }
+                    return true;
+                },
+                helpText: 'Your 12-digit AWS Account ID (for IAM policies and ARNs)'
+            }
+        ],
+        setupGuide: 'https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html',
+        signupUrl: 'https://aws.amazon.com/free/',
+        docsUrl: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html',
+        fallbackAvailable: false,
+        usedByAgents: ['dana-database', 'dr-ai-ml', 'marcus-backend']
+    },
+    'aws-rds': {
+        id: 'aws-rds',
+        name: 'AWS RDS PostgreSQL',
+        category: 'database',
+        description: 'Amazon RDS managed PostgreSQL with pgvector for ML workflows',
+        required: false,
+        useCase: 'Managed PostgreSQL database on AWS with pgvector for RAG/embeddings',
+        credentials: [
+            {
+                key: 'RDS_ENDPOINT',
+                label: 'RDS Endpoint',
+                type: 'text',
+                required: true,
+                placeholder: 'ml-workflow-db.abc123.us-east-1.rds.amazonaws.com',
+                validation: (value) => {
+                    if (!value)
+                        return 'RDS endpoint is required';
+                    if (!value.includes('.rds.amazonaws.com')) {
+                        return 'Invalid RDS endpoint format (should end with .rds.amazonaws.com)';
+                    }
+                    return true;
+                },
+                helpText: 'RDS instance endpoint from AWS Console → RDS → Databases'
+            },
+            {
+                key: 'RDS_DATABASE_NAME',
+                label: 'Database Name',
+                type: 'text',
+                required: true,
+                default: 'ml_workflow',
+                placeholder: 'ml_workflow',
+                validation: (value) => {
+                    if (!value)
+                        return 'Database name is required';
+                    if (!/^[a-z_][a-z0-9_]*$/.test(value)) {
+                        return 'Invalid database name (lowercase, alphanumeric + underscores)';
+                    }
+                    return true;
+                },
+                helpText: 'PostgreSQL database name'
+            },
+            {
+                key: 'RDS_USERNAME',
+                label: 'Master Username',
+                type: 'text',
+                required: true,
+                default: 'postgres',
+                placeholder: 'postgres',
+                validation: (value) => {
+                    if (!value)
+                        return 'Username is required';
+                    return true;
+                },
+                helpText: 'RDS master username'
+            },
+            {
+                key: 'RDS_PASSWORD',
+                label: 'Master Password',
+                type: 'password',
+                required: true,
+                placeholder: 'Your secure password',
+                validation: (value) => {
+                    if (!value)
+                        return 'Password is required';
+                    if (value.length < 8) {
+                        return 'Password must be at least 8 characters';
+                    }
+                    return true;
+                },
+                helpText: 'RDS master password (recommend using AWS Secrets Manager)'
+            },
+            {
+                key: 'RDS_USE_IAM_AUTH',
+                label: 'Use IAM Authentication',
+                type: 'text',
+                required: false,
+                default: 'false',
+                placeholder: 'true/false',
+                validation: (value) => {
+                    if (!value)
+                        return true;
+                    if (!['true', 'false'].includes(value.toLowerCase())) {
+                        return 'Must be "true" or "false"';
+                    }
+                    return true;
+                },
+                helpText: 'Enable IAM authentication (recommended for production)'
+            }
+        ],
+        setupGuide: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_GettingStarted.CreatingConnecting.PostgreSQL.html',
+        signupUrl: 'https://aws.amazon.com/rds/postgresql/',
+        docsUrl: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html',
+        fallbackAvailable: true,
+        fallbackDescription: 'Use Cloud SQL (GCP) or Supabase instead',
+        usedByAgents: ['dana-database', 'marcus-backend']
+    },
+    'aws-sagemaker': {
+        id: 'aws-sagemaker',
+        name: 'AWS SageMaker',
+        category: 'ai',
+        description: 'AWS SageMaker for ML model training and deployment',
+        required: false,
+        useCase: 'Train and deploy ML models on AWS infrastructure',
+        credentials: [
+            {
+                key: 'SAGEMAKER_EXECUTION_ROLE_ARN',
+                label: 'SageMaker Execution Role ARN',
+                type: 'text',
+                required: true,
+                placeholder: 'arn:aws:iam::123456789012:role/SageMakerRole',
+                validation: (value) => {
+                    if (!value)
+                        return 'Execution role ARN is required';
+                    if (!value.startsWith('arn:aws:iam::')) {
+                        return 'Invalid ARN format (should start with arn:aws:iam::)';
+                    }
+                    return true;
+                },
+                helpText: 'IAM role ARN for SageMaker execution (from IAM → Roles)'
+            },
+            {
+                key: 'SAGEMAKER_S3_BUCKET',
+                label: 'S3 Bucket for Artifacts',
+                type: 'text',
+                required: true,
+                placeholder: 'sagemaker-ml-workflow',
+                validation: (value) => {
+                    if (!value)
+                        return 'S3 bucket name is required';
+                    if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(value)) {
+                        return 'Invalid S3 bucket name format';
+                    }
+                    return true;
+                },
+                helpText: 'S3 bucket for model artifacts and training data'
+            },
+            {
+                key: 'SAGEMAKER_DEFAULT_INSTANCE_TYPE',
+                label: 'Default Instance Type',
+                type: 'text',
+                required: false,
+                default: 'ml.m5.xlarge',
+                placeholder: 'ml.m5.xlarge',
+                validation: (value) => {
+                    if (!value)
+                        return true;
+                    if (!value.startsWith('ml.')) {
+                        return 'Instance type should start with "ml."';
+                    }
+                    return true;
+                },
+                helpText: 'Default instance type for training jobs'
+            }
+        ],
+        setupGuide: 'https://docs.aws.amazon.com/sagemaker/latest/dg/gs-set-up.html',
+        signupUrl: 'https://aws.amazon.com/sagemaker/',
+        docsUrl: 'https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html',
+        fallbackAvailable: true,
+        fallbackDescription: 'Use Vertex AI (GCP) or local training',
+        usedByAgents: ['dr-ai-ml']
     }
 };
 /**

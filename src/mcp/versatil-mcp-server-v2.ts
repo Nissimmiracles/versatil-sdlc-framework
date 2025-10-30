@@ -30,6 +30,8 @@ import { GitMCPExecutor } from './gitmcp-executor.js';
 import { getMCPOnboarding } from './mcp-onboarding.js';
 import { DocsSearchEngine, DocCategory } from './docs-search-engine.js';
 import { DocsFormatter } from './docs-formatter.js';
+import { ProfileManager } from './core/profile-manager.js';
+import { ModuleLoader } from './core/module-loader.js';
 
 // Initialize MCP executors
 // MCP executors will be initialized lazily with correct projectPath
@@ -68,6 +70,9 @@ export class VERSATILMCPServerV2 {
   // Phase 7.6.0: Enforcement infrastructure
   private boundaryEngine: BoundaryEnforcementEngine | null = null;
   private zeroTrust: ZeroTrustProjectIsolation | null = null;
+  // Phase 7.16.0: Profile-based module loading
+  private profileManager: ProfileManager | null = null;
+  private moduleLoader: ModuleLoader | null = null;
 
   constructor(config: VERSATILMCPConfig) {
     this.config = config;
@@ -84,10 +89,23 @@ export class VERSATILMCPServerV2 {
       }
     }
 
-    // Lazy initialization mode - skip heavy setup
+    // Lazy initialization mode - register tools but delay heavy setup
     if (config.lazyInit) {
-      // Minimal initialization - just create server
-      // Heavy dependencies loaded on first tool invocation
+      // Phase 7.16.0: Initialize ProfileManager for modular tool loading
+      this.initializeProfileManager();
+
+      // CRITICAL FIX: Always register resources/prompts BEFORE connecting transport
+      // This is required by MCP specification - clients query immediately on connect
+      this.registerResources();
+      this.registerPrompts();
+
+      // Phase 7.16.0: Do NOT register legacy tools if ProfileManager is enabled
+      // ProfileManager will load tools based on active profile (coding/testing/ml/full)
+      if (!this.profileManager) {
+        // Fallback: Use legacy tool registration if ProfileManager failed to initialize
+        this.registerTools();
+      }
+      // Heavy dependencies (AgentRegistry, SDLCOrchestrator) loaded on first tool invocation
       return;
     }
 
@@ -177,6 +195,30 @@ export class VERSATILMCPServerV2 {
   }
 
   /**
+   * Initialize ProfileManager for modular tool loading (Phase 7.16.0)
+   */
+  private initializeProfileManager(): void {
+    try {
+      // Create logger for profile management
+      const profileLogger = new VERSATILLogger('ProfileManager');
+
+      // Initialize ProfileManager
+      this.profileManager = new ProfileManager(
+        this.server,
+        undefined, // Use default config path
+        profileLogger
+      );
+
+      // Initialize synchronously (config file read will happen on first use)
+      profileLogger.info('ProfileManager initialized for modular tool loading');
+    } catch (error) {
+      console.error('[MCP] ProfileManager initialization failed:', error);
+      // Fail-safe: continue without profile manager (use legacy tool registration)
+      this.profileManager = null;
+    }
+  }
+
+  /**
    * Lazy initialize heavy dependencies on first tool call
    */
   private async lazyInitialize(): Promise<void> {
@@ -198,10 +240,8 @@ export class VERSATILMCPServerV2 {
 
     this.docsSearchEngine = new DocsSearchEngine(this.config.projectPath || process.cwd());
 
-    // Register tools, resources, prompts
-    this.registerResources();
-    this.registerPrompts();
-    this.registerTools();
+    // Tools/resources/prompts already registered in constructor
+    // No need to re-register here - that would cause "already registered" errors
 
     this.lazyInitialized = true;
 
@@ -259,7 +299,12 @@ export class VERSATILMCPServerV2 {
         mimeType: 'application/json',
       },
       async (uri, { agentId }) => {
-        const agent = this.config.agents.getAgent(agentId as string);
+        // Lazy initialization on first resource access
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
+        const agent = this.config.agents!.getAgent(agentId as string);
 
         if (!agent) {
           return {
@@ -361,6 +406,11 @@ export class VERSATILMCPServerV2 {
         mimeType: 'application/json',
       },
       async (uri) => {
+        // Lazy initialization on first resource access
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
         const perfMetrics = this.config.performanceMonitor?.getMetrics?.() || {};
 
         const metrics = {
@@ -404,6 +454,11 @@ export class VERSATILMCPServerV2 {
         mimeType: 'application/json',
       },
       async (uri) => {
+        // Lazy initialization on first resource access
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
         const currentPhase = (this.config.orchestrator as any)?.getCurrentPhase?.() || 'development';
 
         const phaseInfo = {
@@ -505,12 +560,17 @@ export class VERSATILMCPServerV2 {
         mimeType: 'application/json',
       },
       async (uri) => {
-        // Build index on first access
-        if (!(this.docsSearchEngine as any).indexBuilt) {
-          await this.docsSearchEngine.buildIndex();
+        // Lazy initialization on first resource access
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
         }
 
-        const allDocs = await this.docsSearchEngine.getIndex();
+        // Build index on first access
+        if (!(this.docsSearchEngine as any).indexBuilt) {
+          await this.docsSearchEngine!.buildIndex();
+        }
+
+        const allDocs = await this.docsSearchEngine!.getIndex();
 
         // Organize by category
         const categorized: Record<string, any[]> = {
@@ -946,37 +1006,7 @@ Provide query execution plans with optimization strategies.`,
   }
 
   private registerTools(): void {
-    // Register minimal health check tool FIRST (works without lazy init)
-    this.server.tool(
-      'versatil_health_check',
-      'Comprehensive framework health check with agent status and system metrics',
-      {
-        title: 'Health Check',
-        readOnlyHint: true,
-        destructiveHint: false
-      },
-      async () => {
-        const health = {
-          status: 'healthy',
-          version: this.config.version,
-          lazyMode: this.config.lazyInit || false,
-          initialized: this.lazyInitialized,
-          uptime: process.uptime(),
-          timestamp: new Date().toISOString()
-        };
-
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(health, null, 2),
-            },
-          ],
-        };
-      }
-    );
-
-    // All other tools wrapped with lazy-init check
+    // All tools include lazy-init checks where needed
     this.server.tool(
       'versatil_activate_agent',
       'Activate a specific OPERA agent with context for code analysis',
@@ -1075,7 +1105,12 @@ Provide query execution plans with optimization strategies.`,
         context: z.record(z.any()).optional(),
       },
       async ({ fromPhase, toPhase, context }) => {
-        const result = await this.config.orchestrator.transitionPhase(toPhase, context || {});
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
+        const result = await this.config.orchestrator!.transitionPhase(toPhase, context || {});
         return {
           content: [
             {
@@ -1108,7 +1143,12 @@ Provide query execution plans with optimization strategies.`,
         strictMode: z.boolean().optional(),
       },
       async ({ phase, filePath, strictMode = true }) => {
-        const gates = await this.config.orchestrator.runQualityGates(phase);
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
+        const gates = await this.config.orchestrator!.runQualityGates(phase);
         return {
           content: [
             {
@@ -1142,7 +1182,12 @@ Provide query execution plans with optimization strategies.`,
         chromeMCP: z.boolean().optional(),
       },
       async ({ testType, coverage = true, chromeMCP = true }) => {
-        const maria = this.config.agents.getAgent('enhanced-maria');
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
+        const maria = this.config.agents!.getAgent('enhanced-maria');
         if (!maria) {
           return {
             content: [
@@ -1185,7 +1230,12 @@ Provide query execution plans with optimization strategies.`,
         generateADR: z.boolean().optional(),
       },
       async ({ filePath, analysisType, generateADR = false }) => {
-        const dan = this.config.agents.getAgent('architecture-dan');
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
+        const dan = this.config.agents!.getAgent('architecture-dan');
         if (!dan) {
           return {
             content: [
@@ -1221,7 +1271,12 @@ Provide query execution plans with optimization strategies.`,
         strategy: z.enum(['rolling', 'blue-green', 'canary']).optional(),
       },
       async ({ action, environment, strategy = 'rolling' }) => {
-        const deployer = this.config.agents.getAgent('deployment-orchestrator');
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
+        const deployer = this.config.agents!.getAgent('deployment-orchestrator');
         if (!deployer) {
           return {
             content: [
@@ -1258,13 +1313,18 @@ Provide query execution plans with optimization strategies.`,
         detailed: z.boolean().optional(),
       },
       async ({ include = ['agents', 'flywheel', 'performance'], detailed = false }) => {
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
         const status: any = { timestamp: new Date().toISOString() };
 
         if (include.includes('agents')) {
-          status.agents = this.config.agents.getStatus();
+          status.agents = this.config.agents!.getStatus();
         }
         if (include.includes('flywheel')) {
-          status.flywheel = await this.config.orchestrator.getStatus();
+          status.flywheel = await this.config.orchestrator!.getStatus();
         }
         if (include.includes('performance')) {
           status.performance = await this.config.performanceMonitor.getMetrics();
@@ -1293,7 +1353,12 @@ Provide query execution plans with optimization strategies.`,
         includeRecommendations: z.boolean().optional(),
       },
       async ({ agentId, timeRange = 'day', includeRecommendations = true }) => {
-        const insights = await this.config.performanceMonitor.getAdaptiveInsights();
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
+        const insights = await this.config.performanceMonitor!.getAdaptiveInsights();
         return {
           content: [
             {
@@ -1402,11 +1467,16 @@ Provide query execution plans with optimization strategies.`,
         comprehensive: z.boolean().optional(),
       },
       async ({ comprehensive = false }) => {
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
         const health = {
           status: 'healthy',
           components: {
-            agents: this.config.agents.isHealthy(),
-            orchestrator: await this.config.orchestrator.isHealthy(),
+            agents: this.config.agents!.isHealthy(),
+            orchestrator: await this.config.orchestrator!.isHealthy(),
             performance: this.config.performanceMonitor.isHealthy(),
           },
           timestamp: new Date().toISOString(),
@@ -1442,14 +1512,19 @@ Provide query execution plans with optimization strategies.`,
         component: z.string().optional(),
       },
       async ({ severity, description, component }) => {
-        this.config.logger.error('Emergency protocol activated', {
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
+        this.config.logger!.error('Emergency protocol activated', {
           severity,
           description,
           component,
           timestamp: new Date().toISOString(),
         });
 
-        const response = await this.config.orchestrator.handleEmergency('emergency', {
+        const response = await this.config.orchestrator!.handleEmergency('emergency', {
           severity,
           description,
           component: component || 'unknown',
@@ -1539,12 +1614,17 @@ Provide query execution plans with optimization strategies.`,
         category: z.enum(['agents', 'workflows', 'rules', 'mcp', 'guides', 'troubleshooting', 'quick-reference', 'architecture', 'testing', 'security', 'completion', 'all']).optional(),
       },
       async ({ query, category }) => {
-        // Build index on first use
-        if (!(this.docsSearchEngine as any).indexBuilt) {
-          await this.docsSearchEngine.buildIndex();
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
         }
 
-        const results = await this.docsSearchEngine.search(query, category as DocCategory);
+        // Build index on first use
+        if (!(this.docsSearchEngine as any).indexBuilt) {
+          await this.docsSearchEngine!.buildIndex();
+        }
+
+        const results = await this.docsSearchEngine!.search(query, category as DocCategory);
         const formatted = DocsFormatter.formatSearchResults(results);
 
         return {
@@ -1572,14 +1652,19 @@ Provide query execution plans with optimization strategies.`,
         ]).describe('Agent ID to retrieve documentation for'),
       },
       async ({ agentId }) => {
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
         // Build index on first use
         if (!(this.docsSearchEngine as any).indexBuilt) {
-          await this.docsSearchEngine.buildIndex();
+          await this.docsSearchEngine!.buildIndex();
         }
 
         try {
           // Search for agent documentation
-          const results = await this.docsSearchEngine.search(agentId, 'agents' as DocCategory);
+          const results = await this.docsSearchEngine!.search(agentId, 'agents' as DocCategory);
 
           if (results.length === 0) {
             return {
@@ -1597,7 +1682,7 @@ Provide query execution plans with optimization strategies.`,
           }
 
           // Get full document content
-          const docContent = await this.docsSearchEngine.getDocument(results[0].document.relativePath);
+          const docContent = await this.docsSearchEngine!.getDocument(results[0].document.relativePath);
 
           // Format as structured agent doc
           const agentDoc = DocsFormatter.formatAgentDocs(agentId, docContent);
@@ -1642,15 +1727,20 @@ Provide query execution plans with optimization strategies.`,
         workflowType: z.enum(['every', 'three-tier', 'instinctive', 'compounding', 'all']).describe('Workflow type to retrieve'),
       },
       async ({ workflowType }) => {
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
         // Build index on first use
         if (!(this.docsSearchEngine as any).indexBuilt) {
-          await this.docsSearchEngine.buildIndex();
+          await this.docsSearchEngine!.buildIndex();
         }
 
         try {
           if (workflowType === 'all') {
             // Return all workflow guides
-            const workflows = await this.docsSearchEngine.getDocumentsByCategory('workflows' as DocCategory);
+            const workflows = await this.docsSearchEngine!.getDocumentsByCategory('workflows' as DocCategory);
             const workflowList = workflows.map(w => ({
               title: w.title,
               path: w.relativePath,
@@ -1672,7 +1762,7 @@ Provide query execution plans with optimization strategies.`,
           }
 
           // Search for specific workflow
-          const results = await this.docsSearchEngine.search(workflowType, 'workflows' as DocCategory);
+          const results = await this.docsSearchEngine!.search(workflowType, 'workflows' as DocCategory);
 
           if (results.length === 0) {
             return {
@@ -1689,7 +1779,7 @@ Provide query execution plans with optimization strategies.`,
           }
 
           // Get full document content
-          const docContent = await this.docsSearchEngine.getDocument(results[0].document.relativePath);
+          const docContent = await this.docsSearchEngine!.getDocument(results[0].document.relativePath);
 
           // Format as structured workflow doc
           const workflowDoc = DocsFormatter.formatWorkflowDocs(workflowType, docContent);
@@ -1734,13 +1824,18 @@ Provide query execution plans with optimization strategies.`,
         topic: z.string().optional().describe('Specific topic (leave empty for all quick references)'),
       },
       async ({ topic }) => {
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
         // Build index on first use
         if (!(this.docsSearchEngine as any).indexBuilt) {
-          await this.docsSearchEngine.buildIndex();
+          await this.docsSearchEngine!.buildIndex();
         }
 
         try {
-          const quickRefs = await this.docsSearchEngine.getDocumentsByCategory('quick-reference' as DocCategory);
+          const quickRefs = await this.docsSearchEngine!.getDocumentsByCategory('quick-reference' as DocCategory);
 
           if (topic) {
             // Filter by topic
@@ -1765,7 +1860,7 @@ Provide query execution plans with optimization strategies.`,
             }
 
             // Get full content for first match
-            const docContent = await this.docsSearchEngine.getDocument(filtered[0].relativePath);
+            const docContent = await this.docsSearchEngine!.getDocument(filtered[0].relativePath);
             const formatted = DocsFormatter.formatForMCP(docContent);
 
             return {
@@ -1823,17 +1918,22 @@ Provide query execution plans with optimization strategies.`,
         mcpName: z.string().optional().describe('MCP server name (playwright, github, gitmcp, supabase, etc.)'),
       },
       async ({ mcpName }) => {
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
         // Build index on first use
         if (!(this.docsSearchEngine as any).indexBuilt) {
-          await this.docsSearchEngine.buildIndex();
+          await this.docsSearchEngine!.buildIndex();
         }
 
         try {
-          const mcpDocs = await this.docsSearchEngine.getDocumentsByCategory('mcp' as DocCategory);
+          const mcpDocs = await this.docsSearchEngine!.getDocumentsByCategory('mcp' as DocCategory);
 
           if (mcpName) {
             // Search for specific MCP
-            const results = await this.docsSearchEngine.search(mcpName, 'mcp' as DocCategory);
+            const results = await this.docsSearchEngine!.search(mcpName, 'mcp' as DocCategory);
 
             if (results.length === 0) {
               return {
@@ -1851,7 +1951,7 @@ Provide query execution plans with optimization strategies.`,
             }
 
             // Get full content
-            const docContent = await this.docsSearchEngine.getDocument(results[0].document.relativePath);
+            const docContent = await this.docsSearchEngine!.getDocument(results[0].document.relativePath);
             const formatted = DocsFormatter.formatForMCP(docContent);
 
             return {
@@ -1910,14 +2010,19 @@ Provide query execution plans with optimization strategies.`,
         language: z.string().optional().describe('Programming language filter (typescript, javascript, python, etc.)'),
       },
       async ({ query, language }) => {
+        // Lazy initialization on first tool use
+        if (this.config.lazyInit && !this.lazyInitialized) {
+          await this.lazyInitialize();
+        }
+
         // Build index on first use
         if (!(this.docsSearchEngine as any).indexBuilt) {
-          await this.docsSearchEngine.buildIndex();
+          await this.docsSearchEngine!.buildIndex();
         }
 
         try {
           // Search all documentation
-          const results = await this.docsSearchEngine.search(query);
+          const results = await this.docsSearchEngine!.search(query);
           const examples: any[] = [];
 
           // Extract code blocks from all results
@@ -3750,8 +3855,174 @@ Provide query execution plans with optimization strategies.`,
       }
     );
 
+    // Phase 7.16.0: Profile Management Tools
+    this.server.tool(
+      'mcp_profile_switch',
+      'Switch to a different tool profile (coding/testing/ml/full)',
+      {
+        title: 'Switch MCP Profile',
+        readOnlyHint: false,
+        destructiveHint: false,
+        profile: z.enum(['coding', 'testing', 'ml', 'full']),
+        force: z.boolean().optional(),
+      },
+      async ({ profile, force = false }) => {
+        if (!this.profileManager) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                success: false,
+                error: 'ProfileManager not initialized. Using legacy tool loading.',
+              }),
+            }],
+          };
+        }
+
+        try {
+          await this.profileManager.initialize();
+          const result = await this.profileManager.switchProfile(profile, force);
+
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            }],
+          };
+        } catch (error) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                success: false,
+                error: error instanceof Error ? error.message : String(error),
+              }),
+            }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    this.server.tool(
+      'mcp_profile_status',
+      'Get current profile status and loaded modules',
+      {
+        title: 'MCP Profile Status',
+        readOnlyHint: true,
+        destructiveHint: false,
+        verbose: z.boolean().optional(),
+      },
+      async ({ verbose = false }) => {
+        if (!this.profileManager) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                mode: 'legacy',
+                toolsRegistered: 82,
+                message: 'Using legacy tool loading (all tools loaded)',
+              }),
+            }],
+          };
+        }
+
+        try {
+          const stats = this.profileManager.getProfileStatistics();
+          const config = this.profileManager.getConfiguration();
+
+          const result = {
+            currentProfile: stats.currentProfile,
+            modulesLoaded: stats.modulesLoaded,
+            toolsRegistered: stats.toolsRegistered,
+            availableProfiles: this.profileManager.getAvailableProfiles(),
+          };
+
+          if (verbose && config) {
+            return {
+              content: [{
+                type: 'text',
+                text: JSON.stringify({
+                  ...result,
+                  loadStatistics: stats.loadStatistics,
+                  configuration: config,
+                }, null, 2),
+              }],
+            };
+          }
+
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            }],
+          };
+        } catch (error) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                error: error instanceof Error ? error.message : String(error),
+              }),
+            }],
+            isError: true,
+          };
+        }
+      }
+    );
+
+    this.server.tool(
+      'mcp_module_load',
+      'Load a specific module dynamically',
+      {
+        title: 'Load MCP Module',
+        readOnlyHint: false,
+        destructiveHint: false,
+        moduleId: z.string(),
+      },
+      async ({ moduleId }) => {
+        if (!this.profileManager) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                success: false,
+                error: 'ProfileManager not initialized',
+              }),
+            }],
+          };
+        }
+
+        try {
+          const moduleLoader = this.profileManager.getModuleLoader();
+          const result = await moduleLoader.loadModule(moduleId);
+
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            }],
+          };
+        } catch (error) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                success: false,
+                error: error instanceof Error ? error.message : String(error),
+              }),
+            }],
+            isError: true,
+          };
+        }
+      }
+    );
+
     // Continue in next edit due to size...
-    this.config.logger.info('VERSATIL MCP tools registered successfully', { count: 106 });
+    // Only log if logger is available (lazy init mode may not have it yet)
+    if (this.config.logger) {
+      this.config.logger.info('VERSATIL MCP tools registered successfully', { count: 109 });
+    }
   }
 
   /**
@@ -3780,6 +4051,25 @@ Provide query execution plans with optimization strategies.`,
   async start(): Promise<void> {
     // LAZY MODE: Connect transport FIRST, then lazy-init on first tool use
     if (this.config.lazyInit) {
+      // Phase 7.16.0: Load default profile before connecting
+      if (this.profileManager) {
+        try {
+          const startTime = Date.now();
+          await this.profileManager.initialize();
+          const result = await this.profileManager.getModuleLoader().loadProfile('coding');
+          const loadTime = Date.now() - startTime;
+
+          console.log(`[MCP v7.16.0] Profile: ${result.profile} | Tools: ${result.toolsRegistered} | Time: ${loadTime}ms`);
+
+          if (result.warnings.length > 0) {
+            console.warn(`[MCP] Profile warnings: ${result.warnings.join(', ')}`);
+          }
+        } catch (error) {
+          console.error('[MCP] Profile loading failed, falling back to legacy registration:', error);
+          // Continue with legacy tool registration on failure
+        }
+      }
+
       const transport = new StdioServerTransport();
       await this.server.connect(transport);
       // Server is now listening - heavy init happens on first tool call

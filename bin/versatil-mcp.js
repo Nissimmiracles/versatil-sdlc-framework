@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // MCP Server Log File (for debugging without interfering with stdio)
-const VERSATIL_HOME = join(homedir(), '.versatil');
+const VERSATIL_HOME = process.env.VERSATIL_HOME || join(homedir(), '.versatil');
 const LOG_FILE = join(VERSATIL_HOME, 'mcp-server.log');
 
 // Ensure .versatil directory exists

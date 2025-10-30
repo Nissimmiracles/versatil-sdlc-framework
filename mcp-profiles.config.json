@@ -1,0 +1,170 @@
+{
+  "version": "7.16.0",
+  "description": "Profile-based module loading configuration for VERSATIL MCP Server",
+  "profiles": {
+    "coding": {
+      "description": "Essential tools for development work (default profile)",
+      "modules": ["core-tools", "quality-tools"],
+      "toolCount": 20,
+      "expectedStartupTime": "~500ms",
+      "expectedMemoryMB": 120,
+      "tools": [
+        "versatil_health_check",
+        "versatil_list_agents",
+        "versatil_orchestrate_agents",
+        "versatil_task_decompose",
+        "versatil_guardian_audit",
+        "versatil_security_boundary_check",
+        "versatil_secrets_scan",
+        "versatil_file_read",
+        "versatil_file_write",
+        "versatil_search_files",
+        "versatil_git_status",
+        "versatil_git_commit",
+        "quality_run_tests",
+        "quality_coverage_report",
+        "quality_lint_check",
+        "versatil_profile_switch",
+        "versatil_module_load",
+        "versatil_module_unload",
+        "versatil_module_status",
+        "versatil_system_info"
+      ]
+    },
+    "testing": {
+      "description": "Development + QA/testing tools",
+      "extends": "coding",
+      "modules": ["core-tools", "quality-tools"],
+      "additionalModules": [],
+      "toolCount": 32,
+      "expectedStartupTime": "~750ms",
+      "expectedMemoryMB": 180,
+      "additionalTools": [
+        "quality_playwright_test",
+        "quality_lighthouse_audit",
+        "quality_accessibility_scan",
+        "quality_visual_regression",
+        "quality_stress_test",
+        "quality_load_test",
+        "quality_mutation_test",
+        "quality_security_scan",
+        "quality_dependency_audit"
+      ]
+    },
+    "ml": {
+      "description": "Development + database + ML/AI tools",
+      "extends": "coding",
+      "modules": ["core-tools", "database-tools", "ml-tools"],
+      "toolCount": 47,
+      "expectedStartupTime": "~650ms",
+      "expectedMemoryMB": 220,
+      "additionalTools": [
+        "database_query",
+        "database_migrate",
+        "database_schema_generate",
+        "database_rls_setup",
+        "database_rls_test",
+        "database_backup",
+        "database_restore",
+        "database_analyze_query",
+        "database_optimize_indexes",
+        "database_connection_pool",
+        "database_transaction_start",
+        "database_transaction_commit",
+        "ml_generate_embeddings",
+        "ml_run_inference",
+        "ml_train_model",
+        "ml_evaluate_model",
+        "ml_prepare_dataset",
+        "ml_rag_search",
+        "ml_rag_store",
+        "ml_calculate_similarity",
+        "ml_vertex_predict",
+        "ml_openai_completion",
+        "ml_anthropic_completion",
+        "ml_huggingface_inference",
+        "ml_model_registry_push",
+        "ml_mlflow_track",
+        "ml_hyperparameter_tune"
+      ]
+    },
+    "full": {
+      "description": "All tools loaded (performance degradation expected)",
+      "modules": ["core-tools", "database-tools", "ml-tools", "quality-tools"],
+      "toolCount": 82,
+      "expectedStartupTime": "~1800ms",
+      "expectedMemoryMB": 340,
+      "warning": "Cursor may not respect >80 tools. Use 'coding', 'testing', or 'ml' profiles for better performance."
+    }
+  },
+  "agentOverrides": {
+    "guardian": "coding",
+    "iris-guardian": "coding",
+    "dana-database": "ml",
+    "dr-ai-ml": "ml",
+    "maria-qa": "testing",
+    "enhanced-maria": "testing",
+    "james-frontend": "testing",
+    "marcus-backend": "coding",
+    "alex-ba": "coding",
+    "sarah-pm": "coding",
+    "oliver-mcp": "coding"
+  },
+  "profileDetection": {
+    "enabled": true,
+    "heuristics": {
+      "filePatterns": {
+        "*.sql": "ml",
+        "*.prisma": "ml",
+        "schema.ts": "ml",
+        "migrations/**": "ml",
+        "*.test.ts": "testing",
+        "*.test.tsx": "testing",
+        "*.spec.ts": "testing",
+        "*.spec.tsx": "testing",
+        "**/__tests__/**": "testing"
+      },
+      "taskKeywords": {
+        "database": "ml",
+        "migration": "ml",
+        "train model": "ml",
+        "embeddings": "ml",
+        "rag": "ml",
+        "test": "testing",
+        "coverage": "testing",
+        "playwright": "testing",
+        "lighthouse": "testing",
+        "accessibility": "testing"
+      }
+    }
+  },
+  "performance": {
+    "startupTargetMs": 600,
+    "memoryTargetMb": 130,
+    "toolLatencyTargetMs": 100,
+    "profileSwitchTargetMs": 500
+  },
+  "compatibility": {
+    "backwardCompatible": true,
+    "toolAliasesEnabled": true,
+    "deprecationWindowVersions": 3,
+    "migrationGuideUrl": "https://github.com/versatil/versatil-sdlc-framework/blob/main/docs/migration/v7.15-to-v7.16.md"
+  },
+  "lazyInitialization": {
+    "enabled": true,
+    "heavyTools": [
+      "database_migrate",
+      "database_backup",
+      "ml_train_model",
+      "ml_vertex_predict",
+      "ml_openai_completion",
+      "ml_anthropic_completion",
+      "ml_hyperparameter_tune",
+      "quality_playwright_test",
+      "quality_lighthouse_audit"
+    ]
+  },
+  "defaultProfile": "coding",
+  "allowProfileSwitching": true,
+  "logLevel": "info"
+}

@@ -173,12 +173,13 @@ export class IrisGuardian {
     }
     /**
      * Start background monitoring
+     * v7.16.0: Added 30-minute todo cleanup cycle
      */
     async startMonitoring(intervalMinutes = 5) {
         this.logger.info(`Starting background monitoring (every ${intervalMinutes} minutes)`);
         // Initial health check
         await this.performHealthCheck();
-        // Schedule recurring checks
+        // Schedule recurring health checks
         const intervalMs = intervalMinutes * 60 * 1000;
         this.monitoringInterval = setInterval(async () => {
             try {
@@ -188,16 +189,58 @@ export class IrisGuardian {
                 this.logger.error('Health check failed', { error: error.message });
             }
         }, intervalMs);
+        // Start todo cleanup cycle (every 30 minutes)
+        this.startTodoCleanup(30);
         this.logger.info('Background monitoring started');
     }
     /**
+     * Start todo cleanup cycle (v7.16.0+)
+     * Automatically archives resolved and stale todos every N minutes
+     */
+    startTodoCleanup(intervalMinutes = 30) {
+        const cleanupEnabled = process.env.GUARDIAN_AUTO_CLEANUP !== 'false';
+        if (!cleanupEnabled) {
+            this.logger.info('Todo auto-cleanup disabled (GUARDIAN_AUTO_CLEANUP=false)');
+            return;
+        }
+        this.logger.info(`Starting todo cleanup cycle (every ${intervalMinutes} minutes)`);
+        // Import cleanup function
+        const { reviewAndCleanupTodos } = require('./todo-deduplicator.js');
+        // Schedule recurring cleanup
+        const intervalMs = intervalMinutes * 60 * 1000;
+        this.cleanupInterval = setInterval(async () => {
+            try {
+                const todosDir = path.join(process.cwd(), 'todos');
+                const maxAgeHours = parseInt(process.env.GUARDIAN_MAX_TODO_AGE_HOURS || '72', 10);
+                this.logger.info('Running todo cleanup cycle...');
+                const result = await reviewAndCleanupTodos(todosDir, maxAgeHours);
+                if (result.archived_count > 0) {
+                    this.logger.info(`Todo cleanup: archived ${result.archived_count} todos, kept ${result.kept_count}`);
+                }
+                if (result.errors.length > 0) {
+                    this.logger.warn(`Todo cleanup errors: ${result.errors.join(', ')}`);
+                }
+            }
+            catch (error) {
+                this.logger.error('Todo cleanup failed', { error: error.message });
+            }
+        }, intervalMs);
+        this.logger.info('Todo cleanup cycle started');
+    }
+    /**
      * Stop background monitoring
+     * v7.16.0: Also stops cleanup interval
      */
     stopMonitoring() {
         if (this.monitoringInterval) {
             clearInterval(this.monitoringInterval);
             this.monitoringInterval = undefined;
             this.logger.info('Background monitoring stopped');
+        }
+        if (this.cleanupInterval) {
+            clearInterval(this.cleanupInterval);
+            this.cleanupInterval = undefined;
+            this.logger.info('Todo cleanup cycle stopped');
         }
     }
     /**
@@ -709,8 +752,9 @@ export function getGuardian() {
 }
 /**
  * Initialize and start Guardian monitoring
+ * v7.16.0: Changed default from 5min to 30min to reduce duplicate todo creation
  */
-export async function initializeGuardian(intervalMinutes = 5) {
+export async function initializeGuardian(intervalMinutes = 30) {
     const guardian = getGuardian();
     await guardian.startMonitoring(intervalMinutes);
     return guardian;

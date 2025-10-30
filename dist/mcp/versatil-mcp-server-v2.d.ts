@@ -32,6 +32,8 @@ export declare class VERSATILMCPServerV2 {
     private eventCallbacks;
     private boundaryEngine;
     private zeroTrust;
+    private profileManager;
+    private moduleLoader;
     constructor(config: VERSATILMCPConfig);
     /**
      * Lazy initialize ShadcnMCPExecutor with correct projectPath
@@ -54,6 +56,10 @@ export declare class VERSATILMCPServerV2 {
      * Phase 7.6.0: Filter RAG results based on context identity
      */
     private filterRagResults;
+    /**
+     * Initialize ProfileManager for modular tool loading (Phase 7.16.0)
+     */
+    private initializeProfileManager;
     /**
      * Lazy initialize heavy dependencies on first tool call
      */

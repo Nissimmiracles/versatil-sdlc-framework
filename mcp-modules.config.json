@@ -1,0 +1,73 @@
+{
+  "version": "7.5.1",
+  "description": "VERSATIL MCP Module Configuration - External MCP Integration",
+  "modules": {
+    "context7": {
+      "enabled": true,
+      "type": "npm-package",
+      "package": "@context7/mcp",
+      "lazy": true,
+      "description": "Library documentation and code examples"
+    },
+    "filesystem": {
+      "enabled": true,
+      "type": "mcp-server",
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem"],
+      "lazy": true,
+      "description": "File system operations"
+    },
+    "enrichr": {
+      "enabled": false,
+      "type": "mcp-server",
+      "command": "npx",
+      "args": ["enrichr-mcp-server"],
+      "lazy": true,
+      "description": "Gene enrichment analysis"
+    },
+    "pdf-tools": {
+      "enabled": false,
+      "type": "mcp-server", 
+      "command": "npx",
+      "args": ["pdf-tools-mcp"],
+      "lazy": true,
+      "description": "PDF manipulation and analysis"
+    },
+    "chrome-control": {
+      "enabled": false,
+      "type": "mcp-server",
+      "command": "npx",
+      "args": ["chrome-control-mcp"],
+      "lazy": true,
+      "description": "Browser automation and control"
+    }
+  },
+  "profiles": {
+    "coding": {
+      "enabled_modules": ["context7", "filesystem"]
+    },
+    "research": {
+      "enabled_modules": ["context7", "enrichr", "pdf-tools"]
+    },
+    "full": {
+      "enabled_modules": ["context7", "filesystem", "enrichr", "pdf-tools", "chrome-control"]
+    }
+  },
+  "routing": {
+    "auto_route": true,
+    "rules": [
+      {
+        "pattern": ".*documentation.*|.*docs.*|.*library.*",
+        "target": "context7"
+      },
+      {
+        "pattern": ".*file.*|.*read.*|.*write.*",
+        "target": "filesystem"
+      },
+      {
+        "pattern": ".*gene.*|.*enrichment.*|.*biological.*",
+        "target": "enrichr"
+      }
+    ]
+  }
+}
