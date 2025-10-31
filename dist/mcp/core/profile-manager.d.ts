@@ -76,6 +76,11 @@ export declare class ProfileManager {
     private configPath;
     constructor(server: Server | McpServer, configPath?: string, logger?: VERSATILLogger);
     /**
+     * Get framework root directory (where this package is installed)
+     * Uses import.meta.url to find the actual installation location
+     */
+    private getFrameworkRoot;
+    /**
      * Initialize profile manager and load configuration
      */
     initialize(): Promise<void>;
@@ -83,6 +88,14 @@ export declare class ProfileManager {
      * Load profile configuration from file
      */
     loadConfiguration(): Promise<void>;
+    /**
+     * Check if a path is in user's project directory
+     */
+    private isInUserProjectScope;
+    /**
+     * Create default profile configuration in user's project
+     */
+    private createDefaultProfileConfig;
     /**
      * Switch to a new profile with hot-reload
      */

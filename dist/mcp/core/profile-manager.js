@@ -4,7 +4,9 @@
  */
 import { ModuleLoader, MODULE_REGISTRY } from './module-loader.js';
 import { VERSATILLogger } from '../../utils/logger.js';
+import { fileURLToPath } from 'url';
 import * as fs from 'fs/promises';
+import * as fssync from 'fs';
 import * as path from 'path';
 // Simple async lock for profile switching
 class AsyncLock {
@@ -36,7 +38,51 @@ export class ProfileManager {
         this.server = server;
         this.moduleLoader = new ModuleLoader(server, logger);
         this.logger = logger || new VERSATILLogger('ProfileManager');
-        this.configPath = configPath || path.join(process.cwd(), 'mcp-profiles.config.json');
+        // Path resolution priority:
+        // 1. Explicit configPath parameter
+        // 2. Framework installation directory (for npx/npm installs)
+        // 3. User's project directory (fallback)
+        if (configPath) {
+            this.configPath = configPath;
+            this.logger.debug('Using explicit config path', { path: configPath });
+        }
+        else {
+            const frameworkRoot = this.getFrameworkRoot();
+            const frameworkConfigPath = path.join(frameworkRoot, 'mcp-profiles.config.json');
+            if (fssync.existsSync(frameworkConfigPath)) {
+                this.configPath = frameworkConfigPath;
+                this.logger.debug('Using framework config path', { path: frameworkConfigPath });
+            }
+            else {
+                // Fallback: check user's project directory
+                const userConfigPath = path.join(process.cwd(), 'mcp-profiles.config.json');
+                this.configPath = userConfigPath;
+                this.logger.debug('Using user project config path', { path: userConfigPath });
+            }
+        }
+    }
+    /**
+     * Get framework root directory (where this package is installed)
+     * Uses import.meta.url to find the actual installation location
+     */
+    getFrameworkRoot() {
+        try {
+            // This file is at: <framework-root>/src/mcp/core/profile-manager.ts
+            // So we need to go up 3 levels to reach framework root
+            const currentFileUrl = new URL(import.meta.url);
+            const currentFilePath = fileURLToPath(currentFileUrl);
+            const frameworkRoot = path.resolve(path.dirname(currentFilePath), '../../..');
+            this.logger.debug('Resolved framework root', {
+                currentFile: currentFilePath,
+                frameworkRoot
+            });
+            return frameworkRoot;
+        }
+        catch (error) {
+            // Fallback to process.cwd() if import.meta.url fails
+            this.logger.warn('Failed to resolve framework root, using process.cwd()', { error });
+            return process.cwd();
+        }
     }
     /**
      * Initialize profile manager and load configuration
@@ -61,8 +107,86 @@ export class ProfileManager {
             });
         }
         catch (error) {
-            this.logger.error('Failed to load profile configuration', { error });
-            throw new Error(`Failed to load profile config from ${this.configPath}: ${error}`);
+            // If config doesn't exist in user project, try to create default
+            if (error.code === 'ENOENT' && this.isInUserProjectScope(this.configPath)) {
+                this.logger.warn('Profile config not found in user project, creating default config', {
+                    path: this.configPath
+                });
+                await this.createDefaultProfileConfig();
+                // Retry loading
+                try {
+                    const configData = await fs.readFile(this.configPath, 'utf-8');
+                    this.config = JSON.parse(configData);
+                    this.logger.info('Default profile configuration created and loaded');
+                }
+                catch (retryError) {
+                    this.logger.error('Failed to load default profile config', { error: retryError });
+                    throw new Error(`Failed to load profile config from ${this.configPath}: ${retryError}`);
+                }
+            }
+            else {
+                this.logger.error('Failed to load profile configuration', { error });
+                throw new Error(`Failed to load profile config from ${this.configPath}: ${error}`);
+            }
+        }
+    }
+    /**
+     * Check if a path is in user's project directory
+     */
+    isInUserProjectScope(filePath) {
+        const frameworkRoot = this.getFrameworkRoot();
+        const normalizedPath = path.resolve(filePath);
+        const normalizedFrameworkRoot = path.resolve(frameworkRoot);
+        return !normalizedPath.startsWith(normalizedFrameworkRoot);
+    }
+    /**
+     * Create default profile configuration in user's project
+     */
+    async createDefaultProfileConfig() {
+        const defaultConfig = {
+            version: '7.16.1',
+            description: 'VERSATIL MCP Profile Configuration - Generated from framework defaults',
+            profiles: {
+                coding: {
+                    description: 'General development profile with core tools',
+                    modules: ['core-tools', 'quality-tools'],
+                    expectedStartupTime: '~500ms',
+                    expectedMemoryMB: 150,
+                    toolCount: 32
+                },
+                testing: {
+                    description: 'Testing profile with extended QA tools',
+                    extends: 'coding',
+                    modules: ['core-tools', 'quality-tools'],
+                    expectedStartupTime: '~600ms',
+                    expectedMemoryMB: 180,
+                    toolCount: 32
+                },
+                ml: {
+                    description: 'ML/AI development profile',
+                    extends: 'coding',
+                    modules: ['core-tools', 'database-tools', 'ml-tools'],
+                    expectedStartupTime: '~1000ms',
+                    expectedMemoryMB: 250,
+                    toolCount: 59
+                },
+                full: {
+                    description: 'Complete toolset (not recommended for production)',
+                    modules: ['*'],
+                    expectedStartupTime: '~2000ms',
+                    expectedMemoryMB: 300,
+                    toolCount: 82,
+                    warning: 'Full profile is resource-intensive. Use specific profiles for better performance.'
+                }
+            }
+        };
+        try {
+            await fs.writeFile(this.configPath, JSON.stringify(defaultConfig, null, 2), 'utf-8');
+            this.logger.info('Created default profile config', { path: this.configPath });
+        }
+        catch (error) {
+            this.logger.error('Failed to create default profile config', { error });
+            throw error;
         }
     }
     /**

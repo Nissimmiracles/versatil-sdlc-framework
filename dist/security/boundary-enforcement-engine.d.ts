@@ -182,6 +182,10 @@ export declare class BoundaryEnforcementEngine extends EventEmitter {
     private matchesRule;
     private matchesPattern;
     private evaluateCondition;
+    /**
+     * Check if file is in user's project directory (not in framework)
+     */
+    private isInUserProjectScope;
     private isExecutableFile;
     private isPathTraversal;
     private isSymlinkAttempt;

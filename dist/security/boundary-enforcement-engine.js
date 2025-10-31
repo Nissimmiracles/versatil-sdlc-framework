@@ -211,6 +211,42 @@ export class BoundaryEnforcementEngine extends EventEmitter {
             ],
             access_rules: [
                 {
+                    rule_id: 'shared_allow_user_env_files',
+                    name: 'Allow User Project .env Files',
+                    description: 'Allow user to create and modify .env files in their own project',
+                    source_pattern: '*',
+                    target_pattern: '**/.env*',
+                    action: 'allow',
+                    enforcement_level: 'advisory',
+                    conditions: ['write_operation', 'user_project_scope'],
+                    enabled: true,
+                    priority: 10
+                },
+                {
+                    rule_id: 'shared_allow_user_mcp_config',
+                    name: 'Allow User MCP Config',
+                    description: 'Allow user to create mcp-profiles.config.json in their project',
+                    source_pattern: '*',
+                    target_pattern: '**/mcp-profiles.config.json',
+                    action: 'allow',
+                    enforcement_level: 'advisory',
+                    conditions: ['write_operation', 'user_project_scope'],
+                    enabled: true,
+                    priority: 10
+                },
+                {
+                    rule_id: 'shared_allow_user_package_json',
+                    name: 'Allow User package.json',
+                    description: 'Allow user to modify package.json in their project',
+                    source_pattern: '*',
+                    target_pattern: '**/package.json',
+                    action: 'allow',
+                    enforcement_level: 'advisory',
+                    conditions: ['write_operation', 'user_project_scope'],
+                    enabled: true,
+                    priority: 10
+                },
+                {
                     rule_id: 'shared_allow_mcp_logs',
                     name: 'Allow MCP Server Logs',
                     description: 'Allow MCP server to write log files to .versatil/logs',
@@ -220,7 +256,7 @@ export class BoundaryEnforcementEngine extends EventEmitter {
                     enforcement_level: 'advisory',
                     conditions: ['write_operation'],
                     enabled: true,
-                    priority: 1
+                    priority: 10
                 },
                 {
                     rule_id: 'shared_allow_mcp_server_log',
@@ -232,7 +268,7 @@ export class BoundaryEnforcementEngine extends EventEmitter {
                     enforcement_level: 'advisory',
                     conditions: ['write_operation'],
                     enabled: true,
-                    priority: 1
+                    priority: 10
                 },
                 {
                     rule_id: 'shared_read_only',
@@ -345,9 +381,27 @@ export class BoundaryEnforcementEngine extends EventEmitter {
                 return this.isPathTraversal(filePath);
             case 'symlink_creation':
                 return this.isSymlinkAttempt(filePath);
+            case 'user_project_scope':
+                return this.isInUserProjectScope(filePath);
             default:
                 return false;
         }
+    }
+    /**
+     * Check if file is in user's project directory (not in framework)
+     */
+    isInUserProjectScope(filePath) {
+        const normalizedPath = path.normalize(filePath);
+        const normalizedFrameworkRoot = path.normalize(this.frameworkRoot);
+        const normalizedVersatilHome = path.normalize(this.versatilHome);
+        // File is in user project scope if it's NOT in:
+        // 1. Framework root
+        // 2. .versatil home directory
+        // 3. /tmp/versatil-projects (sandbox)
+        const isInFramework = normalizedPath.startsWith(normalizedFrameworkRoot);
+        const isInVersatilHome = normalizedPath.startsWith(normalizedVersatilHome);
+        const isInSandbox = normalizedPath.startsWith('/tmp/versatil-projects');
+        return !isInFramework && !isInVersatilHome && !isInSandbox;
     }
     isExecutableFile(filePath) {
         const executableExtensions = ['.sh', '.bash', '.exe', '.bat', '.cmd', '.ps1'];
