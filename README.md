@@ -19,15 +19,14 @@
 ## 🚀 Quick Start
 
 ```bash
-# Install via npm
-npm install @versatil/sdlc-framework
+# Run VERSATIL MCP Server (Recommended)
+npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp
 
-# Or via git
-npm install git+https://github.com/Nissimmiracles/versatil-sdlc-framework.git
+# This installs in seconds and enables 59 AI tools in Claude Desktop + Cursor IDE
 ```
 
 ```bash
-# Your first command
+# Your first command in Cursor
 /plan "Add user authentication"
 
 # VERSATIL will:
@@ -36,7 +35,7 @@ npm install git+https://github.com/Nissimmiracles/versatil-sdlc-framework.git
 # ✅ Create todos with 88% accurate time estimates
 ```
 
-**[→ Full Installation Guide](docs/INSTALLATION.md)**
+**[→ Full Installation Guide](docs/INSTALLATION.md)** • **[→ npx Setup Guide](docs/guides/NPX_INSTALLATION.md)**
 
 ---
 
@@ -158,32 +157,40 @@ Each feature teaches the framework, making the next feature **40% faster**:
 
 ## 📦 Installation
 
-### Option 1: npm (Recommended)
+### Option 1: npx (Recommended for MCP)
 
 ```bash
-npm install @versatil/sdlc-framework
-```
+# Quick start - no installation needed
+npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp
 
-### Option 2: Git URL
-
-```bash
-npm install git+https://github.com/Nissimmiracles/versatil-sdlc-framework.git
-```
-
-### Option 3: MCP Integration (Claude Desktop)
-
-```json
+# Add to Claude Desktop config
 {
   "mcpServers": {
     "versatil": {
-      "command": "node",
-      "args": ["./node_modules/@versatil/sdlc-framework/dist/mcp/versatil-mcp-server-v2.js"]
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1",
+        "versatil-mcp"
+      ]
     }
   }
 }
 ```
 
-**[→ Complete Installation Guide](docs/INSTALLATION.md)**
+**Benefits**: ⚡ 2-3 min first run • ✅ Always latest • 🔒 No global pollution
+
+### Option 2: Clone for Development
+
+```bash
+# For framework development or customization
+git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git
+cd versatil-sdlc-framework
+npm install
+npm run build
+```
+
+**[→ Complete Installation Guide](docs/INSTALLATION.md)** • **[→ npx Setup Guide](docs/guides/NPX_INSTALLATION.md)**
 
 ---
 

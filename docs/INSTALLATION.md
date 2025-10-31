@@ -1,6 +1,6 @@
 # VERSATIL Framework Installation Guide
 
-**Version**: 7.5.1 | **Last Updated**: 2025-10-27
+**Version**: 7.16.1 | **Last Updated**: 2025-10-31
 
 Choose your installation path based on how you want to use VERSATIL:
 
@@ -8,31 +8,146 @@ Choose your installation path based on how you want to use VERSATIL:
 
 ## Choose Your Path
 
-### 🎯 Path 1: Cursor Users (MCP Integration)
+### 🎯 Path 1: npx (Recommended - MCP Server)
 **Best for**: Claude Desktop + Cursor IDE users
-**Installation Time**: 2 minutes
-**Requirements**: Claude Desktop, Cursor IDE, Node.js 18+
+**Installation Time**: 2-3 minutes (first run)
+**Requirements**: Node.js 18+
 
-[→ Jump to Cursor MCP Setup](#cursor-mcp-setup)
+**Why npx?**
+- ⚡ Fast: 2-3 min vs 10-15 min npm install
+- ✅ Simple: One command, no global install
+- 🔒 Clean: No dependencies in your project
+- 🚀 Always latest: Pin to specific versions
+
+[→ Jump to npx Setup](#npx-setup-recommended)
 
 ---
 
-### 🖥️ Path 2: Terminal/CLI Users
-**Best for**: Terminal workflows, other IDEs, CI/CD
-**Installation Time**: 5 minutes
-**Requirements**: Node.js 18+, npm 9+
+### 🛠️ Path 2: Development Setup
+**Best for**: Framework development, customization
+**Installation Time**: 10-15 minutes
+**Requirements**: Node.js 18+, npm 9+, Git
+
+[→ Jump to Development Setup](#development-setup)
+
+---
+
+### 🖥️ Path 3: Global CLI Installation
+**Best for**: Terminal workflows, automation scripts
+**Installation Time**: 10-15 minutes
+**Requirements**: Node.js 18+, npm 9+, Git
 
 [→ Jump to CLI Installation](#cli-installation)
 
 ---
 
-## Cursor MCP Setup
+## npx Setup (Recommended)
 
 ### Prerequisites
 
-- **Claude Desktop** installed ([download](https://claude.ai/download))
-- **Cursor IDE** installed ([download](https://cursor.sh))
 - **Node.js** 18.0.0+ ([download](https://nodejs.org))
+- **Claude Desktop** installed ([download](https://claude.ai/download)) *optional*
+- **Cursor IDE** installed ([download](https://cursor.sh)) *optional*
+
+### Quick Start
+
+```bash
+# Run VERSATIL MCP Server
+npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp
+
+# That's it! The MCP server is now running
+```
+
+**First run**: 2-3 minutes (downloads and caches)
+**Subsequent runs**: Instant (uses cache)
+
+### Configure Claude Desktop
+
+Add VERSATIL MCP to your Claude Desktop config:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+**Linux**: `~/.config/Claude/claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "versatil": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1",
+        "versatil-mcp"
+      ]
+    }
+  }
+}
+```
+
+### Configure Cursor IDE (Optional)
+
+Add to `.cursor/mcp_config.json` in your project:
+
+```json
+{
+  "mcpServers": {
+    "versatil": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1",
+        "versatil-mcp"
+      ]
+    }
+  }
+}
+```
+
+### Restart and Verify
+
+```bash
+# macOS
+killall "Claude" "Cursor"
+open -a "Claude"
+open -a "Cursor"
+
+# Or manually quit and reopen both applications
+```
+
+In Claude Desktop, try:
+```
+Call versatil_health_check
+```
+
+Expected response:
+```json
+{
+  "status": "healthy",
+  "version": "7.16.1",
+  "profile": "coding",
+  "tools": 32,
+  "startupTime": "<10ms"
+}
+```
+
+### Version Pinning
+
+```bash
+# Use specific version (recommended)
+npx --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp
+
+# Use latest from main branch
+npx --package=github:Nissimmiracles/versatil-sdlc-framework#main versatil-mcp
+
+# Use specific commit
+npx --package=github:Nissimmiracles/versatil-sdlc-framework#8d8ff99 versatil-mcp
+```
+
+---
+
+## Development Setup
+
+For framework development or customization:
 
 ### Step 1: Clone Repository
 
@@ -48,88 +163,23 @@ npm install
 npm run build
 ```
 
-**Time**: 5-10 minutes
+**Time**: 10-15 minutes (downloads ~1-2GB dependencies)
 
-### Step 3: Configure MCP Server
-
-The MCP configuration is already set up in `.cursor/mcp_config.json`. You just need to verify it points to the correct path:
+### Step 3: Verify Build
 
 ```bash
-# Check the config
-cat .cursor/mcp_config.json
+# Check build output
+ls -la dist/
+
+# Test MCP server
+node bin/versatil-mcp.js
 ```
-
-Expected output:
-```json
-{
-  "mcpServers": {
-    "claude-opera": {
-      "command": "node",
-      "args": ["<YOUR_PATH>/bin/versatil-mcp.js", "<YOUR_PATH>"],
-      "cwd": "<YOUR_PATH>",
-      "env": {
-        "NODE_ENV": "production",
-        "VERSATIL_MCP_MODE": "true"
-      }
-    }
-  }
-}
-```
-
-### Step 4: Update Paths (if needed)
-
-If the paths don't match your installation:
-
-```bash
-# Run auto-fixer
-node scripts/fix-mcp-configs.cjs
-```
-
-This will update:
-- `.cursor/mcp_config.json`
-- `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS)
-- Or equivalent Windows/Linux paths
-
-### Step 5: Restart Claude Desktop & Cursor
-
-```bash
-# macOS
-killall "Claude" "Cursor"
-open -a "Claude"
-open -a "Cursor"
-
-# Or manually quit and reopen both applications
-```
-
-### Step 6: Verify MCP Connection
-
-In Claude Desktop, try:
-```
-Call versatil_health_check
-```
-
-Expected response:
-```json
-{
-  "status": "healthy",
-  "version": "7.5.1",
-  "lazyMode": true,
-  "startupTime": "<500ms"
-}
-```
-
-### Step 7: Test Agent Activation
-
-In Cursor, create a test file:
-```bash
-echo "describe('test', () => {})" > test.spec.ts
-```
-
-Save the file. Maria-QA should auto-activate and provide quality feedback.
 
 ---
 
 ## CLI Installation
+
+For global CLI tool access (not typical for MCP use):
 
 ### Prerequisites
 
@@ -137,16 +187,38 @@ Save the file. Maria-QA should auto-activate and provide quality feedback.
 - **npm** 9.0.0+ (comes with Node.js)
 - **Git** (for cloning repository)
 
-### Step 1: Install Globally via npm
+### Step 1: Clone and Install
 
 ```bash
-# Install VERSATIL globally
-npm install -g @versatil/sdlc-framework
+# Clone repository
+git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git
+cd versatil-sdlc-framework
+
+# Install globally
+npm install
+npm run build
+npm link
 
 # Verify installation
 versatil --version
-# Expected: 7.5.1
+# Expected: 7.16.1
 ```
+
+**Time**: 10-15 minutes
+
+### Step 2: Use CLI Commands
+
+```bash
+# Run MCP server
+versatil-mcp
+
+# Other CLI tools
+versatil --help
+versatil-daemon start
+versatil-config
+```
+
+**Note**: Most users should use [npx setup](#npx-setup-recommended) instead of global CLI installation.
 
 **Alternative**: Use npx (no installation required)
 ```bash
