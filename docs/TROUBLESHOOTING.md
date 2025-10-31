@@ -1,7 +1,7 @@
 # VERSATIL Framework Troubleshooting Guide
 
-**Version**: 7.9.0
-**Last Updated**: 2025-10-28
+**Version**: 7.16.1
+**Last Updated**: 2025-10-31
 
 ## Overview
 
@@ -10,6 +10,8 @@ This guide provides detailed troubleshooting steps for common VERSATIL framework
 - Framework features not working as expected
 - Installation or configuration problems
 - Performance degradation
+
+**Note**: As of v7.16.1, VERSATIL uses **npx** for MCP server execution (no installation required). Legacy `npm install` commands in this guide refer to development setup only.
 
 ---
 
@@ -30,21 +32,21 @@ This guide provides detailed troubleshooting steps for common VERSATIL framework
 
 ## Installation Issues
 
-### Issue: Framework Not Installed
+### Issue: MCP Server Not Running
 
 **Symptoms**:
 ```bash
-npx versatil doctor
-# Error: command not found
+# MCP server not responding
+# Tools not available in Claude Desktop/Cursor
 ```
 
 **Solution**:
 ```bash
-# Install framework
-npm install @versatil/sdlc-framework
+# Run VERSATIL MCP Server
+npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp
 
-# Verify
-npx versatil doctor --quick
+# Or add to Claude Desktop config
+# See: docs/INSTALLATION.md
 ```
 
 ---
@@ -72,8 +74,9 @@ npm uninstall @versatil/sdlc-framework
 # Clear npm cache
 npm cache clean --force
 
-# Reinstall
-npm install @versatil/sdlc-framework
+# Clear npx cache and re-run
+rm -rf ~/.npm/_npx
+npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp
 
 # Verify
 npx versatil doctor

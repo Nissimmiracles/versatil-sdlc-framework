@@ -260,22 +260,22 @@ Complete comparison of VERSATIL with other AI coding assistants and frameworks.
 
 ### From Copilot to VERSATIL
 
-1. **Install VERSATIL**: `npm install @versatil/sdlc-framework`
+1. **Install VERSATIL**: `npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp`
 2. **First feature**: `/plan "Your feature"` (VERSATIL searches RAG)
 3. **Style detection**: Automatic from git history (15 seconds)
 4. **Keep Copilot**: Use both! Copilot for inline, VERSATIL for features
 
 ### From Cursor to VERSATIL
 
-1. **Install VERSATIL**: `npm install @versatil/sdlc-framework`
+1. **Install VERSATIL**: `npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp`
 2. **Import context**: VERSATIL auto-detects from git (no manual config)
-3. **Private RAG**: Run `npm run setup:private-rag` (2 minutes)
+3. **Private RAG**: Automatic setup on first run
 4. **First feature**: `/plan` instead of Composer mode
 5. **Keep Cursor**: Use both! Cursor for editing, VERSATIL for orchestration
 
 ### From Claude Code SDK to VERSATIL
 
-1. **Install VERSATIL**: `npm install @versatil/sdlc-framework`
+1. **Install VERSATIL**: `npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp`
 2. **Enable agents**: 18 specialized agents vs generic Claude
 3. **Enable RAG**: Public + Private memory vs session-only
 4. **Enable orchestration**: OPERA methodology vs ad-hoc

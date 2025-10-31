@@ -32,9 +32,9 @@ Step-by-step tutorials for mastering VERSATIL OPERA Framework - from first insta
 **Goal**: Plan and implement a simple authentication feature using VERSATIL agents
 
 ### Prerequisites
-- VERSATIL installed (`npm install @versatil/sdlc-framework`)
-- Node.js ≥18, npm ≥9
-- Claude Desktop with VERSATIL configured
+- VERSATIL MCP Server running (`npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp`)
+- Node.js ≥18
+- Claude Desktop with VERSATIL configured (see [Installation Guide](INSTALLATION.md))
 
 ### Step 1: Verify Installation (2 minutes)
 

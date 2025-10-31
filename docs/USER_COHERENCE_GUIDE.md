@@ -1,13 +1,15 @@
 # User Coherence Guide
 
-**Version**: 7.9.0
-**Last Updated**: 2025-10-28
+**Version**: 7.16.1
+**Last Updated**: 2025-10-31
 
 ## Overview
 
-VERSATIL Framework includes comprehensive **User Coherence** validation - a health checking system that ensures your framework installation is up-to-date, properly configured, and functioning correctly.
+VERSATIL Framework includes comprehensive **User Coherence** validation - a health checking system that ensures your MCP server is up-to-date, properly configured, and functioning correctly.
 
-This guide explains how to use the coherence checking tools to maintain a healthy VERSATIL installation in your projects.
+This guide explains how to use the coherence checking tools to maintain a healthy VERSATIL MCP server.
+
+**Note**: As of v7.16.1, VERSATIL uses **npx** for MCP server execution. Health checks focus on MCP server status rather than traditional npm package installation.
 
 ---
 
@@ -86,9 +88,9 @@ npx versatil doctor --fix
 ```
 
 **Actions**:
-- **Corrupted**: Run `npm install @versatil/sdlc-framework`
-- **Partial**: Reinstall framework
-- **Outdated build**: Run `npm run build` in framework directory
+- **Corrupted**: Clear npx cache: `rm -rf ~/.npm/_npx`
+- **Partial**: Re-run: `npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp`
+- **Outdated**: Update version tag in MCP config
 
 ---
 
