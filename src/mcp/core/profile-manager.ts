@@ -178,33 +178,92 @@ export class ProfileManager {
    * Load profile configuration from file
    */
   async loadConfiguration(): Promise<void> {
+    const frameworkRoot = this.getFrameworkRoot();
+    const frameworkConfigPath = path.join(frameworkRoot, 'mcp-profiles.config.json');
+    const userConfigPath = path.join(process.cwd(), 'mcp-profiles.config.json');
+
     try {
       const configData = await fs.readFile(this.configPath, 'utf-8');
       this.config = JSON.parse(configData);
       this.logger.info('Profile configuration loaded', {
         version: this.config?.version,
         profiles: Object.keys(this.config?.profiles || {}),
+        source: this.configPath
       });
     } catch (error) {
-      // If config doesn't exist in user project, try to create default
-      if ((error as any).code === 'ENOENT' && this.isInUserProjectScope(this.configPath)) {
-        this.logger.warn('Profile config not found in user project, creating default config', {
-          path: this.configPath
+      // Enhanced error logging with search paths
+      if ((error as any).code === 'ENOENT') {
+        this.logger.error('Profile configuration not found', {
+          searched: [
+            { path: frameworkConfigPath, exists: await this.fileExists(frameworkConfigPath) },
+            { path: userConfigPath, exists: await this.fileExists(userConfigPath) }
+          ],
+          selected: this.configPath,
+          isUserProject: this.isInUserProjectScope(this.configPath)
         });
-        await this.createDefaultProfileConfig();
-        // Retry loading
-        try {
-          const configData = await fs.readFile(this.configPath, 'utf-8');
-          this.config = JSON.parse(configData);
-          this.logger.info('Default profile configuration created and loaded');
-        } catch (retryError) {
-          this.logger.error('Failed to load default profile config', { error: retryError });
-          throw new Error(`Failed to load profile config from ${this.configPath}: ${retryError}`);
+
+        // If config doesn't exist in user project, try to create default
+        if (this.isInUserProjectScope(this.configPath)) {
+          this.logger.warn(`
+Profile config not found. Creating default in your project.
+
+Note: This is optional - framework has built-in config.
+Location: ${this.configPath}
+
+To use framework defaults instead:
+  - Delete this file
+  - Framework will use bundled config
+          `);
+
+          await this.createDefaultProfileConfig();
+
+          // Retry loading
+          try {
+            const configData = await fs.readFile(this.configPath, 'utf-8');
+            this.config = JSON.parse(configData);
+            this.logger.info('Default profile configuration created and loaded');
+          } catch (retryError) {
+            this.logger.error('Failed to load default profile config', { error: retryError });
+            throw new Error(`Failed to load profile config from ${this.configPath}: ${retryError}`);
+          }
+        } else {
+          // Not in user project and config not found - this is a problem
+          throw new Error(`
+Profile config not found in framework directory.
+
+Searched:
+  1. Framework: ${frameworkConfigPath} ✗
+  2. User project: ${userConfigPath} ✗
+
+This usually means:
+  - npx cache corrupted → Clear: rm -rf ~/.npm/_npx
+  - Using old version → Update to v7.16.1+
+  - Build issue → Report at github.com/Nissimmiracles/versatil-sdlc-framework/issues
+
+To create custom config:
+  npx --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-setup --init-config
+          `);
         }
       } else {
-        this.logger.error('Failed to load profile configuration', { error });
+        this.logger.error('Failed to load profile configuration', {
+          error,
+          path: this.configPath,
+          errorCode: (error as any).code
+        });
         throw new Error(`Failed to load profile config from ${this.configPath}: ${error}`);
       }
+    }
+  }
+
+  /**
+   * Check if file exists
+   */
+  private async fileExists(filePath: string): Promise<boolean> {
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -222,8 +281,8 @@ export class ProfileManager {
    * Create default profile configuration in user's project
    */
   private async createDefaultProfileConfig(): Promise<void> {
-    const defaultConfig: ProfileConfig = {
-      version: '7.16.1',
+    const defaultConfig: ProfileConfig & { _metadata?: any } = {
+      version: '7.16.2',
       description: 'VERSATIL MCP Profile Configuration - Generated from framework defaults',
       profiles: {
         coding: {
@@ -257,12 +316,24 @@ export class ProfileManager {
           toolCount: 82,
           warning: 'Full profile is resource-intensive. Use specific profiles for better performance.'
         }
+      },
+      _metadata: {
+        created_by: 'versatil-framework',
+        created_at: new Date().toISOString(),
+        framework_version: '7.16.2',
+        auto_generated: true,
+        note: 'Auto-generated config. Safe to delete - framework will use bundled defaults.',
+        docs: 'https://github.com/Nissimmiracles/versatil-sdlc-framework/blob/main/docs/guides/NPX_INSTALLATION.md'
       }
     };
 
     try {
       await fs.writeFile(this.configPath, JSON.stringify(defaultConfig, null, 2), 'utf-8');
-      this.logger.info('Created default profile config', { path: this.configPath });
+      this.logger.info('Created default profile config', {
+        path: this.configPath,
+        version: defaultConfig.version,
+        profiles: Object.keys(defaultConfig.profiles)
+      });
     } catch (error) {
       this.logger.error('Failed to create default profile config', { error });
       throw error;

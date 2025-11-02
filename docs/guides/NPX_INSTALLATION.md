@@ -283,6 +283,102 @@ DEBUG=versatil:* npx --package=github:Nissimmiracles/versatil-sdlc-framework#v7.
 
 ---
 
+## Configuration File Management
+
+### Where is mcp-profiles.config.json?
+
+**Framework Installation** (npx):
+- Config bundled with framework at: `~/.npm/_npx/.../mcp-profiles.config.json`
+- Framework finds and uses it automatically
+- **You don't need to create it**
+
+**User Project** (optional):
+- Framework MAY auto-create in your project if not found
+- Contains `_metadata` field explaining it's auto-generated
+- **Safe to delete** - framework will use bundled defaults
+
+### Auto-Created Config
+
+If framework creates `mcp-profiles.config.json` in your project:
+
+```json
+{
+  "version": "7.16.2",
+  "profiles": { ... },
+  "_metadata": {
+    "created_by": "versatil-framework",
+    "created_at": "2025-10-31T...",
+    "framework_version": "7.16.2",
+    "auto_generated": true,
+    "note": "Auto-generated config. Safe to delete - framework will use bundled defaults."
+  }
+}
+```
+
+**What this means:**
+- ✅ Framework couldn't find bundled config (rare)
+- ✅ Created fallback in your project
+- ✅ Safe to delete and rely on framework defaults
+- ✅ Or customize if needed
+
+### Custom Configuration
+
+To override framework defaults:
+
+**Option 1: Edit auto-created file**
+```bash
+# If framework created mcp-profiles.config.json
+# Just edit it - changes apply immediately
+vim mcp-profiles.config.json
+```
+
+**Option 2: Create from scratch**
+```bash
+# Copy framework defaults
+cat ~/.npm/_npx/.../mcp-profiles.config.json > mcp-profiles.config.json
+
+# Or create minimal custom config
+cat > mcp-profiles.config.json <<EOF
+{
+  "version": "7.16.2",
+  "profiles": {
+    "custom": {
+      "modules": ["core-tools"],
+      "toolCount": 20
+    }
+  }
+}
+EOF
+```
+
+**Option 3: Use environment variable**
+```bash
+# Point to custom config
+MCP_CONFIG_PATH=/path/to/custom-config.json npx versatil-mcp
+```
+
+### Config Search Order
+
+1. **Explicit path** (if provided via env var)
+2. **Framework directory** (bundled with npx install)
+3. **User project directory** (current working directory)
+
+Framework logs show search results when starting.
+
+### Security Note
+
+**Guardian Boundary Engine** protects config files:
+- ✅ Allows creation in **your own project**
+- ❌ Blocks creation in **framework directory**
+- ❌ Blocks creation in **system directories**
+
+If you see "Boundary violation" errors:
+- This is **correct behavior** (Zero Trust security)
+- Framework protecting sensitive directories
+- Config should be in your project or framework bundle
+
+---
+
 ## Performance Benchmarks
 
 ### Installation Time Comparison
