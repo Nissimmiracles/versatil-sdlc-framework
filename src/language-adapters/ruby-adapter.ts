@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * VERSATIL Framework v3.0.0 - Ruby Language Adapter
  *
@@ -40,7 +41,8 @@ export class RubyAdapter extends BaseLanguageAdapter {
         cwd: this.rootPath
       });
       if (stdout.trim()) return true;
-    } catch {}
+    } catch { // eslint-disable-line no-empty
+    }
 
     return false;
   }
@@ -60,7 +62,7 @@ export class RubyAdapter extends BaseLanguageAdapter {
     try {
       const { stdout } = await execAsync('ruby --version');
       this.rubyVersion = stdout.trim();
-    } catch {
+    } catch { // eslint-disable-line no-empty
       this.rubyVersion = 'Unknown';
     }
 
@@ -121,7 +123,8 @@ export class RubyAdapter extends BaseLanguageAdapter {
       try {
         const { stdout: files } = await execAsync('ls pkg/');
         artifacts.push(...files.split('\n').filter(f => f.endsWith('.gem')).map(f => `pkg/${f}`));
-      } catch {}
+      } catch { // eslint-disable-line no-empty
+      }
 
       return {
         success: true,
@@ -203,7 +206,8 @@ export class RubyAdapter extends BaseLanguageAdapter {
     try {
       const lintResult = await this.lint();
       lintScore = Math.max(0, 100 - (lintResult.errors + lintResult.warnings) * 5);
-    } catch {}
+    } catch { // eslint-disable-line no-empty
+    }
 
     return {
       testCoverage,
@@ -234,7 +238,8 @@ export class RubyAdapter extends BaseLanguageAdapter {
     try {
       const { stdout } = await execAsync(`find . -name "*.rb" -type f`, { cwd: this.rootPath });
       files.push(...stdout.split('\n').filter(f => f.trim() && f.endsWith('.rb')));
-    } catch {}
+    } catch { // eslint-disable-line no-empty
+    }
 
     return Array.from(new Set(files));
   }

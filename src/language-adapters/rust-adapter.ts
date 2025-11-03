@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * VERSATIL Framework v3.0.0 - Rust Language Adapter
  *
@@ -52,7 +53,7 @@ export class RustAdapter extends BaseLanguageAdapter {
           if (stdout.trim()) {
             return true;
           }
-        } catch {
+        } catch { // eslint-disable-line no-empty
           continue;
         }
       }
@@ -83,7 +84,7 @@ export class RustAdapter extends BaseLanguageAdapter {
     try {
       const { stdout } = await execAsync('rustc --version');
       this.rustVersion = stdout.trim();
-    } catch {
+    } catch { // eslint-disable-line no-empty
       this.rustVersion = 'Unknown';
     }
 
@@ -160,7 +161,7 @@ export class RustAdapter extends BaseLanguageAdapter {
       if (options?.coverage) {
         try {
           command = `cargo tarpaulin --out Json --output-dir target/coverage`;
-        } catch {
+        } catch { // eslint-disable-line no-empty
           // Fallback to regular cargo test if tarpaulin not available
           command = `cargo test ${patternArg}`;
         }
@@ -191,7 +192,7 @@ export class RustAdapter extends BaseLanguageAdapter {
             const coverageData = JSON.parse(readFileSync(coverageFile, 'utf8'));
             coverage = coverageData.coverage;
           }
-        } catch {
+        } catch { // eslint-disable-line no-empty
           coverage = undefined;
         }
       }
@@ -263,7 +264,7 @@ export class RustAdapter extends BaseLanguageAdapter {
         });
         const binaries = files.split('\n').filter(f => f && !f.includes('.') && !f.includes('build'));
         artifacts.push(...binaries.map(b => `${targetDir}/${b}`));
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // No artifacts found
       }
 
@@ -469,7 +470,7 @@ export class RustAdapter extends BaseLanguageAdapter {
         const coverageData = JSON.parse(readFileSync(coverageFile, 'utf8'));
         testCoverage = coverageData.coverage || 0;
       }
-    } catch {
+    } catch { // eslint-disable-line no-empty
       testCoverage = 0;
     }
 
@@ -479,7 +480,7 @@ export class RustAdapter extends BaseLanguageAdapter {
       const lintResult = await this.lint();
       const totalIssues = lintResult.errors + lintResult.warnings;
       lintScore = Math.max(0, 100 - (totalIssues * 5)); // Deduct 5 points per issue
-    } catch {
+    } catch { // eslint-disable-line no-empty
       lintScore = 100;
     }
 
@@ -530,7 +531,7 @@ export class RustAdapter extends BaseLanguageAdapter {
         });
 
         files.push(...stdout.split('\n').filter(f => f.trim() && f.endsWith('.rs')));
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // Pattern not found, continue
       }
     }

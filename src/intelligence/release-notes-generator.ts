@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * VERSATIL Framework - Release Notes Generator
  *

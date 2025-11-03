@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * UltraThink Breakthrough Intelligence System
  * Advanced problem-solving for bottlenecks, struggle loops, and breakthrough solutions
@@ -593,7 +594,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
             { cwd: projectPath, encoding: 'utf8' }
           ).trim();
           performanceCommentCount += parseInt(result) || 0;
-        } catch {
+        } catch { // eslint-disable-line no-empty
           // Keyword not found - continue
         }
       }
@@ -668,7 +669,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
             conflictingConstraints: ['quick fixes vs architectural refactoring']
           });
         }
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // No performance commits found or git log failed
       }
 
@@ -711,7 +712,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
             conflictingConstraints: ['code organization vs bundle size']
           });
         }
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // find command failed - skip
       }
 
@@ -1253,7 +1254,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
             conflictingConstraints: ['review time vs delivery speed']
           });
         }
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // GH CLI not available
       }
     } catch (error) {
@@ -1480,7 +1481,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
             ]
           });
         }
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // GH CLI not available
       }
     } catch (error) {
@@ -1589,7 +1590,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
             ]
           });
         }
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // GH CLI not available
       }
     } catch (error) {
@@ -1987,7 +1988,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
             });
           }
         }
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // No docs found
       }
     } catch (error) {
@@ -2281,7 +2282,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
         if (recentMerges.length > 0) {
           avgCycleTime = 5 * 24 * 60 * 60 * 1000; // Estimate 5 days if active merging
         }
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // Default cycle time
       }
 
@@ -2413,7 +2414,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
         if (fs.existsSync(path.join(projectPath, 'README.md'))) docQuality += 0.2;
         if (fs.existsSync(path.join(projectPath, 'docs'))) docQuality += 0.2;
         docQuality = Math.min(docQuality, 1.0);
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // File system error
       }
 
@@ -2467,7 +2468,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
           const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
           depCount = Object.keys({ ...packageJson.dependencies, ...packageJson.devDependencies }).length;
         }
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // No package.json
       }
 
@@ -2582,7 +2583,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
         if (prComments > 100) meetingEfficiency = 0.8; // High engagement
         else if (prComments > 50) meetingEfficiency = 0.6;
-      } catch {
+      } catch { // eslint-disable-line no-empty
         // gh not available
       }
 
