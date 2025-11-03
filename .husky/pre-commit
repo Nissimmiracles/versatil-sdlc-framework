@@ -8,7 +8,7 @@
 echo "🏗️  Step 1/2: Running architectural validation..."
 
 # Run architectural validation FIRST (fast, catches major issues)
-npm run validate:architecture
+pnpm run validate:architecture
 
 # Check if architectural validation passed
 if [ $? -ne 0 ]; then
@@ -22,7 +22,7 @@ echo ""
 echo "🧪 Step 2/2: Running test coverage check..."
 
 # Run tests with coverage
-npm run test:coverage
+pnpm run test:coverage
 
 # Check if tests passed
 if [ $? -ne 0 ]; then
