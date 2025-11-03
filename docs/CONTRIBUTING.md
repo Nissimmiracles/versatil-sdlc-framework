@@ -53,8 +53,14 @@ cd versatil-sdlc-framework
 
 ### 2. Install Dependencies
 ```bash
-npm install
+# Install pnpm if not already installed
+npm install -g pnpm
+
+# Install framework dependencies
+pnpm install
 ```
+
+**Note**: The framework uses pnpm@10.17.0 for dependency management. All scripts use pnpm.
 
 ### 3. Build and Test
 ```bash

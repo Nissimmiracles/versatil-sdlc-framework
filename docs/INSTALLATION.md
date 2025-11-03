@@ -159,11 +159,13 @@ cd versatil-sdlc-framework
 ### Step 2: Install Dependencies
 
 ```bash
-npm install
+pnpm install
 pnpm run build
 ```
 
 **Time**: 10-15 minutes (downloads ~1-2GB dependencies)
+
+**Note**: The framework uses pnpm@10.17.0 for development. Install pnpm: `npm install -g pnpm`
 
 ### Step 3: Verify Build
 
@@ -184,7 +186,7 @@ For global CLI tool access (not typical for MCP use):
 ### Prerequisites
 
 - **Node.js** 18.0.0+ ([download](https://nodejs.org))
-- **npm** 9.0.0+ (comes with Node.js)
+- **pnpm** 10.17.0+ (`npm install -g pnpm`)
 - **Git** (for cloning repository)
 
 ### Step 1: Clone and Install
@@ -194,14 +196,16 @@ For global CLI tool access (not typical for MCP use):
 git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git
 cd versatil-sdlc-framework
 
-# Install globally
-npm install
+# Install dependencies and build
+pnpm install
 pnpm run build
+
+# Link globally
 npm link
 
 # Verify installation
 versatil --version
-# Expected: 7.16.1
+# Expected: 7.16.2
 ```
 
 **Time**: 10-15 minutes
