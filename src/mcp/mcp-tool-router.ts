@@ -363,12 +363,13 @@ export class MCPToolRouter extends EventEmitter {
         );
 
       case 'get_examples':
-      case 'get_code_examples':
+      case 'get_code_examples': {
         const docsResult = await this.gitMCP.searchFrameworkDocs(
           params.framework,
           params.topic
         );
         return {
+      }
           success: true,
           data: {
             examples: docsResult.examples,

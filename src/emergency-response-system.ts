@@ -789,10 +789,11 @@ class EmergencyResponseSystem {
       let validationPassed = false;
 
       switch (context.type) {
-        case 'build_failure':
+        case 'build_failure': {
           const { stdout, stderr } = await execAsync('npm run build 2>&1 || true');
           validationPassed = !stderr && stdout.includes('build');
           break;
+        }
 
         case 'router_failure':
           // Test router functionality with real test
