@@ -17,15 +17,49 @@
  * - Performance benchmarks
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { RAGHealthMonitor, getRAGHealthMonitor } from './rag-health-monitor.js';
 import type { RAGHealthReport, RAGIssue, RAGComponentHealth } from './rag-health-monitor.js';
+
+// Mock external dependencies to avoid real GraphRAG/Supabase connections
+vi.mock('../../lib/graphrag-store.js', () => ({
+  graphRAGStore: {
+    query: vi.fn().mockResolvedValue({ results: [], entities: [] }),
+  }
+}));
+
+vi.mock('../../rag/enhanced-vector-memory-store.js', () => ({
+  EnhancedVectorMemoryStore: vi.fn().mockImplementation(() => ({}))
+}));
+
+vi.mock('../../rag/rag-router.js', () => ({
+  getRAGRouter: vi.fn().mockReturnValue({
+    query: vi.fn().mockResolvedValue([]),
+  })
+}));
+
+// Mock child_process to avoid real docker commands
+vi.mock('child_process', async () => {
+  const actual = await vi.importActual('child_process');
+  return {
+    ...actual,
+    exec: vi.fn((cmd: string, callback: any) => {
+      // Simulate successful docker stats output
+      callback(null, { stdout: '1.2GiB / 2GiB', stderr: '' });
+    })
+  };
+});
 
 describe('RAGHealthMonitor', () => {
   let monitor: RAGHealthMonitor;
 
   beforeEach(() => {
+    vi.clearAllMocks();
     monitor = RAGHealthMonitor.getInstance();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   describe('Singleton Pattern', () => {
