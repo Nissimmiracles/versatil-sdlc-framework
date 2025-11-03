@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 /**
  * VERSATIL SDLC Framework - MCP Auto-Update System
  * Continuously discovers, evaluates, and integrates new MCPs

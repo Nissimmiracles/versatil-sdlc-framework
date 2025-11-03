@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * VERSATIL Enterprise Monitoring Dashboard
  * Real-time monitoring, metrics collection, and business intelligence

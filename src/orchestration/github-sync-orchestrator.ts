@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * VERSATIL SDLC Framework - GitHub Sync Orchestrator
  * Handles full GitHub integration with context-aware PRs and synchronization

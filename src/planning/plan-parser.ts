@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 /**
  * @fileoverview Plan Parser - Parse plan text into structured data
  *
