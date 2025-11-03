@@ -109,7 +109,7 @@ Thumbs.db
 # Package Managers
 # package-lock.json  # Needed for GitHub Actions npm ci
 yarn.lock
-pnpm-lock.yaml
+# pnpm-lock.yaml  # Keep this - required for reproducible builds
 
 # Backup Files
 *.backup
