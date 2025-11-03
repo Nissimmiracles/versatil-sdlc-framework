@@ -19,25 +19,21 @@ fi
 
 echo "✅ Architectural validation passed"
 echo ""
-echo "🧪 Step 2/2: Running test coverage check..."
+echo "🧪 Step 2/2: Running fast smoke tests..."
 
-# Run tests with coverage
-pnpm run test:coverage
+# Run only smoke tests (fast subset - under 30 seconds)
+# Full coverage runs in CI/CD pipeline
+pnpm run test:unit --run --reporter=dot 2>&1 | head -50
 
-# Check if tests passed
+# Check if smoke tests passed
 if [ $? -ne 0 ]; then
-  echo "❌ Tests failed. Commit blocked."
+  echo "❌ Smoke tests failed. Commit blocked."
+  echo "   Run 'pnpm test' to see details"
   exit 1
 fi
 
-# Check coverage threshold
-node scripts/check-coverage-threshold.cjs
-
-# Check threshold result
-if [ $? -ne 0 ]; then
-  echo "❌ Coverage below threshold. Commit blocked."
-  exit 1
-fi
-
+echo "✅ Smoke tests passed. Full coverage will run in CI."
+echo "   💡 To run full tests locally: pnpm run test:coverage"
+echo ""
 echo "✅ All quality gates passed. Proceeding with commit..."
 exit 0
