@@ -13,7 +13,7 @@
  * Anti-recursion protections (v7.10.0+):
  * - Layer 3: Session tracking to prevent infinite loops
  */
-import { writeFileSync } from 'fs';
+import { writeFileSync, readdirSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { checkDuplicate } from './todo-deduplicator.js';
 // ============================================================================
@@ -220,7 +220,6 @@ function categorizeIssue(issue) {
  */
 function todoAlreadyExists(verifiedIssue, todosDir) {
     try {
-        import { readdirSync, readFileSync, existsSync } from 'fs';
         if (!existsSync(todosDir)) {
             return false; // No todos directory = no duplicates
         }

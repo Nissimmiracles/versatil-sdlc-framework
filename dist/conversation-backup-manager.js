@@ -7,6 +7,7 @@
  */
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import { execSync } from 'child_process';
 /**
  * Conversation Backup Manager
  *
@@ -405,7 +406,6 @@ export class ConversationBackupManager {
      */
     async getCurrentGitBranch(projectPath) {
         try {
-            import { execSync } from 'child_process';
             const branch = execSync('git branch --show-current', {
                 cwd: projectPath,
                 encoding: 'utf-8'
@@ -421,7 +421,6 @@ export class ConversationBackupManager {
      */
     async getCurrentGitCommit(projectPath) {
         try {
-            import { execSync } from 'child_process';
             const commit = execSync('git rev-parse --short HEAD', {
                 cwd: projectPath,
                 encoding: 'utf-8'

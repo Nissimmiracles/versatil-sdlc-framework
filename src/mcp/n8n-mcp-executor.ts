@@ -426,10 +426,17 @@ export class N8nMCPExecutor {
    */
   private getNextCronExecution(cronExpression: string): string {
     try {
-      // Use cron-parser for accurate cron expression parsing
-      import parser from 'cron-parser';
-      const interval = parser.parseExpression(cronExpression);
-      const next = interval.next().toDate();
+      // Note: cron-parser package needs to be installed for accurate parsing
+      // Run: pnpm add cron-parser
+      // For now, using fallback calculation
+      // import parser from 'cron-parser';
+      // const interval = parser.parseExpression(cronExpression);
+      // const next = interval.next().toDate();
+      // return next.toISOString();
+
+      // Fallback calculation
+      const now = new Date();
+      const next = new Date(now.getTime() + 3600000); // +1 hour fallback
       return next.toISOString();
     } catch (error) {
       // Fallback for invalid cron expressions

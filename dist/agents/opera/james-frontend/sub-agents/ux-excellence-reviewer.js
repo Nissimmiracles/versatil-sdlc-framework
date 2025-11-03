@@ -14,6 +14,9 @@
  * @module UXExcellenceReviewer
  */
 import { EventEmitter } from 'events';
+import { VisualConsistencyChecker } from '../ux-review/visual-consistency-checker.js';
+import { MarkdownAnalyzer } from '../ux-review/markdown-analyzer.js';
+import { UXReportGenerator } from '../ux-review/ux-report-generator.js';
 // ============================================================================
 // UX EXCELLENCE REVIEWER CLASS
 // ============================================================================
@@ -87,12 +90,23 @@ export class UXExcellenceReviewer extends EventEmitter {
      * Review visual consistency (uses dedicated checker)
      */
     async reviewVisualConsistency(context) {
-        import { VisualConsistencyChecker } from '../ux-review/visual-consistency-checker';
-        const checker = new VisualConsistencyChecker(context.designSystem);
+        // Convert DesignSystemInfo to DesignTokens format expected by checker
+        const designTokens = context.designSystem ? {
+            colors: context.designSystem.colorPalette.reduce((acc, color, idx) => {
+                acc[`color-${idx}`] = color;
+                return acc;
+            }, {}),
+            spacing: context.designSystem.spacing.scale, // Extract scale array
+            typography: context.designSystem.typography,
+            shadows: {},
+            borderRadius: {},
+            transitions: {}
+        } : undefined;
+        const checker = new VisualConsistencyChecker(designTokens);
         const checkContext = {
             filePaths: context.filePaths,
             fileContents: context.fileContents,
-            designTokens: context.designSystem,
+            designTokens: designTokens,
             framework: context.framework
         };
         const report = await checker.check(checkContext);
@@ -163,7 +177,6 @@ export class UXExcellenceReviewer extends EventEmitter {
      * Analyze markdown rendering (uses dedicated analyzer)
      */
     async analyzeMarkdownRendering(context) {
-        import { MarkdownAnalyzer } from '../ux-review/markdown-analyzer';
         const analyzer = new MarkdownAnalyzer();
         const markdownContext = {
             filePaths: context.filePaths,
@@ -230,7 +243,6 @@ export class UXExcellenceReviewer extends EventEmitter {
      */
     generateFormattedReport(result) {
         // Use the dedicated report generator for comprehensive reports
-        import { UXReportGenerator } from '../ux-review/ux-report-generator';
         const reportGenerator = new UXReportGenerator();
         const reportData = {
             timestamp: new Date(),

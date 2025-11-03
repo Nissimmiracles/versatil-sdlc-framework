@@ -11,8 +11,10 @@
 import { versatilDispatcher } from './agent-dispatcher.js';
 import { versatilIntegration } from './framework-integration.js';
 import { promises as fs } from 'fs';
+import fsSync from 'fs';
 import path from 'path';
 import { EventEmitter } from 'events';
+import chokidar from 'chokidar';
 /**
  * Development Environment Integration Service
  * Bridges VERSATIL framework with actual development tools
@@ -52,7 +54,6 @@ class VERSATILDevelopmentIntegration extends EventEmitter {
     async setupRealFileWatching() {
         try {
             // Check if chokidar is available for better file watching
-            import chokidar from 'chokidar';
             const watcher = chokidar.watch(this.context.projectRoot, {
                 ignored: [
                     '**/node_modules/**',
@@ -81,9 +82,8 @@ class VERSATILDevelopmentIntegration extends EventEmitter {
      * Fallback to native Node.js file watching
      */
     setupNativeFileWatching() {
-        import fs from 'fs';
         try {
-            fs.watch(this.context.projectRoot, { recursive: true }, (eventType, filename) => {
+            fsSync.watch(this.context.projectRoot, { recursive: true }, (eventType, filename) => {
                 if (filename && !this.shouldIgnoreFile(filename)) {
                     const fullPath = path.join(this.context.projectRoot, filename);
                     this.handleRealFileChange(eventType, fullPath);

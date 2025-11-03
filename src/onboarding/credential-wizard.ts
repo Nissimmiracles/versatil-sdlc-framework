@@ -5,6 +5,7 @@
 
 import * as readline from 'readline';
 import * as fs from 'fs';
+import fsSync from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import {
@@ -87,7 +88,6 @@ export class CredentialWizard {
     }
 
     // Ensure .versatil directory exists (synchronous for constructor)
-    import fsSync from 'fs';
     if (!fsSync.existsSync(this.versatilHome)) {
       fsSync.mkdirSync(this.versatilHome, { recursive: true });
     }

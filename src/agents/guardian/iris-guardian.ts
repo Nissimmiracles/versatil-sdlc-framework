@@ -19,6 +19,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { VERSATILLogger } from '../../utils/logger.js';
+import { reviewAndCleanupTodos } from './todo-deduplicator.js';
 
 /**
  * Execution context for Guardian
@@ -323,9 +324,6 @@ export class IrisGuardian {
     }
 
     this.logger.info(`Starting todo cleanup cycle (every ${intervalMinutes} minutes)`);
-
-    // Import cleanup function
-    import { reviewAndCleanupTodos } from './todo-deduplicator.js';
 
     // Schedule recurring cleanup
     const intervalMs = intervalMinutes * 60 * 1000;

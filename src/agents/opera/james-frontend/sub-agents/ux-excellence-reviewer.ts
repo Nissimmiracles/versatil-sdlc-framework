@@ -15,6 +15,9 @@
  */
 
 import { EventEmitter } from 'events';
+import { VisualConsistencyChecker } from '../ux-review/visual-consistency-checker.js';
+import { MarkdownAnalyzer } from '../ux-review/markdown-analyzer.js';
+import { UXReportGenerator } from '../ux-review/ux-report-generator.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -339,13 +342,25 @@ export class UXExcellenceReviewer extends EventEmitter {
    * Review visual consistency (uses dedicated checker)
    */
   async reviewVisualConsistency(context: UXReviewContext): Promise<VisualConsistencyAnalysis> {
-    import { VisualConsistencyChecker } from '../ux-review/visual-consistency-checker';
-    const checker = new VisualConsistencyChecker(context.designSystem);
+    // Convert DesignSystemInfo to DesignTokens format expected by checker
+    const designTokens = context.designSystem ? {
+      colors: context.designSystem.colorPalette.reduce((acc, color, idx) => {
+        acc[`color-${idx}`] = color;
+        return acc;
+      }, {} as Record<string, string>),
+      spacing: context.designSystem.spacing.scale, // Extract scale array
+      typography: context.designSystem.typography,
+      shadows: {},
+      borderRadius: {},
+      transitions: {}
+    } : undefined;
+
+    const checker = new VisualConsistencyChecker(designTokens);
 
     const checkContext = {
       filePaths: context.filePaths,
       fileContents: context.fileContents,
-      designTokens: context.designSystem,
+      designTokens: designTokens,
       framework: context.framework
     };
 
@@ -422,7 +437,6 @@ export class UXExcellenceReviewer extends EventEmitter {
    * Analyze markdown rendering (uses dedicated analyzer)
    */
   async analyzeMarkdownRendering(context: UXReviewContext): Promise<MarkdownAnalysisResult> {
-    import { MarkdownAnalyzer } from '../ux-review/markdown-analyzer';
     const analyzer = new MarkdownAnalyzer();
 
     const markdownContext = {
@@ -494,7 +508,6 @@ export class UXExcellenceReviewer extends EventEmitter {
    */
   generateFormattedReport(result: UXReviewResult): string {
     // Use the dedicated report generator for comprehensive reports
-    import { UXReportGenerator } from '../ux-review/ux-report-generator';
     const reportGenerator = new UXReportGenerator();
 
     const reportData = {

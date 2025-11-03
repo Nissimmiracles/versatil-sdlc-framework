@@ -7,6 +7,7 @@ import * as os from 'os';
 import fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import { EventEmitter } from 'events';
+import { spawn } from 'child_process';
 import { VERSATILLogger } from '../utils/logger.js';
 import { StackAwareOrchestrator } from './stack-aware-orchestrator.js';
 import { PlanFirstOpera } from './plan-first-opera.js';
@@ -194,7 +195,6 @@ VERSATIL operates on your project without mixing framework files with your code.
      * Start MCP servers with complete port isolation
      */
     async startIsolatedMCPServers() {
-        import { spawn } from 'child_process';
         for (const [key, config] of Object.entries(this.mcpServers)) {
             try {
                 // Each MCP server runs in isolated process

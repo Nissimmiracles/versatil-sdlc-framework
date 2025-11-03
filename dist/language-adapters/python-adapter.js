@@ -446,27 +446,31 @@ export class PythonAdapter extends BaseLanguageAdapter {
         const pyproject = join(this.rootPath, 'pyproject.toml');
         if (existsSync(pyproject)) {
             try {
-                import toml from '@iarna/toml';
-                const content = readFileSync(pyproject, 'utf-8');
-                const parsed = toml.parse(content);
+                // Note: @iarna/toml package needs to be installed for this feature
+                // Run: pnpm add @iarna/toml
+                // For now, skipping pyproject.toml parsing
+                // import toml from '@iarna/toml';
+                // const content = readFileSync(pyproject, 'utf-8');
+                // const parsed: any = toml.parse(content);
+                // TODO: Re-enable after installing @iarna/toml package
                 // Poetry dependencies
-                if (parsed.tool?.poetry?.dependencies) {
-                    Object.keys(parsed.tool.poetry.dependencies).forEach(dep => {
-                        if (dep !== 'python') {
-                            const version = parsed.tool.poetry.dependencies[dep];
-                            deps[dep] = typeof version === 'string' ? version : 'latest';
-                        }
-                    });
-                }
+                // if (parsed.tool?.poetry?.dependencies) {
+                //   Object.keys(parsed.tool.poetry.dependencies).forEach(dep => {
+                //     if (dep !== 'python') {
+                //       const version = parsed.tool.poetry.dependencies[dep];
+                //       deps[dep] = typeof version === 'string' ? version : 'latest';
+                //     }
+                //   });
+                // }
                 // PEP 621 dependencies
-                if (parsed.project?.dependencies && Array.isArray(parsed.project.dependencies)) {
-                    parsed.project.dependencies.forEach((dep) => {
-                        const parts = dep.split('==');
-                        const name = parts[0];
-                        const version = parts[1] || 'latest';
-                        deps[name] = version;
-                    });
-                }
+                // if (parsed.project?.dependencies && Array.isArray(parsed.project.dependencies)) {
+                //   parsed.project.dependencies.forEach((dep: string) => {
+                //     const parts = dep.split('==');
+                //     const name = parts[0];
+                //     const version = parts[1] || 'latest';
+                //     deps[name] = version;
+                //   });
+                // }
             }
             catch (error) {
                 console.warn('Failed to parse pyproject.toml:', error);

@@ -11,11 +11,11 @@ export declare const ComponentLibrarySchema: z.ZodObject<{
         gzipped: z.ZodNumber;
         raw: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        gzipped?: number;
         raw?: number;
+        gzipped?: number;
     }, {
-        gzipped?: number;
         raw?: number;
+        gzipped?: number;
     }>;
     accessibility_score: z.ZodNumber;
     compatibility: z.ZodObject<{
@@ -57,8 +57,8 @@ export declare const ComponentLibrarySchema: z.ZodObject<{
         csr?: boolean;
     };
     bundle_size?: {
-        gzipped?: number;
         raw?: number;
+        gzipped?: number;
     };
     accessibility_score?: number;
     installation_method?: "npm" | "cdn" | "copy-paste" | "cli";
@@ -83,8 +83,8 @@ export declare const ComponentLibrarySchema: z.ZodObject<{
         csr?: boolean;
     };
     bundle_size?: {
-        gzipped?: number;
         raw?: number;
+        gzipped?: number;
     };
     accessibility_score?: number;
     installation_method?: "npm" | "cdn" | "copy-paste" | "cli";

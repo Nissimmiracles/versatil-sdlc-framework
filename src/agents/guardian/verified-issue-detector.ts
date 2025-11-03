@@ -14,7 +14,7 @@
  * - Layer 3: Session tracking to prevent infinite loops
  */
 
-import { writeFileSync } from 'fs';
+import { writeFileSync, readdirSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
 import type { HealthCheckResult, HealthIssue } from './types.js';
@@ -324,8 +324,6 @@ function categorizeIssue(issue: HealthIssue): string {
  */
 function todoAlreadyExists(verifiedIssue: VerifiedIssue, todosDir: string): boolean {
   try {
-    import { readdirSync, readFileSync, existsSync } from 'fs';
-
     if (!existsSync(todosDir)) {
       return false; // No todos directory = no duplicates
     }

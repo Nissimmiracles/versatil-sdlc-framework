@@ -9,6 +9,7 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
+import { execSync } from 'child_process';
 
 /**
  * Conversation message structure
@@ -555,7 +556,6 @@ export class ConversationBackupManager {
    */
   private async getCurrentGitBranch(projectPath: string): Promise<string | undefined> {
     try {
-      import { execSync } from 'child_process';
       const branch = execSync('git branch --show-current', {
         cwd: projectPath,
         encoding: 'utf-8'
@@ -571,7 +571,6 @@ export class ConversationBackupManager {
    */
   private async getCurrentGitCommit(projectPath: string): Promise<string | undefined> {
     try {
-      import { execSync } from 'child_process';
       const commit = execSync('git rev-parse --short HEAD', {
         cwd: projectPath,
         encoding: 'utf-8'
