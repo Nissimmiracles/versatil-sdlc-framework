@@ -233,8 +233,8 @@ export class OliverMCP {
    */
   async executeToolCall(toolCall: ToolCallRequest): Promise<MCPToolCallResult> {
     const startTime = Date.now();
-    let retriesUsed = 0;
-    let usedFallback = false;
+    const retriesUsed = 0;
+    const usedFallback = false;
 
     // Route to appropriate MCP server
     const routing = await this.routeQuery(`${toolCall.tool} ${toolCall.action}`);

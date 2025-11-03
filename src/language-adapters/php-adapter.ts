@@ -214,7 +214,7 @@ export class PHPAdapter extends BaseLanguageAdapter {
   }
 
   async getQualityMetrics(): Promise<any> {
-    let testCoverage = 0;
+    const testCoverage = 0;
     let lintScore = 100;
 
     try {

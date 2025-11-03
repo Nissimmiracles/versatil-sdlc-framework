@@ -227,7 +227,7 @@ export class TieredMemoryStore {
 
     let hotToWarm = 0;
     let warmToCold = 0;
-    let coldToWarm = 0;
+    const coldToWarm = 0;
 
     // Demote old hot entries to warm
     for (const [path, entry] of this.hotTier.entries()) {

@@ -249,7 +249,7 @@ export class UserCoherenceCheckService {
       }
 
       // Calculate version difference
-      let behind_by = { major: 0, minor: 0, patch: 0 };
+      const behind_by = { major: 0, minor: 0, patch: 0 };
       let status: VersionCheck['status'] = 'unknown';
 
       if (cleanInstalled !== 'unknown' && latestVersion !== 'unknown') {

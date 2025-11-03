@@ -283,7 +283,7 @@ export class SmartTestSelector {
     }
 
     const fromDir = dirname(fromFile);
-    let resolvedPath = join(fromDir, importStr);
+    const resolvedPath = join(fromDir, importStr);
 
     // Try adding extensions if file doesn't exist
     const extensions = ['.ts', '.tsx', '.js', '.jsx', '/index.ts', '/index.tsx', '/index.js'];
@@ -390,7 +390,7 @@ export class SmartTestSelector {
    */
   private getTestedFile(testFile: string): string | null {
     // Remove test suffix and __tests__ directory
-    let sourceFile = testFile
+    const sourceFile = testFile
       .replace(/\.(test|spec)\.(ts|tsx|js|jsx)$/, '.ts')
       .replace(/\/__tests__\//, '/');
 
