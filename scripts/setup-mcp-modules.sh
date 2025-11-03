@@ -7,7 +7,7 @@ cd "/Users/nissimmenashe/VERSATIL SDLC FW"
 
 # Install Context7 for documentation
 echo "📚 Installing Context7 MCP..."
-npm install @context7/mcp --save
+pnpm add @context7/mcp
 
 echo ""
 echo "✅ MCP Modules setup complete!"

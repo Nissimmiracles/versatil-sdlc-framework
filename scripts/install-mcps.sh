@@ -23,13 +23,13 @@ install_package() {
     echo -e "${YELLOW}Installing ${package}...${NC}"
     echo "Description: ${description}"
 
-    if npm install "${package}" --legacy-peer-deps 2>&1 | tee /tmp/npm-install.log; then
+    if pnpm add "${package}" 2>&1 | tee /tmp/pnpm-install.log; then
         echo -e "${GREEN}✅ ${package} installed successfully${NC}"
         echo ""
         return 0
     else
         echo -e "${RED}❌ Failed to install ${package}${NC}"
-        echo "Check /tmp/npm-install.log for details"
+        echo "Check /tmp/pnpm-install.log for details"
         echo ""
         return 1
     fi
@@ -108,8 +108,8 @@ echo "=============================="
 echo ""
 echo "Next steps:"
 echo "  1. Configure MCP credentials in .env file"
-echo "  2. Run 'npm run build' to recompile"
-echo "  3. Test MCPs with 'npm test'"
+echo "  2. Run 'pnpm build' to recompile"
+echo "  3. Test MCPs with 'pnpm test'"
 echo ""
 echo "For more info, see:"
 echo "  • docs/MCP_INTEGRATIONS_STATUS.md"
