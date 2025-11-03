@@ -46,7 +46,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Build project (if needed)
-        run: npm run build || echo "No build needed"
+        run: pnpm run build || echo "No build needed"
         continue-on-error: true
 
       - name: Run WCAG 2.1 AA enforcement tests
@@ -164,13 +164,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run linter
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Run type checking
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Check code formatting
-        run: npm run format:check || echo "::warning::Code formatting issues found"
+        run: pnpm run format:check || echo "::warning::Code formatting issues found"
         continue-on-error: true
 
   # Test coverage
@@ -197,7 +197,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests with coverage
-        run: npm run test:coverage || npm run test:unit
+        run: pnpm run test:coverage || npm run test:unit
         continue-on-error: true
 
       - name: Upload coverage reports
@@ -233,7 +233,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run npm audit
-        run: npm audit --audit-level=moderate || echo "::warning::Security vulnerabilities found"
+        run: pnpm audit --audit-level=moderate || echo "::warning::Security vulnerabilities found"
         continue-on-error: true
 
       - name: Run Semgrep SAST scan
@@ -279,7 +279,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build project
-        run: npm run build || echo "Build not required"
+        run: pnpm run build || echo "Build not required"
         continue-on-error: true
 
       - name: Start test server

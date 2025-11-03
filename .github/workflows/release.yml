@@ -43,12 +43,12 @@ jobs:
         continue-on-error: false
 
       - name: Run unit tests
-        run: npm run test:unit
+        run: pnpm run test:unit
         # TODO: Re-enable full test suite after fixing integration test hangs
-        # run: npm test
+        # run: pnpm test
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Extract version from tag
         id: version

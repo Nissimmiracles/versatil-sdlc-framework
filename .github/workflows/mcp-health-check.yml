@@ -61,7 +61,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Install Playwright browsers
         if: contains(inputs.mcp-servers, 'chrome')

@@ -39,7 +39,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Benchmark Maria-QA with Playwright MCP
         run: |

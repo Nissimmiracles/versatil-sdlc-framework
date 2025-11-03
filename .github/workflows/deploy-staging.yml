@@ -115,7 +115,7 @@ jobs:
           echo "VERSATIL_ENV=staging" >> $GITHUB_ENV
 
       - name: 🏗️ Build for Staging
-        run: npm run build:staging
+        run: pnpm run build:staging
         env:
           VERSATIL_ENV: staging
           SUPABASE_URL: ${{ secrets.SUPABASE_STAGING_URL }}

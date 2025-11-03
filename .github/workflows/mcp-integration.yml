@@ -41,7 +41,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Test Playwright MCP Executor
         run: |
@@ -279,7 +279,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Test MCP Integration Routing
         run: |
