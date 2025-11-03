@@ -15,7 +15,7 @@
 
 import { chromium } from 'playwright-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import type { Browser, BrowserContext, Page } from 'playwright';
+import type { Browser, BrowserContext, Page } from 'playwright-core';
 import type { MCPExecutionResult } from './chrome-mcp-executor.js';
 
 // Add stealth plugin to playwright-extra

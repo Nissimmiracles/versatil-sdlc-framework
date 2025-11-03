@@ -10,7 +10,7 @@ allowed-tools:
 
 **Auto-invoked during**: Pre-commit hooks, PR reviews, deployment validation, `/review` command
 
-Execute automated quality validation to enforce BMAD (Best Measured Automated Defensively) standards.
+Execute automated quality validation to enforce VERSATIL quality standards (Best Measured Automated Defensively).
 
 ## What This Skill Provides
 
@@ -29,7 +29,7 @@ Use this skill when you need to:
 - **Pre-commit validation** - Check quality before committing
 - **PR review automation** - Automated code review checks
 - **Deployment gates** - Ensure production readiness
-- **Quality enforcement** - BMAD standards (80%+ coverage)
+- **Quality enforcement** - VERSATIL standards (80%+ coverage)
 
 ## Quick Start
 
@@ -70,9 +70,9 @@ Use this skill when you need to:
 
 ---
 
-## Quality Standards (BMAD)
+## Quality Standards
 
-**Best Measured Automated Defensively** - Maria-QA enforces:
+**VERSATIL Quality Standards (Best Measured Automated Defensively)** - Maria-QA enforces:
 
 | Check | Standard | Blocking |
 |-------|----------|----------|
@@ -219,7 +219,7 @@ For complete specifications, examples, and troubleshooting:
 - **Coverage Standards**: See `references/coverage-requirements.md`
 - **TypeScript Config**: See `references/typescript-validation.md`
 - **Contract Schema**: See `references/contract-validation.md`
-- **BMAD Standards**: See `references/bmad-principles.md`
+- **Quality Standards**: See `references/quality-principles.md`
 
 ---
 

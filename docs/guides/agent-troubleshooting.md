@@ -883,6 +883,6 @@ versatil init
 
 **Related Documentation**:
 - [Cursor Integration Guide](CURSOR_INTEGRATION.md)
-- [BMad Commands Reference](BMAD_COMMANDS.md)
+- [Commands Reference](../reference/commands.md)
 - [Quality Gates Guide](QUALITY_GATES.md)
 - [Installation Troubleshooting](INSTALLATION_TROUBLESHOOTING.md)

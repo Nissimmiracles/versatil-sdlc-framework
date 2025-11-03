@@ -18,11 +18,11 @@ fi
 # Install dependencies
 echo "📦 Installing dependencies..."
 if [ -f "package.json" ]; then
-    npm install
+    pnpm install
 else
     echo "⚠️ No package.json found, creating minimal setup..."
-    npm init -y
-    npm install @modelcontextprotocol/sdk
+    pnpm init -y
+    pnpm add @modelcontextprotocol/sdk
 fi
 
 # Get current directory

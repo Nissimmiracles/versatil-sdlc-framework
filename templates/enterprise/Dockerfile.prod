@@ -1,5 +1,5 @@
 # VERSATIL SDLC Framework - Production Docker Image
-# Multi-stage build with Enhanced BMAD agents and security hardening
+# Multi-stage build with Enhanced OPERA agents and security hardening
 
 # Build stage
 FROM node:18-alpine AS builder

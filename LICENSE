@@ -26,16 +26,13 @@ VERSATIL SDLC Framework - Additional Terms and Acknowledgments
 
 This software includes the following components and methodologies:
 
-1. BMAD (Business-Managed Agile Development) Methodology
+1. OPERA Framework (Orchestrated Production-Ready Enterprise Agents)
+   - Six specialized AI agents: Maria-QA, James-Frontend, Marcus-Backend,
+     Sarah-PM, Alex-BA, and Dr.AI-ML
    - Developed by the VERSATIL team
    - Licensed under MIT License
 
-2. Agent-Based Development Framework
-   - Six specialized AI agents: Maria-QA, James-Frontend, Marcus-Backend,
-     Sarah-PM, Alex-BA, and Dr.AI-ML
-   - Licensed under MIT License
-
-3. Chrome MCP Integration
+2. Chrome MCP Integration
    - Integration with Model Context Protocol for browser testing
    - Chrome MCP is subject to its own licensing terms
 
@@ -62,7 +59,7 @@ ATTRIBUTION REQUIREMENTS:
 If you use this software in your project, please include the following
 attribution in your documentation or application:
 
-"Powered by VERSATIL SDLC Framework - AI-Native Development with BMAD Methodology"
+"Powered by VERSATIL SDLC Framework - AI-Native Development with OPERA Framework"
 Website: https://github.com/versatil-platform/versatil-sdlc-framework
 
 ================================================================================

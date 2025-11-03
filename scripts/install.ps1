@@ -70,6 +70,18 @@ function Test-NpmInstalled {
     }
 }
 
+function Test-PnpmInstalled {
+    try {
+        $pnpmVersion = pnpm --version
+        Write-Host "✅ pnpm detected: v$pnpmVersion" -ForegroundColor $ColorSuccess
+        return $true
+    } catch {
+        Write-Host "❌ pnpm not found" -ForegroundColor $ColorError
+        Write-Host "   Install with: npm install -g pnpm@10.17.0" -ForegroundColor $ColorWarning
+        return $false
+    }
+}
+
 function Test-GitInstalled {
     try {
         $gitVersion = git --version
@@ -92,10 +104,10 @@ function Install-Framework {
     try {
         if ($IsGlobal) {
             Write-Host "Installing globally (requires admin privileges)..." -ForegroundColor $ColorInfo
-            npm install -g versatil-sdlc-framework
+            pnpm add -g versatil-sdlc-framework
         } else {
             Write-Host "Installing locally..." -ForegroundColor $ColorInfo
-            npm install versatil-sdlc-framework
+            pnpm add versatil-sdlc-framework
         }
 
         Write-Host ""
@@ -155,7 +167,7 @@ function Show-PostInstall {
     Write-Host "     cd your-project"
     Write-Host "     versatil init"
     Write-Host ""
-    Write-Host "🤖 BMAD Agents:" -ForegroundColor $ColorInfo
+    Write-Host "🤖 OPERA Agents:" -ForegroundColor $ColorInfo
     Write-Host "  • Maria-QA      - Quality assurance"
     Write-Host "  • James-Frontend - UI/UX development"
     Write-Host "  • Marcus-Backend - API development"
@@ -219,6 +231,14 @@ function Main {
         Write-Host ""
         Write-Host "❌ npm is required but not installed." -ForegroundColor $ColorError
         Write-Host "   npm should come with Node.js. Please reinstall Node.js." -ForegroundColor $ColorError
+        Write-Host ""
+        exit 1
+    }
+
+    if (-not (Test-PnpmInstalled)) {
+        Write-Host ""
+        Write-Host "❌ pnpm is required but not installed." -ForegroundColor $ColorError
+        Write-Host "   Install with: npm install -g pnpm@10.17.0" -ForegroundColor $ColorError
         Write-Host ""
         exit 1
     }

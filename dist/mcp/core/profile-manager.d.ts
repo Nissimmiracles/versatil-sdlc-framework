@@ -89,6 +89,10 @@ export declare class ProfileManager {
      */
     loadConfiguration(): Promise<void>;
     /**
+     * Check if file exists
+     */
+    private fileExists;
+    /**
      * Check if a path is in user's project directory
      */
     private isInUserProjectScope;

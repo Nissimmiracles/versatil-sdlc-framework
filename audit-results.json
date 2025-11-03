@@ -1,0 +1,783 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@getzep/zep-cloud": {
+      "name": "@getzep/zep-cloud",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "form-data"
+      ],
+      "effects": [
+        "@langchain/community",
+        "@n8n/n8n-nodes-langchain"
+      ],
+      "range": "<=2.2.0",
+      "nodes": [
+        "node_modules/@n8n/n8n-nodes-langchain/node_modules/@getzep/zep-cloud"
+      ],
+      "fixAvailable": true
+    },
+    "@grpc/grpc-js": {
+      "name": "@grpc/grpc-js",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1097546,
+          "name": "@grpc/grpc-js",
+          "dependency": "@grpc/grpc-js",
+          "title": "@grpc/grpc-js can allocate memory for incoming messages well above configured limits",
+          "url": "https://github.com/advisories/GHSA-7v5v-9h63-cj86",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-789"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+          },
+          "range": "<1.8.22"
+        }
+      ],
+      "effects": [
+        "@zilliz/milvus2-sdk-node"
+      ],
+      "range": "<1.8.22",
+      "nodes": [
+        "node_modules/@zilliz/milvus2-sdk-node/node_modules/@grpc/grpc-js"
+      ],
+      "fixAvailable": true
+    },
+    "@langchain/community": {
+      "name": "@langchain/community",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "@getzep/zep-cloud"
+      ],
+      "effects": [],
+      "range": "0.2.3 || >=0.2.13",
+      "nodes": [
+        "node_modules/@n8n/n8n-nodes-langchain/node_modules/@langchain/community"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/ai-workflow-builder": {
+      "name": "@n8n/ai-workflow-builder",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "@n8n/backend-common",
+        "n8n-workflow"
+      ],
+      "effects": [
+        "n8n"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@n8n/ai-workflow-builder"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/api-types": {
+      "name": "@n8n/api-types",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "n8n-workflow"
+      ],
+      "effects": [
+        "@n8n/db",
+        "n8n"
+      ],
+      "range": ">=0.19.0",
+      "nodes": [
+        "node_modules/@n8n/api-types"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/backend-common": {
+      "name": "@n8n/backend-common",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "@n8n/decorators",
+        "n8n-workflow"
+      ],
+      "effects": [
+        "@n8n/ai-workflow-builder",
+        "@n8n/backend-test-utils",
+        "@n8n/db",
+        "n8n",
+        "n8n-core"
+      ],
+      "range": ">=0.3.0",
+      "nodes": [
+        "node_modules/@n8n/backend-common"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/backend-test-utils": {
+      "name": "@n8n/backend-test-utils",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "@n8n/backend-common",
+        "@n8n/db",
+        "n8n-workflow"
+      ],
+      "effects": [
+        "n8n"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@n8n/backend-test-utils"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/client-oauth2": {
+      "name": "@n8n/client-oauth2",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "axios"
+      ],
+      "effects": [
+        "@n8n/n8n-nodes-langchain",
+        "n8n",
+        "n8n-core"
+      ],
+      "range": "0.11.0 - 0.29.0",
+      "nodes": [
+        "node_modules/@n8n/client-oauth2"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/db": {
+      "name": "@n8n/db",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "@n8n/api-types",
+        "@n8n/backend-common",
+        "@n8n/decorators",
+        "n8n-core",
+        "n8n-workflow"
+      ],
+      "effects": [
+        "n8n"
+      ],
+      "range": ">=0.3.0",
+      "nodes": [
+        "node_modules/@n8n/db"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/decorators": {
+      "name": "@n8n/decorators",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "n8n-workflow"
+      ],
+      "effects": [
+        "@n8n/backend-common",
+        "@n8n/db",
+        "n8n-core"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@n8n/decorators"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/imap": {
+      "name": "@n8n/imap",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "imap"
+      ],
+      "effects": [
+        "n8n-nodes-base"
+      ],
+      "range": "<=0.8.0 || >=0.9.0",
+      "nodes": [
+        "node_modules/@n8n/imap"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/n8n-nodes-langchain": {
+      "name": "@n8n/n8n-nodes-langchain",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "@getzep/zep-cloud",
+        "@langchain/community",
+        "@n8n/client-oauth2",
+        "form-data",
+        "mammoth",
+        "n8n-nodes-base",
+        "n8n-workflow"
+      ],
+      "effects": [
+        "n8n"
+      ],
+      "range": "<=0.2.0 || >=0.3.0",
+      "nodes": [
+        "node_modules/@n8n/n8n-nodes-langchain"
+      ],
+      "fixAvailable": true
+    },
+    "@n8n/task-runner": {
+      "name": "@n8n/task-runner",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "n8n-core",
+        "n8n-workflow"
+      ],
+      "effects": [
+        "n8n"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/@n8n/task-runner"
+      ],
+      "fixAvailable": true
+    },
+    "@playwright/test": {
+      "name": "@playwright/test",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "playwright"
+      ],
+      "effects": [],
+      "range": "0.9.7 - 0.1112.0-alpha2 || 1.38.0-alpha-1692262648000 - 1.55.1-beta-1758616458000",
+      "nodes": [
+        "node_modules/@playwright/test"
+      ],
+      "fixAvailable": true
+    },
+    "@rudderstack/rudder-sdk-node": {
+      "name": "@rudderstack/rudder-sdk-node",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "axios"
+      ],
+      "effects": [
+        "n8n"
+      ],
+      "range": "2.0.6 - 2.1.8",
+      "nodes": [
+        "node_modules/@rudderstack/rudder-sdk-node"
+      ],
+      "fixAvailable": true
+    },
+    "@zilliz/milvus2-sdk-node": {
+      "name": "@zilliz/milvus2-sdk-node",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@grpc/grpc-js"
+      ],
+      "effects": [],
+      "range": "2.2.21 - 2.3.5 || >=2.5.11",
+      "nodes": [
+        "node_modules/@zilliz/milvus2-sdk-node"
+      ],
+      "fixAvailable": true
+    },
+    "axios": {
+      "name": "axios",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1108263,
+          "name": "axios",
+          "dependency": "axios",
+          "title": "Axios is vulnerable to DoS attack through lack of data size check",
+          "url": "https://github.com/advisories/GHSA-4hjh-wcwx-xvwj",
+          "severity": "high",
+          "cwe": [
+            "CWE-770"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": ">=1.0.0 <1.12.0"
+        }
+      ],
+      "effects": [
+        "@n8n/client-oauth2",
+        "@rudderstack/rudder-sdk-node"
+      ],
+      "range": "1.0.0 - 1.11.0",
+      "nodes": [
+        "node_modules/@n8n/client-oauth2/node_modules/axios",
+        "node_modules/@rudderstack/rudder-sdk-node/node_modules/axios"
+      ],
+      "fixAvailable": true
+    },
+    "blessed-contrib": {
+      "name": "blessed-contrib",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "map-canvas"
+      ],
+      "effects": [],
+      "range": ">=1.0.12",
+      "nodes": [
+        "node_modules/blessed-contrib"
+      ],
+      "fixAvailable": {
+        "name": "blessed-contrib",
+        "version": "1.0.11",
+        "isSemVerMajor": true
+      }
+    },
+    "form-data": {
+      "name": "form-data",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1106507,
+          "name": "form-data",
+          "dependency": "form-data",
+          "title": "form-data uses unsafe random function in form-data for choosing boundary",
+          "url": "https://github.com/advisories/GHSA-fjxv-7rqg-78g4",
+          "severity": "critical",
+          "cwe": [
+            "CWE-330"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=4.0.0 <4.0.4"
+        }
+      ],
+      "effects": [
+        "@getzep/zep-cloud",
+        "@n8n/n8n-nodes-langchain",
+        "n8n-core",
+        "n8n-workflow"
+      ],
+      "range": "4.0.0 - 4.0.3",
+      "nodes": [
+        "node_modules/@n8n/n8n-nodes-langchain/node_modules/form-data",
+        "node_modules/n8n-core/node_modules/form-data",
+        "node_modules/n8n-workflow/node_modules/form-data"
+      ],
+      "fixAvailable": true
+    },
+    "imap": {
+      "name": "imap",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "utf7"
+      ],
+      "effects": [
+        "@n8n/imap"
+      ],
+      "range": ">=0.8.18",
+      "nodes": [
+        "node_modules/imap"
+      ],
+      "fixAvailable": true
+    },
+    "mailparser": {
+      "name": "mailparser",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "nodemailer"
+      ],
+      "effects": [
+        "n8n-nodes-base"
+      ],
+      "range": "2.3.1 - 3.7.4",
+      "nodes": [
+        "node_modules/mailparser"
+      ],
+      "fixAvailable": true
+    },
+    "mammoth": {
+      "name": "mammoth",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1109073,
+          "name": "mammoth",
+          "dependency": "mammoth",
+          "title": "Mammoth is vulnerable to Directory Traversal",
+          "url": "https://github.com/advisories/GHSA-rmjr-87wv-gf87",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-22"
+          ],
+          "cvss": {
+            "score": 9.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:N/A:H"
+          },
+          "range": ">=0.3.25 <1.11.0"
+        }
+      ],
+      "effects": [
+        "@n8n/n8n-nodes-langchain"
+      ],
+      "range": "0.3.25 - 1.10.0",
+      "nodes": [
+        "node_modules/mammoth"
+      ],
+      "fixAvailable": true
+    },
+    "map-canvas": {
+      "name": "map-canvas",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "xml2js"
+      ],
+      "effects": [
+        "blessed-contrib"
+      ],
+      "range": ">=0.0.5",
+      "nodes": [
+        "node_modules/map-canvas"
+      ],
+      "fixAvailable": {
+        "name": "blessed-contrib",
+        "version": "1.0.11",
+        "isSemVerMajor": true
+      }
+    },
+    "n8n": {
+      "name": "n8n",
+      "severity": "critical",
+      "isDirect": true,
+      "via": [
+        "@n8n/ai-workflow-builder",
+        "@n8n/api-types",
+        "@n8n/backend-common",
+        "@n8n/backend-test-utils",
+        "@n8n/client-oauth2",
+        "@n8n/db",
+        "@n8n/decorators",
+        "@n8n/n8n-nodes-langchain",
+        "@n8n/task-runner",
+        "@rudderstack/rudder-sdk-node",
+        {
+          "source": 1108669,
+          "name": "n8n",
+          "dependency": "n8n",
+          "title": "n8n: Execute Command Node Allows Authenticated Users to Run Arbitrary Commands on Host",
+          "url": "https://github.com/advisories/GHSA-365g-vjw2-grx8",
+          "severity": "high",
+          "cwe": [
+            "CWE-78"
+          ],
+          "cvss": {
+            "score": 8.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+          },
+          "range": "<=1.114.4"
+        },
+        "n8n-core",
+        "n8n-nodes-base",
+        "n8n-workflow",
+        "nodemailer",
+        "validator"
+      ],
+      "effects": [],
+      "range": "*",
+      "nodes": [
+        "node_modules/n8n"
+      ],
+      "fixAvailable": true
+    },
+    "n8n-core": {
+      "name": "n8n-core",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "@n8n/backend-common",
+        "@n8n/client-oauth2",
+        "@n8n/decorators",
+        "form-data",
+        "n8n-workflow"
+      ],
+      "effects": [
+        "@n8n/db",
+        "@n8n/task-runner",
+        "n8n"
+      ],
+      "range": ">=1.17.1",
+      "nodes": [
+        "node_modules/n8n-core"
+      ],
+      "fixAvailable": true
+    },
+    "n8n-nodes-base": {
+      "name": "n8n-nodes-base",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "@n8n/imap",
+        {
+          "source": 1108670,
+          "name": "n8n-nodes-base",
+          "dependency": "n8n-nodes-base",
+          "title": "n8n: Execute Command Node Allows Authenticated Users to Run Arbitrary Commands on Host",
+          "url": "https://github.com/advisories/GHSA-365g-vjw2-grx8",
+          "severity": "high",
+          "cwe": [
+            "CWE-78"
+          ],
+          "cvss": {
+            "score": 8.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+          },
+          "range": "<=1.113.0"
+        },
+        "mailparser",
+        "n8n-workflow",
+        "nodemailer"
+      ],
+      "effects": [
+        "@n8n/n8n-nodes-langchain",
+        "n8n"
+      ],
+      "range": "*",
+      "nodes": [
+        "node_modules/n8n-nodes-base"
+      ],
+      "fixAvailable": true
+    },
+    "n8n-workflow": {
+      "name": "n8n-workflow",
+      "severity": "critical",
+      "isDirect": false,
+      "via": [
+        "form-data"
+      ],
+      "effects": [
+        "@n8n/ai-workflow-builder",
+        "@n8n/api-types",
+        "@n8n/backend-common",
+        "@n8n/backend-test-utils",
+        "@n8n/decorators",
+        "@n8n/n8n-nodes-langchain",
+        "n8n-nodes-base"
+      ],
+      "range": ">=1.17.1",
+      "nodes": [
+        "node_modules/n8n-workflow"
+      ],
+      "fixAvailable": true
+    },
+    "nodemailer": {
+      "name": "nodemailer",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1108571,
+          "name": "nodemailer",
+          "dependency": "nodemailer",
+          "title": "Nodemailer: Email to an unintended domain can occur due to Interpretation Conflict",
+          "url": "https://github.com/advisories/GHSA-mm7p-fcc7-pg87",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-20",
+            "CWE-436"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<7.0.7"
+        }
+      ],
+      "effects": [
+        "mailparser",
+        "n8n",
+        "n8n-nodes-base"
+      ],
+      "range": "<7.0.7",
+      "nodes": [
+        "node_modules/nodemailer"
+      ],
+      "fixAvailable": true
+    },
+    "playwright": {
+      "name": "playwright",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        {
+          "source": 1109208,
+          "name": "playwright",
+          "dependency": "playwright",
+          "title": "Playwright downloads and installs browsers without verifying the authenticity of the SSL certificate",
+          "url": "https://github.com/advisories/GHSA-7mvr-c777-76hp",
+          "severity": "high",
+          "cwe": [
+            "CWE-347"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<1.55.1"
+        }
+      ],
+      "effects": [
+        "@playwright/test"
+      ],
+      "range": "<1.55.1",
+      "nodes": [
+        "node_modules/playwright"
+      ],
+      "fixAvailable": true
+    },
+    "semver": {
+      "name": "semver",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1101089,
+          "name": "semver",
+          "dependency": "semver",
+          "title": "semver vulnerable to Regular Expression Denial of Service",
+          "url": "https://github.com/advisories/GHSA-c2qf-rxjj-qqgw",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<5.7.2"
+        }
+      ],
+      "effects": [
+        "utf7"
+      ],
+      "range": "<5.7.2",
+      "nodes": [
+        "node_modules/utf7/node_modules/semver"
+      ],
+      "fixAvailable": true
+    },
+    "utf7": {
+      "name": "utf7",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "semver"
+      ],
+      "effects": [
+        "imap"
+      ],
+      "range": ">=1.0.2",
+      "nodes": [
+        "node_modules/utf7"
+      ],
+      "fixAvailable": true
+    },
+    "validator": {
+      "name": "validator",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1109241,
+          "name": "validator",
+          "dependency": "validator",
+          "title": "validator.js has a URL validation bypass vulnerability in its isURL function",
+          "url": "https://github.com/advisories/GHSA-9965-vmph-33xx",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-79"
+          ],
+          "cvss": {
+            "score": 6.1,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N"
+          },
+          "range": "<13.15.20"
+        }
+      ],
+      "effects": [],
+      "range": "<13.15.20",
+      "nodes": [
+        "node_modules/validator"
+      ],
+      "fixAvailable": true
+    },
+    "xml2js": {
+      "name": "xml2js",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1096693,
+          "name": "xml2js",
+          "dependency": "xml2js",
+          "title": "xml2js is vulnerable to prototype pollution",
+          "url": "https://github.com/advisories/GHSA-776f-qx25-q3cc",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-1321"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<0.5.0"
+        }
+      ],
+      "effects": [
+        "map-canvas"
+      ],
+      "range": "<0.5.0",
+      "nodes": [
+        "node_modules/xml2js"
+      ],
+      "fixAvailable": {
+        "name": "blessed-contrib",
+        "version": "1.0.11",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 9,
+      "high": 9,
+      "critical": 15,
+      "total": 33
+    },
+    "dependencies": {
+      "prod": 823,
+      "dev": 303,
+      "optional": 1599,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 2675
+    }
+  }
+}

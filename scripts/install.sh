@@ -79,6 +79,17 @@ check_requirements() {
     NPM_VERSION=$(npm --version)
     log_success "npm version $NPM_VERSION ✓"
 
+    # Check pnpm (required for VERSATIL SDLC Framework v7.16+)
+    if ! command -v pnpm &> /dev/null; then
+        log_error "pnpm is not installed. VERSATIL SDLC Framework requires pnpm@10.17.0+"
+        log_info "Install pnpm with: npm install -g pnpm@10.17.0"
+        log_info "Or enable via corepack: corepack enable pnpm && corepack install"
+        exit 1
+    fi
+
+    PNPM_VERSION=$(pnpm --version)
+    log_success "pnpm version $PNPM_VERSION ✓"
+
     # Check Git
     if ! command -v git &> /dev/null; then
         log_error "Git is not installed. Please install Git from https://git-scm.com/"
@@ -211,7 +222,7 @@ install_chrome_mcp() {
     # Install Chrome MCP globally
     if ! npm list -g @modelcontextprotocol/server-chrome &> /dev/null; then
         log_info "Installing Chrome MCP server globally..."
-        npm install -g @modelcontextprotocol/server-chrome
+        pnpm add -g @modelcontextprotocol/server-chrome
 
         if [[ $? -eq 0 ]]; then
             log_success "Chrome MCP server installed ✓"
@@ -241,7 +252,7 @@ setup_testing() {
         TESTING_DEPS="playwright @playwright/test axe-core pa11y lighthouse"
 
         log_info "Installing testing dependencies: $TESTING_DEPS"
-        npm install --save-dev $TESTING_DEPS
+        pnpm add -D $TESTING_DEPS
 
         # Create basic test structure
         mkdir -p tests/{unit,integration,e2e,visual}
@@ -376,7 +387,7 @@ create_scripts() {
             pkg.scripts['maria:test'] = 'playwright test';
             pkg.scripts['maria:visual'] = 'chrome-mcp test --visual';
             pkg.scripts['james:lint'] = 'eslint src/ --fix';
-            pkg.scripts['marcus:security'] = 'npm audit';
+            pkg.scripts['marcus:security'] = 'pnpm audit';
 
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
             "
@@ -429,7 +440,7 @@ james-frontend() {
 marcus-backend() {
     echo "⚙️ Marcus-Backend: $1"
     case $1 in
-        "security") npm audit ;;
+        "security") pnpm audit ;;
         "api") echo "Starting API server..." ;;
         "db") echo "Database operations..." ;;
         *) echo "Usage: marcus-backend [security|api|db]" ;;
@@ -479,7 +490,7 @@ fi
 # Security audit
 if command -v npm &> /dev/null; then
     echo "Running security audit..."
-    npm audit --audit-level moderate 2>/dev/null || echo "Security audit completed"
+    pnpm audit --audit-level moderate 2>/dev/null || echo "Security audit completed"
 fi
 
 echo "✅ Pre-commit checks completed"

@@ -20,7 +20,7 @@
 
 ```bash
 # Run VERSATIL MCP Server (Recommended)
-npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp
+npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2 versatil-mcp
 
 # This installs in seconds and enables 59 AI tools in Claude Desktop + Cursor IDE
 ```
@@ -41,7 +41,7 @@ npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versat
 
 ## 🎯 What is VERSATIL?
 
-VERSATIL gives you **18 specialized AI agents** that **learn YOUR coding style** and work like a senior dev team:
+VERSATIL gives you **23+ specialized AI agents** that **learn YOUR coding style** and work like a senior dev team:
 
 ```mermaid
 graph LR
@@ -103,7 +103,7 @@ Each feature teaches the framework, making the next feature **40% faster**:
 
 ---
 
-### 3. 🤖 18 Specialized Agents (OPERA)
+### 3. 🤖 23+ Specialized Agents (OPERA)
 
 | Agent | Role | Key Capability |
 |-------|------|----------------|
@@ -161,7 +161,7 @@ Each feature teaches the framework, making the next feature **40% faster**:
 
 ```bash
 # Quick start - no installation needed
-npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versatil-mcp
+npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2 versatil-mcp
 
 # Add to Claude Desktop config
 {
@@ -170,7 +170,7 @@ npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versat
       "command": "npx",
       "args": [
         "--yes",
-        "--package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1",
+        "--package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2",
         "versatil-mcp"
       ]
     }
@@ -186,8 +186,8 @@ npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1 versat
 # For framework development or customization
 git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git
 cd versatil-sdlc-framework
-npm install
-npm run build
+pnpm install
+pnpm run build
 ```
 
 **[→ Complete Installation Guide](docs/INSTALLATION.md)** • **[→ npx Setup Guide](docs/guides/NPX_INSTALLATION.md)**
@@ -263,7 +263,7 @@ npm run build
 | Feature | VERSATIL | Copilot | Cursor |
 |---------|----------|---------|--------|
 | **Learns YOUR style** | ✅ Auto-detected | ❌ Generic | ⚠️ Manual |
-| **Multi-agent coordination** | ✅ 18 agents | ❌ Single AI | ❌ Single AI |
+| **Multi-agent coordination** | ✅ 23+ agents | ❌ Single AI | ❌ Single AI |
 | **RAG memory (zero context loss)** | ✅ Public + Private | ❌ No memory | ⚠️ Basic |
 | **Compounding engineering** | ✅ 40% faster by F5 | ❌ No learning | ❌ No learning |
 | **Auto-testing (80%+ coverage)** | ✅ Maria-QA | ❌ Manual | ❌ Manual |
