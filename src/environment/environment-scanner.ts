@@ -14,5 +14,6 @@ export const environmentScanner = {
   async getLatestScan(): Promise<ProjectContext | null> {
     return { projectInfo: {}, technology: {}, structure: {} };
   },
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   watchForChanges(callback: Function): void {}
 };

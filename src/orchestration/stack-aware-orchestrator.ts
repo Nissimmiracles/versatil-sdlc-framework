@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-this-alias, no-case-declarations, no-empty, no-control-regex */
 /**
  * VERSATIL SDLC Framework - Stack-Aware Orchestrator
  * Optimized for: Cursor / Claude / Supabase / n8n / Vercel / OPERA

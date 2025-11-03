@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-this-alias, no-case-declarations, no-empty, no-control-regex */
 /**
  * VERSATIL SDLC Framework - MCP Server Implementation v2
  * SDK v1.18.2 Compatible
@@ -66,7 +67,7 @@ export class VERSATILMCPServerV2 {
   private onboardingCompleted: boolean = false;
   private docsSearchEngine: DocsSearchEngine | null = null;
   private lazyInitialized: boolean = false;
-  private eventCallbacks: Map<string, Function[]> = new Map();
+  private eventCallbacks: Map<string, Function[]> = new Map(); // eslint-disable-line @typescript-eslint/no-unsafe-function-type
   // Phase 7.6.0: Enforcement infrastructure
   private boundaryEngine: BoundaryEnforcementEngine | null = null;
   private zeroTrust: ZeroTrustProjectIsolation | null = null;

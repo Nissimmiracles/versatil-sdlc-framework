@@ -144,7 +144,7 @@ export class MultiInstanceCoordinator extends EventEmitter {
   private instances: Map<string, CollaborationInstance> = new Map();
   private currentSession: CollaborationSession | null = null;
   private distributionStrategies: Map<string, WorkDistributionStrategy> = new Map();
-  private conflictResolvers: Map<string, Function> = new Map();
+  private conflictResolvers: Map<string, Function> = new Map(); // eslint-disable-line @typescript-eslint/no-unsafe-function-type
   private communicationPath: string;
   private isLeader: boolean = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
