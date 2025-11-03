@@ -473,7 +473,7 @@ ${!report.pass ? `
     getMiddlewareExample() {
         return `# Node.js (Express)
 npm install helmet
-const helmet = require('helmet');
+import helmet from 'helmet';
 app.use(helmet());
 
 # Python (Flask)

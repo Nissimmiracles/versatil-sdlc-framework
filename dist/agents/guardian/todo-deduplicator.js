@@ -100,7 +100,7 @@ export async function reviewAndCleanupTodos(todosDir, maxAgeHours = 72) {
                     const archivalNote = `\n\n---\n**Archived**: ${now.toISOString()}\n**Reason**: ${shouldArchive.reason}\n`;
                     writeFileSync(archivePath, content + archivalNote);
                     // Remove original
-                    const { unlinkSync } = require('fs');
+                    import { unlinkSync } from 'fs';
                     unlinkSync(filepath);
                     result.archived_count++;
                     result.archived_files.push(file);
@@ -231,7 +231,7 @@ async function checkIssueResolved(content) {
  */
 async function checkBuildPassing() {
     try {
-        const { execSync } = require('child_process');
+        import { execSync } from 'child_process';
         // Quick check: see if dist/ directory exists and is recent
         const distPath = join(process.cwd(), 'dist');
         if (existsSync(distPath)) {
@@ -259,7 +259,7 @@ async function checkTestsPassing() {
  */
 async function checkDependenciesUpToDate() {
     try {
-        const { execSync } = require('child_process');
+        import { execSync } from 'child_process';
         const output = execSync('npm outdated --json', { encoding: 'utf-8', timeout: 10000 });
         const outdated = JSON.parse(output || '{}');
         return Object.keys(outdated).length === 0;

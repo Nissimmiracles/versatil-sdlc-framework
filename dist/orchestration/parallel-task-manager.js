@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /**
  * VERSATIL SDLC Framework - Parallel Task Manager
  * Implements Rule 1: Run many tasks in parallel if not colliding with SDLC process

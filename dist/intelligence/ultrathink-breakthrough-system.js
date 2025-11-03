@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * UltraThink Breakthrough Intelligence System
  * Advanced problem-solving for bottlenecks, struggle loops, and breakthrough solutions
@@ -250,7 +251,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectPerformanceBottlenecks(projectPath) {
         const bottlenecks = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Search for performance-related keywords in code
             const performanceKeywords = ['slow', 'performance', 'timeout', 'lag', 'optimize', 'bottleneck'];
             let performanceCommentCount = 0;
@@ -259,7 +260,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                     const result = execSync(`git grep -i "${keyword}" -- "*.ts" "*.tsx" "*.js" "*.jsx" | wc -l`, { cwd: projectPath, encoding: 'utf8' }).trim();
                     performanceCommentCount += parseInt(result) || 0;
                 }
-                catch {
+                catch { // eslint-disable-line no-empty
                     // Keyword not found - continue
                 }
             }
@@ -328,7 +329,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                     });
                 }
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // No performance commits found or git log failed
             }
             // Check for large files (potential bundle bloat)
@@ -366,7 +367,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                     });
                 }
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // find command failed - skip
             }
         }
@@ -378,7 +379,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectVelocityBottlenecks(projectPath) {
         const bottlenecks = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             const gitLog = execSync('git log --since="30 days ago" --pretty=format:"%ad" --date=short', {
                 cwd: projectPath,
                 encoding: 'utf8'
@@ -466,7 +467,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectDecisionParalysis(projectPath) {
         const bottlenecks = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Check TODO/FIXME density
             const todoCount = parseInt(execSync('git grep -i "TODO\\|FIXME\\|XXX\\|HACK" -- "*.ts" "*.tsx" "*.js" "*.jsx" | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim());
             const fileCount = parseInt(execSync('find . -type f \\( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \\) | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim());
@@ -546,7 +547,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectResourceConstraints(projectPath) {
         const bottlenecks = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             const contributors = execSync('git log --since="3 months ago" --format="%an" | sort | uniq -c | sort -rn', { cwd: projectPath, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
             const commitCounts = contributors.map(line => {
                 const match = line.trim().match(/^(\d+)/);
@@ -625,9 +626,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectTechnicalDebtBottlenecks(projectPath) {
         const bottlenecks = [];
         try {
-            const { execSync } = require('child_process');
-            const fs = require('fs');
-            const path = require('path');
+            import { execSync } from 'child_process';
+            import fs from 'fs';
+            import path from 'path';
             // Check for large files
             const largeFileCount = parseInt(execSync('find . -type f \\( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \\) -exec wc -l {} \\; | awk \'$1 > 500\' | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim());
             if (largeFileCount > 10) {
@@ -705,9 +706,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectKnowledgeGaps(projectPath) {
         const bottlenecks = [];
         try {
-            const { execSync } = require('child_process');
-            const fs = require('fs');
-            const path = require('path');
+            import { execSync } from 'child_process';
+            import fs from 'fs';
+            import path from 'path';
             const hasReadme = fs.existsSync(path.join(projectPath, 'README.md'));
             const docsDir = fs.existsSync(path.join(projectPath, 'docs'));
             if (!hasReadme && !docsDir) {
@@ -783,7 +784,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectCommunicationBottlenecks(projectPath) {
         const bottlenecks = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             const commitMessages = execSync('git log --since="1 month ago" --pretty=format:"%s"', { cwd: projectPath, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
             const shortMessages = commitMessages.filter(msg => msg.length < 20).length;
             const shortRatio = shortMessages / Math.max(commitMessages.length, 1);
@@ -851,7 +852,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                     });
                 }
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // GH CLI not available
             }
         }
@@ -863,9 +864,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectProcessBottlenecks(projectPath) {
         const bottlenecks = [];
         try {
-            const { execSync } = require('child_process');
-            const fs = require('fs');
-            const path = require('path');
+            import { execSync } from 'child_process';
+            import fs from 'fs';
+            import path from 'path';
             // Check for CI/CD
             const hasCIConfig = fs.existsSync(path.join(projectPath, '.github/workflows')) ||
                 fs.existsSync(path.join(projectPath, '.gitlab-ci.yml')) ||
@@ -980,7 +981,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectRepeatedFailurePatterns(projectPath) {
         const loops = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Count reverted commits
             const revertedCommits = execSync('git log --all --grep="Revert" --oneline --since="3 months ago"', { cwd: projectPath, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
             if (revertedCommits.length > 5) {
@@ -1055,7 +1056,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                     });
                 }
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // GH CLI not available
             }
         }
@@ -1067,7 +1068,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectAnalysisParalysis(projectPath) {
         const loops = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Check stale branches
             const branches = execSync('git for-each-ref --format="%(refname:short) %(committerdate:relative)" refs/heads/', { cwd: projectPath, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
             const staleBranches = branches.filter(b => {
@@ -1154,7 +1155,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                     });
                 }
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // GH CLI not available
             }
         }
@@ -1166,9 +1167,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectOvercomplication(projectPath) {
         const loops = [];
         try {
-            const { execSync } = require('child_process');
-            const fs = require('fs');
-            const path = require('path');
+            import { execSync } from 'child_process';
+            import fs from 'fs';
+            import path from 'path';
             // Check abstraction ratio
             const interfaceCount = parseInt(execSync('git grep "^interface " -- "*.ts" "*.tsx" | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim());
             const classCount = parseInt(execSync('git grep "^class " -- "*.ts" "*.tsx" | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim());
@@ -1258,7 +1259,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectMissingPerspectives(projectPath) {
         const loops = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Check contributor diversity
             const authorStats = execSync('git log --since="6 months ago" --format="%an" | sort | uniq -c | sort -rn', { cwd: projectPath, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
             if (authorStats.length === 1) {
@@ -1342,7 +1343,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectWrongProblemDefinition(projectPath) {
         const loops = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Check refactor frequency
             const refactorCommits = execSync('git log --all --grep="refactor\\|rewrite\\|redesign" -i --oneline --since="6 months ago"', { cwd: projectPath, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
             if (refactorCommits.length > 10) {
@@ -1424,7 +1425,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectKnowledgeLoops(projectPath) {
         const loops = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Check TODO growth
             const currentTodos = parseInt(execSync('git grep -i "TODO\\|FIXME" -- "*.ts" "*.tsx" | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim());
             if (currentTodos > 50) {
@@ -1502,7 +1503,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                     }
                 }
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // No docs found
             }
         }
@@ -1514,7 +1515,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectCognitiveBiases(projectPath) {
         const loops = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Sunk cost: unmerged branches
             const unmergedBranches = parseInt(execSync('git branch -a --no-merged | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim());
             if (unmergedBranches > 10) {
@@ -1598,7 +1599,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     async detectResourceThrashing(projectPath) {
         const loops = [];
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Check context switching
             const recentCommits = execSync('git log --since="7 days ago" --name-only --pretty=format:', { cwd: projectPath, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
             const uniqueFiles = new Set(recentCommits);
@@ -1682,7 +1683,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     // Meta-analysis methods
     async analyzeTeamDynamics(projectPath) {
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Analyze contributor activity
             const contributors = execSync('git log --since="90 days ago" --pretty=format:"%an" | sort | uniq', { cwd: projectPath, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
             const contributorCount = contributors.length;
@@ -1733,7 +1734,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     }
     async analyzeProcessEfficiency(projectPath) {
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Detect stale branches (bottleneck indicator)
             const staleBranches = parseInt(execSync('git branch -r | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim()) || 0;
             const bottlenecks = [];
@@ -1749,7 +1750,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                     avgCycleTime = 5 * 24 * 60 * 60 * 1000; // Estimate 5 days if active merging
                 }
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // Default cycle time
             }
             // Calculate throughput (features per month)
@@ -1794,8 +1795,8 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     }
     async analyzeToolEffectiveness(projectPath) {
         try {
-            const fs = require('fs');
-            const path = require('path');
+            import fs from 'fs';
+            import path from 'path';
             // Analyze package.json for tool usage
             const packageJsonPath = path.join(projectPath, 'package.json');
             const utilizationRate = {};
@@ -1844,7 +1845,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     }
     async analyzeKnowledgeGaps(projectPath) {
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Analyze file ownership concentration
             const fileOwnership = execSync('git log --pretty=format:"%an" --name-only | grep -v "^$" | sort | uniq -c | sort -nr | head -20', { cwd: projectPath, encoding: 'utf8' }).trim().split('\n').filter(Boolean);
             const criticalGaps = [];
@@ -1856,15 +1857,15 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
             // Analyze documentation quality (README, docs/)
             let docQuality = 0.5;
             try {
-                const fs = require('fs');
-                const path = require('path');
+                import fs from 'fs';
+                import path from 'path';
                 if (fs.existsSync(path.join(projectPath, 'README.md')))
                     docQuality += 0.2;
                 if (fs.existsSync(path.join(projectPath, 'docs')))
                     docQuality += 0.2;
                 docQuality = Math.min(docQuality, 1.0);
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // File system error
             }
             // Estimate knowledge transfer rate from collaboration
@@ -1897,9 +1898,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     }
     async analyzeCognitiveLoad(projectPath) {
         try {
-            const { execSync } = require('child_process');
-            const fs = require('fs');
-            const path = require('path');
+            import { execSync } from 'child_process';
+            import fs from 'fs';
+            import path from 'path';
             // Analyze dependency count (complexity indicator)
             let depCount = 0;
             try {
@@ -1909,7 +1910,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                     depCount = Object.keys({ ...packageJson.dependencies, ...packageJson.devDependencies }).length;
                 }
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // No package.json
             }
             const complexityLevel = Math.min(depCount / 100, 1.0); // 100+ deps = 1.0
@@ -1946,7 +1947,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     }
     async analyzeInnovationIndex(projectPath) {
         try {
-            const { execSync } = require('child_process');
+            import { execSync } from 'child_process';
             // Analyze experimental branches (feature/, experiment/, prototype/)
             const experimentalBranches = parseInt(execSync('git branch -a | grep -E "feature/|experiment/|prototype/" | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim()) || 0;
             const totalBranches = parseInt(execSync('git branch -a | wc -l', { cwd: projectPath, encoding: 'utf8' }).trim()) || 1;
@@ -1981,9 +1982,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
     }
     async analyzeCollaborationQuality(projectPath) {
         try {
-            const { execSync } = require('child_process');
-            const fs = require('fs');
-            const path = require('path');
+            import { execSync } from 'child_process';
+            import fs from 'fs';
+            import path from 'path';
             // Analyze PR review patterns (collaboration proxy)
             let meetingEfficiency = 0.5;
             try {
@@ -1993,7 +1994,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
                 else if (prComments > 50)
                     meetingEfficiency = 0.6;
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // gh not available
             }
             // Analyze documentation (README, docs/)

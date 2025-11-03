@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /**
  * VERSATIL Memory Tool Operations
  *

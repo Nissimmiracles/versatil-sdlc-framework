@@ -237,9 +237,9 @@ export class EnhancedOPERACoordinator extends EventEmitter {
         query.filters!.fileTypes = [fileType];
       }
     }
-    
-    const results = await vectorMemoryStore.queryMemories(arguments[0]);
-    
+
+    const results = await vectorMemoryStore.queryMemories(query);
+
     // Parse and return relevant memories
     return results.documents.map(doc => {
       try {
@@ -460,9 +460,9 @@ export class EnhancedOPERACoordinator extends EventEmitter {
         }
       }
     };
-    
-    const recentInteractions = await vectorMemoryStore.queryMemories(arguments[0]);
-    
+
+    const recentInteractions = await vectorMemoryStore.queryMemories(query);
+
     // Simple pattern detection - repeated issues
     if (recentInteractions.documents.length >= 3) {
       const commonIssues = this.findCommonIssues(recentInteractions.documents);
@@ -756,8 +756,8 @@ export class EnhancedOPERACoordinator extends EventEmitter {
         agentId,
         topK: 1000 // Get count
       };
-      
-      const results = await vectorMemoryStore.queryMemories(arguments[0]);
+
+      const results = await vectorMemoryStore.queryMemories(query);
       agentStats[agentId] = results.documents.length;
     }
     

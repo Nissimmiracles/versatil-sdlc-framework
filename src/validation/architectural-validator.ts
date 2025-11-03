@@ -175,7 +175,7 @@ class DependencyGraphImpl implements DependencyGraph {
 export class PagesMustHaveRoutesRule implements ArchitecturalRule {
   name = 'pages-must-have-routes';
   description = 'All page components must have corresponding route definitions';
-  severity: 'blocker' = 'blocker';
+  severity = 'blocker' as const;
   enabled = true;
 
   async check(graph: DependencyGraph): Promise<ArchitecturalViolation[]> {
@@ -294,7 +294,7 @@ Or run: npm run versatil:add-route ${page.filePath}
 export class MenusMustHaveRoutesRule implements ArchitecturalRule {
   name = 'menus-must-have-routes';
   description = 'All navigation menu items must have valid route definitions';
-  severity: 'critical' = 'critical';
+  severity = 'critical' as const;
   enabled = true;
 
   async check(graph: DependencyGraph): Promise<ArchitecturalViolation[]> {
@@ -407,7 +407,7 @@ export class MenusMustHaveRoutesRule implements ArchitecturalRule {
 export class RoutesMustHaveComponentsRule implements ArchitecturalRule {
   name = 'routes-must-have-components';
   description = 'All route definitions must point to existing components';
-  severity: 'blocker' = 'blocker';
+  severity = 'blocker' as const;
   enabled = true;
 
   async check(graph: DependencyGraph): Promise<ArchitecturalViolation[]> {
@@ -482,7 +482,7 @@ export class RoutesMustHaveComponentsRule implements ArchitecturalRule {
 export class DeliverableCompletenessRule implements ArchitecturalRule {
   name = 'deliverable-completeness';
   description = 'Multi-file deliverables must be complete before commit';
-  severity: 'major' = 'major';
+  severity = 'major' as const;
   enabled = true;
 
   async check(graph: DependencyGraph, changedFiles: string[]): Promise<ArchitecturalViolation[]> {

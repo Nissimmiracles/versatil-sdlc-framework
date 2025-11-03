@@ -369,7 +369,6 @@ export class MCPToolRouter extends EventEmitter {
           params.topic
         );
         return {
-      }
           success: true,
           data: {
             examples: docsResult.examples,
@@ -377,6 +376,7 @@ export class MCPToolRouter extends EventEmitter {
             topic: params.topic
           }
         };
+      }
 
       default:
         throw new Error(`Unknown GitMCP action: ${action}`);

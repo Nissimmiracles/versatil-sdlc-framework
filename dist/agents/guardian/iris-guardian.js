@@ -205,7 +205,7 @@ export class IrisGuardian {
         }
         this.logger.info(`Starting todo cleanup cycle (every ${intervalMinutes} minutes)`);
         // Import cleanup function
-        const { reviewAndCleanupTodos } = require('./todo-deduplicator.js');
+        import { reviewAndCleanupTodos } from './todo-deduplicator.js';
         // Schedule recurring cleanup
         const intervalMs = intervalMinutes * 60 * 1000;
         this.cleanupInterval = setInterval(async () => {

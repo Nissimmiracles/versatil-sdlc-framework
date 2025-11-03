@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-useless-escape */
 /**
  * VERSATIL Security Daemon
  * Real-time enforcement of microsegmentation and security boundaries

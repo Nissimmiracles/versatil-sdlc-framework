@@ -457,7 +457,7 @@ export class BoundaryEnforcementEngine extends EventEmitter {
         return 'unauthorized_access';
     }
     extractProjectId(filePath) {
-        const match = filePath.match(/\/tmp\/versatil-projects\/([^\/]+)/);
+        const match = filePath.match(/\/tmp\/versatil-projects\/([^/]+)/);
         return match ? match[1] : undefined;
     }
     determineSeverity(rule, filePath) {

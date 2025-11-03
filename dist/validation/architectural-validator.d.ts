@@ -71,7 +71,7 @@ export interface ArchitecturalRule {
 export declare class PagesMustHaveRoutesRule implements ArchitecturalRule {
     name: string;
     description: string;
-    severity: 'blocker';
+    severity: "blocker";
     enabled: boolean;
     check(graph: DependencyGraph): Promise<ArchitecturalViolation[]>;
     private generateRouteSuggestion;
@@ -86,7 +86,7 @@ export declare class PagesMustHaveRoutesRule implements ArchitecturalRule {
 export declare class MenusMustHaveRoutesRule implements ArchitecturalRule {
     name: string;
     description: string;
-    severity: 'critical';
+    severity: "critical";
     enabled: boolean;
     check(graph: DependencyGraph): Promise<ArchitecturalViolation[]>;
     private extractMenuItems;
@@ -101,7 +101,7 @@ export declare class MenusMustHaveRoutesRule implements ArchitecturalRule {
 export declare class RoutesMustHaveComponentsRule implements ArchitecturalRule {
     name: string;
     description: string;
-    severity: 'blocker';
+    severity: "blocker";
     enabled: boolean;
     check(graph: DependencyGraph): Promise<ArchitecturalViolation[]>;
     private extractRoutes;
@@ -115,7 +115,7 @@ export declare class RoutesMustHaveComponentsRule implements ArchitecturalRule {
 export declare class DeliverableCompletenessRule implements ArchitecturalRule {
     name: string;
     description: string;
-    severity: 'major';
+    severity: "major";
     enabled: boolean;
     check(graph: DependencyGraph, changedFiles: string[]): Promise<ArchitecturalViolation[]>;
     private getExpectedDeliverableFiles;

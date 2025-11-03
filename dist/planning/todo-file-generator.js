@@ -153,7 +153,7 @@ export class TodoFileGenerator {
         const filesList = spec.files_involved
             .map(f => `  - \`${f}\``)
             .join('\n');
-        content = content.replace(/  - `path\/to\/file1.ts`\n  - `path\/to\/file2.ts`/g, filesList);
+        content = content.replace(/ {2}- `path\/to\/file1.ts`\n {2}- `path\/to\/file2.ts`/g, filesList);
         // Replace dependencies
         if (spec.dependencies.depends_on.length > 0) {
             const depsList = spec.dependencies.depends_on

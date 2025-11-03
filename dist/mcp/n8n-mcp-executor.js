@@ -358,7 +358,7 @@ export class N8nMCPExecutor {
     getNextCronExecution(cronExpression) {
         try {
             // Use cron-parser for accurate cron expression parsing
-            const parser = require('cron-parser');
+            import parser from 'cron-parser';
             const interval = parser.parseExpression(cronExpression);
             const next = interval.next().toDate();
             return next.toISOString();

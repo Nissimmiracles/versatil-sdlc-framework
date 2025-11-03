@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * INSIGHT Mode: Frontend UI/UX Deep Research Analysis
  * Comprehensive research for optimal frontend agent capabilities

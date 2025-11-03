@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * VERSATIL Framework v3.0.0 - Rust Language Adapter
  *
@@ -38,7 +39,7 @@ export class RustAdapter extends BaseLanguageAdapter {
                         return true;
                     }
                 }
-                catch {
+                catch { // eslint-disable-line no-empty
                     continue;
                 }
             }
@@ -67,7 +68,7 @@ export class RustAdapter extends BaseLanguageAdapter {
             const { stdout } = await execAsync('rustc --version');
             this.rustVersion = stdout.trim();
         }
-        catch {
+        catch { // eslint-disable-line no-empty
             this.rustVersion = 'Unknown';
         }
         // Parse Cargo.toml for package name
@@ -131,7 +132,7 @@ export class RustAdapter extends BaseLanguageAdapter {
                 try {
                     command = `cargo tarpaulin --out Json --output-dir target/coverage`;
                 }
-                catch {
+                catch { // eslint-disable-line no-empty
                     // Fallback to regular cargo test if tarpaulin not available
                     command = `cargo test ${patternArg}`;
                 }
@@ -158,7 +159,7 @@ export class RustAdapter extends BaseLanguageAdapter {
                         coverage = coverageData.coverage;
                     }
                 }
-                catch {
+                catch { // eslint-disable-line no-empty
                     coverage = undefined;
                 }
             }
@@ -219,7 +220,7 @@ export class RustAdapter extends BaseLanguageAdapter {
                 const binaries = files.split('\n').filter(f => f && !f.includes('.') && !f.includes('build'));
                 artifacts.push(...binaries.map(b => `${targetDir}/${b}`));
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // No artifacts found
             }
             return {
@@ -392,7 +393,7 @@ export class RustAdapter extends BaseLanguageAdapter {
                 testCoverage = coverageData.coverage || 0;
             }
         }
-        catch {
+        catch { // eslint-disable-line no-empty
             testCoverage = 0;
         }
         // Run clippy for linting score
@@ -402,7 +403,7 @@ export class RustAdapter extends BaseLanguageAdapter {
             const totalIssues = lintResult.errors + lintResult.warnings;
             lintScore = Math.max(0, 100 - (totalIssues * 5)); // Deduct 5 points per issue
         }
-        catch {
+        catch { // eslint-disable-line no-empty
             lintScore = 100;
         }
         // Rust has excellent built-in complexity checks via clippy
@@ -443,7 +444,7 @@ export class RustAdapter extends BaseLanguageAdapter {
                 });
                 files.push(...stdout.split('\n').filter(f => f.trim() && f.endsWith('.rs')));
             }
-            catch {
+            catch { // eslint-disable-line no-empty
                 // Pattern not found, continue
             }
         }

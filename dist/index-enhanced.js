@@ -79,10 +79,11 @@ Run: npx versatil-sdlc migrate
             await showBanner('autonomous');
             await startAutonomousMode();
             break;
-        case 'migrate':
+        case 'migrate': {
             const migration = new VersatilMigration();
             await migration.run();
             break;
+        }
         case 'test':
             console.log('Running test suite...');
             require('./tests/run-all-tests');

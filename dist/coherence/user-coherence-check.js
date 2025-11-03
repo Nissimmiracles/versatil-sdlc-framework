@@ -18,7 +18,7 @@
  * @version 7.9.0
  */
 import { execSync } from 'child_process';
-import { existsSync, readdirSync, statSync } from 'fs';
+import { existsSync, readdirSync, statSync, readFileSync } from 'fs';
 import { join } from 'path';
 import semver from 'semver';
 /**
@@ -99,7 +99,8 @@ export class UserCoherenceCheckService {
     async checkVersion() {
         try {
             // Get installed version from package.json
-            const packageJson = require(join(this.projectRoot, 'package.json'));
+            const packageJsonPath = join(this.projectRoot, 'package.json');
+            const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
             const installedVersion = packageJson.dependencies?.['@versatil/sdlc-framework'] ||
                 packageJson.devDependencies?.['@versatil/sdlc-framework'] ||
                 'unknown';
@@ -118,7 +119,7 @@ export class UserCoherenceCheckService {
                 console.warn('[UserCoherenceCheck] Could not fetch latest npm version:', error);
             }
             // Calculate version difference
-            let behind_by = { major: 0, minor: 0, patch: 0 };
+            const behind_by = { major: 0, minor: 0, patch: 0 };
             let status = 'unknown';
             if (cleanInstalled !== 'unknown' && latestVersion !== 'unknown') {
                 const diff = semver.diff(cleanInstalled, latestVersion);
@@ -421,7 +422,8 @@ export class UserCoherenceCheckService {
     async checkContext() {
         try {
             // Detect current context
-            const packageJson = require(join(this.projectRoot, 'package.json'));
+            const packageJsonPath = join(this.projectRoot, 'package.json');
+            const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
             const hasFrameworkDependency = !!(packageJson.dependencies?.['@versatil/sdlc-framework'] ||
                 packageJson.devDependencies?.['@versatil/sdlc-framework']);
             const isFrameworkRepo = packageJson.name === '@versatil/sdlc-framework';

@@ -25,7 +25,8 @@ export class PHPAdapter extends BaseLanguageAdapter {
             if (stdout.trim())
                 return true;
         }
-        catch { }
+        catch { // eslint-disable-line no-empty
+        }
         return false;
     }
     getCapabilities() {
@@ -43,7 +44,7 @@ export class PHPAdapter extends BaseLanguageAdapter {
             const { stdout } = await execAsync('php --version');
             this.phpVersion = stdout.split('\n')[0];
         }
-        catch {
+        catch { // eslint-disable-line no-empty
             this.phpVersion = 'Unknown';
         }
         const composerPath = join(this.rootPath, 'composer.json');
@@ -154,7 +155,7 @@ export class PHPAdapter extends BaseLanguageAdapter {
                 issues
             };
         }
-        catch {
+        catch { // eslint-disable-line no-empty
             return { errors: 0, warnings: 0, issues: [] };
         }
     }
@@ -182,13 +183,14 @@ export class PHPAdapter extends BaseLanguageAdapter {
         return ['maria-qa', 'marcus-backend', 'james-frontend', 'devops-dan', 'security-sam'];
     }
     async getQualityMetrics() {
-        let testCoverage = 0;
+        const testCoverage = 0;
         let lintScore = 100;
         try {
             const lintResult = await this.lint();
             lintScore = Math.max(0, 100 - (lintResult.errors + lintResult.warnings) * 5);
         }
-        catch { }
+        catch { // eslint-disable-line no-empty
+        }
         return {
             testCoverage,
             lintScore,
@@ -216,7 +218,8 @@ export class PHPAdapter extends BaseLanguageAdapter {
             const { stdout } = await execAsync(`find . -name "*.php" -type f`, { cwd: this.rootPath });
             files.push(...stdout.split('\n').filter(f => f.trim() && f.endsWith('.php')));
         }
-        catch { }
+        catch { // eslint-disable-line no-empty
+        }
         return Array.from(new Set(files));
     }
     async parseDependencies() {

@@ -231,7 +231,7 @@ export class MCPToolRouter extends EventEmitter {
             case 'search_docs':
                 return await this.gitMCP.searchFrameworkDocs(params.framework, params.topic);
             case 'get_examples':
-            case 'get_code_examples':
+            case 'get_code_examples': {
                 const docsResult = await this.gitMCP.searchFrameworkDocs(params.framework, params.topic);
                 return {
                     success: true,
@@ -241,6 +241,7 @@ export class MCPToolRouter extends EventEmitter {
                         topic: params.topic
                     }
                 };
+            }
             default:
                 throw new Error(`Unknown GitMCP action: ${action}`);
         }

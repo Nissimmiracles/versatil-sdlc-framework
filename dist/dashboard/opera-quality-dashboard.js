@@ -179,12 +179,12 @@ export class OPERAQualityDashboard extends EventEmitter {
         // Analyze file path to determine affected components
         const components = [];
         if (filePath.includes('components/')) {
-            const componentMatch = filePath.match(/components\/([^\/]+)/);
+            const componentMatch = filePath.match(/components\/([^/]+)/);
             if (componentMatch && componentMatch[1])
                 components.push(componentMatch[1]);
         }
         if (changeType === 'route' && filePath.includes('pages/')) {
-            const pageMatch = filePath.match(/pages\/([^\/]+)/);
+            const pageMatch = filePath.match(/pages\/([^/]+)/);
             if (pageMatch && pageMatch[1])
                 components.push(`${pageMatch[1]}-page`);
         }

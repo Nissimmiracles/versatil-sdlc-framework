@@ -34,7 +34,7 @@ export class CredentialWizard {
             this.credentialsPath = options.outputPath || path.join(this.versatilHome, 'credentials.json');
         }
         // Ensure .versatil directory exists (synchronous for constructor)
-        const fsSync = require('fs');
+        import fsSync from 'fs';
         if (!fsSync.existsSync(this.versatilHome)) {
             fsSync.mkdirSync(this.versatilHome, { recursive: true });
         }

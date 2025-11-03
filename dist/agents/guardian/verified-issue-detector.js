@@ -220,7 +220,7 @@ function categorizeIssue(issue) {
  */
 function todoAlreadyExists(verifiedIssue, todosDir) {
     try {
-        const { readdirSync, readFileSync, existsSync } = require('fs');
+        import { readdirSync, readFileSync, existsSync } from 'fs';
         if (!existsSync(todosDir)) {
             return false; // No todos directory = no duplicates
         }

@@ -168,7 +168,7 @@ export class TieredMemoryStore {
         console.log('[TieredMemoryStore] Starting tier migration...');
         let hotToWarm = 0;
         let warmToCold = 0;
-        let coldToWarm = 0;
+        const coldToWarm = 0;
         // Demote old hot entries to warm
         for (const [path, entry] of this.hotTier.entries()) {
             if (this.shouldDemoteToWarm(entry.metadata)) {
@@ -386,7 +386,7 @@ export class TieredMemoryStore {
         if (decompress) {
             // Read compressed
             const chunks = [];
-            await pipeline(createReadStream(filePath), createGunzip(), async function* (source) {
+            await pipeline(createReadStream(filePath), createGunzip(), async function (source) {
                 for await (const chunk of source) {
                     chunks.push(chunk);
                 }

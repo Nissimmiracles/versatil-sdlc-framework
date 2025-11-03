@@ -1,5 +1,5 @@
-/* eslint-disable no-useless-escape */
 #!/usr/bin/env node
+/* eslint-disable no-useless-escape */
 
 /**
  * VERSATIL Security Daemon

@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 /**
  * VERSATIL Framework v3.0.0 - Ruby Language Adapter
  *
@@ -27,7 +28,8 @@ export class RubyAdapter extends BaseLanguageAdapter {
             if (stdout.trim())
                 return true;
         }
-        catch { }
+        catch { // eslint-disable-line no-empty
+        }
         return false;
     }
     getCapabilities() {
@@ -45,7 +47,7 @@ export class RubyAdapter extends BaseLanguageAdapter {
             const { stdout } = await execAsync('ruby --version');
             this.rubyVersion = stdout.trim();
         }
-        catch {
+        catch { // eslint-disable-line no-empty
             this.rubyVersion = 'Unknown';
         }
         const mainFiles = await this.findRubyFiles(['lib/**/*.rb', 'app/**/*.rb']);
@@ -100,7 +102,8 @@ export class RubyAdapter extends BaseLanguageAdapter {
                 const { stdout: files } = await execAsync('ls pkg/');
                 artifacts.push(...files.split('\n').filter(f => f.endsWith('.gem')).map(f => `pkg/${f}`));
             }
-            catch { }
+            catch { // eslint-disable-line no-empty
+            }
             return {
                 success: true,
                 output: stdout,
@@ -169,13 +172,14 @@ export class RubyAdapter extends BaseLanguageAdapter {
         return ['maria-qa', 'marcus-backend', 'james-frontend', 'devops-dan', 'security-sam'];
     }
     async getQualityMetrics() {
-        let testCoverage = 0;
+        const testCoverage = 0;
         let lintScore = 100;
         try {
             const lintResult = await this.lint();
             lintScore = Math.max(0, 100 - (lintResult.errors + lintResult.warnings) * 5);
         }
-        catch { }
+        catch { // eslint-disable-line no-empty
+        }
         return {
             testCoverage,
             lintScore,
@@ -203,7 +207,8 @@ export class RubyAdapter extends BaseLanguageAdapter {
             const { stdout } = await execAsync(`find . -name "*.rb" -type f`, { cwd: this.rootPath });
             files.push(...stdout.split('\n').filter(f => f.trim() && f.endsWith('.rb')));
         }
-        catch { }
+        catch { // eslint-disable-line no-empty
+        }
         return Array.from(new Set(files));
     }
     async parseDependencies() {

@@ -238,12 +238,13 @@ export class ConfigWizard {
             case 'view':
                 console.log(await this.preferenceManager.getSummary());
                 break;
-            case 'reset':
+            case 'reset': {
                 const confirm = await this.askYesNo('Reset all preferences to defaults?', false);
                 if (confirm) {
                     await this.preferenceManager.resetToDefaults();
                 }
                 break;
+            }
         }
         this.rl.close();
     }

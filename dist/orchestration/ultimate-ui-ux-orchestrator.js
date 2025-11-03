@@ -283,10 +283,11 @@ export class UltimateUIUXOrchestrator extends EventEmitter {
                             await new Promise(resolve => setTimeout(resolve, step.duration));
                         }
                         break;
-                    case 'screenshot':
+                    case 'screenshot': {
                         const screenshot = await this.uiTools.playwright.screenshot();
                         screenshots.push(screenshot);
                         break;
+                    }
                     case 'keyboard':
                         await this.uiTools.playwright.keyboard(step.key);
                         break;

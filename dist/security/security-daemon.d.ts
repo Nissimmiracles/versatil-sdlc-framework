@@ -1,9 +1,4 @@
 #!/usr/bin/env node
-/**
- * VERSATIL Security Daemon
- * Real-time enforcement of microsegmentation and security boundaries
- * Runs continuously to protect framework and project isolation
- */
 import { EventEmitter } from 'events';
 interface SecurityDaemonConfig {
     frameworkRoot: string;

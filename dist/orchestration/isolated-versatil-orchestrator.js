@@ -4,6 +4,8 @@
  */
 import * as path from 'path';
 import * as os from 'os';
+import fs from 'fs';
+import { promises as fsPromises } from 'fs';
 import { EventEmitter } from 'events';
 import { VERSATILLogger } from '../utils/logger.js';
 import { StackAwareOrchestrator } from './stack-aware-orchestrator.js';
@@ -53,7 +55,7 @@ export class IsolatedVERSATILOrchestrator extends EventEmitter {
         }
         // Check for .versatil directory in project (old installation)
         const oldVersatilPath = path.join(this.projectRoot, '.versatil');
-        if (require('fs').existsSync(oldVersatilPath)) {
+        if (fs.existsSync(oldVersatilPath)) {
             this.logger.warn('Found old .versatil directory in project. Consider migrating to isolated installation.');
         }
     }
@@ -100,9 +102,8 @@ export class IsolatedVERSATILOrchestrator extends EventEmitter {
      * Ensure all framework directories exist in user's home
      */
     async ensureFrameworkDirectories() {
-        const fs = require('fs').promises;
         for (const dir of Object.values(this.paths.framework)) {
-            await fs.mkdir(dir, { recursive: true });
+            await fsPromises.mkdir(dir, { recursive: true });
         }
         // Create .gitignore to prevent accidental commits
         const gitignorePath = path.join(this.versatilRoot, '.gitignore');
@@ -112,7 +113,7 @@ export class IsolatedVERSATILOrchestrator extends EventEmitter {
 !.gitignore
 !README.md
     `.trim();
-        await fs.writeFile(gitignorePath, gitignoreContent);
+        await fsPromises.writeFile(gitignorePath, gitignoreContent);
         // Create README for clarity
         const readmePath = path.join(this.versatilRoot, 'README.md');
         const readmeContent = `
@@ -134,18 +135,17 @@ Your project: ${this.projectRoot}
 
 VERSATIL operates on your project without mixing framework files with your code.
     `.trim();
-        await fs.writeFile(readmePath, readmeContent);
+        await fsPromises.writeFile(readmePath, readmeContent);
     }
     /**
      * Load project configuration without modifying project
      */
     async loadProjectConfig() {
-        const fs = require('fs').promises;
         try {
             // Try to load existing .versatil-project.json
             const configPath = this.paths.project.versatilConfig;
-            if (require('fs').existsSync(configPath)) {
-                const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
+            if (fs.existsSync(configPath)) {
+                const config = JSON.parse(await fsPromises.readFile(configPath, 'utf-8'));
                 this.applyProjectConfig(config);
             }
             else {
@@ -161,7 +161,6 @@ VERSATIL operates on your project without mixing framework files with your code.
      * Create default project configuration
      */
     async createDefaultProjectConfig() {
-        const fs = require('fs').promises;
         const defaultConfig = {
             version: '1.3.0',
             mode: 'plan', // Always start in plan mode
@@ -188,14 +187,14 @@ VERSATIL operates on your project without mixing framework files with your code.
             }
         };
         const configPath = this.paths.project.versatilConfig;
-        await fs.writeFile(configPath, JSON.stringify(defaultConfig, null, 2));
+        await fsPromises.writeFile(configPath, JSON.stringify(defaultConfig, null, 2));
         this.logger.info('Created default project configuration', { path: configPath });
     }
     /**
      * Start MCP servers with complete port isolation
      */
     async startIsolatedMCPServers() {
-        const { spawn } = require('child_process');
+        import { spawn } from 'child_process';
         for (const [key, config] of Object.entries(this.mcpServers)) {
             try {
                 // Each MCP server runs in isolated process

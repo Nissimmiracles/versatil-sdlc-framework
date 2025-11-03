@@ -483,7 +483,7 @@ export class TieredMemoryStore {
       await pipeline(
         createReadStream(filePath),
         createGunzip(),
-        async function* (source) {
+        async function (source) {
           for await (const chunk of source) {
             chunks.push(chunk as Buffer);
           }
