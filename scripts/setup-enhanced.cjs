@@ -53,7 +53,7 @@ async function setup() {
       console.log('✅ VERSATIL SDLC Framework detected\n');
     } catch {
       console.log('Installing VERSATIL SDLC Framework...');
-      execSync('npm install versatil-sdlc-framework@latest', { stdio: 'inherit' });
+      execSync('pnpm install versatil-sdlc-framework@latest', { stdio: 'inherit' });
       console.log('✅ VERSATIL SDLC Framework installed\n');
     }
     
@@ -254,13 +254,13 @@ Your project is now configured with:
 
 Quick Start Commands:
 --------------------
-  npm run versatil:enhanced    # Start in enhanced mode
-  npm run versatil:auto        # Start in autonomous mode
-  npm run versatil:demo        # Run the demo script
+  pnpm run versatil:enhanced    # Start in enhanced mode
+  pnpm run versatil:auto        # Start in autonomous mode
+  pnpm run versatil:demo        # Run the demo script
 
 Next Steps:
 -----------
-1. Try the demo: npm run versatil:demo
+1. Try the demo: pnpm run versatil:demo
 2. Read the guide: ENHANCED_FEATURES_GUIDE.md
 3. Start building with enhanced agents!
 

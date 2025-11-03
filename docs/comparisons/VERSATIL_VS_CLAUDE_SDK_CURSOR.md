@@ -285,7 +285,7 @@ if (coverage < 80%) {
 
 **2. Security Scanning (Marcus-Backend)**:
 - **OWASP Top 10 compliance** (automatic scan)
-- **Dependency vulnerabilities** (npm audit)
+- **Dependency vulnerabilities** (pnpm audit)
 - **SQL injection protection** (parameterized queries)
 - **XSS/CSRF prevention** (security headers)
 - **API rate limiting** (DDoS protection)

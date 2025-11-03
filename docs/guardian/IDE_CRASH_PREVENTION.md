@@ -60,7 +60,7 @@ IDE stays performant (no crashes)
 
 ```bash
 # Manual IDE performance check
-npm run guardian:health-check
+pnpm run guardian:health-check
 
 # View telemetry logs
 tail -f ~/.versatil/logs/guardian/session-start.log
@@ -256,7 +256,7 @@ Cursor: No crashes, smooth performance
 ### Health Check Output
 
 ```bash
-$ npm run guardian:health-check
+$ pnpm run guardian:health-check
 
 🔍 Running Project Health Check...
 
@@ -293,7 +293,7 @@ $ tail -f ~/.versatil/logs/guardian/session-start.log
 
 **Check confidence level**:
 ```bash
-npm run guardian:health-check
+pnpm run guardian:health-check
 # Look for "IDE crash risk detected: X (confidence: Y%)"
 # Auto-fix only triggers if Y ≥ 90%
 ```

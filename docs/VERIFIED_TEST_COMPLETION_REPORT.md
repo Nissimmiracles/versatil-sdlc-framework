@@ -13,7 +13,7 @@
 
 **Evidence (Ground Truth)**:
 ```bash
-$ npm test -- --run --exclude="**/rag-health-monitor.test.ts" 2>&1 | tee test-results.txt
+$ pnpm test -- --run --exclude="**/rag-health-monitor.test.ts" 2>&1 | tee test-results.txt
 
 Test Files: 8 passed (8)
 Tests:      223 passed (223)
@@ -58,7 +58,7 @@ Duration:   14.92s
 **How It Was Verified**:
 ```bash
 # Actual command executed
-npm test -- --run --exclude="**/rag-health-monitor.test.ts" 2>&1 | tee test-results.txt
+pnpm test -- --run --exclude="**/rag-health-monitor.test.ts" 2>&1 | tee test-results.txt
 
 # Output captured in /tmp/test-results.txt
 # Vitest reported: "Tests: 223 passed (223)"
@@ -201,7 +201,7 @@ To independently verify these claims:
 
 ```bash
 # Run all passing tests (excludes slow RAG tests)
-npm test -- --run --exclude="**/rag-health-monitor.test.ts"
+pnpm test -- --run --exclude="**/rag-health-monitor.test.ts"
 # Expected: "Tests: 223 passed (223)"
 
 # Count test files

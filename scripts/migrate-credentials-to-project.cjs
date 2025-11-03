@@ -194,7 +194,7 @@ async function main() {
     console.log('✨ Migration complete!');
     console.log('');
     console.log('🚀 Next steps:');
-    console.log('  • Run: npm run mcp:health (verify MCP connections)');
+    console.log('  • Run: pnpm run mcp:health (verify MCP connections)');
     console.log('  • Run: versatil-daemon start (enable agents)');
     console.log('  • All credentials are now project-specific and encrypted!');
     console.log('');
@@ -203,7 +203,7 @@ async function main() {
     console.error('\n❌ Migration failed:', error.message);
     console.log('');
     console.log('💡 Make sure the framework is built:');
-    console.log('   npm run build\n');
+    console.log('   pnpm run build\n');
     process.exit(1);
   }
 

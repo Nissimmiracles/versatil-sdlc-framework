@@ -155,7 +155,7 @@ GUARDIAN_GROUP_TODOS=false
 /update
 
 # Or via npm
-npm update @versatil/sdlc-framework
+pnpm update @versatil/sdlc-framework
 ```
 
 **Expected Output**:
@@ -287,7 +287,7 @@ npm install @versatil/sdlc-framework@7.9.0
 # Or via git (if installed from source)
 cd ~/.versatil
 git checkout v7.9.0
-npm run build
+pnpm run build
 ```
 
 ---

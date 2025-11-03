@@ -118,7 +118,7 @@ npm list @versatil/sdlc-framework
 npm view @versatil/sdlc-framework version
 
 # Update (patch/minor - safe)
-npm update @versatil/sdlc-framework
+pnpm update @versatil/sdlc-framework
 
 # Update (major - review breaking changes first)
 npm view @versatil/sdlc-framework@8.0.0  # Review changes
@@ -273,7 +273,7 @@ npx versatil doctor
 npx versatil doctor --fix
 
 # Or manually restart GraphRAG
-npm run rag:start
+pnpm run rag:start
 
 # Check Neo4j container status
 docker ps | grep neo4j
@@ -307,7 +307,7 @@ curl -H "apikey: YOUR_KEY" YOUR_SUPABASE_URL/rest/v1/
 
 # If credentials invalid, update .env
 # Then restart
-npm run rag:restart
+pnpm run rag:restart
 
 # Verify
 npx versatil doctor
@@ -327,10 +327,10 @@ npx versatil doctor
 cat .versatil/config/rag.json
 
 # Reset RAG system
-npm run rag:reset
+pnpm run rag:reset
 
 # Reinitialize
-npm run rag:init
+pnpm run rag:init
 
 # Verify
 npx versatil doctor
@@ -391,7 +391,7 @@ ping your-mcp-server-host
 
 **Symptoms**:
 - Health check shows critical vulnerabilities
-- npm audit reports issues
+- pnpm audit reports issues
 
 **Health Check Output**:
 ```
@@ -406,10 +406,10 @@ ping your-mcp-server-host
 npx versatil doctor --fix
 
 # Or manually
-npm audit fix
+pnpm audit fix
 
 # If force needed
-npm audit fix --force
+pnpm audit fix --force
 
 # Verify
 npx versatil doctor
@@ -596,7 +596,7 @@ npx versatil doctor --quick
 npx versatil doctor
 
 # If GraphRAG timeout, restart it
-npm run rag:start
+pnpm run rag:start
 
 # If Vector store slow, check Supabase status
 # https://status.supabase.com/
@@ -654,7 +654,7 @@ npx versatil doctor --fix
 
 # Or manually rebuild
 cd node_modules/@versatil/sdlc-framework
-npm run build
+pnpm run build
 
 # Verify
 npx versatil doctor
@@ -673,7 +673,7 @@ npx versatil doctor
 # Rebuild framework
 cd node_modules/@versatil/sdlc-framework
 npm install
-npm run build
+pnpm run build
 
 # Verify
 npx versatil doctor
@@ -697,7 +697,7 @@ npm install --save-dev typescript@latest
 
 # Retry build
 cd node_modules/@versatil/sdlc-framework
-npm run build
+pnpm run build
 
 # If still failing, report issue on GitHub
 ```
@@ -850,7 +850,7 @@ npm install @versatil/sdlc-framework
 
 **Solution**: Restart RAG services
 ```bash
-npm run rag:start
+pnpm run rag:start
 npx versatil doctor
 ```
 

@@ -160,7 +160,7 @@ cd versatil-sdlc-framework
 
 ```bash
 npm install
-npm run build
+pnpm run build
 ```
 
 **Time**: 10-15 minutes (downloads ~1-2GB dependencies)
@@ -196,7 +196,7 @@ cd versatil-sdlc-framework
 
 # Install globally
 npm install
-npm run build
+pnpm run build
 npm link
 
 # Verify installation
@@ -320,7 +320,7 @@ After installation, verify these items:
 
 #### 1. Framework Health
 ```bash
-npm run doctor  # (Cursor path)
+pnpm run doctor  # (Cursor path)
 versatil doctor  # (CLI path)
 
 # Should show:
@@ -331,13 +331,13 @@ versatil doctor  # (CLI path)
 
 #### 2. Build Status
 ```bash
-npm run build  # (Cursor path)
+pnpm run build  # (Cursor path)
 # No TypeScript errors
 ```
 
 #### 3. Test Suite
 ```bash
-npm test  # (Cursor path)
+pnpm test  # (Cursor path)
 versatil test  # (CLI path)
 
 # All tests should pass
@@ -432,12 +432,12 @@ versatil-daemon restart
 **Solution**:
 ```bash
 # Install Playwright browsers
-npm run playwright:install
+pnpm run playwright:install
 
 # Run tests individually
-npm run test:unit           # Should pass
-npm run test:integration    # May require setup
-npm run test:e2e           # Requires Playwright
+pnpm run test:unit           # Should pass
+pnpm run test:integration    # May require setup
+pnpm run test:e2e           # Requires Playwright
 ```
 
 ---
@@ -509,7 +509,7 @@ npm run test:e2e           # Requires Playwright
 - [ ] Repository cloned or npm package installed
 - [ ] Dependencies installed successfully
 - [ ] Build completed without errors
-- [ ] Health check passes (`npm run doctor` or `versatil doctor`)
+- [ ] Health check passes (`pnpm run doctor` or `versatil doctor`)
 - [ ] MCP server running <500ms (Cursor path only)
 - [ ] Agents can be invoked manually
 - [ ] Tests pass

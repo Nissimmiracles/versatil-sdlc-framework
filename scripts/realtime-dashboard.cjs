@@ -6,7 +6,7 @@
  * Updates automatically without user intervention
  *
  * Usage:
- *   npm run dashboard              # Launch real-time dashboard
+ *   pnpm run dashboard              # Launch real-time dashboard
  *   node scripts/realtime-dashboard.cjs
  *
  * Controls:

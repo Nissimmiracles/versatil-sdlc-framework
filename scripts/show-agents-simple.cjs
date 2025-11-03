@@ -17,7 +17,7 @@ function displayAgents() {
   console.log('╚══════════════════════════════════════════════════════════════╝\n');
 
   if (!fs.existsSync(AGENTS_DIR)) {
-    console.log('❌ No agents configured. Run "npm run init" to set up agents.');
+    console.log('❌ No agents configured. Run "pnpm run init" to set up agents.');
     return;
   }
 
@@ -67,7 +67,7 @@ function displayAgents() {
   console.log('└─────────────────────────────────────────────────────────────┘');
   console.log('• Agents auto-activate based on file patterns and keywords');
   console.log('• Edit files matching patterns to see agents in action');
-  console.log('• Run "npm run validate" to see all agents working');
+  console.log('• Run "pnpm run validate" to see all agents working');
   console.log('• Check ".versatil/agents/" for individual configurations\n');
 
   // Show recent agent activity

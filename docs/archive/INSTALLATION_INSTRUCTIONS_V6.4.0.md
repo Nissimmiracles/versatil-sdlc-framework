@@ -24,7 +24,7 @@ git checkout v6.4.0
 npm install
 
 # Build the framework
-npm run build
+pnpm run build
 
 # Link globally (optional)
 npm link
@@ -61,10 +61,10 @@ git checkout v6.4.0
 
 # Rebuild
 npm install
-npm run build
+pnpm run build
 
 # Verify
-npm run build && node -e "console.log(require('./package.json').version)"
+pnpm run build && node -e "console.log(require('./package.json').version)"
 # Should show: 6.4.0
 ```
 
@@ -83,7 +83,7 @@ cd versatil-sdlc-framework-6.4.0
 
 # Install and build
 npm install
-npm run build
+pnpm run build
 npm link
 ```
 
@@ -202,7 +202,7 @@ ls -la /path/to/versatil/docs/CURSOR_INSTALLATION_UPDATE_V6.4.0.md
 cd /path/to/versatil-sdlc-framework
 
 # Rebuild
-npm run build
+pnpm run build
 
 # Verify build
 ls -la dist/roadmap-generator.js
@@ -222,7 +222,7 @@ npm unlink -g @versatil/claude-opera
 cd /path/to/versatil-sdlc-framework
 rm -rf node_modules dist
 npm install
-npm run build
+pnpm run build
 
 # Link new version
 npm link
@@ -247,7 +247,7 @@ grep -n "generateProjectRoadmap" /path/to/versatil/dist/onboarding-wizard.js
 # Should find the method
 
 # If not found, rebuild
-npm run build
+pnpm run build
 
 # Test manually
 node -e "

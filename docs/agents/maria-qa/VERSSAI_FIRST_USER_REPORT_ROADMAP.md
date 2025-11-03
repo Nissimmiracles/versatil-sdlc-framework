@@ -118,9 +118,9 @@ versatil bmad --help
 ```
 
 **Native Commands Available** (`.claude/commands/framework/`):
-- `/framework:doctor` - Comprehensive health audit (npm run doctor)
+- `/framework:doctor` - Comprehensive health audit (pnpm run doctor)
 - Parallel execution - Auto-enabled in daemon (Rule 1, no command needed)
-- Stress testing - Maria-QA automation (npm run test:stress)
+- Stress testing - Maria-QA automation (pnpm run test:stress)
 - `/framework:validate` - Quick validation check
 
 **Implementation Status**:

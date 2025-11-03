@@ -197,7 +197,7 @@ Feature 4: 8 hours (Session CODIFY) → 71% faster (way too good)
 **Reality**: Let's check the actual tests.
 
 ```bash
-$ npm test
+$ pnpm test
 FAIL UNIT tests/unit/contracts/contract-tracker.test.ts
   ✕ should create stats directory on initialization (2 ms)
   ✕ should load existing data on initialization (4 ms)

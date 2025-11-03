@@ -435,7 +435,7 @@ Tests should cover:
 
 ### Next Steps
 
-1. Run `npm run build` to compile TypeScript
+1. Run `pnpm run build` to compile TypeScript
 2. Test codification: `node scripts/codify-session-learnings.cjs 2025-10-19`
 3. Verify RAG storage in Supabase dashboard
 4. Check generated reports in `~/.versatil/sessions/`

@@ -16,7 +16,7 @@
  * - ~/.versatil/logs/: Log files for hook execution
  * - ~/.versatil/metrics/: Agent performance metrics
  *
- * Runs on: npm install (via postinstall hook)
+ * Runs on: pnpm install (via postinstall hook)
  */
 
 const fs = require('fs');
@@ -809,7 +809,7 @@ else
   # Fallback if compass script not found
   echo "{
     \\"allowed\\": true,
-    \\"message\\": \\"✅ Task $TASK_ID completed! Run 'npm run session:compass' to see updated context.\\",
+    \\"message\\": \\"✅ Task $TASK_ID completed! Run 'pnpm run session:compass' to see updated context.\\",
     \\"metadata\\": {
       \\"task_id\\": \\"$TASK_ID\\",
       \\"compass_displayed\\": false,

@@ -180,7 +180,7 @@ async function main() {
   console.log(`  Impact Score: ${impactScore}/10\n`);
 
   console.log('🎯 Next Steps:\n');
-  console.log('  1. Run: npm run session:summary');
+  console.log('  1. Run: pnpm run session:summary');
   console.log('  2. See your first VERSATIL session report!\n');
 }
 

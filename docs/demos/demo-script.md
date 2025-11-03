@@ -72,7 +72,7 @@ touch src/components/LoginForm.jsx
 ```bash
 # Trigger emergency by breaking build
 echo "invalid syntax" >> src/index.js
-npm run build
+pnpm run build
 ```
 
 **Demonstrate:**

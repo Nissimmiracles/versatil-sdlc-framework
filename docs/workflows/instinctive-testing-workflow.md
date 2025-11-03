@@ -180,7 +180,7 @@ Auto_Tests:
      - Scripts executable
 
   2. Security_Tests:
-     - npm audit clean (no critical/high vulns)
+     - pnpm audit clean (no critical/high vulns)
      - No secrets in .env committed
      - License compatibility
 

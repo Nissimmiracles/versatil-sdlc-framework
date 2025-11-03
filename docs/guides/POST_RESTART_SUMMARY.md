@@ -50,13 +50,13 @@ cd "/Users/nissimmenashe/VERSATIL SDLC FW"
 npm install
 
 # 3. Build framework
-npm run build
+pnpm run build
 
 # 4. Verify health
-npm run doctor
+pnpm run doctor
 
 # 5. Start development
-npm run dev
+pnpm run dev
 ```
 
 **Time**: 5-10 minutes
@@ -70,8 +70,8 @@ npm run dev
 git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git
 cd versatil-sdlc-framework
 npm install
-npm run build
-npm run doctor
+pnpm run build
+pnpm run doctor
 ```
 
 ---
@@ -140,12 +140,12 @@ npm run doctor
 
 3. **Install & Build**
    ```bash
-   npm install && npm run build
+   npm install && pnpm run build
    ```
 
 4. **Verify Health**
    ```bash
-   npm run doctor
+   pnpm run doctor
    ```
 
 5. **Test MCP**
@@ -171,7 +171,7 @@ npm run doctor
 8. **Start Development**
    ```bash
    git checkout -b feature/your-next-enhancement
-   npm run build:watch
+   pnpm run build:watch
    ```
 
 ### Optional Setup (15 minutes)
@@ -184,15 +184,15 @@ npm run doctor
 
 10. **Initialize RAG Memory**
     ```bash
-    npm run rag:seed-defaults
-    npm run rag:test
+    pnpm run rag:seed-defaults
+    pnpm run rag:test
     ```
 
 11. **Explore Framework**
     ```bash
-    npm run show-agents
-    npm run session:compass
-    npm run status
+    pnpm run show-agents
+    pnpm run session:compass
+    pnpm run status
     ```
 
 ---
@@ -214,8 +214,8 @@ npm run doctor
 | Task | Time |
 |------|------|
 | `npm install` | 5-10 minutes |
-| `npm run build` | 30-60 seconds |
-| `npm run doctor` | <5 seconds |
+| `pnpm run build` | 30-60 seconds |
+| `pnpm run doctor` | <5 seconds |
 | Total setup | **6-11 minutes** |
 
 ---
@@ -226,11 +226,11 @@ After restart, verify these work:
 
 - [ ] **Installation**
   - [ ] `npm install` completes without errors
-  - [ ] `npm run build` creates `dist/` directory
+  - [ ] `pnpm run build` creates `dist/` directory
   - [ ] No TypeScript compilation errors
 
 - [ ] **Health Check**
-  - [ ] `npm run doctor` passes all checks
+  - [ ] `pnpm run doctor` passes all checks
   - [ ] All 18 agents configured
   - [ ] All 12 MCP tools integrated
   - [ ] RAG memory ready
@@ -242,12 +242,12 @@ After restart, verify these work:
   - [ ] Cursor connects successfully
 
 - [ ] **Testing**
-  - [ ] `npm run test:unit` passes
-  - [ ] `npm run test:integration` passes (optional)
+  - [ ] `pnpm run test:unit` passes
+  - [ ] `pnpm run test:integration` passes (optional)
   - [ ] No critical test failures
 
 - [ ] **Development**
-  - [ ] `npm run dev` starts without errors
+  - [ ] `pnpm run dev` starts without errors
   - [ ] File changes trigger rebuild
   - [ ] Agents auto-activate on file edits
 
@@ -343,7 +343,7 @@ Your Current Setup:
 ### Quick Fixes
 - **Build fails**: See [QUICK_START.md → Quick Fixes](QUICK_START.md#quick-fixes)
 - **MCP not working**: Run `node scripts/fix-mcp-configs.cjs`
-- **Tests failing**: Run `npm run playwright:install`
+- **Tests failing**: Run `pnpm run playwright:install`
 
 ### Documentation
 - **Installation issues**: [RESTART_INSTALLATION_GUIDE.md → Troubleshooting](RESTART_INSTALLATION_GUIDE.md#troubleshooting)
@@ -362,8 +362,8 @@ Your Current Setup:
 Before starting enhancement work:
 
 - [ ] Read [QUICK_START.md](QUICK_START.md)
-- [ ] Run `npm install && npm run build`
-- [ ] Verify `npm run doctor` passes
+- [ ] Run `npm install && pnpm run build`
+- [ ] Verify `pnpm run doctor` passes
 - [ ] Test MCP server (check logs)
 - [ ] Restart Claude/Cursor if using MCP
 - [ ] Create feature branch for new work

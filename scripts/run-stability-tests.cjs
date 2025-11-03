@@ -80,7 +80,7 @@ class VERSATILStabilityTester {
       // Test 1: Clean build from scratch
       this.runTest(suite, 'Clean Build', () => {
         this.cleanDirectory(path.join(this.projectRoot, 'dist'));
-        const result = execSync('npm run build', {
+        const result = execSync('pnpm run build', {
           cwd: this.projectRoot,
           encoding: 'utf8',
           timeout: 120000 // 2 minute timeout
@@ -95,7 +95,7 @@ class VERSATILStabilityTester {
 
       // Test 2: Incremental build
       this.runTest(suite, 'Incremental Build', () => {
-        const result = execSync('npm run build', {
+        const result = execSync('pnpm run build', {
           cwd: this.projectRoot,
           encoding: 'utf8',
           timeout: 60000
@@ -456,7 +456,7 @@ class VERSATILStabilityTester {
       this.runTest(suite, 'Build Performance', () => {
         const startTime = Date.now();
 
-        execSync('npm run build', {
+        execSync('pnpm run build', {
           cwd: this.projectRoot,
           encoding: 'utf8',
           timeout: 120000

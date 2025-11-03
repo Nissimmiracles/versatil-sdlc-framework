@@ -191,7 +191,7 @@ User_Workflow:
       - ✅ Progress tracked in workflow state
 
   Step_3_Build:
-    Action: "npm run build"
+    Action: "pnpm run build"
     Expected:
       - ✅ VELOCITY ASSESS phase triggered
       - ✅ Quality gates checked

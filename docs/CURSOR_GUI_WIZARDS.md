@@ -285,7 +285,7 @@ Modified: Setting changed
    await Read('.versatil/config.json');       // Load current config
    await Write('.versatil/config.json', ...); // Save new config
    await Bash('npm install');                 // Install dependencies
-   await Bash('npm run build');              // Rebuild framework
+   await Bash('pnpm run build');              // Rebuild framework
    ```
 
 ---
@@ -313,8 +313,8 @@ Modified: Setting changed
 
 ```bash
 # Old way (still works)
-npm run onboard                    # Terminal wizard
-npm run update:check               # Check for updates
+pnpm run onboard                    # Terminal wizard
+pnpm run update:check               # Check for updates
 versatil config wizard             # Terminal config wizard
 
 # New way (chat-based GUI)
@@ -419,13 +419,13 @@ versatil config wizard             # Terminal config wizard
 
 ```bash
 # Run wizard integration tests
-npm run test:wizards
+pnpm run test:wizards
 
 # Test markdown rendering
-npm run test:markdown-output
+pnpm run test:markdown-output
 
 # Verify configuration file generation
-npm run test:config-generation
+pnpm run test:config-generation
 ```
 
 ---
@@ -452,7 +452,7 @@ npm run test:config-generation
 ## FAQ
 
 ### Q: Can I still use terminal commands?
-**A**: Yes! Terminal commands (`npm run onboard`, etc.) still work. Chat-based wizards are an alternative, not a replacement.
+**A**: Yes! Terminal commands (`pnpm run onboard`, etc.) still work. Chat-based wizards are an alternative, not a replacement.
 
 ### Q: How do I share my configuration with my team?
 **A**: Use `/config-wizard --export` to create a configuration file, then share it. Your team can import via `/config-wizard --import team-config.json`.
@@ -510,7 +510,7 @@ After reloading, type in chat:
 Don't like chat-based wizards? Terminal commands are still available:
 
 ```bash
-npm run onboard
+pnpm run onboard
 versatil update check
 versatil config wizard
 ```

@@ -7,11 +7,11 @@
  * for new versions/features/fixes.
  *
  * Usage:
- *   npm run monitor                  # Full health check
- *   npm run monitor -- --watch       # Continuous monitoring
- *   npm run monitor -- --stress      # Run stress tests
- *   npm run monitor -- --report      # Generate detailed report
- *   npm run monitor -- --validate-upgrade  # Check version compatibility
+ *   pnpm run monitor                  # Full health check
+ *   pnpm run monitor -- --watch       # Continuous monitoring
+ *   pnpm run monitor -- --stress      # Run stress tests
+ *   pnpm run monitor -- --report      # Generate detailed report
+ *   pnpm run monitor -- --validate-upgrade  # Check version compatibility
  */
 
 const fs = require('fs');
@@ -144,7 +144,7 @@ async function runHealthCheck() {
     console.log('💡 Recommendations:');
     console.log('   • Run /doctor --fix to auto-fix issues');
     console.log('   • Review agent logs: .versatil/logs/');
-    console.log('   • Run full stress tests: npm run monitor -- --stress\n');
+    console.log('   • Run full stress tests: pnpm run monitor -- --stress\n');
   }
 
   // Exit code based on health

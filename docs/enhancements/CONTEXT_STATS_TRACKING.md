@@ -53,7 +53,7 @@ Context Statistics Tracking provides comprehensive monitoring of token usage, co
 ### Quick Check
 
 ```bash
-npm run context:stats
+pnpm run context:stats
 ```
 
 Shows:
@@ -67,7 +67,7 @@ Shows:
 ### Detailed Report
 
 ```bash
-npm run context:report
+pnpm run context:report
 ```
 
 Generates markdown report with:
@@ -80,7 +80,7 @@ Generates markdown report with:
 ### Cleanup Old Data
 
 ```bash
-npm run context:cleanup
+pnpm run context:cleanup
 ```
 
 Removes stats older than 30 days while keeping recent data for trends.
@@ -217,7 +217,7 @@ console.log(report);
 ```bash
 # User reports: "Agent forgot our discussion"
 
-npm run context:stats
+pnpm run context:stats
 
 # Check last clear event:
 # - When did it happen?
@@ -229,7 +229,7 @@ npm run context:stats
 ### Performance Optimization
 
 ```bash
-npm run context:report
+pnpm run context:report
 
 # Identify:
 # - Which agents use context most efficiently
@@ -241,7 +241,7 @@ npm run context:report
 ### Team Reports
 
 ```bash
-npm run context:report > weekly-stats.md
+pnpm run context:report > weekly-stats.md
 
 # Share with team:
 # - Total tokens processed this week
@@ -300,7 +300,7 @@ Context statistics automatically integrate with Memory Tool operations:
    → Tracked: view operation, marcus-backend agent, 87 tokens
 
 4. End of day:
-   → Run: npm run context:stats
+   → Run: pnpm run context:stats
    → See: Complete picture of context usage
 ```
 

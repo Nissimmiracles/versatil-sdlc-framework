@@ -272,7 +272,7 @@ versatil update --review-only
 ┌─────────────────────────────────────────────────────────┐
 │  2. Post-Update Review (NEW - v7.7.0)                   │
 │     ├─ Framework Health Check                           │
-│     │  └─ npm run monitor                               │
+│     │  └─ pnpm run monitor                               │
 │     │     ├─ Agents: 8/8 operational?                   │
 │     │     ├─ Build: Passing?                            │
 │     │     ├─ Tests: 95%+ passing?                       │
@@ -393,7 +393,7 @@ TodoScanner
 | Version check | ~1s | GitHub API call |
 | Backup | ~5s | Depends on .versatil size |
 | Install update | 60-120s | npm install time |
-| Health check | ~5s | npm run monitor |
+| Health check | ~5s | pnpm run monitor |
 | Agent reviews | ~3s | Parallel execution |
 | Project assessment | ~2s | Git + file checks |
 | Todo scan | ~1s | File parsing |

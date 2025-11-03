@@ -6,10 +6,10 @@
  * Displays comprehensive session overview on Cursor/Claude tab open
  *
  * Usage:
- *   npm run session:compass          # Show full overview
- *   npm run session:compass --brief  # Show brief summary
- *   npm run session:compass --json   # Output JSON
- *   npm run session:compass --watch  # Watch mode (refresh every 60s)
+ *   pnpm run session:compass          # Show full overview
+ *   pnpm run session:compass --brief  # Show brief summary
+ *   pnpm run session:compass --json   # Output JSON
+ *   pnpm run session:compass --watch  # Watch mode (refresh every 60s)
  *
  * Part of VERSATIL Pulse System (Phase 2: Session Opening Hook)
  */
@@ -406,11 +406,11 @@ async function main() {
 ${colors.bright}${colors.cyan}VERSATIL Session Compass${colors.reset}
 
 ${colors.bright}Usage:${colors.reset}
-  npm run session:compass          Show full session overview
-  npm run session:compass --brief  Show brief summary only
-  npm run session:compass --json   Output as JSON
-  npm run session:compass --watch  Watch mode (refresh every 60s)
-  npm run session:compass --help   Show this help
+  pnpm run session:compass          Show full session overview
+  pnpm run session:compass --brief  Show brief summary only
+  pnpm run session:compass --json   Output as JSON
+  pnpm run session:compass --watch  Watch mode (refresh every 60s)
+  pnpm run session:compass --help   Show this help
 
 ${colors.bright}Description:${colors.reset}
   Displays comprehensive development context on session open:
@@ -423,10 +423,10 @@ ${colors.bright}Description:${colors.reset}
   - Quick stats and recommendations
 
 ${colors.bright}Examples:${colors.reset}
-  npm run session:compass                    # Full overview
-  npm run session:compass --brief            # Quick summary
-  npm run session:compass --json > state.json  # Export to JSON
-  npm run session:compass --watch            # Continuous monitoring
+  pnpm run session:compass                    # Full overview
+  pnpm run session:compass --brief            # Quick summary
+  pnpm run session:compass --json > state.json  # Export to JSON
+  pnpm run session:compass --watch            # Continuous monitoring
     `);
     return;
   }
@@ -443,7 +443,7 @@ ${colors.bright}Examples:${colors.reset}
         overview = await compass.generateOverview();
       } else {
         // Fallback to mock data
-        console.log(`${colors.dim}(Using mock data - run 'npm run build' for real-time data)${colors.reset}\n`);
+        console.log(`${colors.dim}(Using mock data - run 'pnpm run build' for real-time data)${colors.reset}\n`);
         overview = await getMockOverview();
       }
 

@@ -53,7 +53,7 @@ Successfully implemented **Phase 4: HMR Integration** - the final phase of the a
 **Lines:** 160
 **Permissions:** Executable
 
-**Purpose:** CLI wrapper for npm run integration
+**Purpose:** CLI wrapper for pnpm run integration
 
 **Features:**
 - Command-line argument parsing (--verbose, --silent, --errors-only, --help)
@@ -87,7 +87,7 @@ Successfully implemented **Phase 4: HMR Integration** - the final phase of the a
 **Scripts Added:**
 ```json
 "validate:watch": "node scripts/architectural-watcher.cjs",
-"dev:validated": "concurrently -n \"BUILD,WATCH\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev\" \"npm run validate:watch\""
+"dev:validated": "concurrently -n \"BUILD,WATCH\" -c \"bgBlue.bold,bgGreen.bold\" \"pnpm run dev\" \"pnpm run validate:watch\""
 ```
 
 ### docs/IMPLEMENTATION_COMPLETE.md
@@ -106,7 +106,7 @@ Successfully implemented **Phase 4: HMR Integration** - the final phase of the a
 ### Option 1: Concurrent Development Mode (Recommended)
 
 ```bash
-npm run dev:validated
+pnpm run dev:validated
 ```
 
 **What Happens:**
@@ -125,22 +125,22 @@ npm run dev:validated
 ### Option 2: Standalone Watcher
 
 ```bash
-npm run validate:watch
+pnpm run validate:watch
 ```
 
 **Modes:**
 ```bash
-npm run validate:watch              # Normal mode
-npm run validate:watch -- --verbose # Show all validations
-npm run validate:watch -- --silent  # Errors only
-npm run validate:watch -- --errors-only  # Suppress warnings
-npm run validate:watch -- --help    # Show help
+pnpm run validate:watch              # Normal mode
+pnpm run validate:watch -- --verbose # Show all validations
+pnpm run validate:watch -- --silent  # Errors only
+pnpm run validate:watch -- --errors-only  # Suppress warnings
+pnpm run validate:watch -- --help    # Show help
 ```
 
 ### Option 3: Normal Development (No Validation)
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 Uses TypeScript compiler only, no real-time architectural validation.
@@ -169,7 +169,7 @@ Developer Workflow (WITHOUT HMR Integration):
 ```
 Developer Workflow (WITH HMR Integration):
 ──────────────────────────────────────────────
-1. Start: npm run dev:validated
+1. Start: pnpm run dev:validated
 2. Create DealFlow.tsx page and save           [1 minute]
    → 🔍 Validating (added): DealFlow.tsx
    → ❌ ARCHITECTURAL ISSUE DETECTED:
@@ -273,7 +273,7 @@ const colors = {
 
 ```bash
 # 1. Start watcher
-npm run dev:validated
+pnpm run dev:validated
 
 # 2. Create orphaned page
 echo "export default function Test() { return <div>Test</div>; }" > src/pages/Test.tsx
@@ -347,7 +347,7 @@ echo "export default function Test() { return <div>Test</div>; }" > src/pages/Te
 
 ### Testing (Next Steps)
 
-- [ ] Run `npm run dev:validated` in real project
+- [ ] Run `pnpm run dev:validated` in real project
 - [ ] Test orphaned page detection
 - [ ] Test broken navigation detection
 - [ ] Test debouncing behavior

@@ -296,7 +296,7 @@ describe('Quality Gates Integration', () => {
 cd src/mcp
 # Create mcp-health-monitor.test.ts
 # Create mcp-tool-router.test.ts
-npm test -- src/mcp/*.test.ts --run
+pnpm test -- src/mcp/*.test.ts --run
 git add src/mcp/*.test.ts
 git commit --no-verify -m "test(priority-4): Add MCP health & routing tests - Batch 2"
 
@@ -304,13 +304,13 @@ git commit --no-verify -m "test(priority-4): Add MCP health & routing tests - Ba
 # Create mcp-task-executor.test.ts
 cd ../rag
 # Create rag-router.test.ts
-npm test -- src/mcp/mcp-task-executor.test.ts src/rag/rag-router.test.ts --run
+pnpm test -- src/mcp/mcp-task-executor.test.ts src/rag/rag-router.test.ts --run
 git add src/mcp/mcp-task-executor.test.ts src/rag/rag-router.test.ts
 git commit --no-verify -m "test(priority-4): Add task executor & RAG router tests - Batch 3"
 
 # Batch 4: Vector Memory Store
 # Create enhanced-vector-memory-store.test.ts
-npm test -- src/rag/enhanced-vector-memory-store.test.ts --run
+pnpm test -- src/rag/enhanced-vector-memory-store.test.ts --run
 git add src/rag/enhanced-vector-memory-store.test.ts
 git commit --no-verify -m "test(priority-4): Add vector memory store tests - Batch 4 (COMPLETE)"
 ```
@@ -322,19 +322,19 @@ mkdir -p tests/integration
 
 # Suite 1: Agent Collaboration
 # Create agent-collaboration.test.ts
-npm test -- tests/integration/agent-collaboration.test.ts --run
+pnpm test -- tests/integration/agent-collaboration.test.ts --run
 git add tests/integration/agent-collaboration.test.ts
 git commit --no-verify -m "test(priority-5): Add agent collaboration integration tests"
 
 # Suite 2: SDLC Orchestration
 # Create sdlc-orchestration-e2e.test.ts
-npm test -- tests/integration/sdlc-orchestration-e2e.test.ts --run
+pnpm test -- tests/integration/sdlc-orchestration-e2e.test.ts --run
 git add tests/integration/sdlc-orchestration-e2e.test.ts
 git commit --no-verify -m "test(priority-5): Add SDLC orchestration e2e tests"
 
 # Suite 3: Quality Gates
 # Create quality-gates-integration.test.ts
-npm test -- tests/integration/quality-gates-integration.test.ts --run
+pnpm test -- tests/integration/quality-gates-integration.test.ts --run
 git add tests/integration/quality-gates-integration.test.ts
 git commit --no-verify -m "test(priority-5): Add quality gates integration tests (COMPLETE)"
 ```
@@ -343,7 +343,7 @@ git commit --no-verify -m "test(priority-5): Add quality gates integration tests
 ```bash
 # After all tests are created, align implementations
 # This phase fixes failing tests by implementing missing methods
-npm test -- src/**/*.test.ts --run --coverage
+pnpm test -- src/**/*.test.ts --run --coverage
 # Review failures
 # Implement missing functionality
 # Re-run tests until coverage reaches 80%
@@ -398,7 +398,7 @@ npm test -- src/**/*.test.ts --run --coverage
 
 1. **Generate Coverage Report**
    ```bash
-   npm test -- --coverage
+   pnpm test -- --coverage
    cat coverage/coverage-summary.json
    ```
 
@@ -454,7 +454,7 @@ describe('MCPHealthMonitor', () => {
 EOF
 
 # Step 2: Run test to see failures (expected)
-npm test -- src/mcp/mcp-health-monitor.test.ts --run
+pnpm test -- src/mcp/mcp-health-monitor.test.ts --run
 
 # Step 3: Commit test file
 git add src/mcp/mcp-health-monitor.test.ts

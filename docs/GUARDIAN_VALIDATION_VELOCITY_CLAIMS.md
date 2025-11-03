@@ -261,7 +261,7 @@ These claims depend on runtime performance and require empirical testing:
    ```markdown
    ⚠️ Performance Note: Timing values are targets based on design specs.
    Actual performance may vary based on hardware, project size, and system load.
-   Run `npm test tests/validation/velocity-automatic-reactions.test.ts` to benchmark.
+   Run `pnpm test tests/validation/velocity-automatic-reactions.test.ts` to benchmark.
    ```
 
 3. ⚠️ **ADD VALIDATION BADGE**:
@@ -322,13 +322,13 @@ These claims depend on runtime performance and require empirical testing:
 **Appendix: Test Execution Command**
 ```bash
 # Run validation tests
-npm test tests/validation/velocity-automatic-reactions.test.ts
+pnpm test tests/validation/velocity-automatic-reactions.test.ts
 
 # Run with coverage
-npm run test:coverage -- tests/validation/velocity-automatic-reactions.test.ts
+pnpm run test:coverage -- tests/validation/velocity-automatic-reactions.test.ts
 
 # Run with verbose output
-npm test tests/validation/velocity-automatic-reactions.test.ts -- --reporter=verbose
+pnpm test tests/validation/velocity-automatic-reactions.test.ts -- --reporter=verbose
 ```
 
 ---

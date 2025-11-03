@@ -256,7 +256,7 @@ class DeploymentVerifier {
     console.log(chalk.cyan('🔨 Verifying build...'));
 
     try {
-      const result = execSync('npm run build', {
+      const result = execSync('pnpm run build', {
         cwd: this.rootDir,
         encoding: 'utf8',
         stdio: 'pipe'
@@ -286,7 +286,7 @@ class DeploymentVerifier {
     console.log(chalk.cyan('🧪 Verifying tests...'));
 
     try {
-      const result = execSync('npm test -- --passWithNoTests', {
+      const result = execSync('pnpm test -- --passWithNoTests', {
         cwd: this.rootDir,
         encoding: 'utf8',
         stdio: 'pipe',

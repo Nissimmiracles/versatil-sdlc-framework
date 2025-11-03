@@ -249,7 +249,7 @@ await cacheWarmer.intelligentPrefetch({
 **Migration Schedule**:
 ```bash
 # Run tier migration daily
-npm run memory:migrate
+pnpm run memory:migrate
 
 # Output:
 # ✅ Migrated 5 hot → warm (stale patterns)
@@ -349,13 +349,13 @@ The daemon is the **heart** of VERSATIL's visual features:
 ```bash
 # Step 1: Start daemon
 cd /path/to/your/project
-npm run daemon:start
+pnpm run daemon:start
 
 # Step 2: Verify it's running
 ps aux | grep versatil-daemon
 
 # Step 3: Test Session Compass
-npm run session:compass:brief
+pnpm run session:compass:brief
 
 # Expected output:
 # 📁 Project: Your Project
@@ -453,14 +453,14 @@ Created comprehensive guide: [`docs/guides/VISUAL_FEATURES_SETUP.md`](../guides/
 2. ✅ **Fix Visual Features in Your Other Project**:
    ```bash
    cd /path/to/your/other/project
-   npm run daemon:start
-   npm run session:compass:brief
+   pnpm run daemon:start
+   pnpm run session:compass:brief
    ```
 
 3. ✅ **Run Full Test Suite** (validate all enhancements):
    ```bash
-   npm run test:stress
-   npm run test:coverage
+   pnpm run test:stress
+   pnpm run test:coverage
    ```
 
 ---
@@ -511,7 +511,7 @@ Created comprehensive guide: [`docs/guides/VISUAL_FEATURES_SETUP.md`](../guides/
 
 ```bash
 # 1. Context statistics (Phase 1)
-npm run context:stats
+pnpm run context:stats
 
 # Expected output:
 # Cache hit rate: 70%+ (up from 45%)
@@ -519,7 +519,7 @@ npm run context:stats
 # Token waste: -25%
 
 # 2. Forecasting accuracy (Phase 2)
-npm run forecast:stats
+pnpm run forecast:stats
 
 # Expected output:
 # Training data points: 150+
@@ -527,7 +527,7 @@ npm run forecast:stats
 # Avg prediction error: <15%
 
 # 3. Cache warming effectiveness (Phase 2)
-npm run cache:stats
+pnpm run cache:stats
 
 # Expected output:
 # Cache hit rate improvement: +15%
@@ -535,7 +535,7 @@ npm run cache:stats
 # First query latency: -40%
 
 # 4. Tiered memory performance (Phase 2)
-npm run memory:stats
+pnpm run memory:stats
 
 # Expected output:
 # Hot tier access: <5ms
@@ -639,7 +639,7 @@ git log -1
 2. **Fix Visual Features in Your Other Project** (critical):
    ```bash
    cd /path/to/your/other/project
-   npm run daemon:start
+   pnpm run daemon:start
    ```
 
 **Both can be done in parallel** (commit takes 2 minutes, daemon fix takes 5 minutes).

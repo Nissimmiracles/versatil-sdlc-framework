@@ -250,14 +250,14 @@ COPY package*.json ./
 COPY tsconfig.json ./
 
 # Install dependencies
-RUN npm ci --only=production && \
+RUN pnpm install --frozen-lockfile --only=production && \
     npm install -g typescript
 
 # Copy source code
 COPY src ./src
 
 # Build TypeScript
-RUN npm run build
+RUN pnpm run build
 
 # =============================================================================
 # Production Stage

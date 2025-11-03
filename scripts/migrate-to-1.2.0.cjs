@@ -177,7 +177,7 @@ This tool will help you migrate to VERSATIL v1.2.0 with:
     }, 100);
     
     try {
-      await execAsync(`npm install versatil-sdlc-framework@${this.targetVersion}`);
+      await execAsync(`pnpm install versatil-sdlc-framework@${this.targetVersion}`);
       clearInterval(interval);
       process.stdout.write('\r   ✅ Dependencies updated successfully\n');
     } catch (error) {
@@ -390,7 +390,7 @@ New Features Available:
 
 Next Steps:
 1. Test the new features:
-   npm run test:demo
+   pnpm run test:demo
 
 2. Enable autonomous mode (optional):
    npx versatil-sdlc autonomous

@@ -335,7 +335,7 @@ visual-regression:
         PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
         PERCY_BRANCH: ${{ github.head_ref || github.ref_name }}
         PERCY_PULL_REQUEST: ${{ github.event.pull_request.number }}
-      run: npm run test:visual:percy
+      run: pnpm run test:visual:percy
 
     - name: Comment PR with Percy results
       # Auto-comments on PR with Percy build link
@@ -390,7 +390,7 @@ const response = await maria.activateWithVisualTesting({
 });
 
 // Response includes Percy recommendation:
-// "UI component changed. Run Percy visual regression: npm run test:visual:percy:components"
+// "UI component changed. Run Percy visual regression: pnpm run test:visual:percy:components"
 ```
 
 ---
@@ -407,12 +407,12 @@ const response = await maria.activateWithVisualTesting({
 **Action**:
 ```bash
 # Maria-QA suggests:
-"UI component changed. Run Percy visual regression: npm run test:visual:percy:components"
+"UI component changed. Run Percy visual regression: pnpm run test:visual:percy:components"
 ```
 
 **User Action**:
 ```bash
-npm run test:visual:percy:components
+pnpm run test:visual:percy:components
 # Or let CI/CD run automatically
 ```
 
@@ -463,7 +463,7 @@ quality-gate:
 export PERCY_TOKEN=your_percy_token_here
 
 # 2. Run all Percy visual tests
-npm run test:visual:percy
+pnpm run test:visual:percy
 
 # 3. View results on Percy dashboard
 # https://percy.io/your-org/versatil-sdlc-framework
@@ -473,17 +473,17 @@ npm run test:visual:percy
 
 ```bash
 # Test specific component
-npm run test:visual:percy:components
+pnpm run test:visual:percy:components
 
 # Dry run (no snapshots uploaded)
-npm run test:visual:percy:dry-run
+pnpm run test:visual:percy:dry-run
 ```
 
 ### Responsive Testing
 
 ```bash
 # Test responsive layouts
-npm run test:visual:percy:responsive
+pnpm run test:visual:percy:responsive
 ```
 
 ---
@@ -716,7 +716,7 @@ echo "PERCY_TOKEN=your_percy_token_here" >> ~/.versatil/.env
 
 ```bash
 export PERCY_TOKEN=your_token_here
-npm run test:visual:percy
+pnpm run test:visual:percy
 ```
 
 ### 5. Review on Percy Dashboard

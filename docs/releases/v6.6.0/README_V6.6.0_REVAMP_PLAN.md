@@ -269,10 +269,10 @@ npx versatil init
 npm install @versatil/sdlc-framework@latest
 
 # 2. Run migration (automatic backup)
-npm run context:migrate
+pnpm run context:migrate
 
 # 3. Validate
-npm run context:test
+pnpm run context:test
 
 # 4. Start using context-aware agents!
 ```

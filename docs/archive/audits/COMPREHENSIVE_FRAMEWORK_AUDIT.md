@@ -93,7 +93,7 @@ import { McpClient } from '@modelcontextprotocol/sdk';
 #### Security Audit Results
 
 ```bash
-# npm audit summary
+# pnpm audit summary
 {
   "vulnerabilities": {
     "@azure/identity": {
@@ -118,18 +118,18 @@ import { McpClient } from '@modelcontextprotocol/sdk';
 1. **Immediate Actions** (Priority: HIGH):
    ```bash
    # Fix known vulnerabilities
-   npm audit fix
+   pnpm audit fix
 
    # Update @azure/identity to 4.2.1+
    npm install @azure/identity@latest
 
    # Review @getzep/zep-cloud usage (via n8n optional dependency)
-   npm update @n8n/n8n-nodes-langchain
+   pnpm update @n8n/n8n-nodes-langchain
    ```
 
 2. **Regular Security Maintenance**:
    - Enable Dependabot alerts in GitHub repository
-   - Run `npm audit` weekly (automate via CI/CD)
+   - Run `pnpm audit` weekly (automate via CI/CD)
    - Monitor GHSA (GitHub Security Advisories)
 
 3. **Secrets Management Verification**:
@@ -170,19 +170,19 @@ npm install @supabase/supabase-js@latest
 npm install @modelcontextprotocol/sdk@latest
 
 # Test after each update
-npm run test:unit && npm run build
+pnpm run test:unit && pnpm run build
 ```
 
 **Phase 2: Secondary Updates (Week 2)**
 ```bash
 # Update TypeScript dependencies
-npm update @types/node @types/jest
+pnpm update @types/node @types/jest
 
 # Update Playwright (browser automation improvements)
-npm update @playwright/test playwright
+pnpm update @playwright/test playwright
 
 # Update testing dependencies
-npm update jest ts-jest jest-html-reporters
+pnpm update jest ts-jest jest-html-reporters
 ```
 
 **Phase 3: Optional Dependencies (Week 3)**
@@ -191,7 +191,7 @@ npm update jest ts-jest jest-html-reporters
 npm outdated --depth=0 | grep optional
 
 # Update if actively used in production
-npm update @google-cloud/aiplatform @google-cloud/vertexai @sentry/node
+pnpm update @google-cloud/aiplatform @google-cloud/vertexai @sentry/node
 ```
 
 ### Dependency Maintenance Score
@@ -307,7 +307,7 @@ Class/Interface Extensions: 118 instances
 ### Build Performance
 
 ```bash
-Build Command: npm run build
+Build Command: pnpm run build
 Build Time: 5.38 seconds ✅
 
 Breakdown:
@@ -440,7 +440,7 @@ test:coverage:integration: "jest --coverage --testMatch='**/*.test.ts' --selectP
    "docs:api": "typedoc --out docs/api src/index.ts"
 
    # Run to generate
-   npm run docs:api
+   pnpm run docs:api
    ```
 
 3. **Create Architecture Diagrams**:
@@ -501,7 +501,7 @@ rm -rf dist/agents/introspective-agent-old.*
 rm -rf coverage/jest/lcov-report/src/agents/introspective-agent-old.ts.html
 rm -rf coverage/jest/src/agents/introspective-agent-old.ts.html
 
-echo "✅ Backup files cleaned. Run 'npm run build' to rebuild."
+echo "✅ Backup files cleaned. Run 'pnpm run build' to rebuild."
 EOF
 
 chmod +x scripts/cleanup-backups.sh
@@ -586,7 +586,7 @@ Recent work:
 
 ### Test Coverage (Unknown - Requires Fix)
 
-**Issue**: `npm run test:coverage` times out
+**Issue**: `pnpm run test:coverage` times out
 
 **Recommended Solution**:
 ```json
@@ -721,7 +721,7 @@ $(pwd)
 # ✅ No supabase/ directory in project
 ```
 
-**Validation Script**: `npm run validate:isolation` ✅
+**Validation Script**: `pnpm run validate:isolation` ✅
 
 ---
 
@@ -731,9 +731,9 @@ $(pwd)
 
 1. **Fix Security Vulnerabilities**
    ```bash
-   npm audit fix
+   pnpm audit fix
    npm install @azure/identity@latest
-   npm update @n8n/n8n-nodes-langchain
+   pnpm update @n8n/n8n-nodes-langchain
    ```
    **Effort**: 1 hour
    **Impact**: Security compliance
@@ -743,7 +743,7 @@ $(pwd)
    npm install @anthropic-ai/claude-agent-sdk@latest
    npm install @supabase/supabase-js@latest
    npm install @modelcontextprotocol/sdk@latest
-   npm run test:unit && npm run build
+   pnpm run test:unit && pnpm run build
    ```
    **Effort**: 2-3 hours (includes testing)
    **Impact**: Bug fixes, new features, security patches
@@ -791,7 +791,7 @@ $(pwd)
 7. **Add TSDoc API Documentation**
    ```bash
    npm install --save-dev typedoc
-   npm run docs:api  # Generate API reference
+   pnpm run docs:api  # Generate API reference
    ```
    **Effort**: 4-5 hours (documenting key functions)
    **Impact**: Better developer experience
@@ -818,7 +818,7 @@ $(pwd)
 
 | Risk | Severity | Impact | Mitigation |
 |------|----------|--------|------------|
-| Security Vulnerabilities (2 moderate) | High | Potential exploits | `npm audit fix` immediately |
+| Security Vulnerabilities (2 moderate) | High | Potential exploits | `pnpm audit fix` immediately |
 | Outdated Claude SDK (4 versions behind) | Medium | Missing bug fixes and features | Update to 0.1.14 |
 | Test Coverage Unknown | Medium | Blind spots in testing | Fix timeout issue |
 
@@ -860,11 +860,11 @@ $(pwd)
 ## 📋 Action Plan Summary
 
 ### Week 1: Critical Updates
-- [ ] Run `npm audit fix` and update security vulnerabilities
+- [ ] Run `pnpm audit fix` and update security vulnerabilities
 - [ ] Update Claude SDK to 0.1.14
 - [ ] Update Supabase to 2.75.0
 - [ ] Fix test coverage timeout
-- [ ] Test all updates: `npm run test:unit && npm run build`
+- [ ] Test all updates: `pnpm run test:unit && pnpm run build`
 
 ### Week 2: Code Quality
 - [ ] Clean up backup files (13 files)
@@ -880,10 +880,10 @@ $(pwd)
 - [ ] Create GitHub issues for remaining technical debt
 
 ### Week 4: Validation & Release
-- [ ] Run full test suite: `npm run test:full`
+- [ ] Run full test suite: `pnpm run test:full`
 - [ ] Verify repository health: Sarah-PM analyzer
 - [ ] Update CHANGELOG.md
-- [ ] Tag release: `npm run release:minor` (1.1.0)
+- [ ] Tag release: `pnpm run release:minor` (1.1.0)
 - [ ] Push to GitHub: `git push && git push --tags`
 
 ---
@@ -951,7 +951,7 @@ The VERSATIL Claude Opera framework is **production-ready** with excellent archi
 ### Next Steps
 
 **Immediate** (This Week):
-1. Security updates (`npm audit fix`)
+1. Security updates (`pnpm audit fix`)
 2. Critical dependency updates (Claude SDK, Supabase, MCP)
 3. Fix test coverage timeout
 
@@ -993,7 +993,7 @@ This comprehensive audit analyzed:
 
 ### B. Tools Used
 
-- `npm audit` - Security vulnerability scanning
+- `pnpm audit` - Security vulnerability scanning
 - `npm outdated` - Dependency version analysis
 - `grep -r` - Code pattern analysis
 - `find` - File system analysis
@@ -1010,7 +1010,7 @@ This comprehensive audit analyzed:
 - [src/agents/opera/sarah-pm/repository-analyzer.ts](src/agents/opera/sarah-pm/repository-analyzer.ts) - Repository analyzer
 - [package.json](package.json) - Dependency manifest
 - GitHub Security Advisories (GHSA)
-- npm audit reports
+- pnpm audit reports
 
 ---
 

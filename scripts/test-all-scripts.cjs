@@ -14,13 +14,13 @@ Testing all framework scripts...
 `);
 
 const scripts = [
-  { name: 'show-agents', cmd: 'npm run show-agents', critical: true },
-  { name: 'agents (alias)', cmd: 'npm run agents', critical: true },
-  { name: 'init', cmd: 'npm run init', critical: true },
-  { name: 'version:check', cmd: 'npm run version:check', critical: false },
-  { name: 'opera:health', cmd: 'npm run opera:health', critical: true },
-  { name: 'test:enhanced', cmd: 'npm run test:enhanced', critical: true },
-  { name: 'build', cmd: 'npm run build', critical: true },
+  { name: 'show-agents', cmd: 'pnpm run show-agents', critical: true },
+  { name: 'agents (alias)', cmd: 'pnpm run agents', critical: true },
+  { name: 'init', cmd: 'pnpm run init', critical: true },
+  { name: 'version:check', cmd: 'pnpm run version:check', critical: false },
+  { name: 'opera:health', cmd: 'pnpm run opera:health', critical: true },
+  { name: 'test:enhanced', cmd: 'pnpm run test:enhanced', critical: true },
+  { name: 'build', cmd: 'pnpm run build', critical: true },
 ];
 
 let passed = 0;

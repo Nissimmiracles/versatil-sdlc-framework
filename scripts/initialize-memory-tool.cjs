@@ -7,7 +7,7 @@
  *
  * Usage:
  *   node scripts/initialize-memory-tool.cjs
- *   npm run memory:init
+ *   pnpm run memory:init
  */
 
 const fs = require('fs-extra');

@@ -32,7 +32,7 @@ export class MultiInstanceCoordinator extends EventEmitter {
         this.instances = new Map();
         this.currentSession = null;
         this.distributionStrategies = new Map();
-        this.conflictResolvers = new Map();
+        this.conflictResolvers = new Map(); // eslint-disable-line @typescript-eslint/no-unsafe-function-type
         this.isLeader = false;
         this.heartbeatInterval = null;
         this.instanceId = randomUUID();

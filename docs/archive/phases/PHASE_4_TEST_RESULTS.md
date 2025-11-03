@@ -169,7 +169,7 @@ node scripts/architectural-watcher.cjs --help
 VERSATIL Architectural Watcher
 
 Usage:
-  npm run validate:watch [options]
+  pnpm run validate:watch [options]
 
 Options:
   --verbose, -v         Show detailed output including successful validations
@@ -180,9 +180,9 @@ Options:
   --help, -h            Show this help message
 
 Examples:
-  npm run validate:watch                    # Normal mode
-  npm run validate:watch -- --verbose       # Verbose output
-  npm run validate:watch -- --errors-only   # Errors only
+  pnpm run validate:watch                    # Normal mode
+  pnpm run validate:watch -- --verbose       # Verbose output
+  pnpm run validate:watch -- --errors-only   # Errors only
 
 The watcher monitors your project for architectural violations in real-time:
   • Orphaned page components (pages without routes)
@@ -216,7 +216,7 @@ git commit -m "test: orphaned page"
 **Verification:**
 ⏳ Deferred - pre-commit hook integration tested in Phase 2
 ⏳ Hook file updated correctly in `.husky/pre-commit`
-⏳ Calls `npm run validate:architecture` (which we confirmed works)
+⏳ Calls `pnpm run validate:architecture` (which we confirmed works)
 
 ---
 
@@ -246,15 +246,15 @@ npm install concurrently@^8.2.2
 # Command timed out after 60s
 ```
 
-**Impact:** Cannot test `npm run dev:validated` (concurrent TypeScript + watcher)
+**Impact:** Cannot test `pnpm run dev:validated` (concurrent TypeScript + watcher)
 
 **Workaround:** Test components separately:
 ```bash
 # Terminal 1: TypeScript compiler
-npm run dev
+pnpm run dev
 
 # Terminal 2: Architectural watcher
-npm run validate:watch
+pnpm run validate:watch
 ```
 
 **Root Cause:** Network or npm registry issue (not framework issue)
@@ -344,13 +344,13 @@ import TestOrphanedPage from './pages/TestOrphanedPage.tsx';
 
 2. **Test Concurrent Mode** (after concurrently installed):
    ```bash
-   npm run dev:validated
+   pnpm run dev:validated
    # Verify both BUILD and WATCH processes run
    ```
 
 3. **Test Real-Time File Changes**:
    ```bash
-   npm run validate:watch --verbose
+   pnpm run validate:watch --verbose
    # In another terminal: edit TestOrphanedPage.tsx
    # Verify warning appears within 500ms
    ```
@@ -373,7 +373,7 @@ import TestOrphanedPage from './pages/TestOrphanedPage.tsx';
 1. **Memory Usage**:
    ```bash
    # Start watcher
-   npm run validate:watch &
+   pnpm run validate:watch &
    WATCHER_PID=$!
 
    # Monitor memory

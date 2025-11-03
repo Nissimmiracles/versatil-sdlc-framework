@@ -59,16 +59,16 @@ npm install
 ### 3. Build and Test
 ```bash
 # Build the framework
-npm run build
+pnpm run build
 
 # Run linting
-npm run lint
+pnpm run lint
 
 # Run tests
-npm test
+pnpm test
 
 # Full validation
-npm run validate
+pnpm run validate
 ```
 
 ### 4. Set Up Development Environment
@@ -331,16 +331,16 @@ All contributions must pass:
 ### Unit Tests
 ```bash
 # Run specific test
-npm test -- --testNamePattern="Agent Dispatcher"
+pnpm test -- --testNamePattern="Agent Dispatcher"
 
 # Run with coverage
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 ### Integration Testing
 ```bash
 # Test framework integration
-npm run test:integration
+pnpm run test:integration
 
 # Test CLI commands
 versatil init --dry-run
@@ -422,7 +422,7 @@ versatil-mcp /path/to/test/project
 ## 📋 Pull Request Process
 
 ### Before Submitting
-- [ ] Run `npm run validate` successfully
+- [ ] Run `pnpm run validate` successfully
 - [ ] Update documentation for new features
 - [ ] Add tests for new functionality
 - [ ] Follow commit message conventions

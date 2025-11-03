@@ -7,7 +7,7 @@
  * 
  * Usage:
  *   node scripts/migrate-to-gcp.cjs
- *   npm run rag:migrate:gcp
+ *   pnpm run rag:migrate:gcp
  */
 
 const fs = require('fs');
@@ -76,7 +76,7 @@ async function migrateToGCP() {
     log.success('GCP Firestore initialized\n');
   } catch (error) {
     log.error(`Failed to initialize GCP Firestore: ${error.message}`);
-    log.info('Make sure the framework is compiled: npm run build');
+    log.info('Make sure the framework is compiled: pnpm run build');
     process.exit(1);
   }
 

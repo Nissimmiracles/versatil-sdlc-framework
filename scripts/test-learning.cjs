@@ -62,7 +62,7 @@ async function testLearningSystem() {
   for (const dir of requiredDirs) {
     if (!fs.existsSync(dir.path)) {
       log.error(`Directory ${dir.name} not found at ${dir.path}`);
-      log.info('Run: npm run learning:seed');
+      log.info('Run: pnpm run learning:seed');
       allPassed = false;
     } else {
       log.success(`Directory ${dir.name} exists`);
@@ -78,7 +78,7 @@ async function testLearningSystem() {
     const patternFiles = fs.readdirSync(patternsDir).filter(f => f.endsWith('.json'));
     if (patternFiles.length === 0) {
       log.warn('No learning patterns found');
-      log.info('Run: npm run learning:seed');
+      log.info('Run: pnpm run learning:seed');
       allPassed = false;
     } else {
       log.success(`Found ${patternFiles.length} learning patterns`);
@@ -90,7 +90,7 @@ async function testLearningSystem() {
   const indexPath = path.join(indexesDir, 'search.json');
   if (!fs.existsSync(indexPath)) {
     log.warn('Search index not found');
-    log.info('Run: npm run learning:seed');
+    log.info('Run: pnpm run learning:seed');
     allPassed = false;
   } else {
     try {
@@ -224,15 +224,15 @@ async function testLearningSystem() {
 
   if (!allPassed) {
     log.info('\nTroubleshooting:');
-    console.log('  1. Seed default patterns: npm run learning:seed');
-    console.log('  2. Re-run tests: npm run learning:test');
+    console.log('  1. Seed default patterns: pnpm run learning:seed');
+    console.log('  2. Re-run tests: pnpm run learning:test');
     console.log('  3. Check logs: tail -f ~/.versatil/logs/learning.log');
     process.exit(1);
   } else {
     log.success('Learning system is fully functional!');
     log.info('\nNext steps:');
     console.log('  • Use VERSATIL normally (patterns accumulate automatically)');
-    console.log('  • Monitor growth: npm run learning:test --verbose');
+    console.log('  • Monitor growth: pnpm run learning:test --verbose');
     console.log('  • Check patterns: ls ~/.versatil/learning/patterns/ | wc -l');
   }
 }

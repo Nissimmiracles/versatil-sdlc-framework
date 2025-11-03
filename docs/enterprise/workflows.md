@@ -55,9 +55,9 @@ The VERSATIL SDLC Framework uses **7 active GitHub workflows** to ensure quality
 - **Steps**:
   1. Checkout code
   2. Setup Node.js with npm cache
-  3. Install dependencies (`npm ci`)
-  4. Run unit tests (`npm run test:unit`)
-  5. Build (`npm run build`)
+  3. Install dependencies (`pnpm install --frozen-lockfile`)
+  4. Run unit tests (`pnpm run test:unit`)
+  5. Build (`pnpm run build`)
 
 #### 2. `lint` Job
 - **Platform**: Ubuntu Latest, Node 20
@@ -71,10 +71,10 @@ The VERSATIL SDLC Framework uses **7 active GitHub workflows** to ensure quality
 **Example**:
 ```yaml
 - name: Run unit tests
-  run: npm run test:unit
+  run: pnpm run test:unit
 
 - name: Build
-  run: npm run build
+  run: pnpm run build
 ```
 
 ---
@@ -269,7 +269,7 @@ const criticalFiles = [
 
 #### 2. `dependency-scan` Job
 - **Steps**:
-  1. Run `npm audit` (moderate+ vulnerabilities)
+  1. Run `pnpm audit` (moderate+ vulnerabilities)
   2. Generate JSON report
   3. Upload results
 
@@ -292,7 +292,7 @@ grep -r -n -i "api[_-]key" --include="*.ts" src/
 
 **Artifacts**:
 - `security-scan-report` - Semgrep results
-- `dependency-scan-results` - npm audit JSON
+- `dependency-scan-results` - pnpm audit JSON
 - `overall-security-summary` - Aggregated report
 
 ---

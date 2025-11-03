@@ -75,7 +75,7 @@ npm install -D typescript@latest
 2. **Clean build**:
 ```bash
 rm -rf dist/
-npm run build
+pnpm run build
 ```
 
 3. **Check for syntax errors**:

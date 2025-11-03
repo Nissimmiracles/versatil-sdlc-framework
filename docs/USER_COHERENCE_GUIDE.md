@@ -160,7 +160,7 @@ npx versatil doctor --fix
 ```
 
 **Actions**:
-- **GraphRAG timeout**: Run `npm run rag:start`
+- **GraphRAG timeout**: Run `pnpm run rag:start`
 - **Vector store failed**: Check Supabase connection
 - **Router failed**: Reinstall framework
 - **Pattern search failed**: Check RAG configuration
@@ -186,7 +186,7 @@ npx versatil doctor --fix
 ```
 
 **Actions**:
-- **Critical vulnerabilities**: Run `npm audit fix` immediately
+- **Critical vulnerabilities**: Run `pnpm audit fix` immediately
 - **High vulnerabilities**: Update dependencies
 - **Missing peers**: Run `npm install`
 - **Incompatible versions**: Update Node.js or TypeScript
@@ -260,10 +260,10 @@ The coherence checker can automatically fix many common issues.
 
 | Issue | Fix Action | Confidence | Duration |
 |-------|-----------|-----------|----------|
-| GraphRAG timeout | `npm run rag:start` | 85% | 1 min |
-| Outdated build | `npm run build` | 90% | 2 min |
+| GraphRAG timeout | `pnpm run rag:start` | 85% | 1 min |
+| Outdated build | `pnpm run build` | 90% | 2 min |
 | Missing dependencies | `npm install` | 90% | 3 min |
-| Security vulnerabilities | `npm audit fix` | 95% | 1.5 min |
+| Security vulnerabilities | `pnpm audit fix` | 95% | 1.5 min |
 
 ### Manual Fixes Required
 
@@ -402,7 +402,7 @@ npx versatil doctor
 npx versatil doctor --fix
 
 # Or manually
-npm run rag:start
+pnpm run rag:start
 
 # Verify
 npx versatil doctor
@@ -425,10 +425,10 @@ npx versatil doctor
 npx versatil doctor --fix
 
 # Or manually
-npm audit fix
+pnpm audit fix
 
 # If force needed
-npm audit fix --force
+pnpm audit fix --force
 
 # Verify
 npx versatil doctor

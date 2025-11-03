@@ -303,7 +303,7 @@ async function quickCheckCommand(url) {
     console.log(`Status: ${pass ? colorize('PASS ✅', 'green') : colorize('FAIL ❌', 'red')}\n`);
 
     if (!pass) {
-      console.log(colorize('Run full scan for details: npm run security:scan ' + url, 'yellow') + '\n');
+      console.log(colorize('Run full scan for details: pnpm run security:scan ' + url, 'yellow') + '\n');
     }
 
   } catch (error) {
@@ -391,10 +391,10 @@ ${colorize('EXAMPLES:', 'bright')}
   node scripts/security-scan.cjs watch https://example.com --interval 600000
 
 ${colorize('INTEGRATION:', 'bright')}
-  ${colorize('npm run security:scan <url>', 'cyan')}       - Quick scan
-  ${colorize('npm run security:report <url>', 'cyan')}     - Full report
-  ${colorize('npm run security:fix', 'cyan')}              - Auto-fix headers
-  ${colorize('npm run security:validate <url>', 'cyan')}   - Validate CSP
+  ${colorize('pnpm run security:scan <url>', 'cyan')}       - Quick scan
+  ${colorize('pnpm run security:report <url>', 'cyan')}     - Full report
+  ${colorize('pnpm run security:fix', 'cyan')}              - Auto-fix headers
+  ${colorize('pnpm run security:validate <url>', 'cyan')}   - Validate CSP
 
 ${colorize('QUALITY GATES:', 'bright')}
   Minimum grade: ${colorize('A', 'green')} (deployment blocked below this threshold)

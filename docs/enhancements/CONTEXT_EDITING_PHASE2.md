@@ -194,7 +194,7 @@ Beautiful CLI interface for viewing context statistics:
 
 ```bash
 # View current statistics
-npm run context:stats
+pnpm run context:stats
 
 # Output:
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -235,12 +235,12 @@ npm run context:stats
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # Generate detailed report
-npm run context:report
+pnpm run context:report
 
 # Output: Markdown report with trends, efficiency, recommendations
 
 # Clean up old stats (keep last 30 days)
-npm run context:cleanup
+pnpm run context:cleanup
 ```
 
 ---
@@ -356,7 +356,7 @@ Added convenient npm commands for context statistics:
 
 - **Clear Events**: Keep last 1,000 (auto-cleanup on overflow)
 - **Memory Operations**: Keep last 5,000 (auto-cleanup on overflow)
-- **Sessions**: Keep last 30 days (manual cleanup with `npm run context:cleanup`)
+- **Sessions**: Keep last 30 days (manual cleanup with `pnpm run context:cleanup`)
 
 ### Performance
 
@@ -396,7 +396,7 @@ console.log(`Peak tokens: ${completed.peakTokens}`);
 
 ```bash
 # Generate weekly report
-npm run context:report > weekly-context-report.md
+pnpm run context:report > weekly-context-report.md
 
 # Email to team
 # Shows:
@@ -413,7 +413,7 @@ npm run context:report > weekly-context-report.md
 # User reports: "Agent seems to have forgotten our discussion"
 
 # Check recent clear events
-npm run context:stats
+pnpm run context:stats
 
 # View last clear event details:
 # - Timestamp: When did it clear?
@@ -445,15 +445,15 @@ node -e "require('./dist/memory/context-stats-tracker.js').getGlobalContextTrack
 ✅ Operations recorded to memory-ops.json
 
 # 4. View statistics
-npm run context:stats
+pnpm run context:stats
 ✅ Displays formatted statistics with charts
 
 # 5. Generate report
-npm run context:report
+pnpm run context:report
 ✅ Markdown report generated
 
 # 6. Cleanup old stats
-npm run context:cleanup
+pnpm run context:cleanup
 ✅ Stats older than 30 days removed
 ```
 
@@ -476,7 +476,7 @@ npm run context:cleanup
 | **Context-Aware Agents** | Phase 1 + 2 | Memory workflow + best practices |
 | **Memory Directories** | Phase 1 | Storage (`~/.versatil/memories/`) |
 | **Context Stats Tracker** | Phase 2 | Monitoring (`~/.versatil/stats/`) |
-| **CLI Tools** | Phase 2 | User interface (`npm run context:*`) |
+| **CLI Tools** | Phase 2 | User interface (`pnpm run context:*`) |
 
 ### All Three Memory Systems Working Together
 
@@ -507,9 +507,9 @@ Result: Complete observability + zero context loss + continuous learning
 
 ### For Developers
 
-1. **Monitor Regularly**: Run `npm run context:stats` weekly to check health
+1. **Monitor Regularly**: Run `pnpm run context:stats` weekly to check health
 2. **Review Reports**: Generate monthly reports to identify trends
-3. **Clean Up**: Run `npm run context:cleanup` monthly to prevent unbounded growth
+3. **Clean Up**: Run `pnpm run context:cleanup` monthly to prevent unbounded growth
 4. **Check Agent Behavior**: If agent forgets info, check if memory ops happened before clear
 
 ### For Agents (Automatic)

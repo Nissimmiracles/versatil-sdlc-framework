@@ -29,11 +29,11 @@ The VERSATIL Framework integrates **12 Model Context Protocol (MCP) servers** to
 
 ```bash
 # 1. Run automated setup wizard
-npm run mcp:setup
+pnpm run mcp:setup
 
 # 2. Follow interactive prompts to configure MCPs
 # 3. Validate installation
-npm run mcp:health
+pnpm run mcp:health
 
 # Done! All MCPs configured and validated.
 ```
@@ -135,7 +135,7 @@ The easiest way to configure MCPs is using the automated setup wizard:
 
 ```bash
 # Launch setup wizard
-npm run mcp:setup
+pnpm run mcp:setup
 ```
 
 **Wizard Features**:
@@ -210,19 +210,19 @@ npm run mcp:setup
 
 ```bash
 # Full interactive mode (default)
-npm run mcp:setup
+pnpm run mcp:setup
 
 # Configure specific MCP
-npm run mcp:setup -- --only=github
+pnpm run mcp:setup -- --only=github
 
 # Skip validation (faster, for testing)
-npm run mcp:setup -- --no-validate
+pnpm run mcp:setup -- --no-validate
 
 # Reconfigure existing MCP (overwrites)
-npm run mcp:setup -- --force
+pnpm run mcp:setup -- --force
 
 # Show current configuration
-npm run mcp:setup -- --show
+pnpm run mcp:setup -- --show
 ```
 
 ---
@@ -284,7 +284,7 @@ Some MCPs require additional npm packages:
 
 ```bash
 # Install Playwright browsers (one-time)
-npm run playwright:install
+pnpm run playwright:install
 
 # Install optional MCP servers
 npm install -g @modelcontextprotocol/server-github
@@ -296,7 +296,7 @@ npm install -g vertex-ai-mcp-server
 
 ```bash
 # Run health check
-npm run mcp:health
+pnpm run mcp:health
 
 # Expected output:
 # ✅ GitHub MCP: Healthy (120ms)
@@ -341,13 +341,13 @@ Verify all MCPs are configured correctly:
 
 ```bash
 # Quick health check (5 seconds)
-npm run mcp:health
+pnpm run mcp:health
 
 # Verbose output (shows connection details)
-npm run mcp:health:verbose
+pnpm run mcp:health:verbose
 
 # Continuous monitoring (every 60s)
-npm run mcp:health:watch
+pnpm run mcp:health:watch
 ```
 
 ### Health Check Output
@@ -394,13 +394,13 @@ Test specific MCP functionality:
 
 ```bash
 # Test GitHub MCP
-npm run test:mcp -- --filter=github
+pnpm run test:mcp -- --filter=github
 
 # Test Playwright MCP
-npm run test:mcp -- --filter=playwright
+pnpm run test:mcp -- --filter=playwright
 
 # Test Supabase MCP
-npm run test:mcp -- --filter=supabase
+pnpm run test:mcp -- --filter=supabase
 ```
 
 ### Framework Integration Test
@@ -409,11 +409,11 @@ Verify MCPs integrate correctly with OPERA agents:
 
 ```bash
 # Run integration tests
-npm run test:integration
+pnpm run test:integration
 
 # Test specific agent + MCP integration
-npm run test:maria-qa  # Tests Playwright + Chrome MCP
-npm run test:marcus   # Tests GitHub + Semgrep + Sentry
+pnpm run test:maria-qa  # Tests Playwright + Chrome MCP
+pnpm run test:marcus   # Tests GitHub + Semgrep + Sentry
 ```
 
 ---
@@ -459,7 +459,7 @@ source ~/.versatil/.env
 **Solution**:
 ```bash
 # Check MCP server health
-npm run mcp:health:verbose
+pnpm run mcp:health:verbose
 
 # Increase timeout in mcp_config.json
 "env": {
@@ -490,7 +490,7 @@ curl -I https://api.github.com  # For GitHub MCP
 **Solution**:
 ```bash
 # Validate isolation
-npm run validate:isolation
+pnpm run validate:isolation
 
 # Move credentials to correct location
 mv .env ~/.versatil/.env
@@ -521,7 +521,7 @@ For complex issues, see:
 
 1. **Verify Framework Health**
    ```bash
-   npm run doctor
+   pnpm run doctor
    ```
 
 2. **Test Agent Integration**
@@ -536,7 +536,7 @@ For complex issues, see:
 3. **Configure Proactive Agents**
    ```bash
    # Enable automatic agent activation
-   npm run init
+   pnpm run init
 
    # Start daemon for background monitoring
    versatil-daemon start
@@ -670,7 +670,7 @@ All other MCPs are optional enhancements.
 npm cache clean --force
 
 # Reinstall MCP servers
-npm run install-mcps
+pnpm run install-mcps
 ```
 
 ### Q: Can I use custom MCP servers?
@@ -711,7 +711,7 @@ npm run install-mcps
 Or use the wizard:
 
 ```bash
-npm run mcp:setup -- --disable=sentry
+pnpm run mcp:setup -- --disable=sentry
 ```
 
 ---

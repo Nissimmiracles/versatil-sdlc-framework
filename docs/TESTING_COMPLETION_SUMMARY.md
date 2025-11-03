@@ -268,31 +268,31 @@ Successfully completed comprehensive test specification creation for VERSATIL Fr
 ### Test Commands
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run with coverage
-npm run test:coverage
+pnpm run test:coverage
 
 # Run specific test file
-npm test src/mcp/mcp-health-monitor.test.ts
+pnpm test src/mcp/mcp-health-monitor.test.ts
 
 # Run in watch mode
-npm run test:watch
+pnpm run test:watch
 
 # Run integration tests only
-npm test tests/integration/
+pnpm test tests/integration/
 ```
 
 ### Coverage Commands
 ```bash
 # Generate coverage report
-npm run test:coverage
+pnpm run test:coverage
 
 # View HTML coverage report
 open coverage/index.html
 
 # Check coverage thresholds
-npm run test:coverage -- --reporter=json-summary
+pnpm run test:coverage -- --reporter=json-summary
 ```
 
 ---

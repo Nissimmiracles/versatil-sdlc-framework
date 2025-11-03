@@ -339,7 +339,7 @@ Add a new endpoint, save.
 **Test 3: Run Tests**
 
 ```bash
-npm test
+pnpm test
 ```
 
 **Expected:**

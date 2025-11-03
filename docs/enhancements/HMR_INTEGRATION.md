@@ -61,7 +61,7 @@ Developer creates new page component:
 │  Developer Workflow (with HMR Integration)                  │
 └─────────────────────────────────────────────────────────────┘
 
-1. Developer runs: npm run dev:validated
+1. Developer runs: pnpm run dev:validated
    ↓
    ┌──────────────────────┐    ┌──────────────────────────┐
    │  TypeScript Compiler │    │  Architectural Watcher   │
@@ -169,17 +169,17 @@ console.log(`Violations: ${status.violationCount}`);
 
 **File**: `scripts/architectural-watcher.cjs` (160 lines)
 
-**Purpose**: CLI wrapper for npm run command integration
+**Purpose**: CLI wrapper for pnpm run command integration
 
 **Features:**
 
 1. **Command-Line Arguments**:
    ```bash
-   npm run validate:watch              # Normal mode
-   npm run validate:watch -- --verbose # Verbose mode
-   npm run validate:watch -- --silent  # Errors only
-   npm run validate:watch -- --errors-only  # Suppress warnings
-   npm run validate:watch -- --help    # Show help
+   pnpm run validate:watch              # Normal mode
+   pnpm run validate:watch -- --verbose # Verbose mode
+   pnpm run validate:watch -- --silent  # Errors only
+   pnpm run validate:watch -- --errors-only  # Suppress warnings
+   pnpm run validate:watch -- --help    # Show help
    ```
 
 2. **Build Validation**:
@@ -206,7 +206,7 @@ console.log(`Violations: ${status.violationCount}`);
 {
   "scripts": {
     "validate:watch": "node scripts/architectural-watcher.cjs",
-    "dev:validated": "concurrently -n \"BUILD,WATCH\" -c \"bgBlue.bold,bgGreen.bold\" \"npm run dev\" \"npm run validate:watch\""
+    "dev:validated": "concurrently -n \"BUILD,WATCH\" -c \"bgBlue.bold,bgGreen.bold\" \"pnpm run dev\" \"pnpm run validate:watch\""
   }
 }
 ```
@@ -218,7 +218,7 @@ console.log(`Violations: ${status.violationCount}`);
 
 ```bash
 # Single command starts both TypeScript compiler and watcher
-npm run dev:validated
+pnpm run dev:validated
 
 # Output (split-screen terminal):
 ┌─────────────────────────────────────────────────────────────┐
@@ -450,7 +450,7 @@ async function shutdown(signal) {
 **Setup:**
 ```bash
 # Terminal 1: Start validated development
-npm run dev:validated
+pnpm run dev:validated
 ```
 
 **Steps:**
@@ -555,7 +555,7 @@ git add src/pages/Orphan.tsx
 **Test Command:**
 ```bash
 # Run watcher with performance monitoring
-npm run validate:watch -- --verbose
+pnpm run validate:watch -- --verbose
 # In another terminal, monitor resources:
 top -pid $(pgrep -f "architectural-watcher")
 ```
@@ -571,15 +571,15 @@ top -pid $(pgrep -f "architectural-watcher")
 **Before Phase 4:**
 ```bash
 #!/usr/bin/env sh
-npm run validate:architecture
-npm run test:coverage
+pnpm run validate:architecture
+pnpm run test:coverage
 ```
 
 **After Phase 4 (unchanged):**
 ```bash
 #!/usr/bin/env sh
 echo "🏗️  Step 1/2: Running architectural validation..."
-npm run validate:architecture
+pnpm run validate:architecture
 
 if [ $? -ne 0 ]; then
   echo "❌ Architectural validation failed. Commit blocked."
@@ -587,7 +587,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "🧪 Step 2/2: Running test coverage check..."
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 **Why Unchanged?**
@@ -687,21 +687,21 @@ const result = await validator.validate([filePath]);
 #### Option 1: Normal Development (no validation)
 
 ```bash
-npm run dev
+pnpm run dev
 # TypeScript compiler only, no architectural validation
 ```
 
 #### Option 2: Validated Development (HMR integration)
 
 ```bash
-npm run dev:validated
+pnpm run dev:validated
 # TypeScript compiler + real-time architectural validation
 ```
 
 #### Option 3: Standalone Watcher
 
 ```bash
-npm run validate:watch
+pnpm run validate:watch
 # Architectural validation only (no TypeScript compiler)
 ```
 
@@ -863,7 +863,7 @@ export default {
 - [x] Create orchestration script
 - [x] Add npm scripts (`validate:watch`, `dev:validated`)
 - [x] Add `concurrently` dependency
-- [x] Compile TypeScript (`npm run build`)
+- [x] Compile TypeScript (`pnpm run build`)
 - [x] Test orphaned page detection
 - [x] Test broken navigation detection
 - [x] Test debouncing behavior

@@ -53,7 +53,7 @@ async storeNewPatterns(context: AgentActivationContext, response: AgentResponse)
 
 **Usage**:
 ```bash
-npm run rag:setup
+pnpm run rag:setup
 ```
 
 **Migrations Include**:
@@ -86,9 +86,9 @@ npm run rag:setup
 
 **Usage**:
 ```bash
-npm run rag:seed-framework          # Seed all patterns
-npm run rag:seed-framework --dry-run # Preview without storing
-npm run rag:seed-framework --agent=maria-qa # Specific agent only
+pnpm run rag:seed-framework          # Seed all patterns
+pnpm run rag:seed-framework --dry-run # Preview without storing
+pnpm run rag:seed-framework --agent=maria-qa # Specific agent only
 ```
 
 **For**: Framework developers (you)
@@ -142,9 +142,9 @@ npm run rag:seed-framework --agent=maria-qa # Specific agent only
 
 **Usage**:
 ```bash
-npm run rag:seed-defaults           # Seed all defaults
-npm run rag:seed-defaults --dry-run # Preview
-npm run rag:seed-defaults --silent  # Silent mode (for postinstall)
+pnpm run rag:seed-defaults           # Seed all defaults
+pnpm run rag:seed-defaults --dry-run # Preview
+pnpm run rag:seed-defaults --silent  # Silent mode (for postinstall)
 ```
 
 **For**: All users (including new users)
@@ -166,9 +166,9 @@ npm run rag:seed-defaults --silent  # Silent mode (for postinstall)
 
 **Usage**:
 ```bash
-npm run rag:test                # Quick verification
-npm run rag:test --verbose      # Detailed output with samples
-npm run rag:test --agent=maria-qa # Test specific agent
+pnpm run rag:test                # Quick verification
+pnpm run rag:test --verbose      # Detailed output with samples
+pnpm run rag:test --agent=maria-qa # Test specific agent
 ```
 
 **Expected Output**:
@@ -197,7 +197,7 @@ npm run rag:test --agent=maria-qa # Test specific agent
 
 **Silent Mode**:
 - Gracefully fails if Supabase not configured yet (no error spam)
-- User can run `npm run rag:setup` manually later
+- User can run `pnpm run rag:setup` manually later
 - Retries seeding after setup
 
 ---
@@ -258,19 +258,19 @@ Month_6:
 
 ```yaml
 Setup:
-  1. npm run rag:setup
+  1. pnpm run rag:setup
      - Setup Supabase (cloud or local)
      - Run migrations
      - Test connection
 
-  2. npm run rag:seed-defaults
+  2. pnpm run rag:seed-defaults
      - Seed 100 universal patterns
-     - Verify: npm run rag:test (should show 100)
+     - Verify: pnpm run rag:test (should show 100)
 
-  3. npm run rag:seed-framework
+  3. pnpm run rag:seed-framework
      - Extract patterns from VERSATIL source
      - Seed ~500 framework-specific patterns
-     - Verify: npm run rag:test (should show ~600 total)
+     - Verify: pnpm run rag:test (should show ~600 total)
 
 Development:
   - Agents automatically use RAG (Phase 1 integration)
@@ -334,7 +334,7 @@ CREATE FUNCTION match_memories(
 **How to Access**:
 ```bash
 # Verify RAG exists
-npm run rag:test
+pnpm run rag:test
 
 # View patterns
 # 1. Open Supabase dashboard
@@ -419,16 +419,16 @@ async activate(context: AgentActivationContext): Promise<AgentResponse> {
 
 ```bash
 # 1. Setup RAG (if not done)
-npm run rag:setup
+pnpm run rag:setup
 
 # 2. Seed defaults
-npm run rag:seed-defaults
+pnpm run rag:seed-defaults
 
 # 3. Seed framework patterns
-npm run rag:seed-framework
+pnpm run rag:seed-framework
 
 # 4. Verify
-npm run rag:test --verbose
+pnpm run rag:test --verbose
 
 # 5. Use VERSATIL normally
 # → Agents will automatically use RAG
@@ -446,10 +446,10 @@ npm install -g @versatil/sdlc-framework
 # → Postinstall seeds 100 defaults automatically
 
 # 2. Setup Supabase (optional, but recommended)
-npm run rag:setup
+pnpm run rag:setup
 
 # 3. Verify
-npm run rag:test
+pnpm run rag:test
 
 # 4. Use VERSATIL
 # → RAG learns from your successful work
@@ -478,10 +478,10 @@ npm run rag:test
 ### After RAG Infrastructure
 
 **Now**:
-- ✅ Setup wizard (`npm run rag:setup`)
+- ✅ Setup wizard (`pnpm run rag:setup`)
 - ✅ Supabase database with pgvector
 - ✅ 100 universal defaults seeded
-- ✅ ~500 framework patterns available (`npm run rag:seed-framework`)
+- ✅ ~500 framework patterns available (`pnpm run rag:seed-framework`)
 - ✅ Automatic learning from successful tasks
 - ✅ Semantic search working
 - ✅ New users get defaults automatically (postinstall)

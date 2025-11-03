@@ -64,14 +64,14 @@ const healthResult = await guardian.performHealthCheck();
 
 | Scenario | Confidence | Auto-Fix |
 |----------|------------|----------|
-| Build failure | 95% | `npm run build` |
+| Build failure | 95% | `pnpm run build` |
 | Missing dependencies | 90% | `npm install` |
-| Security vulnerabilities | 85% | `npm audit fix` |
-| Missing hooks | 95% | `npm run build:hooks` |
+| Security vulnerabilities | 85% | `pnpm audit fix` |
+| Missing hooks | 95% | `pnpm run build:hooks` |
 | Supabase connection lost | 85% | Auto-reconnect |
 | GraphRAG query failure | 90% | Fallback to vector |
 | Missing config | 95% | Create `.versatil-project.json` |
-| Outdated framework | 90% | `npm update versatil-sdlc-framework` |
+| Outdated framework | 90% | `pnpm update versatil-sdlc-framework` |
 | No agents configured | 85% | Add default agents |
 | RAG not initialized | 90% | Create `~/.versatil/rag/` |
 
@@ -327,7 +327,7 @@ Guardian operates in **two monitoring modes**:
 
 🚨 [Guardian] 2 critical issue(s) detected:
   1. agents: Agent Maria-QA failing (5 recent failures)
-  2. build: Framework not built - run npm run build
+  2. build: Framework not built - run pnpm run build
 ```
 
 #### 2. post-file-edit Hook (After File Changes)
@@ -625,7 +625,7 @@ echo "Test" | claude
 
 **Action Required**:
 1. Run `npm install` to get new dependencies
-2. Run `npm run build` to build Guardian components
+2. Run `pnpm run build` to build Guardian components
 3. Run `/guardian health` to verify installation
 4. Guardian now monitors automatically via hooks (no daemon needed)
 
@@ -640,7 +640,7 @@ echo "Test" | claude
 **Solutions**:
 1. Check Guardian logger logs: `/guardian-logs`
 2. Verify context detection: `/guardian status --verbose`
-3. Rebuild framework: `npm run build`
+3. Rebuild framework: `pnpm run build`
 4. Check dependencies: `npm install`
 
 ### Auto-Fix Doesn't Work
@@ -658,7 +658,7 @@ echo "Test" | claude
 
 **Solutions**:
 1. Verify hooks are built: `ls .claude/hooks/dist/`
-2. Rebuild hooks: `npm run build:hooks`
+2. Rebuild hooks: `pnpm run build:hooks`
 3. Check hook execution: `/guardian-logs` for hook errors
 4. Verify Claude SDK version: `claude --version` (≥1.0.0)
 

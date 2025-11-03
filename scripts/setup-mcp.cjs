@@ -13,7 +13,7 @@
  * - Automatic health check after setup
  *
  * Usage:
- *   npm run mcp:setup
+ *   pnpm run mcp:setup
  *   node scripts/setup-mcp.cjs
  *   node scripts/setup-mcp.cjs --only=github
  *   node scripts/setup-mcp.cjs --no-validate
@@ -355,8 +355,8 @@ class MCPSetupWizard {
       log('✅ MCPs configured successfully', 'green');
       log('');
       log('Next steps:', 'bright');
-      log('  1. Run health check: npm run mcp:health', 'dim');
-      log('  2. Test integration: npm run test:integration', 'dim');
+      log('  1. Run health check: pnpm run mcp:health', 'dim');
+      log('  2. Test integration: pnpm run test:integration', 'dim');
       log('  3. Start daemon: versatil-daemon start', 'dim');
 
     } catch (error) {
@@ -589,7 +589,7 @@ class MCPSetupWizard {
     log('Running MCP health checks...\n', 'cyan');
 
     return new Promise((resolve) => {
-      const healthCheck = spawn('npm', ['run', 'mcp:health'], {
+      const healthCheck = spawn('pnpm', ['run', 'mcp:health'], {
         stdio: 'inherit',
         shell: true
       });

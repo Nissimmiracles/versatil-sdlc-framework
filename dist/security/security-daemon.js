@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable no-useless-escape */
+/* eslint-disable no-useless-escape, @typescript-eslint/no-require-imports */
 /**
  * VERSATIL Security Daemon
  * Real-time enforcement of microsegmentation and security boundaries

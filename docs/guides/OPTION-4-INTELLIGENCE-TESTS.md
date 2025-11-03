@@ -800,7 +800,7 @@ npx @versatil/sdlc-framework quality perf-test \
 npm install moment  # ~70KB
 
 # Build and check bundle
-npm run build
+pnpm run build
 npx @versatil/sdlc-framework quality bundle-size \
   --max-size 500
 

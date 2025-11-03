@@ -6,7 +6,7 @@
  * active agents, and recent activity, then exits immediately.
  *
  * Usage:
- *   npm run status
+ *   pnpm run status
  *   node scripts/dashboard-status.cjs
  */
 
@@ -239,13 +239,13 @@ function displayStatus() {
   console.log('───────────────────────────────────────────────────────────────────────');
   console.log('');
   console.log('Commands:');
-  console.log('  npm run status            Show this quick status check');
-  console.log('  npm run dashboard         Launch full interactive dashboard');
-  console.log('  npm run monitor           Run comprehensive health check');
+  console.log('  pnpm run status            Show this quick status check');
+  console.log('  pnpm run dashboard         Launch full interactive dashboard');
+  console.log('  pnpm run monitor           Run comprehensive health check');
   console.log('  /monitor                  Quick health check (in Claude)');
   console.log('');
   console.log('For full interactive dashboard with real-time updates:');
-  console.log('  $ npm run dashboard');
+  console.log('  $ pnpm run dashboard');
   console.log('  (Press \'q\' to exit the interactive dashboard)');
   console.log('');
 }

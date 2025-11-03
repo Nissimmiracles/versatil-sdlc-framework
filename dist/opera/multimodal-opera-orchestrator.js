@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-this-alias, no-case-declarations, no-empty, no-control-regex */
 /**
  * VERSATIL SDLC Framework - Multimodal Opera Orchestrator
  * Supports multiple models and modalities for comprehensive understanding

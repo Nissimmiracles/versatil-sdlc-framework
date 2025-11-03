@@ -51,13 +51,13 @@ cd versatil-sdlc-framework
 npm install
 
 # Build the framework
-npm run build
+pnpm run build
 
 # Link for global usage (optional)
 npm link
 
 # Test installation
-npm test
+pnpm test
 ```
 
 ### Method 3: NPX (No Installation)

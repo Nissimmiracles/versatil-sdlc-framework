@@ -251,7 +251,7 @@ To https://github.com/Nissimmiracles/versatil-sdlc-framework.git
 
 1. **ESLint Configuration Missing**
    - Issue: No .eslintrc.json in src/ directory
-   - Impact: Couldn't run npm run validate fully
+   - Impact: Couldn't run pnpm run validate fully
    - Solution: Skip linting for v6.4.0, add in v6.5.0
 
 2. **Plan Mode Violations**

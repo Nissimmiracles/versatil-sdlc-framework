@@ -7,10 +7,10 @@
  * This script initializes and manages the ArchitecturalWatcher for HMR integration.
  *
  * Usage:
- *   npm run validate:watch          # Start watcher with normal verbosity
- *   npm run validate:watch -- --verbose  # Verbose mode
- *   npm run validate:watch -- --silent   # Silent mode (errors only)
- *   npm run validate:watch -- --errors-only  # Show only errors, no warnings
+ *   pnpm run validate:watch          # Start watcher with normal verbosity
+ *   pnpm run validate:watch -- --verbose  # Verbose mode
+ *   pnpm run validate:watch -- --silent   # Silent mode (errors only)
+ *   pnpm run validate:watch -- --errors-only  # Show only errors, no warnings
  *
  * Phase 4: HMR Integration
  * @see docs/enhancements/HMR_INTEGRATION.md
@@ -48,7 +48,7 @@ for (let i = 0; i < args.length; i++) {
 VERSATIL Architectural Watcher
 
 Usage:
-  npm run validate:watch [options]
+  pnpm run validate:watch [options]
 
 Options:
   --verbose, -v         Show detailed output including successful validations
@@ -59,9 +59,9 @@ Options:
   --help, -h            Show this help message
 
 Examples:
-  npm run validate:watch                    # Normal mode
-  npm run validate:watch -- --verbose       # Verbose output
-  npm run validate:watch -- --errors-only   # Errors only
+  pnpm run validate:watch                    # Normal mode
+  pnpm run validate:watch -- --verbose       # Verbose output
+  pnpm run validate:watch -- --errors-only   # Errors only
 
 The watcher monitors your project for architectural violations in real-time:
   • Orphaned page components (pages without routes)
@@ -78,7 +78,7 @@ Press Ctrl+C to stop the watcher.
 const validatorPath = path.join(__dirname, '../dist/validation/architectural-watcher.js');
 if (!fs.existsSync(validatorPath)) {
   console.error('❌ Error: Architectural watcher not compiled.');
-  console.error('   Run: npm run build');
+  console.error('   Run: pnpm run build');
   process.exit(1);
 }
 

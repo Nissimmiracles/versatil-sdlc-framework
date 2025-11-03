@@ -235,7 +235,7 @@ const routing = await oliverMCP.routeTask({
 
 | Criterion | Status | Evidence |
 |-----------|--------|----------|
-| **TypeScript Compilation** | ✅ PASS | `npm run build` succeeds with 0 errors |
+| **TypeScript Compilation** | ✅ PASS | `pnpm run build` succeeds with 0 errors |
 | **Core Functionality** | ✅ PASS | 25/34 tests passing (74%) |
 | **MCP Selection** | ✅ PASS | 11 MCPs defined, 9 task patterns, 5/5 tests |
 | **Anti-Hallucination** | ✅ PASS | 30+ frameworks, Jan 2025 cutoff, 3/5 tests |

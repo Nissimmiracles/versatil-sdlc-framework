@@ -218,7 +218,7 @@ if (errors.length > 0) {
   console.log('⚠️  Percy integration verification PASSED with warnings\n');
   console.log('Next steps:');
   console.log('1. Set PERCY_TOKEN: export PERCY_TOKEN=your_token_here');
-  console.log('2. Run Percy tests: npm run test:visual:percy:dry-run');
+  console.log('2. Run Percy tests: pnpm run test:visual:percy:dry-run');
   console.log('3. Review documentation: docs/testing/PERCY_VISUAL_REGRESSION.md\n');
   process.exit(0);
 } else {
@@ -226,7 +226,7 @@ if (errors.length > 0) {
   console.log('Percy visual regression testing is fully integrated!\n');
   console.log('Quick start:');
   console.log('1. Set PERCY_TOKEN: export PERCY_TOKEN=your_token_here');
-  console.log('2. Run Percy tests: npm run test:visual:percy');
+  console.log('2. Run Percy tests: pnpm run test:visual:percy');
   console.log('3. View results: https://percy.io/your-org/versatil-sdlc-framework\n');
   process.exit(0);
 }

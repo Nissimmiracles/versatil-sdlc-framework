@@ -508,7 +508,7 @@ If enforcement causes issues:
 ```bash
 git checkout v7.5.1
 npm install
-npm run build
+pnpm run build
 ```
 
 **Impact**: System works without enforcement (current v7.5.1 behavior)
@@ -556,7 +556,7 @@ npm run build
 **Symptom**: No boundaries in prompt, violations not blocked
 
 **Solutions**:
-1. Rebuild hooks: `npm run build`
+1. Rebuild hooks: `pnpm run build`
 2. Verify settings: `.claude/settings.json` has UserPromptSubmit hook
 3. Check MCP server logs: `~/.versatil/mcp-server.log`
 4. Test context detection: `node -e "require('./dist/isolation/context-identity.js').detectContextIdentity(process.cwd()).then(console.log)"`

@@ -25,7 +25,7 @@ Before starting, ensure you have:
 **Best for**: Most users, fastest setup
 
 ```bash
-npm run mcp:setup
+pnpm run mcp:setup
 ```
 
 Follow interactive prompts. **Time**: 15-30 minutes.
@@ -57,7 +57,7 @@ These 3 MCPs are **required** for core framework functionality.
    ```
 3. Validate:
    ```bash
-   npm run mcp:health -- --filter=github
+   pnpm run mcp:health -- --filter=github
    ```
 
 **Success Criteria**: ✅ GitHub MCP: Healthy (< 500ms)
@@ -73,7 +73,7 @@ These 3 MCPs are **required** for core framework functionality.
 **Setup**:
 1. Install Playwright browsers:
    ```bash
-   npm run playwright:install
+   pnpm run playwright:install
    ```
 2. Add to `~/.versatil/.env`:
    ```bash
@@ -83,7 +83,7 @@ These 3 MCPs are **required** for core framework functionality.
    ```
 3. Validate:
    ```bash
-   npm run mcp:health -- --filter=playwright
+   pnpm run mcp:health -- --filter=playwright
    ```
 
 **Success Criteria**: ✅ Playwright MCP: Healthy (< 1000ms)
@@ -107,11 +107,11 @@ These 3 MCPs are **required** for core framework functionality.
    ```
 4. Run migrations:
    ```bash
-   npm run migrate:vector-store
+   pnpm run migrate:vector-store
    ```
 5. Validate:
    ```bash
-   npm run mcp:health -- --filter=supabase
+   pnpm run mcp:health -- --filter=supabase
    ```
 
 **Success Criteria**: ✅ Supabase MCP: Healthy (< 500ms)
@@ -133,7 +133,7 @@ These MCPs significantly enhance framework capabilities.
 2. Already configured in `.cursor/mcp_config.json`
 3. Validate:
    ```bash
-   npm run mcp:health -- --filter=gitmcp
+   pnpm run mcp:health -- --filter=gitmcp
    ```
 
 **Success Criteria**: ✅ GitMCP: Healthy (< 200ms)
@@ -155,7 +155,7 @@ These MCPs significantly enhance framework capabilities.
    ```
 3. Validate:
    ```bash
-   npm run mcp:health -- --filter=semgrep
+   pnpm run mcp:health -- --filter=semgrep
    ```
 
 **Success Criteria**: ✅ Semgrep MCP: Healthy (< 2000ms)
@@ -180,7 +180,7 @@ These MCPs significantly enhance framework capabilities.
    ```
 4. Validate:
    ```bash
-   npm run mcp:health -- --filter=sentry
+   pnpm run mcp:health -- --filter=sentry
    ```
 
 **Success Criteria**: ✅ Sentry MCP: Healthy (< 1000ms)
@@ -192,7 +192,7 @@ These MCPs significantly enhance framework capabilities.
 Run comprehensive health check:
 
 ```bash
-npm run mcp:health
+pnpm run mcp:health
 ```
 
 **Expected Output**:
@@ -230,7 +230,7 @@ Verify MCPs work with OPERA agents:
 
 ```bash
 # Run E2E tests
-npm run test:e2e
+pnpm run test:e2e
 
 # Expected: Tests run in Chromium browser
 ```
@@ -239,7 +239,7 @@ npm run test:e2e
 
 ```bash
 # Security scan
-npm run security:scan
+pnpm run security:scan
 
 # Expected: Semgrep finds 0 high-severity issues
 ```
@@ -248,7 +248,7 @@ npm run security:scan
 
 ```bash
 # Query RAG memory
-npm run test:supabase
+pnpm run test:supabase
 
 # Expected: Vector search returns relevant code patterns
 ```
@@ -271,7 +271,7 @@ versatil-daemon status
 
 ```bash
 # Comprehensive health check
-npm run doctor
+pnpm run doctor
 
 # Expected: 100% health score
 ```
@@ -352,16 +352,16 @@ cat .cursor/mcp_config.json | jq '.mcpServers | keys'
 
 ```bash
 # Install Playwright browsers
-npm run playwright:install
+pnpm run playwright:install
 
 # Run Supabase migrations
-npm run migrate:vector-store
+pnpm run migrate:vector-store
 ```
 
 ### 5. Validate
 
 ```bash
-npm run mcp:health
+pnpm run mcp:health
 ```
 
 ---
@@ -372,10 +372,10 @@ After setup, you should have:
 
 - [ ] ✅ 3 critical MCPs healthy (GitHub, Playwright, Supabase)
 - [ ] ✅ 3 high-priority MCPs healthy (GitMCP, Semgrep, Sentry)
-- [ ] ✅ Framework health score ≥ 90% (`npm run doctor`)
+- [ ] ✅ Framework health score ≥ 90% (`pnpm run doctor`)
 - [ ] ✅ Proactive daemon running (`versatil-daemon status`)
-- [ ] ✅ Test suite passing (`npm run test:integration`)
-- [ ] ✅ Credentials isolated to `~/.versatil/.env` (`npm run validate:isolation`)
+- [ ] ✅ Test suite passing (`pnpm run test:integration`)
+- [ ] ✅ Credentials isolated to `~/.versatil/.env` (`pnpm run validate:isolation`)
 
 **Total setup time**: 30-48 minutes
 
@@ -419,7 +419,7 @@ npm install -g @modelcontextprotocol/server-github
 
 # Or clear cache and retry
 npm cache clean --force
-npm run mcp:setup
+pnpm run mcp:setup
 ```
 
 ### "Missing credentials"

@@ -67,7 +67,7 @@ find .claude/commands -name "*.md" -type f | wc -l
 
 **Evidence** (Victor-Verifier + Wave 2 Complete - 2025-11-03 13:08 PM):
 ```bash
-npm test -- --run --exclude="**/rag-health-monitor.test.ts" 2>&1
+pnpm test -- --run --exclude="**/rag-health-monitor.test.ts" 2>&1
 # Result: 435 tests passing (14 test files)
 # Duration: 11.11s
 # Pass Rate: 100% (435/435)
@@ -118,8 +118,8 @@ Total Written (all files):    461 tests (includes 26 excluded)
 - Excluded: 26 RAG health monitor tests (timeout >5s with real GraphRAG/Supabase)
 
 **Victor-Verifier Confidence Score**: 95% ✅
-- Evidence: Actual `npm test` execution output captured in test-results.txt
-- Method: `npm test -- --run --exclude="**/rag-health-monitor.test.ts"`
+- Evidence: Actual `pnpm test` execution output captured in test-results.txt
+- Method: `pnpm test -- --run --exclude="**/rag-health-monitor.test.ts"`
 - Verification: Real Vitest execution showing "Test Files: 14 passed (14), Tests: 435 passed (435)"
 - Ground Truth: Not estimated, not grep count - actual test runner output
 
@@ -142,7 +142,7 @@ Total Written (all files):    461 tests (includes 26 excluded)
 
 **Actual Code Coverage** (2025-11-03 13:05 PM):
 ```bash
-npm run test:coverage -- --exclude="**/rag-health-monitor.test.ts"
+pnpm run test:coverage -- --exclude="**/rag-health-monitor.test.ts"
 # Coverage Report:
 # Statements: 2.01% (1,167 / 57,797)
 # Branches:   2.3%  (720 / 31,214)
@@ -374,7 +374,7 @@ Current vs Target:
 - ✅ Add vitest to package.json devDependencies
 - ⏳ Install husky properly
 - ⏳ Generate package-lock.json
-- ⏳ Run npm audit
+- ⏳ Run pnpm audit
 - ⏳ Verify all tests run successfully
 
 ### Phase 2: Guardian Tests (Week 1)
@@ -422,7 +422,7 @@ Current vs Target:
 
 **Security Audit Results** (2025-11-03 13:06 PM):
 ```bash
-$ npm audit
+$ pnpm audit
 
 33 vulnerabilities (9 moderate, 9 high, 15 critical)
 
@@ -456,7 +456,7 @@ Action: Monitor n8n releases, consider isolation or alternative workflow engine
 - [x] RAG system verified (23 implementation files)
 - [x] Source file count verified (422 TypeScript files)
 - [ ] Test coverage at 80%+ (IN PROGRESS - current ~22%)
-- [ ] Security audit clean (PENDING - npm audit blocked)
+- [ ] Security audit clean (PENDING - pnpm audit blocked)
 - [ ] All quality gates passing (PENDING - tests need to run)
 
 ---
@@ -485,10 +485,10 @@ grep -r "describe\|it(" tests/ | wc -l
 cat package.json | grep '"version"'
 
 # Run tests (after setup)
-npm run test
+pnpm run test
 
 # Generate coverage report
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 ---

@@ -274,7 +274,7 @@ Enhancement Detected → Execute Immediately → Notify User → Create Audit Tr
 **User Experience**:
 ```
 ✅ Guardian Auto-Applied: Auto-fix security vulnerabilities
-   npm audit fix --force
+   pnpm audit fix --force
    ROI: 15 vulnerabilities fixed, 0.5h/week saved
 
 📝 Audit trail: todos/enhancement-security-critical-1234-ab3f.md

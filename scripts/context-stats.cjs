@@ -6,9 +6,9 @@
  * View context management and memory operation statistics
  *
  * Usage:
- *   npm run context:stats     # View current statistics
- *   npm run context:report    # Generate detailed report
- *   npm run context:cleanup   # Clean up old stats (keep last 30 days)
+ *   pnpm run context:stats     # View current statistics
+ *   pnpm run context:report    # Generate detailed report
+ *   pnpm run context:cleanup   # Clean up old stats (keep last 30 days)
  */
 
 const path = require('path');
@@ -46,10 +46,10 @@ async function main() {
     console.log(c('yellow', '⚠️  Building framework first...\n'));
     const { execSync } = require('child_process');
     try {
-      execSync('npm run build', { stdio: 'inherit', cwd: path.join(__dirname, '..') });
+      execSync('pnpm run build', { stdio: 'inherit', cwd: path.join(__dirname, '..') });
     } catch (error) {
       console.error(c('yellow', '\n⚠️  Build failed. Statistics may not be available yet.'));
-      console.log(dim('   Run: npm run build'));
+      console.log(dim('   Run: pnpm run build'));
       process.exit(1);
     }
   }
@@ -87,7 +87,7 @@ async function main() {
   } catch (error) {
     console.error(c('yellow', '\n⚠️  Error:'), error.message);
     console.log(dim('\n   Statistics may not be available yet.'));
-    console.log(dim('   Try: npm run build && npm run memory:init\n'));
+    console.log(dim('   Try: pnpm run build && pnpm run memory:init\n'));
     process.exit(1);
   }
 }
@@ -136,8 +136,8 @@ async function showStats(tracker) {
   }
 
   console.log(c('cyan', '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
-  console.log(dim('  Run `npm run context:report` for detailed report'));
-  console.log(dim('  Run `npm run context:cleanup` to remove old stats\n'));
+  console.log(dim('  Run `pnpm run context:report` for detailed report'));
+  console.log(dim('  Run `pnpm run context:cleanup` to remove old stats\n'));
 }
 
 async function showReport(tracker) {
@@ -154,9 +154,9 @@ async function cleanup(tracker) {
 
 function showHelp() {
   console.log(c('bright', 'Usage:\n'));
-  console.log(c('white', '  npm run context:stats    '), dim('# View current statistics'));
-  console.log(c('white', '  npm run context:report   '), dim('# Generate detailed report'));
-  console.log(c('white', '  npm run context:cleanup  '), dim('# Clean up old stats (keep last 30 days)'));
+  console.log(c('white', '  pnpm run context:stats    '), dim('# View current statistics'));
+  console.log(c('white', '  pnpm run context:report   '), dim('# Generate detailed report'));
+  console.log(c('white', '  pnpm run context:cleanup  '), dim('# Clean up old stats (keep last 30 days)'));
   console.log();
 }
 

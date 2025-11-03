@@ -289,7 +289,7 @@ private registerAllAgents(): void {
 ### Compilation Tests ✅
 
 ```bash
-npm run build
+pnpm run build
 # ✅ SUCCESS: No TypeScript errors
 # ✅ All files compiled correctly
 ```

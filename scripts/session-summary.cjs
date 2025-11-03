@@ -6,9 +6,9 @@
  * Generates human-readable reports of framework usage and impact.
  *
  * Usage:
- *   npm run session:summary         # Show current session
- *   npm run session:summary --week  # Show weekly report
- *   npm run session:summary --all   # Show all-time stats
+ *   pnpm run session:summary         # Show current session
+ *   pnpm run session:summary --week  # Show weekly report
+ *   pnpm run session:summary --all   # Show all-time stats
  */
 
 const fs = require('fs').promises;
@@ -139,9 +139,9 @@ async function showCurrentSession() {
   // Footer
   console.log(`${c.gray}─────────────────────────────────────────────────────────────${c.reset}\n`);
   console.log(`${c.gray}Commands:${c.reset}`);
-  console.log(`  ${c.cyan}npm run session:summary${c.reset}        Show current session`);
-  console.log(`  ${c.cyan}npm run session:summary --week${c.reset} Show weekly report`);
-  console.log(`  ${c.cyan}npm run session:summary --all${c.reset}  Show all-time stats\n`);
+  console.log(`  ${c.cyan}pnpm run session:summary${c.reset}        Show current session`);
+  console.log(`  ${c.cyan}pnpm run session:summary --week${c.reset} Show weekly report`);
+  console.log(`  ${c.cyan}pnpm run session:summary --all${c.reset}  Show all-time stats\n`);
 }
 
 /**

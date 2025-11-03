@@ -114,7 +114,7 @@ echo '{"file_path": "/project/.versatil/test.ts", "agent": "test"}' | ~/.versati
 
 **Example Safe Command**:
 ```bash
-echo '{"command": "npm test", "cwd": "/project", "agent": "maria-qa"}' | ~/.versatil/hooks/beforeShellExecution.sh
+echo '{"command": "pnpm test", "cwd": "/project", "agent": "maria-qa"}' | ~/.versatil/hooks/beforeShellExecution.sh
 
 # Output:
 {
@@ -313,7 +313,7 @@ tail -f ~/.versatil/logs/hooks.log
 
 # Output:
 [2025-10-19 18:42:15] afterFileEdit: /tmp/test.ts by maria-qa
-[2025-10-19 18:42:16] ALLOWED: npm test
+[2025-10-19 18:42:16] ALLOWED: pnpm test
 [2025-10-19 18:42:17] beforeReadFile: /tmp/app.ts by james (purpose: reading)
 ```
 

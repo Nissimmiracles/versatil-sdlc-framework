@@ -57,10 +57,10 @@ User requested two major improvements:
 
 **Verified**:
 ```bash
-npm run learning:seed
+pnpm run learning:seed
 # ✅ 21 patterns stored to ~/.versatil/learning/patterns/
 
-npm run learning:test
+pnpm run learning:test
 # ✅ All Tests Passed
 # ✅ Learning system is fully functional!
 ```
@@ -616,7 +616,7 @@ Structure:
 - [x] `~/.versatil/learning/` directories exist
 - [x] 21 default patterns seeded
 - [x] Search index created
-- [x] `npm run learning:test` passes
+- [x] `pnpm run learning:test` passes
 - [ ] Local storage fallback in learning-codifier
 - [ ] Session extraction hook active
 - [ ] Patterns accumulate over time

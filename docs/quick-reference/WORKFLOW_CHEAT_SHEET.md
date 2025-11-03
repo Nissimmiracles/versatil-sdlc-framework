@@ -430,13 +430,13 @@ Compounding_Effect:
 
 ```bash
 # View workflow progress
-npm run dashboard                    # Real-time visualization
+pnpm run dashboard                    # Real-time visualization
 
 # View workflow metrics
-npm run workflow:metrics             # Success rate, time savings
+pnpm run workflow:metrics             # Success rate, time savings
 
 # View compounding effect
-npm run compounding:report           # Show 40% improvement trend
+pnpm run compounding:report           # Show 40% improvement trend
 ```
 
 ---

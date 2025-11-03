@@ -302,8 +302,8 @@ allowed-tools: ["Bash", "Read", "Edit"]
 
 Please run the project linter and fix all issues:
 
-1. Run `npm run lint` to check for issues
-2. Run `npm run lint:fix` to auto-fix
+1. Run `pnpm run lint` to check for issues
+2. Run `pnpm run lint:fix` to auto-fix
 3. Report any remaining issues that need manual fixes
 ```
 

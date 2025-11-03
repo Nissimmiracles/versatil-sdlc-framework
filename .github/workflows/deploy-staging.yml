@@ -50,12 +50,12 @@ jobs:
       - name: 🏗️ Build for Staging
         run: |
           export VERSATIL_ENV=staging
-          npm run build
+          pnpm run build
 
       - name: 🧪 Run Critical Tests
         run: |
-          npm run test:critical
-          npm run test:integration:staging
+          pnpm run test:critical
+          pnpm run test:integration:staging
 
       - name: 🔍 Pre-Deployment Validation
         run: node scripts/intelligent-deployment-validator.cjs
@@ -69,7 +69,7 @@ jobs:
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           else
             # Run comprehensive validation
-            npm run validate:deployment:staging
+            pnpm run validate:deployment:staging
             if [ $? -eq 0 ]; then
               echo "should_deploy=true" >> $GITHUB_OUTPUT
             else
@@ -80,7 +80,7 @@ jobs:
       - name: 📝 Generate Version
         id: version
         run: |
-          VERSION=$(npm run version:generate --silent)
+          VERSION=$(pnpm run version:generate --silent)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
   deploy-staging:
@@ -124,25 +124,25 @@ jobs:
       - name: 🚀 Deploy Infrastructure
         run: |
           # Deploy using your preferred method (Docker, Kubernetes, etc.)
-          npm run deploy:infrastructure:staging
+          pnpm run deploy:infrastructure:staging
         env:
           DEPLOY_TOKEN: ${{ secrets.STAGING_DEPLOY_TOKEN }}
           DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
 
       - name: 🚀 Deploy Application
         run: |
-          npm run deploy:app:staging
+          pnpm run deploy:app:staging
         env:
           DEPLOY_TOKEN: ${{ secrets.STAGING_DEPLOY_TOKEN }}
 
       - name: ⏳ Wait for Deployment
         run: |
           echo "Waiting for deployment to be ready..."
-          npm run wait:deployment:staging --timeout=300
+          pnpm run wait:deployment:staging --timeout=300
 
       - name: 🩺 Health Check
         run: |
-          npm run health:check:staging
+          pnpm run health:check:staging
           if [ $? -ne 0 ]; then
             echo "❌ Health check failed"
             exit 1
@@ -177,18 +177,18 @@ jobs:
 
       - name: 🧪 Smoke Tests
         run: |
-          npm run test:smoke:staging
+          pnpm run test:smoke:staging
         env:
           STAGING_URL: https://staging.versatil.dev
 
       - name: ⚡ Performance Tests
         run: |
-          npm run test:performance:staging
+          pnpm run test:performance:staging
           npx lighthouse https://staging.versatil.dev --output json --output-path lighthouse-staging.json
 
       - name: 🔒 Security Validation
         run: |
-          npm run test:security:staging
+          pnpm run test:security:staging
           # OWASP ZAP baseline scan
           docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py \
             -t https://staging.versatil.dev -J staging-security-report.json
@@ -255,13 +255,13 @@ jobs:
       - name: 🔄 Rollback Deployment
         run: |
           echo "🔄 Rolling back staging deployment..."
-          npm run rollback:staging
+          pnpm run rollback:staging
         env:
           DEPLOY_TOKEN: ${{ secrets.STAGING_DEPLOY_TOKEN }}
 
       - name: 🩺 Verify Rollback
         run: |
-          npm run health:check:staging
+          pnpm run health:check:staging
           if [ $? -eq 0 ]; then
             echo "✅ Rollback successful"
           else

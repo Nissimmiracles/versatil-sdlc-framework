@@ -105,7 +105,7 @@ cd versatil-sdlc-framework
 npm install
 
 # Verify installation
-npm run demo:native
+pnpm run demo:native
 ```
 
 ### Method 3: npm (Future)
@@ -152,7 +152,7 @@ ls -la .claude/hooks/*.ts
 
 ```bash
 # Test native hook simulation
-npm run demo:native
+pnpm run demo:native
 ```
 
 **Expected**: Color-coded output showing all 4 SDK events
@@ -248,7 +248,7 @@ npm run demo:native
 
 4. **Run Interactive Demo**:
    ```bash
-   npm run demo:native
+   pnpm run demo:native
    # See all 4 SDK events simulated
    ```
 
@@ -330,7 +330,7 @@ grep -r "lifecycle_hooks\|auto_activation_rules" .claude/agents/
 # Expected: No output
 
 # Run demo
-npm run demo:native
+pnpm run demo:native
 # Expected: All 4 SDK events simulated successfully
 ```
 
@@ -427,6 +427,6 @@ Option C: **Self-Hosted Marketplace**
 
 **Installation**: `git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git`
 
-**Demo**: `npm run demo:native`
+**Demo**: `pnpm run demo:native`
 
 **Proof**: First framework with 100% native Claude SDK integration

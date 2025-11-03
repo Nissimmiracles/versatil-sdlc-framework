@@ -317,7 +317,7 @@ ls -la capabilities/
 rm ~/.versatil/memories/*/docs-cache-*.md
 
 # Or use npm script
-npm run memory:cleanup
+pnpm run memory:cleanup
 ```
 
 ### Verify MCP Access

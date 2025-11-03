@@ -11,7 +11,7 @@
  * - Local JSON files (offline)
  *
  * Usage:
- *   npm run setup:private-rag
+ *   pnpm run setup:private-rag
  *   node scripts/setup-private-rag.cjs
  */
 
@@ -155,7 +155,7 @@ async function main() {
     log('\n' + colors.cyan + 'Next steps:' + colors.reset);
     log('1. Start using Private RAG: /learn "Completed feature X"');
     log('2. Query patterns: /plan "Add similar feature"');
-    log('3. Check stats: npm run rag:stats\n');
+    log('3. Check stats: pnpm run rag:stats\n');
 
     rl.close();
 

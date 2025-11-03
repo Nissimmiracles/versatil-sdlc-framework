@@ -698,7 +698,7 @@ const code = await codeGenerator.generate({
 
 #### Quality Gates
 1. **Test Coverage**: ≥ 80% via `quality-gates` skill
-2. **TypeScript**: Strict mode, no errors via `npm run typecheck`
+2. **TypeScript**: Strict mode, no errors via `pnpm run typecheck`
 3. **Contract Validation**: Score ≥ 90 via `ContractValidator`
 4. **Accessibility**: WCAG 2.1 AA via axe-core
 5. **Performance**: Lighthouse score ≥ 90
@@ -707,8 +707,8 @@ const code = await codeGenerator.generate({
 #### Pre-Commit Hooks
 ```bash
 # .husky/pre-commit
-npm run validate:architecture  # Check architectural files
-npm run test:coverage          # Enforce 80%+ coverage
+pnpm run validate:architecture  # Check architectural files
+pnpm run test:coverage          # Enforce 80%+ coverage
 ```
 
 ### Anti-Hallucination

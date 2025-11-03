@@ -82,7 +82,7 @@ Next session reuses patterns → 40% faster
 
 **Session Activity**:
 - Edited `api/auth.ts` + `api/auth.test.ts`
-- Ran `npm test`
+- Ran `pnpm test`
 - Used Marcus-Backend + Maria-QA
 
 **Learnings Captured**:
@@ -119,7 +119,7 @@ $ claude edit src/api/auth.test.ts
 # PostToolUse hook triggers
 🤖 Maria-QA: Test file edited - Quality validation recommended
    File: src/api/auth.test.ts
-   Suggestion: Run tests with `npm test src/api/auth.test.ts`
+   Suggestion: Run tests with `pnpm test src/api/auth.test.ts`
 ```
 
 ### Example 2: Complete Task → Tests Run
@@ -134,18 +134,18 @@ $ claude edit src/api/auth.test.ts
 🤖 Maria-QA: Task completed with file changes - Running quality checks
    Source files changed: 2
    Recommendation: Run test suite to validate changes
-   💡 Quick check: npm test
+   💡 Quick check: pnpm test
 ```
 
 ### Example 3: Build Succeeds → Quality Gates
 
 ```bash
 # Build command runs
-$ npm run build
+$ pnpm run build
 
 # PostToolUse hook detects build
 🏗️  Build command detected
-   Command: npm run build
+   Command: pnpm run build
    Exit code: 0
 
 ✅ Build succeeded
@@ -153,9 +153,9 @@ $ npm run build
 🤖 Maria-QA: Build completed - Quality validation recommended
    Post-Build Quality Gates:
    1. ✅ Build successful
-   2. 🧪 Run full test suite: npm test
-   3. 📊 Check test coverage: npm run test:coverage
-   4. 🔒 Run security audit: npm audit
+   2. 🧪 Run full test suite: pnpm test
+   3. 📊 Check test coverage: pnpm run test:coverage
+   4. 🔒 Run security audit: pnpm audit
 ```
 
 ### Example 4: Session Ends → Auto-Learning

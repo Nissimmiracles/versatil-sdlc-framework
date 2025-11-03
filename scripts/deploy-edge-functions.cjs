@@ -347,7 +347,7 @@ class EdgeFunctionDeployment {
     try {
       await this.execCommand('supabase --version');
     } catch (error) {
-      throw new Error('Supabase CLI not found. Please install: npm install -g @supabase/cli');
+      throw new Error('Supabase CLI not found. Please install: pnpm add -g @supabase/cli');
     }
 
     console.log(chalk.green('✅ Environment validation passed'));
@@ -494,7 +494,7 @@ class EdgeFunctionDeployment {
 
   async runPostDeploymentTests() {
     try {
-      await this.execCommand('npm run test:edge-functions');
+      await this.execCommand('pnpm run test:edge-functions');
       console.log(chalk.green('✅ Post-deployment tests passed'));
     } catch (error) {
       console.log(chalk.yellow('⚠️ Post-deployment tests not available or failed'));

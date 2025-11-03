@@ -34,26 +34,26 @@ Keywords:
 ### Available Commands
 ```bash
 # Core Testing
-npm run maria:test              # Run comprehensive test suite
-npm run maria:unit              # Unit tests only
-npm run maria:integration       # Integration tests
-npm run maria:e2e              # End-to-end tests
+pnpm run maria:test              # Run comprehensive test suite
+pnpm run maria:unit              # Unit tests only
+pnpm run maria:integration       # Integration tests
+pnpm run maria:e2e              # End-to-end tests
 
 # Chrome MCP Testing
-npm run maria:visual            # Visual regression tests
-npm run maria:performance       # Performance testing with Lighthouse
-npm run maria:accessibility     # Accessibility audit (WCAG 2.1 AA)
-npm run maria:security          # Security vulnerability scan
+pnpm run maria:visual            # Visual regression tests
+pnpm run maria:performance       # Performance testing with Lighthouse
+pnpm run maria:accessibility     # Accessibility audit (WCAG 2.1 AA)
+pnpm run maria:security          # Security vulnerability scan
 
 # Quality Gates
-npm run maria:coverage          # Test coverage report
-npm run maria:quality-gate      # Run all quality gates
-npm run maria:report            # Generate quality report
+pnpm run maria:coverage          # Test coverage report
+pnpm run maria:quality-gate      # Run all quality gates
+pnpm run maria:report            # Generate quality report
 
 # Advanced Testing
-npm run maria:load-test         # Load testing
-npm run maria:stress-test       # Stress testing
-npm run maria:baseline-update   # Update visual test baselines
+pnpm run maria:load-test         # Load testing
+pnpm run maria:stress-test       # Stress testing
+pnpm run maria:baseline-update   # Update visual test baselines
 ```
 
 ### Quality Standards Enforced
@@ -120,29 +120,29 @@ Keywords:
 ### Available Commands
 ```bash
 # Development
-npm run james:dev               # Start development server
-npm run james:build             # Production build
-npm run james:preview           # Preview production build
+pnpm run james:dev               # Start development server
+pnpm run james:build             # Production build
+pnpm run james:preview           # Preview production build
 
 # Code Quality
-npm run james:lint              # ESLint + Prettier
-npm run james:type-check        # TypeScript type checking
-npm run james:format            # Format code with Prettier
+pnpm run james:lint              # ESLint + Prettier
+pnpm run james:type-check        # TypeScript type checking
+pnpm run james:format            # Format code with Prettier
 
 # Performance
-npm run james:analyze           # Bundle analyzer
-npm run james:lighthouse        # Lighthouse audit
-npm run james:optimize          # Performance optimization
+pnpm run james:analyze           # Bundle analyzer
+pnpm run james:lighthouse        # Lighthouse audit
+pnpm run james:optimize          # Performance optimization
 
 # Component Generation
-npm run james:component         # Generate React component
-npm run james:hook              # Generate custom hook
-npm run james:page              # Generate page component
+pnpm run james:component         # Generate React component
+pnpm run james:hook              # Generate custom hook
+pnpm run james:page              # Generate page component
 
 # Testing (Frontend-specific)
-npm run james:test-components   # Component testing
-npm run james:visual-test       # Visual component tests
-npm run james:snapshot          # Snapshot testing
+pnpm run james:test-components   # Component testing
+pnpm run james:visual-test       # Visual component tests
+pnpm run james:snapshot          # Snapshot testing
 ```
 
 ### Technologies & Tools
@@ -234,30 +234,30 @@ Keywords:
 ### Available Commands
 ```bash
 # Server Management
-npm run marcus:start            # Start production server
-npm run marcus:dev              # Start development server
-npm run marcus:debug            # Start with debugging
+pnpm run marcus:start            # Start production server
+pnpm run marcus:dev              # Start development server
+pnpm run marcus:debug            # Start with debugging
 
 # Database
-npm run marcus:db:migrate       # Run database migrations
-npm run marcus:db:seed          # Seed database with test data
-npm run marcus:db:backup        # Backup database
-npm run marcus:db:restore       # Restore database
+pnpm run marcus:db:migrate       # Run database migrations
+pnpm run marcus:db:seed          # Seed database with test data
+pnpm run marcus:db:backup        # Backup database
+pnpm run marcus:db:restore       # Restore database
 
 # Security
-npm run marcus:security         # Security audit
-npm run marcus:vulnerabilities  # Check for vulnerabilities
-npm run marcus:ssl              # SSL certificate management
+pnpm run marcus:security         # Security audit
+pnpm run marcus:vulnerabilities  # Check for vulnerabilities
+pnpm run marcus:ssl              # SSL certificate management
 
 # API Documentation
-npm run marcus:docs             # Generate API documentation
-npm run marcus:postman          # Export Postman collection
-npm run marcus:openapi          # Generate OpenAPI spec
+pnpm run marcus:docs             # Generate API documentation
+pnpm run marcus:postman          # Export Postman collection
+pnpm run marcus:openapi          # Generate OpenAPI spec
 
 # Containerization
-npm run marcus:docker:build     # Build Docker image
-npm run marcus:docker:run       # Run container
-npm run marcus:docker:compose   # Docker Compose operations
+pnpm run marcus:docker:build     # Build Docker image
+pnpm run marcus:docker:run       # Run container
+pnpm run marcus:docker:compose   # Docker Compose operations
 ```
 
 ### Technical Stack
@@ -351,25 +351,25 @@ Keywords:
 ### Available Commands
 ```bash
 # Project Management
-npm run sarah:init              # Initialize project documentation
-npm run sarah:roadmap           # Generate project roadmap
-npm run sarah:milestone         # Create milestone
-npm run sarah:status            # Project status report
+pnpm run sarah:init              # Initialize project documentation
+pnpm run sarah:roadmap           # Generate project roadmap
+pnpm run sarah:milestone         # Create milestone
+pnpm run sarah:status            # Project status report
 
 # Documentation
-npm run sarah:docs:generate     # Generate documentation
-npm run sarah:docs:serve        # Serve documentation
-npm run sarah:changelog         # Update changelog
+pnpm run sarah:docs:generate     # Generate documentation
+pnpm run sarah:docs:serve        # Serve documentation
+pnpm run sarah:changelog         # Update changelog
 
 # Planning
-npm run sarah:sprint:plan       # Sprint planning
-npm run sarah:sprint:review     # Sprint review
-npm run sarah:backlog           # Manage backlog
+pnpm run sarah:sprint:plan       # Sprint planning
+pnpm run sarah:sprint:review     # Sprint review
+pnpm run sarah:backlog           # Manage backlog
 
 # Communication
-npm run sarah:standup           # Daily standup summary
-npm run sarah:report:weekly     # Weekly progress report
-npm run sarah:notify            # Team notifications
+pnpm run sarah:standup           # Daily standup summary
+pnpm run sarah:report:weekly     # Weekly progress report
+pnpm run sarah:notify            # Team notifications
 ```
 
 ### Project Templates
@@ -434,24 +434,24 @@ Keywords:
 ### Available Commands
 ```bash
 # Requirements Management
-npm run alex:requirements       # Generate requirements document
-npm run alex:user-stories       # Create user stories
-npm run alex:acceptance         # Define acceptance criteria
+pnpm run alex:requirements       # Generate requirements document
+pnpm run alex:user-stories       # Create user stories
+pnpm run alex:acceptance         # Define acceptance criteria
 
 # Business Analysis
-npm run alex:process-map        # Create process maps
-npm run alex:stakeholder        # Stakeholder analysis
-npm run alex:gap-analysis       # Gap analysis
+pnpm run alex:process-map        # Create process maps
+pnpm run alex:stakeholder        # Stakeholder analysis
+pnpm run alex:gap-analysis       # Gap analysis
 
 # Documentation
-npm run alex:brd               # Business Requirements Document
-npm run alex:prd               # Product Requirements Document
-npm run alex:wireframes        # Generate wireframes
+pnpm run alex:brd               # Business Requirements Document
+pnpm run alex:prd               # Product Requirements Document
+pnpm run alex:wireframes        # Generate wireframes
 
 # Validation
-npm run alex:validate          # Validate requirements
-npm run alex:traceability      # Requirements traceability matrix
-npm run alex:impact-analysis   # Impact analysis
+pnpm run alex:validate          # Validate requirements
+pnpm run alex:traceability      # Requirements traceability matrix
+pnpm run alex:impact-analysis   # Impact analysis
 ```
 
 ### User Story Template
@@ -532,24 +532,24 @@ Keywords:
 ### Available Commands
 ```bash
 # Model Development
-npm run dr-ai:train             # Train ML models
-npm run dr-ai:evaluate          # Evaluate model performance
-npm run dr-ai:predict           # Make predictions
+pnpm run dr-ai:train             # Train ML models
+pnpm run dr-ai:evaluate          # Evaluate model performance
+pnpm run dr-ai:predict           # Make predictions
 
 # Data Processing
-npm run dr-ai:preprocess        # Data preprocessing
-npm run dr-ai:features          # Feature engineering
-npm run dr-ai:validate          # Data validation
+pnpm run dr-ai:preprocess        # Data preprocessing
+pnpm run dr-ai:features          # Feature engineering
+pnpm run dr-ai:validate          # Data validation
 
 # Deployment
-npm run dr-ai:deploy            # Deploy model to production
-npm run dr-ai:serve             # Serve model API
-npm run dr-ai:monitor           # Monitor model performance
+pnpm run dr-ai:deploy            # Deploy model to production
+pnpm run dr-ai:serve             # Serve model API
+pnpm run dr-ai:monitor           # Monitor model performance
 
 # Analysis
-npm run dr-ai:analyze           # Data analysis
-npm run dr-ai:visualize         # Data visualization
-npm run dr-ai:report            # Generate ML report
+pnpm run dr-ai:analyze           # Data analysis
+pnpm run dr-ai:visualize         # Data visualization
+pnpm run dr-ai:report            # Generate ML report
 ```
 
 ### ML Pipeline Template
@@ -688,10 +688,10 @@ When critical issues are detected:
 
 ```bash
 # Emergency commands
-npm run versatil:emergency      # Activate emergency protocol
-npm run maria:critical-scan     # Comprehensive system scan
-npm run marcus:security-audit   # Emergency security check
-npm run sarah:incident-report   # Generate incident report
+pnpm run versatil:emergency      # Activate emergency protocol
+pnpm run maria:critical-scan     # Comprehensive system scan
+pnpm run marcus:security-audit   # Emergency security check
+pnpm run sarah:incident-report   # Generate incident report
 ```
 
 ### Quality Gate Failures

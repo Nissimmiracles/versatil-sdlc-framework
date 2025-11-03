@@ -454,7 +454,7 @@ async function seedFrameworkPatterns() {
   }
 
   if (!dryRun) {
-    log.info('\nVerify patterns: npm run rag:test');
+    log.info('\nVerify patterns: pnpm run rag:test');
   }
 }
 

@@ -58,7 +58,7 @@ else → Use local JSON
 - ✅ Progress reporting
 - ✅ Statistics summary
 
-**NPM Script**: `npm run rag:migrate:gcp`
+**NPM Script**: `pnpm run rag:migrate:gcp`
 
 ---
 
@@ -106,7 +106,7 @@ Once Firestore API is enabled:
 
 ```bash
 # Migrate 21 local patterns to GCP Firestore
-npm run rag:migrate:gcp
+pnpm run rag:migrate:gcp
 ```
 
 **Expected Output**:
@@ -247,7 +247,7 @@ import('./dist/lib/gcp-vector-store.js').then(async m => {
 
 1. **Enable Firestore API**: [Click here to enable](https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=centering-vine-454613-b3) (1-click)
 
-2. **Run migration**: `npm run rag:migrate:gcp` (2-3 min)
+2. **Run migration**: `pnpm run rag:migrate:gcp` (2-3 min)
 
 **Total time**: 5 minutes
 
@@ -323,4 +323,4 @@ import('./dist/lib/gcp-vector-store.js').then(async m => {
 
 **Setup Documentation Complete** ✅
 
-Click the link above to enable Firestore, then run `npm run rag:migrate:gcp`!
+Click the link above to enable Firestore, then run `pnpm run rag:migrate:gcp`!

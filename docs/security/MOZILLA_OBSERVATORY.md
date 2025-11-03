@@ -716,10 +716,10 @@ Add to `package.json`:
 
 **Usage:**
 ```bash
-npm run security:scan https://example.com
-npm run security:report https://example.com
-npm run security:fix
-npm run security:validate https://example.com
+pnpm run security:scan https://example.com
+pnpm run security:report https://example.com
+pnpm run security:fix
+pnpm run security:validate https://example.com
 ```
 
 ---

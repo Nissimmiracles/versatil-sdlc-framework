@@ -344,7 +344,7 @@ await oliverMCP.websocketSetup({ port: 3001, auth: true });
 ### Run Comprehensive Test Suite
 
 ```bash
-npm run test:mcp-integration
+pnpm run test:mcp-integration
 ```
 
 **Output**:

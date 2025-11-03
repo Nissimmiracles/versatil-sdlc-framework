@@ -6,9 +6,9 @@
  * Generates comprehensive analytics reports from telemetry data
  *
  * Usage:
- *   npm run telemetry:report           # Console output
- *   npm run telemetry:report --json    # JSON output
- *   npm run telemetry:report --md      # Markdown file (docs/TELEMETRY_INSIGHTS.md)
+ *   pnpm run telemetry:report           # Console output
+ *   pnpm run telemetry:report --json    # JSON output
+ *   pnpm run telemetry:report --md      # Markdown file (docs/TELEMETRY_INSIGHTS.md)
  */
 
 const { getMetricsService } = require('../dist/telemetry/automation-metrics.js');

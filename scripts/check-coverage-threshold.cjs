@@ -146,7 +146,7 @@ function displayFailureMessage(result) {
 
   console.error(`\n${colors.yellow}💡 Solutions:${colors.reset}`);
   console.error('  1. Add tests to increase coverage');
-  console.error('  2. Run: npm run test:coverage');
+  console.error('  2. Run: pnpm run test:coverage');
   console.error('  3. Check coverage report: coverage/index.html\n');
 }
 
@@ -167,7 +167,7 @@ function main() {
   if (!coverageReportPath) {
     console.error(`${colors.red}❌ Coverage report not found${colors.reset}`);
     console.error('Expected location: coverage/coverage-summary.json');
-    console.error(`\n${colors.yellow}💡 Run tests first: npm run test:coverage${colors.reset}\n`);
+    console.error(`\n${colors.yellow}💡 Run tests first: pnpm run test:coverage${colors.reset}\n`);
     process.exit(2);
   }
 

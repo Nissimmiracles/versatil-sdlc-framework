@@ -105,17 +105,17 @@ class ActivationValidator {
    */
   async runTests() {
     try {
-      execSync('npm run test -- tests/agents/auto-activation.test.ts', {
+      execSync('pnpm run test -- tests/agents/auto-activation.test.ts', {
         stdio: 'inherit',
         cwd: path.join(__dirname, '..')
       });
 
-      execSync('npm run test -- tests/agents/sub-agent-activation.test.ts', {
+      execSync('pnpm run test -- tests/agents/sub-agent-activation.test.ts', {
         stdio: 'inherit',
         cwd: path.join(__dirname, '..')
       });
 
-      execSync('npm run test -- tests/integration/agent-auto-activation-e2e.test.ts', {
+      execSync('pnpm run test -- tests/integration/agent-auto-activation-e2e.test.ts', {
         stdio: 'inherit',
         cwd: path.join(__dirname, '..')
       });

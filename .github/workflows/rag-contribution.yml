@@ -50,7 +50,7 @@ jobs:
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           echo "🤖 Extracting patterns from PR merge..."
-          npm run rag:contribute-from-pr
+          pnpm run rag:contribute-from-pr
 
       - name: Upload contribution summary
         if: success()

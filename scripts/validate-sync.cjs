@@ -3,7 +3,7 @@
  * VERSATIL Framework - Synchronization Validation Command
  *
  * Single command to validate all synchronization across the framework.
- * Usage: npm run validate:sync
+ * Usage: pnpm run validate:sync
  *
  * @version 2.0.0
  */
@@ -442,7 +442,7 @@ async function attemptRecovery() {
     console.log('Recovering orchestrators...');
     console.log('  → Check if all orchestrator files are properly compiled');
     try {
-      await execPromise('npm run build', { cwd: PROJECT_ROOT });
+      await execPromise('pnpm run build', { cwd: PROJECT_ROOT });
       console.log('  ✅ Compiled TypeScript files');
       recovered++;
     } catch (error) {
@@ -453,13 +453,13 @@ async function attemptRecovery() {
   // Recovery 3: Memory Consistency
   if (results.memoryConsistency.status === 'fail') {
     console.log('Recovering memory consistency...');
-    console.log('  → Run: npm run rag:validate to check memory stores');
+    console.log('  → Run: pnpm run rag:validate to check memory stores');
   }
 
   // Recovery 4: Agent Coordination
   if (results.agentCoordination.status === 'fail') {
     console.log('Recovering agent coordination...');
-    console.log('  → Run: npm run init to recreate agent configurations');
+    console.log('  → Run: pnpm run init to recreate agent configurations');
   }
 
   if (recovered > 0) {

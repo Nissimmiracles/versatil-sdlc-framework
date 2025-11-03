@@ -77,8 +77,8 @@ npm install --save-dev @versatil/sdlc-framework
 }
 
 # Run via npm
-npm run versatil -- --version
-npm run versatil:init
+pnpm run versatil -- --version
+pnpm run versatil:init
 ```
 
 **Advantages**:
@@ -284,7 +284,7 @@ npm view @versatil/sdlc-framework version
 **Fix**:
 ```bash
 # Update to latest
-npm update -g @versatil/sdlc-framework
+pnpm update -g @versatil/sdlc-framework
 
 # Or uninstall and reinstall
 npm uninstall -g @versatil/sdlc-framework
@@ -849,7 +849,7 @@ npm install --save-dev @versatil/sdlc-framework
 npx @versatil/sdlc-framework init
 
 # Update
-npm update -g @versatil/sdlc-framework
+pnpm update -g @versatil/sdlc-framework
 
 # Uninstall
 npm uninstall -g @versatil/sdlc-framework

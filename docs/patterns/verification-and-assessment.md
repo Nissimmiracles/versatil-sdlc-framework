@@ -74,7 +74,7 @@ Victor verifies 6 types of claims:
 | **FileCreation** | "Created src/auth.ts" | `fs.existsSync()`, `ls -la` |
 | **FileEdit** | "Edited line 42" | Read file, check content |
 | **GitCommit** | "Committed hash abc123" | `git show abc123` |
-| **CommandExecution** | "Ran npm test" | Exit code, stdout |
+| **CommandExecution** | "Ran pnpm test" | Exit code, stdout |
 | **DataAssertion** | "Line 42 contains..." | Grep/Read tools |
 | **Metric** | "618 lines written" | `wc -l` |
 
@@ -290,7 +290,7 @@ interface Assessment {
     {
       "type": "TestCoverage",
       "tool": "jest",
-      "command": "npm run test:coverage -- --collectCoverageFrom=\"**/auth/**/*.ts\"",
+      "command": "pnpm run test:coverage -- --collectCoverageFrom=\"**/auth/**/*.ts\"",
       "threshold": 90,
       "mandatory": true,
       "reason": "Security code requires 90%+ coverage"
@@ -323,7 +323,7 @@ interface Assessment {
         {
           "type": "TestCoverage",
           "tool": "jest",
-          "command": "npm run test:coverage",
+          "command": "pnpm run test:coverage",
           "threshold": 90,
           "mandatory": true,
           "reason": "Security code requires 90%+ coverage (not 80%)"

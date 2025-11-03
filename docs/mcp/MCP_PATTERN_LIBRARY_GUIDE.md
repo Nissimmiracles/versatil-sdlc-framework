@@ -496,9 +496,9 @@ console.log(report.total_time_saved);
 
 **CLI Usage**:
 ```bash
-npm run telemetry:report        # Console output
-npm run telemetry:report:json   # JSON export
-npm run telemetry:report:md     # Markdown report
+pnpm run telemetry:report        # Console output
+pnpm run telemetry:report:json   # JSON export
+pnpm run telemetry:report:md     # Markdown report
 ```
 
 ---
@@ -605,7 +605,7 @@ const result = await oliver.routeRequest({
 ### WebSocket Testing
 ```bash
 # Start server
-npm run dev
+pnpm run dev
 
 # Test connection
 curl -X POST http://localhost:3001/test-websocket

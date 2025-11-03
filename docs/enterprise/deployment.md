@@ -79,7 +79,7 @@ OPENAI_API_KEY=your-openai-key
 
 ```bash
 # Validate deployment environment
-npm run edge:validate
+pnpm run edge:validate
 
 # Expected output:
 # 🔍 Validating Deployment Environment
@@ -92,7 +92,7 @@ npm run edge:validate
 
 ```bash
 # Deploy all functions with verification
-npm run edge:deploy:verify
+pnpm run edge:deploy:verify
 
 # Expected output:
 # 🚀 VERSATIL Edge Function Deployment
@@ -153,7 +153,7 @@ npm run edge:deploy:verify
 
 ```bash
 # Check health of all deployed functions
-npm run edge:health
+pnpm run edge:health
 
 # Expected output:
 # 🏥 Edge Function Health Check
@@ -173,7 +173,7 @@ npm run edge:health
 
 ```bash
 # Run complete integration test suite
-npm run test:edge-functions
+pnpm run test:edge-functions
 
 # Expected output:
 # 🧪 VERSATIL Edge Function Integration Tests
@@ -251,7 +251,7 @@ npm run test:edge-functions
 
 ```bash
 # Monitor performance for 10 minutes
-npm run edge:monitor --duration 10
+pnpm run edge:monitor --duration 10
 
 # Expected output:
 # 📊 Monitoring Edge Functions (10 minutes)
@@ -374,19 +374,19 @@ curl -X POST https://your-project-ref.supabase.co/functions/v1/opera-agent \
 
 ```bash
 # Daily health checks
-npm run edge:health
+pnpm run edge:health
 
 # Weekly performance monitoring
-npm run edge:monitor --duration 60
+pnpm run edge:monitor --duration 60
 
 # Monthly full testing
-npm run test:edge-functions
+pnpm run test:edge-functions
 
 # Emergency rollback (if needed)
-npm run edge:rollback
+pnpm run edge:rollback
 
 # Update deployments
-npm run edge:deploy:verify
+pnpm run edge:deploy:verify
 ```
 
 ## Troubleshooting
@@ -404,7 +404,7 @@ npm run edge:deploy:verify
 2. **Rate Limit Errors**
    ```bash
    # Monitor rate limiting
-   npm run edge:monitor --duration 5
+   pnpm run edge:monitor --duration 5
 
    # Adjust rate limits in production-optimizations.ts if needed
    ```
@@ -412,7 +412,7 @@ npm run edge:deploy:verify
 3. **Function Health Issues**
    ```bash
    # Check individual function health
-   npm run edge:health --verbose
+   pnpm run edge:health --verbose
 
    # Redeploy specific function if needed
    supabase functions deploy opera-agent

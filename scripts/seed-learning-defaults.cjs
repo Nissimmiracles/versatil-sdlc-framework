@@ -453,7 +453,7 @@ async function seedLearningDefaults() {
     }
 
     log.info('\nNext steps:');
-    console.log('  • Verify patterns: npm run learning:test');
+    console.log('  • Verify patterns: pnpm run learning:test');
     console.log('  • Use VERSATIL normally (learning accumulates automatically)');
     console.log('  • Monitor growth: ls ~/.versatil/learning/patterns/ | wc -l');
   }

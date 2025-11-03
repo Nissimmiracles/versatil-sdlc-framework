@@ -248,7 +248,7 @@ Claude will:
 npm install -g @versatil/claude-opera
 
 # Or update existing installation
-npm update -g @versatil/claude-opera
+pnpm update -g @versatil/claude-opera
 ```
 
 ### 2. Initialize in Cursor

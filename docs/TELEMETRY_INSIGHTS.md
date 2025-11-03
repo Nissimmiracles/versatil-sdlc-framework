@@ -40,13 +40,13 @@ _No cross-skill loading data available yet_
 
 **Data Source**: `.versatil/telemetry/metrics.json`
 
-**Note**: This is a placeholder report generated during v7.5.0 release. Real telemetry data will be collected automatically as you use the VERSATIL framework. Run `npm run telemetry:report` after framework usage to see actual metrics.
+**Note**: This is a placeholder report generated during v7.5.0 release. Real telemetry data will be collected automatically as you use the VERSATIL framework. Run `pnpm run telemetry:report` after framework usage to see actual metrics.
 
 ## How to Generate Real Insights
 
 1. **Use the Framework**: Work on features using /plan, /work, agent auto-activation
 2. **Wait for Data Collection**: Telemetry is collected automatically in `.versatil/telemetry/metrics.json`
-3. **Generate Report**: Run `npm run telemetry:report --md` to update this file with real data
+3. **Generate Report**: Run `pnpm run telemetry:report --md` to update this file with real data
 4. **Analyze Trends**: Compare reports over time to identify patterns and optimization opportunities
 
 ## Expected Metrics (After Usage)

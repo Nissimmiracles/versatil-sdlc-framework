@@ -207,9 +207,9 @@ class DeploymentReadinessChecker {
       console.log(chalk.green('\n🎉 Framework is READY for production deployment!'));
       console.log(chalk.cyan('\n📋 Next Steps:'));
       console.log(chalk.cyan('1. Update .env with your actual Supabase credentials'));
-      console.log(chalk.cyan('2. Run: npm run edge:validate'));
-      console.log(chalk.cyan('3. Run: npm run edge:deploy:verify'));
-      console.log(chalk.cyan('4. Run: npm run test:edge-functions'));
+      console.log(chalk.cyan('2. Run: pnpm run edge:validate'));
+      console.log(chalk.cyan('3. Run: pnpm run edge:deploy:verify'));
+      console.log(chalk.cyan('4. Run: pnpm run test:edge-functions'));
       console.log(chalk.cyan('\n📖 See PRODUCTION_DEPLOYMENT_GUIDE.md for detailed instructions'));
     } else {
       console.log(chalk.red('\n❌ Framework has issues that need to be resolved:'));

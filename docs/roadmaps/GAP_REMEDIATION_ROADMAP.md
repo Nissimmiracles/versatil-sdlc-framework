@@ -484,9 +484,9 @@ This roadmap details the 4-phase implementation plan to transform VERSATIL from 
 **Acceptance Criteria**:
 - [ ] Tracks all context clear events (timestamp, input tokens, tools cleared)
 - [ ] Tracks all memory operations (view, create, str_replace, etc.)
-- [ ] `npm run context:stats` shows dashboard
-- [ ] `npm run context:report` generates detailed markdown report
-- [ ] `npm run context:cleanup` removes stats older than 30 days
+- [ ] `pnpm run context:stats` shows dashboard
+- [ ] `pnpm run context:report` generates detailed markdown report
+- [ ] `pnpm run context:cleanup` removes stats older than 30 days
 
 ---
 

@@ -40,7 +40,7 @@ function loadEnv() {
   const envPath = path.join(process.env.HOME, '.versatil', '.env');
   if (!fs.existsSync(envPath)) {
     log.error('No .env file found at ~/.versatil/.env');
-    log.info('Run: npm run rag:setup');
+    log.info('Run: pnpm run rag:setup');
     process.exit(1);
   }
 
@@ -73,13 +73,13 @@ async function testRAG() {
 
   if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_KEY) {
     log.error('Missing SUPABASE_URL or SUPABASE_SERVICE_KEY');
-    log.info('Run: npm run rag:setup');
+    log.info('Run: pnpm run rag:setup');
     process.exit(1);
   }
 
   if (env.SUPABASE_URL.includes('your-') || env.SUPABASE_SERVICE_KEY.includes('your-')) {
     log.error('Placeholder credentials detected');
-    log.info('Run: npm run rag:setup');
+    log.info('Run: pnpm run rag:setup');
     process.exit(1);
   }
 
@@ -114,7 +114,7 @@ async function testRAG() {
 
     if (error) {
       log.error(`Table check failed: ${error.message}`);
-      log.info('Run migrations: npm run rag:setup');
+      log.info('Run migrations: pnpm run rag:setup');
       allPassed = false;
     } else {
       log.success('Table exists with correct schema');
@@ -142,7 +142,7 @@ async function testRAG() {
       allPassed = false;
     } else if (count === 0) {
       log.warn('No patterns found in database');
-      log.info('Seed patterns: npm run rag:seed-framework');
+      log.info('Seed patterns: pnpm run rag:seed-framework');
       allPassed = false;
     } else {
       log.success(`Found ${count} patterns`);
@@ -226,7 +226,7 @@ async function testRAG() {
 
     if (error) {
       log.error(`Semantic search failed: ${error.message}`);
-      log.info('Function may not exist. Run: npm run rag:setup');
+      log.info('Function may not exist. Run: pnpm run rag:setup');
       allPassed = false;
     } else {
       log.success(`Semantic search working (returned ${data?.length || 0} results)`);
@@ -275,16 +275,16 @@ async function testRAG() {
 
   if (!allPassed) {
     log.info('\nTroubleshooting:');
-    console.log('  1. Setup Supabase: npm run rag:setup');
-    console.log('  2. Seed patterns: npm run rag:seed-framework');
-    console.log('  3. Re-run tests: npm run rag:test');
+    console.log('  1. Setup Supabase: pnpm run rag:setup');
+    console.log('  2. Seed patterns: pnpm run rag:seed-framework');
+    console.log('  3. Re-run tests: pnpm run rag:test');
     process.exit(1);
   } else {
     log.success('RAG storage is fully functional!');
     log.info('\nNext steps:');
-    console.log('  • Add more patterns: npm run rag:seed-defaults');
-    console.log('  • Test agents: npm run test');
-    console.log('  • Monitor usage: npm run context:stats');
+    console.log('  • Add more patterns: pnpm run rag:seed-defaults');
+    console.log('  • Test agents: pnpm run test');
+    console.log('  • Monitor usage: pnpm run context:stats');
   }
 }
 

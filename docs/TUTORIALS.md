@@ -213,7 +213,7 @@ You've completed your first VERSATIL feature workflow:
 ### Step 1: Run Setup Wizard (5 minutes)
 
 ```bash
-npm run setup:private-rag
+pnpm run setup:private-rag
 ```
 
 **Interactive Wizard**:

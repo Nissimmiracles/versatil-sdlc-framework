@@ -273,9 +273,9 @@ interface ContextClearEvent {
 
 **Commands**:
 ```bash
-npm run context:stats     # Quick statistics
-npm run context:report    # Detailed markdown report
-npm run context:cleanup   # Clean old stats (30+ days)
+pnpm run context:stats     # Quick statistics
+pnpm run context:report    # Detailed markdown report
+pnpm run context:cleanup   # Clean old stats (30+ days)
 ```
 
 ---

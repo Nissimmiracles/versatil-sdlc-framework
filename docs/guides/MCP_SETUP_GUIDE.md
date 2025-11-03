@@ -76,7 +76,7 @@ Optional:
 3. **Verify Installation**:
    ```bash
    versatil --version
-   npm run doctor
+   pnpm run doctor
    ```
 
 ---
@@ -127,7 +127,7 @@ SENTRY_ORG=your-org-slug
 ### 3. Test MCP Health
 
 ```bash
-npm run mcp:health
+pnpm run mcp:health
 ```
 
 Expected output:
@@ -261,7 +261,7 @@ VERSATIL_RATE_LIMIT=2000  # Milliseconds between requests (ethical rate limiting
 
 ```bash
 # Test stealth mode
-npm run test:stealth
+pnpm run test:stealth
 
 # Test design scraping
 node scripts/test-design-scraper.js https://example.com
@@ -708,7 +708,7 @@ CREATE INDEX ON embeddings USING ivfflat (embedding vector_cosine_ops);
 node -e "const { createClient } = require('@supabase/supabase-js'); const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY); supabase.from('embeddings').select('*').limit(1).then(console.log);"
 
 # Test vector search
-npm run test:rag
+pnpm run test:rag
 ```
 
 #### Usage with Agents
@@ -794,7 +794,7 @@ N8N_API_KEY=your_n8n_api_key_here
 curl -H "X-N8N-API-KEY: $N8N_API_KEY" $N8N_BASE_URL/api/v1/workflows
 
 # Test workflow execution
-npm run test:n8n
+pnpm run test:n8n
 ```
 
 #### Usage with Agents
@@ -1109,7 +1109,7 @@ export function AntdTest() {
 EOF
 
 # Run dev server
-npm run dev
+pnpm run dev
 ```
 
 #### Usage with James-Frontend
@@ -1189,7 +1189,7 @@ MCP_CLAUDE_DEBUG=false
 
 ```bash
 # Test Claude Code MCP
-npm run test:claude-mcp
+pnpm run test:claude-mcp
 ```
 
 #### Usage
@@ -1326,7 +1326,7 @@ Automatic integration with all VERSATIL agents. No manual usage required.
 ### Run Health Check
 
 ```bash
-npm run mcp:health
+pnpm run mcp:health
 ```
 
 ### Expected Output
@@ -1361,7 +1361,7 @@ Automation & Monitoring MCPs:
 ### Validate MCP Configuration
 
 ```bash
-npm run mcp:validate
+pnpm run mcp:validate
 ```
 
 This runs `scripts/validate-mcp-config.cjs` which:
@@ -1393,13 +1393,13 @@ See [docs/guides/mcp-troubleshooting.md](./mcp-troubleshooting.md) for detailed 
 tail -f ~/.versatil/logs/mcp.log
 
 # Test specific MCP
-npm run mcp:test playwright
+pnpm run mcp:test playwright
 
 # Validate environment
-npm run env:validate
+pnpm run env:validate
 
 # Reset MCP configuration
-npm run mcp:reset
+pnpm run mcp:reset
 ```
 
 ---

@@ -63,10 +63,10 @@ async function main() {
     console.log('');
   }
 
-  // Step 1: Uninstall npm package
-  console.log('📦 Uninstalling npm package...');
+  // Step 1: Uninstall package
+  console.log('📦 Uninstalling package...');
   try {
-    await execAsync('npm uninstall -g versatil-sdlc-framework');
+    await execAsync('pnpm remove -g versatil-sdlc-framework');
     console.log('✅ Package uninstalled\n');
   } catch (error) {
     console.log('⚠️  Could not uninstall package (may not be installed globally)');
@@ -160,7 +160,7 @@ async function main() {
     console.log('✅ All commands removed\n');
   } else {
     console.log('⚠️  Some commands may still exist');
-    console.log('   Try: npm uninstall -g versatil-sdlc-framework\n');
+    console.log('   Try: pnpm remove -g versatil-sdlc-framework\n');
   }
 
   // Step 5: Show summary
@@ -176,7 +176,7 @@ async function main() {
   console.log('We\'d love to hear your feedback:');
   console.log('  https://github.com/MiraclesGIT/versatil-sdlc-framework/issues\n');
   console.log('To reinstall:');
-  console.log('  npm install -g versatil-sdlc-framework\n');
+  console.log('  pnpm add -g versatil-sdlc-framework\n');
   console.log('═══════════════════════════════════════════════════════════\n');
 }
 
@@ -229,7 +229,7 @@ Examples:
   versatil-uninstall --force --keep-data
 
 What gets removed:
-  • Global npm package (versatil-sdlc-framework)
+  • Global package (versatil-sdlc-framework)
   • Framework directory (~/.versatil) unless --keep-data
   • All agent configurations
   • All RAG memory data

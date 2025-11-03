@@ -797,7 +797,7 @@ Blocked: Customer project data
 ### System Hooks (Bash)
 
 #### `afterBuild.sh`
-**Trigger**: After `npm run build` completes
+**Trigger**: After `pnpm run build` completes
 
 **Purpose**:
 - Post-build validation (tests, coverage, architecture)

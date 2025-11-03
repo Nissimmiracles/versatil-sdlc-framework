@@ -79,7 +79,7 @@ VERSATIL provides two types of RAG storage:
 ### Option 1: Interactive Wizard (Recommended)
 
 ```bash
-npm run setup:private-rag
+pnpm run setup:private-rag
 ```
 
 The wizard will:
@@ -164,7 +164,7 @@ PRIVATE_RAG_LOCAL_DIR=~/.versatil/private-rag
 
 4. **Run Wizard**
    ```bash
-   npm run setup:private-rag
+   pnpm run setup:private-rag
    # Choose: 1 (Firestore)
    # Project ID: your-project-id
    # Key path: ~/.versatil/gcp-key.json
@@ -232,7 +232,7 @@ PRIVATE_RAG_LOCAL_DIR=~/.versatil/private-rag
 
 4. **Run Wizard**
    ```bash
-   npm run setup:private-rag
+   pnpm run setup:private-rag
    # Choose: 2 (Supabase)
    # URL: https://xxxxx.supabase.co
    # Anon key: eyJhbGc...
@@ -260,7 +260,7 @@ PRIVATE_RAG_LOCAL_DIR=~/.versatil/private-rag
 **Setup Steps:**
 
 ```bash
-npm run setup:private-rag
+pnpm run setup:private-rag
 # Choose: 3 (Local JSON)
 # Directory: (press Enter for default)
 ```
@@ -285,7 +285,7 @@ cp -r ~/Dropbox/versatil-backup ~/.versatil/private-rag
 ### Method 1: Interactive Wizard (Recommended)
 
 ```bash
-npm run setup:private-rag
+pnpm run setup:private-rag
 ```
 
 **Features:**
@@ -432,12 +432,12 @@ Private RAG (Your Project):
 
 2. **Test connection**
    ```bash
-   npm run rag:test
+   pnpm run rag:test
    ```
 
 3. **Re-run wizard**
    ```bash
-   npm run setup:private-rag
+   pnpm run setup:private-rag
    ```
 
 ### Firestore permission denied
@@ -478,7 +478,7 @@ chmod 755 ~/.versatil
 chmod 755 ~/.versatil/private-rag
 
 # Or choose different directory
-npm run setup:private-rag
+pnpm run setup:private-rag
 # Choose: 3 (Local)
 # Custom directory: ~/Documents/versatil-rag
 ```
@@ -499,7 +499,7 @@ npm run setup:private-rag
 ### Q: Can I migrate from Local to Firestore later?
 **A:** Yes! Use:
 ```bash
-npm run rag:migrate --from=local --to=firestore
+pnpm run rag:migrate --from=local --to=firestore
 ```
 
 ### Q: Is my data secure?
@@ -556,7 +556,7 @@ All team members with same teamId can access.
 
 4. **Optimize storage** (advanced)
    ```bash
-   npm run rag:optimize
+   pnpm run rag:optimize
    ```
 
 ---

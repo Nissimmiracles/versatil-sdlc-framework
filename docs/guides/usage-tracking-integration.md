@@ -15,7 +15,7 @@ This guide explains how to integrate the new UsageLogger and SessionManager with
 node scripts/test-usage-logger.cjs
 
 # View your session summary
-npm run session:summary
+pnpm run session:summary
 ```
 
 **Output Example**:
@@ -65,9 +65,9 @@ Agent Activity:
 
 | Command | Description | Example Output |
 |---------|-------------|----------------|
-| `npm run session:summary` | Show current session | Today's activity and time saved |
-| `npm run session:summary --week` | Show weekly report | Last 7 days aggregate |
-| `npm run session:summary --all` | Show all-time stats | Cumulative impact since installation |
+| `pnpm run session:summary` | Show current session | Today's activity and time saved |
+| `pnpm run session:summary --week` | Show weekly report | Last 7 days aggregate |
+| `pnpm run session:summary --all` | Show all-time stats | Cumulative impact since installation |
 
 ---
 
@@ -394,8 +394,8 @@ console.log(`Trend: ${cumulativeStats.trend}`);
 ### Immediate (Today)
 
 1. ✅ Test sample data generation: `node scripts/test-usage-logger.cjs`
-2. ✅ View session summary: `npm run session:summary`
-3. ✅ Review weekly report: `npm run session:summary --week`
+2. ✅ View session summary: `pnpm run session:summary`
+3. ✅ Review weekly report: `pnpm run session:summary --week`
 
 ### Short-Term (This Week)
 
@@ -437,7 +437,7 @@ console.log(`Trend: ${cumulativeStats.trend}`);
 
 ### Issue: No session data
 
-**Symptom**: `npm run session:summary` shows "No session data for today yet"
+**Symptom**: `pnpm run session:summary` shows "No session data for today yet"
 
 **Solution**:
 ```bash
@@ -445,7 +445,7 @@ console.log(`Trend: ${cumulativeStats.trend}`);
 node scripts/test-usage-logger.cjs
 
 # Then try again
-npm run session:summary
+pnpm run session:summary
 ```
 
 ### Issue: Missing log files

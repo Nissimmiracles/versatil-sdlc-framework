@@ -2,7 +2,7 @@
 
 /**
  * VERSATIL SDLC Framework - Post-Install Wizard
- * Runs automatically after npm install to guide first-time setup
+ * Runs automatically after pnpm install to guide first-time setup
  */
 
 const fs = require('fs');
@@ -234,7 +234,7 @@ function showGettingStarted() {
   console.log('  • Quick Reference: versatil-sdlc-framework/QUICKSTART.md');
   console.log('  • Automation Guide: docs/AUTOMATION_TEST_REPORT.md\n');
   console.log('💡 Tips:\n');
-  console.log('  • Install MCP dependencies: npm run install-mcps');
+  console.log('  • Install MCP dependencies: pnpm run install-mcps');
   console.log('  • Update framework: versatil update check');
   console.log('  • Change settings: versatil config wizard');
   console.log('  • Get help anytime: versatil <command> --help\n');
@@ -279,15 +279,15 @@ async function promptMCPInstallation() {
         console.log('\n✅ MCP installation complete\n');
       } else {
         console.log('⚠️  MCP installation script not found');
-        console.log('You can install MCPs later with: npm run install-mcps\n');
+        console.log('You can install MCPs later with: pnpm run install-mcps\n');
       }
     } catch (error) {
       console.log('\n⚠️  MCP installation encountered issues');
-      console.log('You can install MCPs later with: npm run install-mcps\n');
+      console.log('You can install MCPs later with: pnpm run install-mcps\n');
     }
   } else {
     console.log('\n📝 MCP installation skipped.\n');
-    console.log('You can install MCPs later with: npm run install-mcps\n');
+    console.log('You can install MCPs later with: pnpm run install-mcps\n');
   }
 }
 

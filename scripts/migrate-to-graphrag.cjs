@@ -13,7 +13,7 @@
  *
  * Usage:
  *   node scripts/migrate-to-graphrag.cjs
- *   npm run rag:migrate:graph
+ *   pnpm run rag:migrate:graph
  */
 
 const fs = require('fs');
@@ -80,7 +80,7 @@ async function migrateToGraphRAG() {
     log.success('GraphRAG Store initialized\n');
   } catch (error) {
     log.error(`Failed to initialize GraphRAG Store: ${error.message}`);
-    log.info('Make sure the framework is compiled: npm run build');
+    log.info('Make sure the framework is compiled: pnpm run build');
     process.exit(1);
   }
 

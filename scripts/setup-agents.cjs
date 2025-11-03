@@ -416,7 +416,7 @@ ${agent.tools.map(t => `- ${t}`).join('\n')}
 
 maria_test_all() {
     echo "${agent.emoji} Running comprehensive test suite..."
-    npm run test
+    pnpm run test
     playwright test
 }
 
@@ -446,7 +446,7 @@ james_lint() {
 
 james_build() {
     echo "${agent.emoji} Building frontend..."
-    npm run build
+    pnpm run build
 }
 
 james_optimize() {
@@ -459,7 +459,7 @@ james_optimize() {
 
 marcus_security() {
     echo "${agent.emoji} Running security audit..."
-    npm audit
+    pnpm audit
     snyk test
 }
 
@@ -633,8 +633,8 @@ module.exports = router;
     console.log(`${colors.blue}Next Steps:${colors.reset}`);
     console.log('1. 🚀 Open your project in Cursor IDE');
     console.log('2. 📝 Edit files matching agent patterns to see auto-activation');
-    console.log('3. ✅ Run: npm run versatil:validate');
-    console.log('4. 🧪 Test Maria-QA: npm run maria:test');
+    console.log('3. ✅ Run: pnpm run versatil:validate');
+    console.log('4. 🧪 Test Maria-QA: pnpm run maria:test');
     console.log('');
 
     console.log(`${colors.yellow}Pro Tips:${colors.reset}`);

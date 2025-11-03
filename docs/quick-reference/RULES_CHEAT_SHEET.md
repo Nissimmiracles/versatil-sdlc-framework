@@ -42,7 +42,7 @@ Execution:
 # → Runs in parallel automatically
 
 # Monitor parallel execution
-npm run dashboard
+pnpm run dashboard
 # → See real-time parallel task visualization
 
 # Force sequential (if needed)
@@ -101,13 +101,13 @@ Output:
 # → Edit API file → stress tests auto-run
 
 # Manual stress test
-npm run test:stress
+pnpm run test:stress
 
 # Generate stress tests for specific file
 /maria generate stress-tests src/api/users.ts
 
 # View stress test results
-npm run test:stress -- --verbose
+pnpm run test:stress -- --verbose
 ```
 
 ### Benefits
@@ -179,7 +179,7 @@ Report_Output:
 ### Examples
 ```bash
 # Manual audit (any time)
-npm run audit
+pnpm run audit
 
 # View last audit report
 cat ~/.versatil/audit-reports/latest.md
@@ -188,7 +188,7 @@ cat ~/.versatil/audit-reports/latest.md
 versatil-config set audit.schedule "0 2 * * *"  # 2 AM daily
 
 # Background monitoring
-npm run dashboard:background
+pnpm run dashboard:background
 ```
 
 ### Benefits
@@ -260,16 +260,16 @@ Onboarding_Workflow:
 ### Examples
 ```bash
 # Run onboarding (new project)
-npm run init
+pnpm run init
 
 # Re-run onboarding (detect new tech stack)
-npm run init --force
+pnpm run init --force
 
 # Dry-run (see what would be configured)
-npm run init --dry-run
+pnpm run init --dry-run
 
 # Skip specific steps
-npm run init --skip-templates
+pnpm run init --skip-templates
 ```
 
 ### Benefits
@@ -345,19 +345,19 @@ Example_Timeline:
 ### Examples
 ```bash
 # View pending releases
-npm run release:status
+pnpm run release:status
 
 # Create release manually
-npm run release
+pnpm run release
 
 # Create pre-release (alpha, beta)
-npm run release -- --prerelease alpha
+pnpm run release -- --prerelease alpha
 
 # Dry-run (see what would be released)
-npm run release -- --dry-run
+pnpm run release -- --dry-run
 
 # Skip deployment
-npm run release -- --no-deploy
+pnpm run release -- --no-deploy
 ```
 
 ### Benefits
@@ -433,10 +433,10 @@ versatil-config set rule5.auto_deploy_production false  # Manual approval
 
 ```bash
 # View rule execution stats
-npm run monitor -- --rules
+pnpm run monitor -- --rules
 
 # View rule efficiency
-npm run dashboard  # → Rules tab
+pnpm run dashboard  # → Rules tab
 
 # Disable rule temporarily
 versatil-config set rule2.enabled false  # Disable stress testing

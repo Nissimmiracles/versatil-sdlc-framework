@@ -77,7 +77,7 @@ function ensureTypeScriptCompiled() {
     console.log(`${colors.yellow}⚠️  Compiled validator not found. Compiling TypeScript...${colors.reset}`);
 
     try {
-      execSync('npm run build', { stdio: 'inherit' });
+      execSync('pnpm run build', { stdio: 'inherit' });
       console.log(`${colors.green}✅ TypeScript compilation complete${colors.reset}`);
     } catch (error) {
       console.error(`${colors.red}❌ TypeScript compilation failed${colors.reset}`);
@@ -92,7 +92,7 @@ function ensureTypeScriptCompiled() {
       console.log(`${colors.yellow}⚠️  Source files modified. Recompiling...${colors.reset}`);
 
       try {
-        execSync('npm run build', { stdio: 'inherit' });
+        execSync('pnpm run build', { stdio: 'inherit' });
         console.log(`${colors.green}✅ TypeScript compilation complete${colors.reset}`);
       } catch (error) {
         console.error(`${colors.red}❌ TypeScript compilation failed${colors.reset}`);

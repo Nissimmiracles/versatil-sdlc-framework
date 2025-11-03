@@ -42,7 +42,7 @@ This is a **major release** that transforms VERSATIL from a static framework int
   - `dist/team/team-context-manager.js`
   - `dist/rag/crg-retrieval-cache.js`
   - `dist/rag/cag-prompt-cache.js`
-- ✅ Integration test passed: `npm run context:test`
+- ✅ Integration test passed: `pnpm run context:test`
 - ✅ All E2E tests passing
 - ✅ Privacy isolation verified (100%)
 
@@ -101,7 +101,7 @@ This is a **major release** that transforms VERSATIL from a static framework int
 **Status**: Complete
 
 - ✅ Migration script created: `scripts/migrate-project-context.cjs` (362 lines)
-- ✅ NPM script added: `npm run context:migrate`
+- ✅ NPM script added: `pnpm run context:migrate`
 - ✅ Auto-backup functionality tested
 - ✅ Zero data loss guaranteed
 - ✅ Validation test passed
@@ -278,10 +278,10 @@ npm install @versatil/sdlc-framework
 npm install @versatil/sdlc-framework@latest
 
 # 2. Run migration (automatic backup)
-npm run context:migrate
+pnpm run context:migrate
 
 # 3. Validate system
-npm run context:test
+pnpm run context:test
 
 # 4. Start using context-aware agents!
 /plan "My next feature"
@@ -305,7 +305,7 @@ If any issues arise:
 
 3. **Verify rollback**:
    ```bash
-   npm run doctor
+   pnpm run doctor
    ```
 
 **Backup Location**: `~/.versatil-backup-20251022-015410/`

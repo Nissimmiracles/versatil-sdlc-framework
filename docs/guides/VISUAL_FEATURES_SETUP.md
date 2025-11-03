@@ -50,7 +50,7 @@ ps aux | grep versatil-daemon | grep -v grep
 ```bash
 # Start daemon for specific project
 cd /path/to/your/project
-npm run daemon:start
+pnpm run daemon:start
 
 # OR if VERSATIL is installed globally
 versatil-daemon start --project "$(pwd)"
@@ -65,14 +65,14 @@ cd /path/to/your/project
 ls -la .versatil-project.json
 
 # Check 2: Are npm scripts available?
-npm run | grep -E "daemon|compass|monitor"
+pnpm run | grep -E "daemon|compass|monitor"
 
 # Check 3: Is framework home accessible?
 ls -la ~/.versatil/
 
 # Expected:
 # ✅ .versatil-project.json exists
-# ✅ npm run daemon:start, session:compass available
+# ✅ pnpm run daemon:start, session:compass available
 # ✅ ~/.versatil/ directory with hooks/, memories/, etc.
 ```
 
@@ -89,7 +89,7 @@ versatil init  # OR: npx versatil-sdlc-framework init
 
 ```bash
 # Should display: git status, last session, next tasks
-npm run session:compass:brief
+pnpm run session:compass:brief
 
 # Expected output:
 # 📁 Project: Your Project Name
@@ -164,10 +164,10 @@ versatil init
 
 ```bash
 # Start background daemon
-npm run daemon:start
+pnpm run daemon:start
 
 # Verify daemon is running
-npm run daemon:status
+pnpm run daemon:status
 
 # Expected output:
 # ✅ Daemon running (PID: 12345)
@@ -180,7 +180,7 @@ npm run daemon:status
 
 ```bash
 # Test 1: Session Compass
-npm run session:compass:brief
+pnpm run session:compass:brief
 # Should show: project context, git status, next tasks
 
 # Test 2: Statusline (requires active agent work)
@@ -202,7 +202,7 @@ git status
 
 **Requirements**:
 - ✅ `~/.cursor/hooks.json` with `beforeSubmitPrompt` hook pointing to `onSessionOpen.sh`
-- ✅ `npm run session:compass:brief` script in package.json
+- ✅ `pnpm run session:compass:brief` script in package.json
 - ✅ `scripts/session-compass.cjs` file exists
 - ✅ `~/.versatil/learning/` directory with session history
 
@@ -242,7 +242,7 @@ git status
 **Manual test**:
 ```bash
 # Start daemon with debug logging
-VERSATIL_LOG_LEVEL=debug npm run daemon:start
+VERSATIL_LOG_LEVEL=debug pnpm run daemon:start
 
 # In another terminal, edit a file
 echo "// test" >> src/test.tsx
@@ -338,7 +338,7 @@ ls ~/.versatil/workflows/
 # Should contain: pr-review.yaml, deploy.yaml, etc.
 
 # Test workflow manually
-npm run workflow:trigger -- --workflow=pr-review
+pnpm run workflow:trigger -- --workflow=pr-review
 ```
 
 ---
@@ -380,7 +380,7 @@ ls tests/stress/ | grep "api-test"
 
 **Symptoms**:
 ```bash
-npm run daemon:start
+pnpm run daemon:start
 # Error: EADDRINUSE: port 3030 already in use
 ```
 
@@ -390,7 +390,7 @@ npm run daemon:start
 ps aux | grep versatil-daemon | grep -v grep | awk '{print $2}' | xargs kill
 
 # Start again
-npm run daemon:start
+pnpm run daemon:start
 ```
 
 ---
@@ -399,7 +399,7 @@ npm run daemon:start
 
 **Symptoms**:
 ```bash
-npm run session:compass:brief
+pnpm run session:compass:brief
 # Output: No session data available
 ```
 
@@ -453,7 +453,7 @@ ls .versatil-project.json
 # If NOT EXISTS → Run: versatil init
 
 # Check if npm scripts exist
-npm run | grep versatil
+pnpm run | grep versatil
 # If EMPTY → Add scripts to package.json (see below)
 
 # Add missing scripts to package.json:
@@ -481,11 +481,11 @@ cat ~/.versatil/logs/agents/james-frontend.log
 
 # Common errors:
 # 1. Missing dependencies → npm install
-# 2. TypeScript errors → npm run build
+# 2. TypeScript errors → pnpm run build
 # 3. Memory limit → Increase Node memory: NODE_OPTIONS=--max-old-space-size=4096
 
 # Restart daemon with debug logging
-VERSATIL_LOG_LEVEL=debug npm run daemon:start
+VERSATIL_LOG_LEVEL=debug pnpm run daemon:start
 ```
 
 ---
@@ -508,11 +508,11 @@ cat .versatil-project.json | jq '.proactive.enabled'
 # Expected: true
 
 # ✅ 4. Session compass works
-npm run session:compass:brief
+pnpm run session:compass:brief
 # Expected: Project context + git status + next tasks
 
 # ✅ 5. Framework health
-npm run monitor
+pnpm run monitor
 # Expected: Health score 80%+
 
 # ✅ 6. Logs are being written
@@ -520,7 +520,7 @@ ls -lh ~/.versatil/logs/
 # Expected: daemon.log, hooks.log, agent logs (sizes > 0)
 
 # ✅ 7. Test automation ready
-npm run test:stress
+pnpm run test:stress
 # Expected: Stress tests exist and can run
 ```
 
@@ -603,13 +603,13 @@ If visual features STILL don't appear after following this guide:
 
 1. **Generate debug report**:
    ```bash
-   npm run framework:doctor -- --verbose
+   pnpm run framework:doctor -- --verbose
    # Saves report to: ~/.versatil/logs/doctor-report.txt
    ```
 
 2. **Check framework health**:
    ```bash
-   npm run monitor report
+   pnpm run monitor report
    # Shows: All systems status, agents active, errors
    ```
 
@@ -628,8 +628,8 @@ If visual features STILL don't appear after following this guide:
 
    # Fresh initialization
    versatil init
-   npm run daemon:start
-   npm run session:compass:brief
+   pnpm run daemon:start
+   pnpm run session:compass:brief
    ```
 
 5. **Report issue**:

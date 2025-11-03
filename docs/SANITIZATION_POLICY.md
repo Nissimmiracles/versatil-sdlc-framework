@@ -135,7 +135,7 @@ await publicRAG.addPattern({
 // ❌ REJECTED: Pattern contains project-specific data
 //    Reason: GCP project ID detected
 //    Action: Store in Private RAG only (NOT Public RAG)
-//    Configure Private RAG: npm run setup:private-rag
+//    Configure Private RAG: pnpm run setup:private-rag
 ```
 
 ### /learn Command (`.claude/commands/learn.md`)

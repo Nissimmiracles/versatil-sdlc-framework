@@ -271,12 +271,12 @@ function showExamples(agent) {
     'maria-qa': [
       '/maria review test coverage',
       '/maria generate tests src/api/users.ts',
-      'npm run test:coverage',
+      'pnpm run test:coverage',
     ],
     'marcus-backend': [
       '/marcus review API security',
       '/marcus optimize endpoint /api/users',
-      'npm run test:stress',
+      'pnpm run test:stress',
     ],
     'james-frontend': [
       '/james optimize component performance',

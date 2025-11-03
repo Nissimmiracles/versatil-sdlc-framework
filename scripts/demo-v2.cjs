@@ -108,7 +108,7 @@ if (runCommand('Test 4: Doctor Health Check', 'node scripts/doctor-integration.c
 }
 
 // Test 5: Isolation Validation
-if (runCommand('Test 5: Isolation Validation', 'npm run validate:isolation')) {
+if (runCommand('Test 5: Isolation Validation', 'pnpm run validate:isolation')) {
   score++;
   console.log('   ✅ PASS: Isolation validation works');
 } else {

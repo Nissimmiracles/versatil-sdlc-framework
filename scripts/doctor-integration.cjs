@@ -229,7 +229,7 @@ async function checkSecurity() {
   console.log('Checking security...');
 
   try {
-    const { stdout } = await execPromise('npm audit --json', { cwd: PROJECT_ROOT });
+    const { stdout } = await execPromise('pnpm audit --json', { cwd: PROJECT_ROOT });
     const audit = JSON.parse(stdout);
     const vulnerabilities = audit.metadata?.vulnerabilities || {};
     const total = Object.values(vulnerabilities).reduce((sum, count) => sum + count, 0);
@@ -298,7 +298,7 @@ async function autoFix() {
   // Fix missing agents
   if (checks.agents.status === 'warn' && checks.agents.fixable) {
     console.log('Fixing missing agent configs...');
-    console.log('  → Recreate agents with: npm run init');
+    console.log('  → Recreate agents with: pnpm run init');
     fixed++;
   }
 
@@ -306,7 +306,7 @@ async function autoFix() {
   if (checks.security.status === 'warn' && checks.security.fixable) {
     console.log('Fixing security vulnerabilities...');
     try {
-      await execPromise('npm audit fix', { cwd: PROJECT_ROOT });
+      await execPromise('pnpm audit fix', { cwd: PROJECT_ROOT });
       console.log('  ✅ Security vulnerabilities fixed');
       fixed++;
     } catch (error) {

@@ -312,7 +312,7 @@ npm install @versatil/sdlc-framework
 
 **Zero-friction migration**:
 ```bash
-npm run context:migrate
+pnpm run context:migrate
 
 # Migration script:
 # 1. Backs up current config to ~/.versatil-backup-[timestamp]/
@@ -329,7 +329,7 @@ npm run context:migrate
 
 **Test the system**:
 ```bash
-npm run context:test
+pnpm run context:test
 
 # E2E integration test:
 # ✅ User context created and applied
@@ -391,13 +391,13 @@ npm run context:test
 
 ```bash
 # Context system
-npm run context:migrate    # Migrate existing project to context system
-npm run context:test       # Run E2E integration test
+pnpm run context:migrate    # Migrate existing project to context system
+pnpm run context:test       # Run E2E integration test
 
 # Context stats (existing)
-npm run context:stats      # Show context statistics
-npm run context:report     # Generate context report
-npm run context:cleanup    # Clean up old context data
+pnpm run context:stats      # Show context statistics
+pnpm run context:report     # Generate context report
+pnpm run context:cleanup    # Clean up old context data
 ```
 
 ---
@@ -520,12 +520,12 @@ Before upgrading to v6.6.0:
 - [ ] Backup current framework state (`~/.versatil/`)
 - [ ] Review git history (used for auto-detection)
 - [ ] Check Node.js ≥18.0.0
-- [ ] Run `npm run doctor` (ensure health ≥90%)
+- [ ] Run `pnpm run doctor` (ensure health ≥90%)
 
 After upgrading to v6.6.0:
 
-- [ ] Run `npm run context:migrate` (if existing user)
-- [ ] Run `npm run context:test` (validate system)
+- [ ] Run `pnpm run context:migrate` (if existing user)
+- [ ] Run `pnpm run context:test` (validate system)
 - [ ] Review auto-detected preferences (`~/.versatil/users/[your-id]/profile.json`)
 - [ ] (Optional) Create team with `/team create "Team Name"`
 - [ ] (Optional) Define project vision with `/vision "Project Mission"`

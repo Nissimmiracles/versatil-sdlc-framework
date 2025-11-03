@@ -6,7 +6,7 @@
  * Command-line tool to check health of all 11 MCPs configured in the framework.
  *
  * Usage:
- *   npm run mcp:health
+ *   pnpm run mcp:health
  *   node scripts/mcp-health-check.cjs
  *   node scripts/mcp-health-check.cjs --verbose
  *   node scripts/mcp-health-check.cjs --watch

@@ -84,7 +84,7 @@ velocity history [limit]          # Show completed workflows
 |---------|-----------|-------|------------|
 | `/plan` command | Command name includes "plan" | Plan | 0.95 |
 | File edit (active workflow) | Code file edited | Work | 0.85 |
-| Build command | `npm run build` | Assess | 0.9 |
+| Build command | `pnpm run build` | Assess | 0.9 |
 | Session end | Hook: `stop` | Codify | 0.95 |
 | Manual | Explicitly specified | Any | 1.0 |
 
@@ -243,7 +243,7 @@ Step_3_File_Edit:
     context.work.filesModified: ["src/components/LoginForm.tsx"]
 
 Step_4_Build:
-  User_Action: "npm run build"
+  User_Action: "pnpm run build"
   Hook_Trigger: "afterBuild.sh"
   Detection: "detectPhaseFromBuild() → ASSESS phase (confidence: 0.9)"
   Command: "velocity assess --auto" (from hook)
@@ -323,7 +323,7 @@ User: Edit LoginForm.tsx
 → No workflow awareness
 → No progress tracking
 
-User: npm run build
+User: pnpm run build
 → Tests run (afterBuild.sh)
 → No quality gate tracking
 → No workflow state update
@@ -350,7 +350,7 @@ User: Edit LoginForm.tsx
 → WORK phase active
 → Progress visible in velocity status
 
-User: npm run build
+User: pnpm run build
 → afterBuild.sh detects active workflow
 → velocity assess --auto
 → Quality gates validated

@@ -12,7 +12,7 @@ Complete guide to installing and running VERSATIL MCP Server using npx (no insta
 |---------|-----|-------------|
 | **Installation Time** | 2-3 min | 10-15 min |
 | **Disk Space** | Cached (~200MB) | 1-2GB per project |
-| **Updates** | Automatic (on demand) | Manual (`npm update`) |
+| **Updates** | Automatic (on demand) | Manual (`pnpm update`) |
 | **Global Pollution** | None | Can conflict |
 | **Version Control** | Pin to any tag/commit | Requires package.json |
 | **MCP Use Case** | ✅ Perfect | ⚠️ Overkill |

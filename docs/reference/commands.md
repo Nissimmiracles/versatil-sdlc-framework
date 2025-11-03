@@ -417,7 +417,7 @@ Overall Health Score: 88/100 (Good)
 ⚠️  3 Issues Require Attention:
   1. High network latency (investigate DNS/routing)
   2. Error rate above threshold (check logs)
-  3. 3 dependency vulnerabilities (run: npm audit fix)
+  3. 3 dependency vulnerabilities (run: pnpm audit fix)
 
 Auto-Remediation Actions:
   ✅ Triggered cache cleanup (freed 2.1GB)

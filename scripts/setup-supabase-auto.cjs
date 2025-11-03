@@ -3,7 +3,7 @@
 /**
  * VERSATIL SDLC Framework - Automatic Supabase Setup
  * This script automatically configures Supabase vector database for RAG
- * Runs during: npm install, MCP installation, or framework initialization
+ * Runs during: pnpm install, MCP installation, or framework initialization
  */
 
 const fs = require('fs');
@@ -135,7 +135,7 @@ DO NOT commit this directory to version control!
         if (process.platform === 'darwin') {
           execSync('brew install supabase/tap/supabase', { stdio: 'inherit' });
         } else if (process.platform === 'linux') {
-          execSync('npm install -g supabase', { stdio: 'inherit' });
+          execSync('pnpm add -g supabase', { stdio: 'inherit' });
         } else {
           log.error('Please install Supabase CLI manually: https://supabase.com/docs/guides/cli');
           return false;

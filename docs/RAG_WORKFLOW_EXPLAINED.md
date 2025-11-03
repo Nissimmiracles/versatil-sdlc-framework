@@ -590,7 +590,7 @@ Feature 5: 5h   █████ (82% faster) ← Predicted
 
 ### Build Process
 
-**Command**: `npm run build:hooks`
+**Command**: `pnpm run build:hooks`
 
 **Script**: `scripts/build-hooks.sh`
 
@@ -693,7 +693,7 @@ tests.forEach(test => {
 **Fix**:
 ```bash
 # Rebuild hooks
-npm run build:hooks
+pnpm run build:hooks
 
 # Verify compilation
 .claude/hooks/dist/before-prompt.cjs <<< '{"prompt":"test hooks"}'

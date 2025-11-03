@@ -434,14 +434,14 @@ $ cat package.json | grep "stress"
 **Evidence of Gap**:
 - ✅ automated-stress-test-generator.ts exists (37KB, comprehensive test generation)
 - ✅ Can generate stress tests for API endpoints
-- ✅ Manual trigger: `npm run test:stress` works
+- ✅ Manual trigger: `pnpm run test:stress` works
 - ❌ **NO FILE WATCHER** triggering stress tests on API changes
 - ❌ NO `.cursor/hooks.json` with `afterFileEdit` hook
 - ❌ NO automatic execution when `*.api.ts` files change
 
 **Impact**:
 - 🚫 Rule 2's core promise BROKEN: "auto-generates and runs stress tests whenever code changes"
-- 🚫 Users must manually run `npm run test:stress` after API changes
+- 🚫 Users must manually run `pnpm run test:stress` after API changes
 - 🚫 Benefits (+89% defect reduction) NOT REALIZED without automation
 - 🚫 Stress tests deferred to CI/CD, not immediate feedback
 
@@ -469,7 +469,7 @@ FILE_PATH="$1"
 # Check if API file was edited
 if [[ "$FILE_PATH" == *.api.* ]] || [[ "$FILE_PATH" == *routes/* ]]; then
   echo "🧪 API file changed - running stress tests..."
-  npm run test:stress -- --testNamePattern="$FILE_PATH"
+  pnpm run test:stress -- --testNamePattern="$FILE_PATH"
 fi
 ```
 
@@ -505,7 +505,7 @@ $ crontab -l | grep "versatil"
 
 **Evidence of Gap**:
 - ✅ daily-audit-system.ts exists (50KB, comprehensive health checks)
-- ✅ Manual trigger: `npm run monitor` works
+- ✅ Manual trigger: `pnpm run monitor` works
 - ✅ Schedule documented: "0 2 * * *" (2 AM daily)
 - ❌ **NO CRON SCHEDULER** actually running audits
 - ❌ NO systemd service for continuous monitoring
@@ -513,7 +513,7 @@ $ crontab -l | grep "versatil"
 
 **Impact**:
 - 🚫 Rule 3's core promise BROKEN: "Daily at 2 AM + immediate on issue detection"
-- 🚫 Health checks only when user manually runs `npm run monitor`
+- 🚫 Health checks only when user manually runs `pnpm run monitor`
 - 🚫 No proactive detection of framework degradation
 - 🚫 Issues accumulate until user checks, not 2 AM daily
 
@@ -542,7 +542,7 @@ console.log('✅ Daily audit daemon started (will run at 2 AM daily)');
 ```bash
 # scripts/install-cron-job.sh
 #!/bin/bash
-CRON_COMMAND="0 2 * * * cd $(pwd) && npm run monitor >> ~/.versatil/logs/daily-audit.log 2>&1"
+CRON_COMMAND="0 2 * * * cd $(pwd) && pnpm run monitor >> ~/.versatil/logs/daily-audit.log 2>&1"
 (crontab -l 2>/dev/null; echo "$CRON_COMMAND") | crontab -
 echo "✅ Daily audit cron job installed (runs 2 AM daily)"
 ```
@@ -563,7 +563,7 @@ bin/versatil-audit-daemon.js  # Daemon entry point
 **Current Implementation**:
 ```bash
 $ cat .claude/rules/README.md | grep "Manual trigger"
-**Manual trigger**: `npm run init`  # Line 227
+**Manual trigger**: `pnpm run init`  # Line 227
 # ❌ Requires MANUAL command, not "zero-config"
 
 $ cat package.json | grep '"init"'
@@ -574,13 +574,13 @@ $ cat package.json | grep '"init"'
 - ✅ intelligent-onboarding-system.ts exists (41KB, tech stack detection)
 - ✅ Can detect Node.js, Python, Docker, etc.
 - ✅ Can configure agents based on project type
-- ❌ **Requires manual `npm run init` command**
+- ❌ **Requires manual `pnpm run init` command**
 - ❌ NOT "zero-config" as promised
 - ❌ No auto-run on first `cd` into new project
 
 **Impact**:
 - 🚫 Rule 4's core promise BROKEN: "zero-config setup"
-- 🚫 Users must know to run `npm run init`
+- 🚫 Users must know to run `pnpm run init`
 - 🚫 Onboarding not "intelligent" if manual trigger required
 - 🚫 Friction introduced: read docs → find command → run it
 
@@ -606,7 +606,7 @@ $ cat package.json | grep '"init"'
 #!/bin/bash
 if [ ! -f ".versatil-project.json" ]; then
   echo "🎯 Detecting project type and configuring VERSATIL..."
-  npm run init
+  pnpm run init
 fi
 ```
 
@@ -985,14 +985,14 @@ tests/memory/memory-tool-operations.test.ts                # Test all 6 operatio
 >
 > **Quick Check**:
 > ```bash
-> npm run context:stats     # View current statistics
-> npm run context:report    # Generate detailed report
-> npm run context:cleanup   # Clean up old stats (30 days)
+> pnpm run context:stats     # View current statistics
+> pnpm run context:report    # Generate detailed report
+> pnpm run context:cleanup   # Clean up old stats (30 days)
 > ```"
 
 **Current Implementation**:
 ```bash
-$ npm run context:stats
+$ pnpm run context:stats
 npm ERR! Missing script: "context:stats"
 # ❌ Script doesn't exist
 
@@ -1544,10 +1544,10 @@ npx husky install
 . "$(dirname "$0")/_/husky.sh"
 
 echo "🧪 Running test coverage check..."
-npm run test:coverage
+pnpm run test:coverage
 
 # Extract coverage percentage
-COVERAGE=$(npm run test:coverage --silent | grep "All files" | awk '{print $10}' | sed 's/%//')
+COVERAGE=$(pnpm run test:coverage --silent | grep "All files" | awk '{print $10}' | sed 's/%//')
 
 if (( $(echo "$COVERAGE < 80" | bc -l) )); then
   echo "❌ Coverage ${COVERAGE}% is below 80% threshold"

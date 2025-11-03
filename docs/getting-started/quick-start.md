@@ -30,7 +30,7 @@ npm install -g versatil-sdlc-framework@latest
 ```bash
 git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git
 cd versatil-sdlc-framework
-npm install && npm run build
+npm install && pnpm run build
 ```
 
 **✓ Installation complete!** You now have access to the `versatil` command globally.

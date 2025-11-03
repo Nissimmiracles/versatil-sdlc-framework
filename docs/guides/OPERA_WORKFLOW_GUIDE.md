@@ -1035,7 +1035,7 @@ npm install -g versatil-sdlc-framework
 
 # Initialize in your project
 cd your-project
-npm run init
+pnpm run init
 
 # Framework auto-detects your tech stack
 # → Configures agents automatically
@@ -1073,13 +1073,13 @@ touch src/components/LoginForm.test.tsx
 
 ```bash
 # View agent activity
-npm run monitor
+pnpm run monitor
 
 # Interactive dashboard
-npm run dashboard
+pnpm run dashboard
 
 # Health check
-npm run doctor
+pnpm run doctor
 ```
 
 ---
@@ -1168,9 +1168,9 @@ cat .versatil/quality-gates.json
 
 **Solutions**:
 1. Run Maria-QA: `/maria generate missing tests`
-2. Check coverage: `npm run test:coverage`
+2. Check coverage: `pnpm run test:coverage`
 3. Add tests for uncovered code
-4. Re-run quality gates: `npm run validate`
+4. Re-run quality gates: `pnpm run validate`
 
 ### Issue: Parallel Execution Conflicts
 
@@ -1180,14 +1180,14 @@ cat .versatil/quality-gates.json
 1. Rule 1 handles collision detection automatically
 2. Check conflict log: `~/.versatil/logs/conflicts.log`
 3. Manual resolution if needed
-4. Re-run: `npm run validate`
+4. Re-run: `pnpm run validate`
 
 ### Issue: MCP Not Working
 
 **Symptoms**: "MCP connection failed: GitHub"
 
 **Solutions**:
-1. Check MCP health: `npm run mcp:health`
+1. Check MCP health: `pnpm run mcp:health`
 2. Validate credentials: Check `~/.versatil/.env`
 3. Test specific MCP: `node scripts/mcp-health-check.cjs github`
 4. See troubleshooting: `/help mcp-troubleshooting`
@@ -1197,8 +1197,8 @@ cat .versatil/quality-gates.json
 **Symptoms**: Agents taking longer than expected
 
 **Solutions**:
-1. Check framework health: `npm run monitor`
-2. Review performance metrics: `npm run dashboard`
+1. Check framework health: `pnpm run monitor`
+2. Review performance metrics: `pnpm run dashboard`
 3. Optimize database: Run Dana's query optimizer
 4. Check system resources: `top`
 
@@ -1286,24 +1286,24 @@ touch src/LoginForm.test.tsx
 
 ```bash
 # Monitoring
-npm run monitor              # Quick health check
-npm run dashboard            # Interactive dashboard
-npm run doctor               # Auto-fix issues
+pnpm run monitor              # Quick health check
+pnpm run dashboard            # Interactive dashboard
+pnpm run doctor               # Auto-fix issues
 
 # Testing
-npm run test:coverage        # Test coverage report
-npm run test:visual:percy    # Visual regression
-npm run security:scan        # Security scan
+pnpm run test:coverage        # Test coverage report
+pnpm run test:visual:percy    # Visual regression
+pnpm run security:scan        # Security scan
 
 # Validation
-npm run validate             # Full validation
-npm run validate:activation  # Agent activation check
-npm run validate:percy       # Percy integration check
-npm run validate:rag         # RAG integrity check
+pnpm run validate             # Full validation
+pnpm run validate:activation  # Agent activation check
+pnpm run validate:percy       # Percy integration check
+pnpm run validate:rag         # RAG integrity check
 
 # MCP
-npm run mcp:setup            # Interactive MCP setup
-npm run mcp:health           # MCP health check
+pnpm run mcp:setup            # Interactive MCP setup
+pnpm run mcp:health           # MCP health check
 
 # Help
 /help                        # Main help menu
@@ -1346,10 +1346,10 @@ npm run mcp:health           # MCP health check
 ### Getting Started Checklist
 
 - [ ] Install framework: `npm install -g versatil-sdlc-framework`
-- [ ] Initialize: `npm run init`
+- [ ] Initialize: `pnpm run init`
 - [ ] Start daemon: `versatil-daemon start`
 - [ ] Code normally: Agents auto-activate
-- [ ] Monitor: `npm run dashboard`
+- [ ] Monitor: `pnpm run dashboard`
 
 ### Next Steps
 

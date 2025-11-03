@@ -16,7 +16,7 @@ VERSATIL supports multi-cloud ML workflow deployments with:
 
 ```bash
 # Launch multi-cloud credential wizard
-npm run setup:ml-credentials
+pnpm run setup:ml-credentials
 
 # Follow prompts to:
 # 1. Select cloud provider (GCP/AWS/Supabase)
@@ -292,7 +292,7 @@ npm install -g supabase
 
 ```bash
 # Run credential wizard and select Supabase
-npm run setup:ml-credentials
+pnpm run setup:ml-credentials
 # Select: 3. Supabase
 
 # Prompts:
@@ -653,10 +653,10 @@ psql -h RDS_ENDPOINT -U postgres -d ml_workflow < backup.sql
 
 # 4. Update application
 export DATABASE_URL="postgresql://postgres:PASSWORD@RDS_ENDPOINT:5432/ml_workflow"
-npm run migrate
+pnpm run migrate
 
 # 5. Verify
-npm run test:db
+pnpm run test:db
 ```
 
 ### AWS → GCP
@@ -675,7 +675,7 @@ gcloud sql import sql ml-workflow-db gs://bucket/backup.sql --database=ml_workfl
 
 # 5. Update application
 export DATABASE_URL="postgresql://postgres:PASSWORD@INSTANCE_IP:5432/ml_workflow_dev"
-npm run migrate
+pnpm run migrate
 ```
 
 ## VERSATIL Agent Integration

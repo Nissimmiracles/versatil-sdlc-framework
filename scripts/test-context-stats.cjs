@@ -33,9 +33,9 @@ async function main() {
     console.log(c('yellow', '⚠️  Building framework first...\n'));
     const { execSync } = require('child_process');
     try {
-      execSync('npm run build', { stdio: 'inherit', cwd: path.join(__dirname, '..') });
+      execSync('pnpm run build', { stdio: 'inherit', cwd: path.join(__dirname, '..') });
     } catch (error) {
-      console.error(c('yellow', '\n⚠️  Build failed. Try: npm run build'));
+      console.error(c('yellow', '\n⚠️  Build failed. Try: pnpm run build'));
       process.exit(1);
     }
   }
@@ -149,9 +149,9 @@ async function main() {
     console.log(c('cyan', '\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
     console.log(c('green', '\n✅ Test completed successfully!\n'));
     console.log(c('bright', 'Try these commands:'));
-    console.log('  npm run context:stats    - View current statistics');
-    console.log('  npm run context:report   - Generate detailed report');
-    console.log('  npm run context:cleanup  - Clean up old stats\n');
+    console.log('  pnpm run context:stats    - View current statistics');
+    console.log('  pnpm run context:report   - Generate detailed report');
+    console.log('  pnpm run context:cleanup  - Clean up old stats\n');
 
   } catch (error) {
     console.error(c('yellow', '\n⚠️  Error:'), error.message);

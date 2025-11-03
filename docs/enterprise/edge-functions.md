@@ -324,7 +324,7 @@ curl -X POST http://localhost:8080/query \
 
 ```bash
 # Run E2E RAG tests (includes Cloud Run integration)
-npm run test:rag
+pnpm run test:rag
 
 # Tests include:
 # - GraphRAG query execution
@@ -573,7 +573,7 @@ If you previously used Supabase Edge Functions for OPERA agent routing:
 
 1. **Deploy Cloud Run**: `cd cloud-functions/graphrag-query && ./deploy.sh`
 2. **Update Config**: Set Cloud Run URL in `.versatil/config.json`
-3. **Test Integration**: Run `npm run test:rag`
+3. **Test Integration**: Run `pnpm run test:rag`
 4. **Remove Supabase Functions**: (optional) Clean up old Supabase deployments
 
 **Full Migration Guide**: [Cloud Run Deployment Guide](cloud-run-deployment.md)

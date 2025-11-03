@@ -104,7 +104,7 @@ Summary:
 
 Next Steps:
 1. Review generated code
-2. Run: npm test
+2. Run: pnpm test
 3. Test manually: POST http://localhost:3000/api/auth/login
 ```
 

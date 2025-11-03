@@ -7,12 +7,12 @@
  * No UI - just data collection for dashboard consumption
  *
  * Usage:
- *   npm run dashboard:background        # Start background service
+ *   pnpm run dashboard:background        # Start background service
  *   node scripts/background-monitor.cjs  # Direct start
  *   node scripts/background-monitor.cjs --interval=5000  # Custom interval
  *
  * To stop:
- *   npm run dashboard:stop
+ *   pnpm run dashboard:stop
  *   Kill the process (PID stored in /tmp/versatil-monitor.pid)
  */
 
@@ -64,7 +64,7 @@ if (fs.existsSync(PID_FILE)) {
     process.kill(existingPid, 0);
     log(`Background monitor already running (PID: ${existingPid})`);
     console.error(`Error: Background monitor already running (PID: ${existingPid})`);
-    console.error(`To stop it, run: npm run dashboard:stop`);
+    console.error(`To stop it, run: pnpm run dashboard:stop`);
     process.exit(1);
   } catch (error) {
     // Process not running, remove stale PID file
@@ -329,7 +329,7 @@ if (DAEMON_MODE) {
 
   log('Running in daemon mode');
   log(`To view logs: tail -f ${LOG_FILE}`);
-  log(`To stop: npm run dashboard:stop or kill ${process.pid}`);
+  log(`To stop: pnpm run dashboard:stop or kill ${process.pid}`);
 } else {
   log('Running in foreground mode (--foreground)');
   log('Press Ctrl+C to stop');

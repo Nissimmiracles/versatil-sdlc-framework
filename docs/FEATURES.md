@@ -518,7 +518,7 @@ High-confidence issues (≥90%) marked for automatic remediation:
 
 ### 1. build
 
-**Issue**: Build failed: Command failed: npm run build
+**Issue**: Build failed: Command failed: pnpm run build
 
 **Details**:
 - **Priority**: critical

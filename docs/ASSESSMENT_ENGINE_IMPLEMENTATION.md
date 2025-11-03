@@ -113,7 +113,7 @@ Victor generates assessment plan:
     {
       "type": "TestCoverage",
       "tool": "jest",
-      "command": "npm run test:coverage -- --collectCoverageFrom=\"**/auth/**/*.ts\"",
+      "command": "pnpm run test:coverage -- --collectCoverageFrom=\"**/auth/**/*.ts\"",
       "threshold": 90,
       "mandatory": true,
       "reason": "Security code requires 90%+ coverage"

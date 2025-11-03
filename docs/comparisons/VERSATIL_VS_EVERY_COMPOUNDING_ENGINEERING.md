@@ -176,7 +176,7 @@ After Feature 1 (Auth endpoint):
 // session-codify.ts analyzes session
 
 Files edited: ["api/auth.ts", "api/auth.test.ts", "middleware/rate-limit.ts"]
-Commands run: ["npm test", "npm run build"]
+Commands run: ["pnpm test", "pnpm run build"]
 Agents used: ["Marcus-Backend", "Maria-QA"]
 
 Learnings detected:
@@ -353,7 +353,7 @@ $ /review
 
 **Manual effort**: 3 commands + manual reflection + manual documentation
 
-**Note**: VERSATIL demo available at: `npm run demo:native`
+**Note**: VERSATIL demo available at: `pnpm run demo:native`
 
 ### VERSATIL Example (Automatic)
 
@@ -361,7 +361,7 @@ $ /review
 # Developer just works (no commands)
 # Edits auth.ts → PostToolUse fires → Marcus-Backend suggests patterns
 # Edits auth.test.ts → PostToolUse fires → Maria-QA suggests tests
-# Runs npm test → SubagentStop fires → Quality checks shown
+# Runs pnpm test → SubagentStop fires → Quality checks shown
 
 # Session ends
 # Stop hook fires automatically
@@ -371,7 +371,7 @@ $ /review
 
 📊 Session Analysis:
    Files edited: 2 (auth.ts, auth.test.ts)
-   Commands run: 1 (npm test)
+   Commands run: 1 (pnpm test)
    Agents used: Marcus-Backend, Maria-QA
 
 💡 Learnings Captured:

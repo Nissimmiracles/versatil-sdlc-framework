@@ -951,10 +951,10 @@ The framework includes comprehensive unit tests for Oliver-MCP:
 
 ```bash
 # Run Oliver-MCP tests
-npm test tests/unit/mcp/oliver-mcp-orchestrator.test.ts
+pnpm test tests/unit/mcp/oliver-mcp-orchestrator.test.ts
 
 # Run with coverage
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 ### Test Categories

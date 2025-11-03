@@ -428,7 +428,7 @@ Each sub-agent includes:
 npm install -g versatil-sdlc-framework@6.4.0
 
 # 2. Initialize project
-npm run init  # Auto-detects tech stack
+pnpm run init  # Auto-detects tech stack
 
 # 3. Use language-specific agents
 /marcus-node-backend "Review my Express routes"

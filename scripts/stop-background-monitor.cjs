@@ -5,7 +5,7 @@
  * Stops the background monitoring service gracefully
  *
  * Usage:
- *   npm run dashboard:stop
+ *   pnpm run dashboard:stop
  *   node scripts/stop-background-monitor.cjs
  */
 

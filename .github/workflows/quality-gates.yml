@@ -53,7 +53,7 @@ jobs:
         id: wcag-tests
         run: |
           echo "Running WCAG 2.1 AA accessibility tests..."
-          npm run test:accessibility || echo "test_failed=true" >> $GITHUB_OUTPUT
+          pnpm run test:accessibility || echo "test_failed=true" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       - name: Run keyboard navigation tests
@@ -197,7 +197,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests with coverage
-        run: pnpm run test:coverage || npm run test:unit
+        run: pnpm run test:coverage || pnpm run test:unit
         continue-on-error: true
 
       - name: Upload coverage reports
@@ -287,7 +287,7 @@ jobs:
         run: |
           # Start dev server in background for testing
           if [ -f "package.json" ] && grep -q "\"dev\"" package.json; then
-            npm run dev &
+            pnpm run dev &
             SERVER_PID=$!
             echo "server_pid=$SERVER_PID" >> $GITHUB_OUTPUT
 
@@ -486,7 +486,7 @@ jobs:
             npx playwright test --project=visual-regression
           else
             echo "Running Percy visual regression tests..."
-            npm run test:visual:percy
+            pnpm run test:visual:percy
           fi
         continue-on-error: true
 

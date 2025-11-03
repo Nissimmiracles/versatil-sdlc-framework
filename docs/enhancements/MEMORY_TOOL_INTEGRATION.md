@@ -50,7 +50,7 @@ VERSATIL SDLC Framework has been enhanced with **Claude's Memory Tool** and **Co
 #### Key Features
 - **18 template files** across 7 agents
 - **Isolated storage** at `~/.versatil/memories/` (not in user projects)
-- **Automatic initialization** via `npm run memory:init`
+- **Automatic initialization** via `pnpm run memory:init`
 - **Pattern persistence** across sessions
 
 ---
@@ -141,13 +141,13 @@ await mariaMemory.storePattern({
 **Added Commands**:
 ```bash
 # Initialize memory directories and templates
-npm run memory:init
+pnpm run memory:init
 
 # View memory statistics
-npm run memory:stats
+pnpm run memory:stats
 
 # Cleanup old cached documentation
-npm run memory:cleanup
+pnpm run memory:cleanup
 ```
 
 ---
@@ -178,7 +178,7 @@ npm run memory:cleanup
 ### Manual Testing Completed
 ```bash
 # 1. Initialize memory tool
-npm run memory:init
+pnpm run memory:init
 ✅ Created 18 template files across 7 agents
 
 # 2. Verify directory structure
@@ -370,7 +370,7 @@ Add to `.claude/mcp_config.json`:
 
 ## 📊 Metrics Dashboard
 
-Run `npm run memory:stats` to see current metrics:
+Run `pnpm run memory:stats` to see current metrics:
 
 ```json
 {

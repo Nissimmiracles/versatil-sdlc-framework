@@ -164,9 +164,9 @@ Created comprehensive health checks and integration tests for all 11 MCPs config
 
 **Usage**:
 ```bash
-npm run mcp:health              # Run health check
-npm run mcp:health:verbose      # Verbose output
-npm run mcp:health:watch        # Watch mode (every 60s)
+pnpm run mcp:health              # Run health check
+pnpm run mcp:health:verbose      # Verbose output
+pnpm run mcp:health:watch        # Watch mode (every 60s)
 ```
 
 **Features**:
@@ -237,13 +237,13 @@ Summary: 9/11 healthy, 1 slow, 1 down
 
 ✅ **Tests run in CI/CD pipeline**
 - Jest integration test suite
-- Can be run via `npm run test:integration`
+- Can be run via `pnpm run test:integration`
 - Supports `--passWithNoTests` flag for CI environments
 
 ✅ **CLI tool for manual health checks**
-- `npm run mcp:health` - Quick health check
-- `npm run mcp:health:verbose` - Detailed output
-- `npm run mcp:health:watch` - Continuous monitoring
+- `pnpm run mcp:health` - Quick health check
+- `pnpm run mcp:health:verbose` - Detailed output
+- `pnpm run mcp:health:watch` - Continuous monitoring
 
 ✅ **Integration tests for top 3 MCPs**
 1. **Playwright**: 23 tests (browser automation, accessibility, Maria-QA integration)
@@ -269,34 +269,34 @@ Summary: 9/11 healthy, 1 slow, 1 down
 
 ### Run All MCP Tests
 ```bash
-npm run test:integration -- tests/mcp/
+pnpm run test:integration -- tests/mcp/
 ```
 
 ### Run Individual Test Suites
 ```bash
 # Health check tests
-npm run test:integration -- tests/mcp/mcp-health-check.test.ts
+pnpm run test:integration -- tests/mcp/mcp-health-check.test.ts
 
 # Playwright integration
-npm run test:integration -- tests/mcp/playwright-integration.test.ts
+pnpm run test:integration -- tests/mcp/playwright-integration.test.ts
 
 # GitHub integration
-npm run test:integration -- tests/mcp/github-integration.test.ts
+pnpm run test:integration -- tests/mcp/github-integration.test.ts
 
 # GitMCP integration
-npm run test:integration -- tests/mcp/gitmcp-integration.test.ts
+pnpm run test:integration -- tests/mcp/gitmcp-integration.test.ts
 ```
 
 ### Manual Health Check (CLI)
 ```bash
 # Quick check
-npm run mcp:health
+pnpm run mcp:health
 
 # Verbose output
-npm run mcp:health:verbose
+pnpm run mcp:health:verbose
 
 # Watch mode (continuous monitoring)
-npm run mcp:health:watch
+pnpm run mcp:health:watch
 ```
 
 ---

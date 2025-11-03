@@ -330,7 +330,7 @@ VERSATIL SDLC Framework has been successfully updated to leverage **all major Cu
 
 ```bash
 # Update to latest version
-npm update -g @versatil/sdlc-framework
+pnpm update -g @versatil/sdlc-framework
 
 # Verify version
 versatil --version

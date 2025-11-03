@@ -285,7 +285,7 @@ Unknown manual todos, need individual review.
 
 ### 2. Build Validation
 ```bash
-✅ npm run build - SUCCESS
+✅ pnpm run build - SUCCESS
 ✅ All TypeScript files compiled
 ✅ No errors or warnings
 ✅ Guardian enhancements built successfully
@@ -399,7 +399,7 @@ await initializeGuardian(5);  // Back to 5 minutes
 ### Option 4: Full Revert
 ```bash
 git revert HEAD  # Revert v7.16.0 Guardian changes
-npm run build
+pnpm run build
 ```
 
 ---
@@ -458,7 +458,7 @@ The Guardian todo audit and enhancement successfully:
 1. "27 outdated dependencies" - ~360 occurrences
 2. "RAG Router malfunction" - ~165 occurrences
 3. "GraphRAG query timeout (7812ms)" - ~165 occurrences
-4. "Build failed: Command failed: npm run build" - ~92 occurrences
+4. "Build failed: Command failed: pnpm run build" - ~92 occurrences
 5. "Tests failed: stderr maxBuffer length exceeded" - ~92 occurrences
 6. Other - ~3 occurrences
 

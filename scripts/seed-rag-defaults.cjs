@@ -696,7 +696,7 @@ Fixes #456
 
 docs(readme): update installation instructions
 
-Add troubleshooting section for common npm install errors.
+Add troubleshooting section for common pnpm install errors.
 
 **Guidelines:**
 - Use present tense ("add" not "added")
@@ -777,7 +777,7 @@ function loadEnv() {
   const envPath = path.join(process.env.HOME, '.versatil', '.env');
   if (!fs.existsSync(envPath)) {
     log.error('No .env file found at ~/.versatil/.env');
-    log.info('Run: npm run rag:setup');
+    log.info('Run: pnpm run rag:setup');
     process.exit(1);
   }
 
@@ -887,7 +887,7 @@ async function seedDefaultPatterns() {
   }
 
   if (env.SUPABASE_URL.includes('your-') || env.SUPABASE_SERVICE_KEY.includes('your-')) {
-    if (!silent) log.error('Placeholder credentials detected. Run: npm run rag:setup');
+    if (!silent) log.error('Placeholder credentials detected. Run: pnpm run rag:setup');
     if (silent) process.exit(0); // Silent fail in postinstall
     process.exit(1);
   }
@@ -953,8 +953,8 @@ async function seedDefaultPatterns() {
     }
 
     if (!dryRun) {
-      log.info('\nVerify patterns: npm run rag:test');
-      log.info('Add framework patterns: npm run rag:seed-framework');
+      log.info('\nVerify patterns: pnpm run rag:test');
+      log.info('Add framework patterns: pnpm run rag:seed-framework');
     }
   }
 }

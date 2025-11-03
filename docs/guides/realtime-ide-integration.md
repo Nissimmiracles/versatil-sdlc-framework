@@ -56,7 +56,7 @@ Based on research (October 2025), Cursor IDE has **known compatibility issues** 
 
 ### 1. Quick Status Check (⭐ NEW - Recommended for First-Time Users)
 
-**Launch Command**: `npm run status`
+**Launch Command**: `pnpm run status`
 
 **Technology**: Node.js (simple console output)
 
@@ -104,9 +104,9 @@ Based on research (October 2025), Cursor IDE has **known compatibility issues** 
 ───────────────────────────────────────────────────────────────────────
 
 Commands:
-  npm run status            Show this quick status check
-  npm run dashboard         Launch full interactive dashboard
-  npm run monitor           Run comprehensive health check
+  pnpm run status            Show this quick status check
+  pnpm run dashboard         Launch full interactive dashboard
+  pnpm run monitor           Run comprehensive health check
 ```
 
 **When to Use**:
@@ -118,17 +118,17 @@ Commands:
 - ✅ **Safe for scripts** - guaranteed to exit
 
 **Why This Was Added**:
-Users reported `npm run dashboard` "hanging" - but it was actually working correctly as a continuous UI. This new `npm run status` command provides a quick, non-blocking alternative for status checks.
+Users reported `pnpm run dashboard` "hanging" - but it was actually working correctly as a continuous UI. This new `pnpm run status` command provides a quick, non-blocking alternative for status checks.
 
 ---
 
 ### 2. Interactive Dashboard (Advanced Real-Time Monitoring)
 
-**Launch Command**: `npm run dashboard`
+**Launch Command**: `pnpm run dashboard`
 
 **Technology**: Node.js + blessed library (terminal UI framework)
 
-**⚠️ Important Behavior**: This is a **continuous interactive UI** that runs until you press 'q' or ESC. It does **not exit automatically** - this is by design for real-time monitoring. If you want a quick check that exits immediately, use `npm run status` instead.
+**⚠️ Important Behavior**: This is a **continuous interactive UI** that runs until you press 'q' or ESC. It does **not exit automatically** - this is by design for real-time monitoring. If you want a quick check that exits immediately, use `pnpm run status` instead.
 
 **Features**:
 - Real-time agent progress bars (7 OPERA agents)
@@ -183,9 +183,9 @@ Users reported `npm run dashboard` "hanging" - but it was actually working corre
 ```
 
 **Dashboard Versions**:
-- `npm run dashboard` - Latest v3 (adaptive layout, node selection)
-- `npm run dashboard:v1` - Original version (simple metrics)
-- `npm run dashboard:v2` - Enhanced version (progress bars)
+- `pnpm run dashboard` - Latest v3 (adaptive layout, node selection)
+- `pnpm run dashboard:v1` - Original version (simple metrics)
+- `pnpm run dashboard:v2` - Enhanced version (progress bars)
 
 ### 2. StatuslineManager (Lightweight Progress)
 
@@ -234,7 +234,7 @@ Users reported `npm run dashboard` "hanging" - but it was actually working corre
 
 ### 3. Background Monitoring
 
-**Launch Command**: `npm run dashboard:background`
+**Launch Command**: `pnpm run dashboard:background`
 
 **Purpose**: Continuous monitoring without visible UI
 
@@ -245,9 +245,9 @@ Users reported `npm run dashboard` "hanging" - but it was actually working corre
 - Auto-recovery on failures
 - Systemd/launchd integration for auto-start
 
-**View Logs**: `npm run dashboard:logs` (tail -f logs)
+**View Logs**: `pnpm run dashboard:logs` (tail -f logs)
 
-**Stop**: `npm run dashboard:stop`
+**Stop**: `pnpm run dashboard:stop`
 
 ---
 
@@ -556,7 +556,7 @@ function createProgressBar(progress: number): string {
     {
       "label": "VERSATIL Dashboard",
       "type": "shell",
-      "command": "npm run dashboard",
+      "command": "pnpm run dashboard",
       "isBackground": true,
       "presentation": {
         "reveal": "always",
@@ -880,7 +880,7 @@ cd versatil-web-dashboard
 
 **Current Best Practice** (October 2025):
 
-1. **Use Existing Terminal Dashboard** (`npm run dashboard`)
+1. **Use Existing Terminal Dashboard** (`pnpm run dashboard`)
    - ✅ Works today, fully featured, reliable
    - Auto-launch in Cursor terminal via tasks.json
    - Keep terminal panel open in bottom pane

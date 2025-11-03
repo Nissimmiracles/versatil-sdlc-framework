@@ -76,7 +76,7 @@ Every pattern detected at session end is automatically classified into one of fi
    3. Both - Best of both worlds (private priority + public contribution)
 
    💡 Tip: Run /learn command to review and store these patterns
-   💡 Configure Private RAG: npm run setup:private-rag
+   💡 Configure Private RAG: pnpm run setup:private-rag
 ```
 
 ---
@@ -209,7 +209,7 @@ All pattern storage operations logged to:
 
 ```bash
 # One-time setup (2-3 minutes)
-npm run setup:private-rag
+pnpm run setup:private-rag
 
 # Follow prompts to choose storage backend:
 # 1. Firestore (1GB free)
@@ -389,7 +389,7 @@ DISABLE_AUTO_LEARNING=true
 
 **A**: Run the verification script:
 ```bash
-npm run verify:rag
+pnpm run verify:rag
 ```
 
 This checks that:
@@ -519,7 +519,7 @@ git push
 
 ```bash
 # Test pattern extraction without storing
-npm run rag:contribute-from-pr
+pnpm run rag:contribute-from-pr
 
 # Review extracted patterns
 cat .versatil/logs/rag-contribution-summary.json

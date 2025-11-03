@@ -3,7 +3,7 @@
  * VERSATIL Framework Recovery System
  * Auto-detects and fixes common framework issues
  *
- * Usage: npm run recover
+ * Usage: pnpm run recover
  *        node scripts/recover-framework.cjs
  *
  * Features:
@@ -314,7 +314,7 @@ class FrameworkRecoverySystem {
         type: 'missing_node_modules',
         severity: 'high',
         message: 'node_modules not found',
-        fix: 'Run npm install'
+        fix: 'Run pnpm install'
       });
       this.log('   ❌ node_modules missing', 'red');
     } else {
@@ -421,17 +421,17 @@ class FrameworkRecoverySystem {
     this.log('   Installing node_modules...', 'blue');
 
     try {
-      execSync('npm install', { cwd: PROJECT_ROOT, stdio: 'inherit' });
+      execSync('pnpm install', { cwd: PROJECT_ROOT, stdio: 'inherit' });
 
       this.fixes.push({
         issue: 'missing_node_modules',
-        action: 'Ran npm install',
+        action: 'Ran pnpm install',
         timestamp: new Date().toISOString()
       });
 
       this.log('   ✅ node_modules installed', 'green');
     } catch (error) {
-      this.log(`   ❌ npm install failed: ${error.message}`, 'red');
+      this.log(`   ❌ pnpm install failed: ${error.message}`, 'red');
       throw error;
     }
   }

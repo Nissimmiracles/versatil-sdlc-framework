@@ -10,8 +10,8 @@ async function analyzeFile() {
   const filePath = process.argv[2];
 
   if (!filePath) {
-    console.log('Usage: npm run analyze -- <file-path>');
-    console.log('Example: npm run analyze -- ./test/sample.js');
+    console.log('Usage: pnpm run analyze -- <file-path>');
+    console.log('Example: pnpm run analyze -- ./test/sample.js');
     process.exit(1);
   }
 

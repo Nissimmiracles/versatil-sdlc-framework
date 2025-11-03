@@ -198,7 +198,7 @@ class ArchitecturalValidator {
         </Suspense>
       } />
 
-   Or run: npm run versatil:add-route src/pages/dealflow/DealFlowSimplified.tsx
+   Or run: pnpm run versatil:add-route src/pages/dealflow/DealFlowSimplified.tsx
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -229,7 +229,7 @@ class ArchitecturalValidator {
 echo "🏗️  Step 1/2: Running architectural validation..."
 
 # Run architectural validation FIRST (fast, catches major issues)
-npm run validate:architecture
+pnpm run validate:architecture
 
 # Check if architectural validation passed
 if [ $? -ne 0 ]; then
@@ -243,7 +243,7 @@ echo ""
 echo "🧪 Step 2/2: Running test coverage check..."
 
 # Run tests with coverage
-npm run test:coverage
+pnpm run test:coverage
 
 # ... rest of coverage checking
 ```
@@ -534,10 +534,10 @@ const routePattern = /<Route[^>]*path=["']([^"']+)["'][^>]*element=\{[^}]*<([A-Z
 ```yaml
 # .github/workflows/ci.yml
 - name: Architectural Validation
-  run: npm run validate:architecture
+  run: pnpm run validate:architecture
 
 - name: Navigation E2E Tests
-  run: npm run test:e2e:navigation
+  run: pnpm run test:e2e:navigation
 
 - name: Block Merge on Violations
   run: |
@@ -597,7 +597,7 @@ const routePattern = /<Route[^>]*path=["']([^"']+)["'][^>]*element=\{[^}]*<([A-Z
 
 1. **Compile TypeScript**
    ```bash
-   npm run build
+   pnpm run build
    ```
    - Generates `dist/validation/architectural-validator.js`
    - Ensures all types are correct
@@ -637,7 +637,7 @@ const routePattern = /<Route[^>]*path=["']([^"']+)["'][^>]*element=\{[^}]*<([A-Z
 4. **Update User Projects**
    ```bash
    # In user project
-   npm update @versatil/sdlc-framework
+   pnpm update @versatil/sdlc-framework
 
    # Framework will auto-update hooks
    # User gets architectural validation immediately

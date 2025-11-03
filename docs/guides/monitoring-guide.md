@@ -53,7 +53,7 @@ VERSATIL monitoring follows these principles:
 /monitor
 
 # Or via npm
-npm run monitor
+pnpm run monitor
 ```
 
 **Expected output:**
@@ -100,7 +100,7 @@ npm run monitor
 /monitor dashboard
 
 # Or via npm
-npm run dashboard
+pnpm run dashboard
 ```
 
 **What you see:**
@@ -124,7 +124,7 @@ npm run dashboard
 /monitor agents
 
 # Or via npm
-npm run show-agents
+pnpm run show-agents
 ```
 
 **Expected output:**
@@ -158,7 +158,7 @@ VERSATIL provides 5 primary monitoring tools:
 
 ### 1. Framework Health Monitor
 
-**Command**: `npm run monitor` or `/monitor`
+**Command**: `pnpm run monitor` or `/monitor`
 
 **What it checks:**
 - ✅ All 7 OPERA agents (config, command, source)
@@ -178,18 +178,18 @@ VERSATIL provides 5 primary monitoring tools:
 
 **Modes:**
 ```bash
-npm run monitor                     # Quick health check
-npm run monitor -- --watch          # Continuous monitoring (every 60s)
-npm run monitor -- --stress         # Include stress tests
-npm run monitor -- --report         # Generate detailed report
-npm run monitor -- --validate-upgrade  # Check upgrade readiness
+pnpm run monitor                     # Quick health check
+pnpm run monitor -- --watch          # Continuous monitoring (every 60s)
+pnpm run monitor -- --stress         # Include stress tests
+pnpm run monitor -- --report         # Generate detailed report
+pnpm run monitor -- --validate-upgrade  # Check upgrade readiness
 ```
 
 ---
 
 ### 2. Real-Time Dashboards
 
-**Command**: `npm run dashboard` (v3 by default)
+**Command**: `pnpm run dashboard` (v3 by default)
 
 **What it shows:**
 - Real-time workflow visualization (ASCII art + blessed)
@@ -202,10 +202,10 @@ npm run monitor -- --validate-upgrade  # Check upgrade readiness
 
 **Available versions:**
 ```bash
-npm run dashboard        # v3 (most features, interactive)
-npm run dashboard:v1     # v1 (simpler, stable)
-npm run dashboard:v2     # v2 (balanced)
-npm run dashboard:v3     # v3 (latest, experimental)
+pnpm run dashboard        # v3 (most features, interactive)
+pnpm run dashboard:v1     # v1 (simpler, stable)
+pnpm run dashboard:v2     # v2 (balanced)
+pnpm run dashboard:v3     # v3 (latest, experimental)
 ```
 
 **When to use:**
@@ -306,7 +306,7 @@ statusline.completeAgent('maria-qa');
 
 ### 5. Background Monitor
 
-**Command**: `npm run dashboard:background`
+**Command**: `pnpm run dashboard:background`
 
 **What it does:**
 - Runs framework health checks in background
@@ -317,9 +317,9 @@ statusline.completeAgent('maria-qa');
 
 **Commands:**
 ```bash
-npm run dashboard:background    # Start background monitor
-npm run dashboard:stop          # Stop background monitor
-npm run dashboard:logs          # View live log stream
+pnpm run dashboard:background    # Start background monitor
+pnpm run dashboard:stop          # Stop background monitor
+pnpm run dashboard:logs          # View live log stream
 ```
 
 **When to use:**
@@ -409,7 +409,7 @@ Measures how accurately the proactive system activates agents based on file patt
 
 **Common issues:**
 - **Settings not configured**: Run `/doctor --fix` to restore settings
-- **Hooks missing**: Run `npm run validate:isolation` to restore hooks
+- **Hooks missing**: Run `pnpm run validate:isolation` to restore hooks
 - **Orchestrator missing**: Reinstall framework: `npm install`
 
 ---
@@ -472,7 +472,7 @@ Integrity = (PresentFiles / TotalFiles) × 100
 **If < 100%:**
 ```bash
 # List missing files
-npm run monitor -- --report
+pnpm run monitor -- --report
 
 # Restore missing files
 /doctor --fix
@@ -487,7 +487,7 @@ npm install
 
 ### Dashboard v3 (Interactive)
 
-**Launch**: `npm run dashboard` or `npm run dashboard:v3`
+**Launch**: `pnpm run dashboard` or `pnpm run dashboard:v3`
 
 **Features:**
 - ✅ Fully responsive layout (adapts to terminal size)
@@ -552,7 +552,7 @@ General:
 
 ### Dashboard v1 (Simple)
 
-**Launch**: `npm run dashboard:v1`
+**Launch**: `pnpm run dashboard:v1`
 
 **Features:**
 - Simpler layout, fewer animations
@@ -570,7 +570,7 @@ General:
 
 ### Dashboard v2 (Balanced)
 
-**Launch**: `npm run dashboard:v2`
+**Launch**: `pnpm run dashboard:v2`
 
 **Features:**
 - Balanced between v1 simplicity and v3 features
@@ -612,13 +612,13 @@ General:
 
 ```bash
 # Start background monitor
-npm run dashboard:background
+pnpm run dashboard:background
 
 # Verify it's running
 ps aux | grep background-monitor
 
 # View logs
-npm run dashboard:logs
+pnpm run dashboard:logs
 
 # Or manually
 tail -f .versatil/logs/background-monitor.log
@@ -650,12 +650,12 @@ tail -f .versatil/logs/background-monitor.log
 crontab -e
 
 # Add line
-0 2 * * * cd /path/to/versatil && npm run monitor >> /var/log/versatil-health.log 2>&1
+0 2 * * * cd /path/to/versatil && pnpm run monitor >> /var/log/versatil-health.log 2>&1
 ```
 
 **Every 4 hours:**
 ```bash
-0 */4 * * * cd /path/to/versatil && npm run monitor -- --watch --interval=14400000
+0 */4 * * * cd /path/to/versatil && pnpm run monitor -- --watch --interval=14400000
 ```
 
 ---
@@ -682,8 +682,8 @@ jobs:
         with:
           node-version: '18'
       - run: npm install
-      - run: npm run monitor
-      - run: npm run test:full
+      - run: pnpm run monitor
+      - run: pnpm run test:full
       - name: Upload health report
         if: failure()
         uses: actions/upload-artifact@v3
@@ -702,7 +702,7 @@ const { execSync } = require('child_process');
 const https = require('https');
 
 // Run health check
-const result = execSync('npm run monitor -- --report').toString();
+const result = execSync('pnpm run monitor -- --report').toString();
 const health = JSON.parse(result);
 
 // Alert if health < 70%
@@ -744,10 +744,10 @@ if (health.overall_health < 70) {
 2. **Schedule daily health checks** via cron at low-traffic hours
 3. **Set up alerting** for health scores < 70%
 4. **Monitor logs** regularly: `tail -f ~/.versatil/logs/framework.log`
-5. **Track agent performance** weekly: `npm run monitor -- --agents`
-6. **Run stress tests** before deployments: `npm run monitor -- --stress`
+5. **Track agent performance** weekly: `pnpm run monitor -- --agents`
+6. **Run stress tests** before deployments: `pnpm run monitor -- --stress`
 7. **Archive debug reports** monthly for historical analysis
-8. **Validate isolation** after updates: `npm run validate:isolation`
+8. **Validate isolation** after updates: `pnpm run validate:isolation`
 
 ---
 
@@ -760,7 +760,7 @@ if (health.overall_health < 70) {
 **Diagnosis steps:**
 1. Run detailed health check:
    ```bash
-   npm run monitor -- --report
+   pnpm run monitor -- --report
    ```
 
 2. Review issues section in output:
@@ -784,7 +784,7 @@ if (health.overall_health < 70) {
 5. If auto-fix fails, reinstall:
    ```bash
    npm install
-   npm run validate:isolation
+   pnpm run validate:isolation
    ```
 
 ---
@@ -794,7 +794,7 @@ if (health.overall_health < 70) {
 **Diagnosis steps:**
 1. Check proactive system status:
    ```bash
-   npm run monitor
+   pnpm run monitor
    ```
    Look for: `Proactive System: X% accuracy`
 
@@ -842,18 +842,18 @@ if (health.overall_health < 70) {
 
 3. If status file missing, trigger activity:
    ```bash
-   npm run test:unit
+   pnpm run test:unit
    # Dashboard should now show Maria-QA activity
    ```
 
 4. Try different dashboard version:
    ```bash
-   npm run dashboard:v1  # Simpler, more stable
+   pnpm run dashboard:v1  # Simpler, more stable
    ```
 
 5. Check dashboard logs:
    ```bash
-   npm run dashboard 2>&1 | tee dashboard.log
+   pnpm run dashboard 2>&1 | tee dashboard.log
    # Review for errors
    ```
 
@@ -864,20 +864,20 @@ if (health.overall_health < 70) {
 **Diagnosis steps:**
 1. Check agent metrics:
    ```bash
-   npm run show-agents
+   pnpm run show-agents
    ```
    Look for: `Avg time: X.Xs` (should be < 5s)
 
 2. Identify slow agents:
    ```bash
-   npm run monitor -- --report
+   pnpm run monitor -- --report
    cat framework-health-report.json | jq '.agents | to_entries | sort_by(.value.avg_response_time) | reverse | .[0:3]'
    ```
 
 3. Check if RAG is causing slowness:
    ```bash
    # View RAG retrieval counts
-   npm run dashboard  # Look for 🧠 indicator
+   pnpm run dashboard  # Look for 🧠 indicator
    ```
 
 4. Check MCP health:
@@ -899,7 +899,7 @@ if (health.overall_health < 70) {
 **Diagnosis steps:**
 1. Check rules status:
    ```bash
-   npm run monitor
+   pnpm run monitor
    ```
    Look for: `📏 Checking 5-Rule system...`
 
@@ -964,10 +964,10 @@ graph TD
 **Morning routine:**
 ```bash
 # 1. Check framework health
-npm run monitor
+pnpm run monitor
 
 # 2. Launch dashboard in separate terminal
-npm run dashboard
+pnpm run dashboard
 
 # 3. Start coding
 # Agents activate automatically as you work
@@ -976,10 +976,10 @@ npm run dashboard
 **Before commit:**
 ```bash
 # 4. Run tests
-npm run test:full
+pnpm run test:full
 
 # 5. Final health check
-npm run monitor
+pnpm run monitor
 
 # 6. Commit if health >= 90%
 git commit -m "feat: implement feature X"
@@ -992,10 +992,10 @@ git commit -m "feat: implement feature X"
 **Every Monday:**
 ```bash
 # 1. Comprehensive health check
-npm run monitor -- --stress
+pnpm run monitor -- --stress
 
 # 2. Review agent performance
-npm run show-agents
+pnpm run show-agents
 
 # 3. Check for framework updates
 npm outdated
@@ -1009,12 +1009,12 @@ cp ~/.versatil/logs/framework.log ~/.versatil/logs/archive/$(date +%Y-%m-%d).log
 ### Pre-Deployment Checklist
 
 **Before deploying to production:**
-- [ ] Run full health check: `npm run monitor`
+- [ ] Run full health check: `pnpm run monitor`
 - [ ] Verify health score >= 95%
-- [ ] Run full test suite: `npm run test:full`
-- [ ] Run stress tests: `npm run monitor -- --stress`
-- [ ] Validate isolation: `npm run validate:isolation`
-- [ ] Check agent metrics: `npm run show-agents`
+- [ ] Run full test suite: `pnpm run test:full`
+- [ ] Run stress tests: `pnpm run monitor -- --stress`
+- [ ] Validate isolation: `pnpm run validate:isolation`
+- [ ] Check agent metrics: `pnpm run show-agents`
 - [ ] Generate debug report: `/monitor report` (archive for rollback)
 - [ ] Review recent logs for warnings
 - [ ] Test all MCP integrations

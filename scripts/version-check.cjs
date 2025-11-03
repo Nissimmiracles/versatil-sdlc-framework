@@ -137,7 +137,7 @@ class VersionChecker {
 
       // Look for installation commands with versions
       const installPatterns = [
-        /npm install.*versatil-sdlc-framework@(\d+\.\d+\.\d+[^\s]*)/g,
+        /pnpm install.*versatil-sdlc-framework@(\d+\.\d+\.\d+[^\s]*)/g,
         /npm.*-g.*versatil-sdlc-framework@(\d+\.\d+\.\d+[^\s]*)/g
       ];
 

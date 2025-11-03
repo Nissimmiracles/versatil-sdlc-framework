@@ -72,19 +72,19 @@ class ReleaseManager {
 
     // Run linting
     console.log('📝 Running ESLint...');
-    this.exec('npm run lint');
+    this.exec('pnpm run lint');
 
     // Run TypeScript compilation
     console.log('🔨 Building TypeScript...');
-    this.exec('npm run build');
+    this.exec('pnpm run build');
 
     // Run tests
     console.log('🧪 Running tests...');
-    this.exec('npm test');
+    this.exec('pnpm test');
 
     // Run security audit
     console.log('🔒 Running security audit...');
-    this.exec('npm audit --audit-level=moderate');
+    this.exec('pnpm audit --audit-level=moderate');
 
     console.log('✅ All tests passed');
   }
@@ -248,7 +248,7 @@ ${changes ? this.formatReleaseChanges(changes) : ''}
 ## 📦 Installation
 
 \`\`\`bash
-npm install -g versatil-sdlc-framework@${version}
+pnpm add -g versatil-sdlc-framework@${version}
 \`\`\`
 
 ## 🔄 Upgrade Guide

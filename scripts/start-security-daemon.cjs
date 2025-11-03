@@ -208,7 +208,7 @@ class SecurityDaemonManager {
       await fs.access(daemonDist);
     } catch (error) {
       console.log('📦 Compiling TypeScript security modules...');
-      await this.execAsync('npm run build:security', { cwd: FRAMEWORK_ROOT });
+      await this.execAsync('pnpm run build:security', { cwd: FRAMEWORK_ROOT });
     }
   }
 

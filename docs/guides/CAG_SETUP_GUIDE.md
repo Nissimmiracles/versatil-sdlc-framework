@@ -36,7 +36,7 @@ CAG_MAX_DAILY_COST=10.0  # $10/day max
 CAG is automatically initialized when the framework starts. You can verify:
 
 ```bash
-npm run build
+pnpm run build
 node dist/index.js
 ```
 
@@ -162,7 +162,7 @@ console.log('Top Agents:', health.topAgents);
 CAG metrics are shown in the VERSATIL dashboard:
 
 ```bash
-npm run dashboard
+pnpm run dashboard
 ```
 
 Look for the **CAG Performance** section:
@@ -249,7 +249,7 @@ echo $ANTHROPIC_API_KEY
 CAG_ENABLED=true
 
 # Check logs for initialization errors
-npm run build && node dist/index.js 2>&1 | grep CAG
+pnpm run build && node dist/index.js 2>&1 | grep CAG
 ```
 
 ## Cost Analysis
