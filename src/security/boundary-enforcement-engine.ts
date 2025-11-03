@@ -497,7 +497,7 @@ export class BoundaryEnforcementEngine extends EventEmitter {
   }
 
   private extractProjectId(filePath: string): string | undefined {
-    const match = filePath.match(/\/tmp\/versatil-projects\/([^\/]+)/);
+    const match = filePath.match(/\/tmp\/versatil-projects\/([^/]+)/);
     return match ? match[1] : undefined;
   }
 
