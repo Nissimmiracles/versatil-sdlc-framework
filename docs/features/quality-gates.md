@@ -843,6 +843,6 @@ pre_deploy:
 
 **Related Documentation**:
 - [Agent Activation Troubleshooting](AGENT_ACTIVATION_TROUBLESHOOTING.md)
-- [BMad Commands Reference](BMAD_COMMANDS.md)
+- [Commands Reference](../reference/commands.md)
 - [Cursor Integration Guide](CURSOR_INTEGRATION.md)
 - [Installation Troubleshooting](INSTALLATION_TROUBLESHOOTING.md)

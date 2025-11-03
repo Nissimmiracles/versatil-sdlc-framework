@@ -55,7 +55,7 @@ describe('ContextVerifier', () => {
     it('should handle framework directory patterns', () => {
       const paths = [
         '/path/to/versatil-sdlc-fw/src/core/base-agent.ts',
-        '/path/to/bmad-framework/src/agents/iris.ts',
+        '/path/to/versatil-framework/src/agents/iris.ts',
         '/path/to/@versatil/sdlc-framework/dist/index.js'
       ];
 

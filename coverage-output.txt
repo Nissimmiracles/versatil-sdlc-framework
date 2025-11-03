@@ -1,0 +1,100 @@
+ src/scripts       |       0 |      100 |       0 |       0 |                   
+  ...e-to-1.2.0.ts |       0 |      100 |       0 |       0 | 3-6               
+ src/security      |    0.37 |        0 |       0 |    0.39 |                   
+  ...ent-engine.ts |       0 |        0 |       0 |       0 | 14-826            
+  ...dit-logger.ts |       0 |        0 |       0 |       0 | 69-434            
+  ...-encryptor.ts |     8.6 |        0 |       0 |     8.6 | 57-370,381-384    
+  ...ial-loader.ts |       0 |        0 |       0 |       0 | 35-380            
+  ...chestrator.ts |       0 |        0 |       0 |       0 | 17-976            
+  ...-framework.ts |       0 |        0 |       0 |       0 | 13-723            
+  ...ry-scanner.ts |       0 |        0 |       0 |       0 | 69-693            
+  ...prevention.ts |       0 |        0 |       0 |       0 | 13-542            
+  ...ity-daemon.ts |       0 |        0 |       0 |       0 | 21-425            
+  ...-validator.ts |       0 |        0 |       0 |       0 | 51-873            
+  ...-generator.ts |       0 |        0 |       0 |       0 | 65-619            
+  ...ty-scanner.ts |       0 |        0 |       0 |       0 | 119-759           
+  ...-isolation.ts |       0 |        0 |       0 |       0 | 14-959            
+ src/simulation    |       0 |        0 |       0 |       0 |                   
+  ...ity-matrix.ts |       0 |        0 |       0 |       0 | 12-69             
+  ...ure-mapper.ts |       0 |        0 |       0 |       0 | 36-459            
+  ...tress-test.ts |       0 |        0 |       0 |       0 | 12-173            
+  ...-validator.ts |       0 |        0 |       0 |       0 | 19-708            
+  ...alone-test.ts |       0 |        0 |       0 |       0 | 26-180            
+  stress-test.ts   |       0 |        0 |       0 |       0 | 13-73             
+  ...-generator.ts |       0 |        0 |       0 |       0 | 36-552            
+ src/stubs         |       0 |      100 |       0 |       0 |                   
+  ...agent-stub.ts |       0 |      100 |       0 |       0 | 26-42             
+ src/tasks         |       0 |        0 |       0 |       0 |                   
+  ...oring-task.ts |       0 |        0 |       0 |       0 | 64-564            
+  ...round-task.ts |       0 |        0 |       0 |       0 | 115-930           
+  ...oring-task.ts |       0 |        0 |       0 |       0 | 63-667            
+ src/team          |    3.17 |        0 |    4.76 |    3.36 |                   
+  ...xt-manager.ts |    3.17 |        0 |    4.76 |    3.36 | 127-468           
+ src/telemetry     |       0 |        0 |       0 |       0 |                   
+  ...on-metrics.ts |       0 |        0 |       0 |       0 | 75-481            
+ src/templates     |       0 |        0 |       0 |       0 |                   
+  ...te-matcher.ts |       0 |        0 |       0 |       0 | 73-345            
+ src/testing       |       0 |        0 |       0 |       0 |                   
+  ...-framework.ts |       0 |        0 |       0 |       0 | 39-532            
+  ...-generator.ts |       0 |        0 |       0 |       0 | 35-1314           
+  ...ing-engine.ts |       0 |        0 |       0 |       0 | 74-619            
+  ...chestrator.ts |       0 |        0 |       0 |       0 | 45-401            
+  ...e-enforcer.ts |       0 |        0 |       0 |       0 | 86-495            
+  ...t-selector.ts |       0 |        0 |       0 |       0 | 16-424            
+  ...est-config.ts |       0 |        0 |       0 |       0 | 61-214            
+  ...on-trigger.ts |       0 |        0 |       0 |       0 | 21-440            
+  ...ger-matrix.ts |       0 |        0 |       0 |       0 | 18-407            
+ ...ting/scenarios |       0 |        0 |       0 |       0 |                   
+  ...rio-runner.ts |       0 |        0 |       0 |       0 | 40-1336           
+  ...ario-tests.ts |       0 |        0 |       0 |       0 | 11-48             
+ src/tracking      |       0 |        0 |       0 |       0 |                   
+  ...et-manager.ts |       0 |        0 |       0 |       0 | 53-431            
+  ...lc-tracker.ts |       0 |        0 |       0 |       0 | 82-796            
+  ...on-compass.ts |       0 |        0 |       0 |       0 | 28-752            
+  ...on-manager.ts |       0 |        0 |       0 |       0 | 49-372            
+  ...us-tracker.ts |       0 |        0 |       0 |       0 | 15-447            
+  ...visualizer.ts |       0 |        0 |       0 |       0 | 53-583            
+  usage-logger.ts  |       0 |        0 |       0 |       0 | 63-377            
+ src/ui            |       0 |        0 |       0 |       0 |                   
+  ...ne-manager.ts |       0 |        0 |       0 |       0 | 56-646            
+ src/update        |       0 |        0 |       0 |       0 |                   
+  ...h-recovery.ts |       0 |        0 |       0 |       0 | 12-484            
+  ...se-checker.ts |       0 |        0 |       0 |       0 | 37-330            
+  ...e-reviewer.ts |       0 |        0 |       0 |       0 | 12-765            
+  ...ck-manager.ts |       0 |        0 |       0 |       0 | 13-519            
+  ...ic-version.ts |       0 |        0 |       0 |       0 | 16-144            
+  todo-scanner.ts  |       0 |        0 |       0 |       0 | 51-396            
+  update-lock.ts   |       0 |        0 |       0 |       0 | 40-465            
+  ...te-manager.ts |       0 |        0 |       0 |       0 | 14-360            
+  ...-validator.ts |       0 |        0 |       0 |       0 | 12-563            
+  ...el-manager.ts |       0 |        0 |       0 |       0 | 35-294            
+  version-diff.ts  |       0 |        0 |       0 |       0 | 38-349            
+ src/user          |    1.07 |        0 |    2.32 |    1.12 |                   
+  ...e-detector.ts |       0 |        0 |       0 |       0 | 19-352            
+  ...mory-store.ts |       0 |        0 |       0 |       0 | 52-382            
+  ...xt-manager.ts |    4.39 |        0 |    6.25 |    4.49 | 109-374           
+ src/utils         |   16.89 |    16.85 |   27.58 |   17.48 |                   
+  ...-scheduler.ts |       0 |        0 |       0 |       0 | 38-430            
+  logger.ts        |     100 |      100 |     100 |     100 |                   
+ src/validation    |       0 |        0 |       0 |       0 |                   
+  ...-validator.ts |       0 |        0 |       0 |       0 | 88-825            
+  ...al-watcher.ts |       0 |        0 |       0 |       0 | 17-377            
+ src/visualization |       0 |        0 |       0 |       0 |                   
+  ...-generator.ts |       0 |        0 |       0 |       0 | 120-762           
+ src/workflows     |       0 |        0 |       0 |       0 |                   
+  ...g-codifier.ts |       0 |        0 |       0 |       0 | 41-628            
+  ...-extractor.ts |       0 |        0 |       0 |       0 | 81-592            
+  ...e-detector.ts |       0 |        0 |       0 |       0 | 66-443            
+  ...-generator.ts |       0 |        0 |       0 |       0 | 309-1245          
+  ...e-detector.ts |       0 |        0 |       0 |       0 | 118-587           
+  ...n-analyzer.ts |       0 |        0 |       0 |       0 | 24-545            
+  ...-generator.ts |       0 |        0 |       0 |       0 | 44-354            
+  ...rator-impl.ts |       0 |        0 |       0 |       0 | 24-514            
+  ...ransitions.ts |       0 |        0 |       0 |       0 | 50-410            
+  ...chestrator.ts |       0 |        0 |       0 |       0 | 145-721           
+  ...te-machine.ts |       0 |        0 |       0 |       0 | 134-585           
+-------------------|---------|----------|---------|---------|-------------------
+ERROR: Coverage for lines (1.96%) does not meet global threshold (80%)
+ERROR: Coverage for functions (2.15%) does not meet global threshold (80%)
+ERROR: Coverage for statements (2.01%) does not meet global threshold (80%)
+ERROR: Coverage for branches (2.3%) does not meet global threshold (80%)

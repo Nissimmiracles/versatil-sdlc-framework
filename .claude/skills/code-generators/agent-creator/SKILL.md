@@ -114,7 +114,7 @@ This demonstrates Sarah-PM's orchestration capabilities - breaking down complex 
 | Placeholder | Description | Example |
 |-------------|-------------|---------|
 | `{{EXPERTISE_1-5}}` | 5 key expertise areas | "Jest unit testing", "Integration tests" |
-| `{{QUALITY_STANDARD_1-3}}` | 3 quality standards | "80%+ test coverage", "BMAD enforced" |
+| `{{QUALITY_STANDARD_1-3}}` | 3 quality standards | "80%+ test coverage", "VERSATIL quality standards enforced" |
 | `{{NUM_SUB_AGENTS}}` | Number of sub-agents | "2", "5", "none" |
 
 ### Sub-Agent Routing

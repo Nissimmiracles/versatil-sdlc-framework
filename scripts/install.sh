@@ -211,7 +211,7 @@ install_chrome_mcp() {
     # Install Chrome MCP globally
     if ! npm list -g @modelcontextprotocol/server-chrome &> /dev/null; then
         log_info "Installing Chrome MCP server globally..."
-        npm install -g @modelcontextprotocol/server-chrome
+        pnpm add -g @modelcontextprotocol/server-chrome
 
         if [[ $? -eq 0 ]]; then
             log_success "Chrome MCP server installed ✓"
@@ -241,7 +241,7 @@ setup_testing() {
         TESTING_DEPS="playwright @playwright/test axe-core pa11y lighthouse"
 
         log_info "Installing testing dependencies: $TESTING_DEPS"
-        npm install --save-dev $TESTING_DEPS
+        pnpm add -D $TESTING_DEPS
 
         # Create basic test structure
         mkdir -p tests/{unit,integration,e2e,visual}
@@ -376,7 +376,7 @@ create_scripts() {
             pkg.scripts['maria:test'] = 'playwright test';
             pkg.scripts['maria:visual'] = 'chrome-mcp test --visual';
             pkg.scripts['james:lint'] = 'eslint src/ --fix';
-            pkg.scripts['marcus:security'] = 'npm audit';
+            pkg.scripts['marcus:security'] = 'pnpm audit';
 
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
             "
@@ -429,7 +429,7 @@ james-frontend() {
 marcus-backend() {
     echo "⚙️ Marcus-Backend: $1"
     case $1 in
-        "security") npm audit ;;
+        "security") pnpm audit ;;
         "api") echo "Starting API server..." ;;
         "db") echo "Database operations..." ;;
         *) echo "Usage: marcus-backend [security|api|db]" ;;
@@ -479,7 +479,7 @@ fi
 # Security audit
 if command -v npm &> /dev/null; then
     echo "Running security audit..."
-    npm audit --audit-level moderate 2>/dev/null || echo "Security audit completed"
+    pnpm audit --audit-level moderate 2>/dev/null || echo "Security audit completed"
 fi
 
 echo "✅ Pre-commit checks completed"

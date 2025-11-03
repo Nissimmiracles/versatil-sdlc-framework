@@ -896,4 +896,4 @@ source ~/.bashrc
 - [Getting Started Guide](GET_STARTED.md)
 - [Agent Activation Troubleshooting](AGENT_ACTIVATION_TROUBLESHOOTING.md)
 - [Cursor Integration Guide](CURSOR_INTEGRATION.md)
-- [BMad Commands Reference](BMAD_COMMANDS.md)
+- [Commands Reference](../reference/commands.md)

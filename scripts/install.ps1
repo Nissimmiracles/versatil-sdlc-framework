@@ -155,7 +155,7 @@ function Show-PostInstall {
     Write-Host "     cd your-project"
     Write-Host "     versatil init"
     Write-Host ""
-    Write-Host "🤖 BMAD Agents:" -ForegroundColor $ColorInfo
+    Write-Host "🤖 OPERA Agents:" -ForegroundColor $ColorInfo
     Write-Host "  • Maria-QA      - Quality assurance"
     Write-Host "  • James-Frontend - UI/UX development"
     Write-Host "  • Marcus-Backend - API development"

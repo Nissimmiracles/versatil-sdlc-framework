@@ -11,8 +11,8 @@ module.exports = async function jestGlobalSetup() {
   process.env.NODE_ENV = 'test';
   process.env.JEST_WORKER_ID = process.env.JEST_WORKER_ID || '1';
 
-  // BMAD methodology configuration
-  global.bmadJestConfig = {
+  // VERSATIL quality standards configuration
+  global.versatilJestConfig = {
     agent: 'Enhanced Maria-QA',
     framework: 'VERSATIL SDLC',
     testType: 'unit',
@@ -30,7 +30,7 @@ module.exports = async function jestGlobalSetup() {
   };
 
   // Enhanced testing capabilities
-  console.log('🎯 BMAD Unit Testing Standards:');
+  console.log('🎯 VERSATIL Unit Testing Standards:');
   console.log('   📊 Coverage Threshold: 80%+');
   console.log('   ⏱️  Max Test Time: 15s');
   console.log('   🔧 Hybrid Jest + Playwright Integration');
