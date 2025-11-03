@@ -170,7 +170,7 @@ npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2 versat
       "command": "npx",
       "args": [
         "--yes",
-        "--package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.1",
+        "--package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2",
         "versatil-mcp"
       ]
     }
@@ -186,8 +186,8 @@ npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2 versat
 # For framework development or customization
 git clone https://github.com/Nissimmiracles/versatil-sdlc-framework.git
 cd versatil-sdlc-framework
-npm install
-npm run build
+pnpm install
+pnpm run build
 ```
 
 **[→ Complete Installation Guide](docs/INSTALLATION.md)** • **[→ npx Setup Guide](docs/guides/NPX_INSTALLATION.md)**

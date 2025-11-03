@@ -79,6 +79,17 @@ check_requirements() {
     NPM_VERSION=$(npm --version)
     log_success "npm version $NPM_VERSION ✓"
 
+    # Check pnpm (required for VERSATIL SDLC Framework v7.16+)
+    if ! command -v pnpm &> /dev/null; then
+        log_error "pnpm is not installed. VERSATIL SDLC Framework requires pnpm@10.17.0+"
+        log_info "Install pnpm with: npm install -g pnpm@10.17.0"
+        log_info "Or enable via corepack: corepack enable pnpm && corepack install"
+        exit 1
+    fi
+
+    PNPM_VERSION=$(pnpm --version)
+    log_success "pnpm version $PNPM_VERSION ✓"
+
     # Check Git
     if ! command -v git &> /dev/null; then
         log_error "Git is not installed. Please install Git from https://git-scm.com/"
