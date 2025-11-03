@@ -324,7 +324,7 @@ function categorizeIssue(issue: HealthIssue): string {
  */
 function todoAlreadyExists(verifiedIssue: VerifiedIssue, todosDir: string): boolean {
   try {
-    const { readdirSync, readFileSync, existsSync } = require('fs');
+    import { readdirSync, readFileSync, existsSync } from 'fs';
 
     if (!existsSync(todosDir)) {
       return false; // No todos directory = no duplicates

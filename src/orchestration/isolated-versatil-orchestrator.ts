@@ -250,7 +250,7 @@ VERSATIL operates on your project without mixing framework files with your code.
    * Start MCP servers with complete port isolation
    */
   private async startIsolatedMCPServers(): Promise<void> {
-    const { spawn } = require('child_process');
+    import { spawn } from 'child_process';
     
     for (const [key, config] of Object.entries(this.mcpServers)) {
       try {

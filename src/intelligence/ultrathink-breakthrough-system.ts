@@ -580,7 +580,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectPerformanceBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
     const bottlenecks: BottleneckAnalysis[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Search for performance-related keywords in code
       const performanceKeywords = ['slow', 'performance', 'timeout', 'lag', 'optimize', 'bottleneck'];
@@ -724,7 +724,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectVelocityBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
     const bottlenecks: BottleneckAnalysis[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
       const gitLog = execSync('git log --since="30 days ago" --pretty=format:"%ad" --date=short', {
         cwd: projectPath,
         encoding: 'utf8'
@@ -818,7 +818,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectDecisionParalysis(projectPath: string): Promise<BottleneckAnalysis[]> {
     const bottlenecks: BottleneckAnalysis[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Check TODO/FIXME density
       const todoCount = parseInt(execSync(
@@ -911,7 +911,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectResourceConstraints(projectPath: string): Promise<BottleneckAnalysis[]> {
     const bottlenecks: BottleneckAnalysis[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       const contributors = execSync(
         'git log --since="3 months ago" --format="%an" | sort | uniq -c | sort -rn',
@@ -998,9 +998,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectTechnicalDebtBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
     const bottlenecks: BottleneckAnalysis[] = [];
     try {
-      const { execSync } = require('child_process');
-      const fs = require('fs');
-      const path = require('path');
+      import { execSync } from 'child_process';
+      import fs from 'fs';
+      import path from 'path';
 
       // Check for large files
       const largeFileCount = parseInt(execSync(
@@ -1085,9 +1085,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectKnowledgeGaps(projectPath: string): Promise<BottleneckAnalysis[]> {
     const bottlenecks: BottleneckAnalysis[] = [];
     try {
-      const { execSync } = require('child_process');
-      const fs = require('fs');
-      const path = require('path');
+      import { execSync } from 'child_process';
+      import fs from 'fs';
+      import path from 'path';
 
       const hasReadme = fs.existsSync(path.join(projectPath, 'README.md'));
       const docsDir = fs.existsSync(path.join(projectPath, 'docs'));
@@ -1175,7 +1175,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectCommunicationBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
     const bottlenecks: BottleneckAnalysis[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       const commitMessages = execSync(
         'git log --since="1 month ago" --pretty=format:"%s"',
@@ -1265,9 +1265,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectProcessBottlenecks(projectPath: string): Promise<BottleneckAnalysis[]> {
     const bottlenecks: BottleneckAnalysis[] = [];
     try {
-      const { execSync } = require('child_process');
-      const fs = require('fs');
-      const path = require('path');
+      import { execSync } from 'child_process';
+      import fs from 'fs';
+      import path from 'path';
 
       // Check for CI/CD
       const hasCIConfig =
@@ -1396,7 +1396,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectRepeatedFailurePatterns(projectPath: string): Promise<StruggleLoop[]> {
     const loops: StruggleLoop[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Count reverted commits
       const revertedCommits = execSync(
@@ -1492,7 +1492,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectAnalysisParalysis(projectPath: string): Promise<StruggleLoop[]> {
     const loops: StruggleLoop[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Check stale branches
       const branches = execSync(
@@ -1601,9 +1601,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectOvercomplication(projectPath: string): Promise<StruggleLoop[]> {
     const loops: StruggleLoop[] = [];
     try {
-      const { execSync } = require('child_process');
-      const fs = require('fs');
-      const path = require('path');
+      import { execSync } from 'child_process';
+      import fs from 'fs';
+      import path from 'path';
 
       // Check abstraction ratio
       const interfaceCount = parseInt(execSync(
@@ -1709,7 +1709,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectMissingPerspectives(projectPath: string): Promise<StruggleLoop[]> {
     const loops: StruggleLoop[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Check contributor diversity
       const authorStats = execSync(
@@ -1808,7 +1808,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectWrongProblemDefinition(projectPath: string): Promise<StruggleLoop[]> {
     const loops: StruggleLoop[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Check refactor frequency
       const refactorCommits = execSync(
@@ -1900,7 +1900,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectKnowledgeLoops(projectPath: string): Promise<StruggleLoop[]> {
     const loops: StruggleLoop[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Check TODO growth
       const currentTodos = parseInt(execSync(
@@ -1999,7 +1999,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectCognitiveBiases(projectPath: string): Promise<StruggleLoop[]> {
     const loops: StruggleLoop[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Sunk cost: unmerged branches
       const unmergedBranches = parseInt(execSync(
@@ -2098,7 +2098,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   private async detectResourceThrashing(projectPath: string): Promise<StruggleLoop[]> {
     const loops: StruggleLoop[] = [];
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Check context switching
       const recentCommits = execSync(
@@ -2193,7 +2193,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
   // Meta-analysis methods
   private async analyzeTeamDynamics(projectPath: string): Promise<TeamDynamicsAnalysis> {
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Analyze contributor activity
       const contributors = execSync(
@@ -2258,7 +2258,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
   private async analyzeProcessEfficiency(projectPath: string): Promise<ProcessEfficiencyAnalysis> {
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Detect stale branches (bottleneck indicator)
       const staleBranches = parseInt(execSync(
@@ -2339,8 +2339,8 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
   private async analyzeToolEffectiveness(projectPath: string): Promise<ToolEffectivenessAnalysis> {
     try {
-      const fs = require('fs');
-      const path = require('path');
+      import fs from 'fs';
+      import path from 'path';
 
       // Analyze package.json for tool usage
       const packageJsonPath = path.join(projectPath, 'package.json');
@@ -2389,7 +2389,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
   private async analyzeKnowledgeGaps(projectPath: string): Promise<KnowledgeGapAnalysis> {
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Analyze file ownership concentration
       const fileOwnership = execSync(
@@ -2408,8 +2408,8 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
       // Analyze documentation quality (README, docs/)
       let docQuality = 0.5;
       try {
-        const fs = require('fs');
-        const path = require('path');
+        import fs from 'fs';
+        import path from 'path';
         if (fs.existsSync(path.join(projectPath, 'README.md'))) docQuality += 0.2;
         if (fs.existsSync(path.join(projectPath, 'docs'))) docQuality += 0.2;
         docQuality = Math.min(docQuality, 1.0);
@@ -2455,9 +2455,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
   private async analyzeCognitiveLoad(projectPath: string): Promise<CognitiveLoadAnalysis> {
     try {
-      const { execSync } = require('child_process');
-      const fs = require('fs');
-      const path = require('path');
+      import { execSync } from 'child_process';
+      import fs from 'fs';
+      import path from 'path';
 
       // Analyze dependency count (complexity indicator)
       let depCount = 0;
@@ -2509,7 +2509,7 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
   private async analyzeInnovationIndex(projectPath: string): Promise<InnovationIndexAnalysis> {
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
 
       // Analyze experimental branches (feature/, experiment/, prototype/)
       const experimentalBranches = parseInt(execSync(
@@ -2568,9 +2568,9 @@ export class UltraThinkBreakthroughSystem extends EventEmitter {
 
   private async analyzeCollaborationQuality(projectPath: string): Promise<CollaborationQualityAnalysis> {
     try {
-      const { execSync } = require('child_process');
-      const fs = require('fs');
-      const path = require('path');
+      import { execSync } from 'child_process';
+      import fs from 'fs';
+      import path from 'path';
 
       // Analyze PR review patterns (collaboration proxy)
       let meetingEfficiency = 0.5;

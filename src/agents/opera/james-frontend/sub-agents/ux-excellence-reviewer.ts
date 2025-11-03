@@ -339,7 +339,7 @@ export class UXExcellenceReviewer extends EventEmitter {
    * Review visual consistency (uses dedicated checker)
    */
   async reviewVisualConsistency(context: UXReviewContext): Promise<VisualConsistencyAnalysis> {
-    const { VisualConsistencyChecker } = require('../ux-review/visual-consistency-checker');
+    import { VisualConsistencyChecker } from '../ux-review/visual-consistency-checker';
     const checker = new VisualConsistencyChecker(context.designSystem);
 
     const checkContext = {
@@ -422,7 +422,7 @@ export class UXExcellenceReviewer extends EventEmitter {
    * Analyze markdown rendering (uses dedicated analyzer)
    */
   async analyzeMarkdownRendering(context: UXReviewContext): Promise<MarkdownAnalysisResult> {
-    const { MarkdownAnalyzer } = require('../ux-review/markdown-analyzer');
+    import { MarkdownAnalyzer } from '../ux-review/markdown-analyzer';
     const analyzer = new MarkdownAnalyzer();
 
     const markdownContext = {
@@ -494,7 +494,7 @@ export class UXExcellenceReviewer extends EventEmitter {
    */
   generateFormattedReport(result: UXReviewResult): string {
     // Use the dedicated report generator for comprehensive reports
-    const { UXReportGenerator } = require('../ux-review/ux-report-generator');
+    import { UXReportGenerator } from '../ux-review/ux-report-generator';
     const reportGenerator = new UXReportGenerator();
 
     const reportData = {

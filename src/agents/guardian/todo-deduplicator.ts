@@ -148,7 +148,7 @@ export async function reviewAndCleanupTodos(
           writeFileSync(archivePath, content + archivalNote);
 
           // Remove original
-          const { unlinkSync } = require('fs');
+          import { unlinkSync } from 'fs';
           unlinkSync(filepath);
 
           result.archived_count++;
@@ -304,7 +304,7 @@ async function checkIssueResolved(content: string): Promise<boolean> {
  */
 async function checkBuildPassing(): Promise<boolean> {
   try {
-    const { execSync } = require('child_process');
+    import { execSync } from 'child_process';
     // Quick check: see if dist/ directory exists and is recent
     const distPath = join(process.cwd(), 'dist');
     if (existsSync(distPath)) {
@@ -333,7 +333,7 @@ async function checkTestsPassing(): Promise<boolean> {
  */
 async function checkDependenciesUpToDate(): Promise<boolean> {
   try {
-    const { execSync } = require('child_process');
+    import { execSync } from 'child_process';
     const output = execSync('npm outdated --json', { encoding: 'utf-8', timeout: 10000 });
     const outdated = JSON.parse(output || '{}');
     return Object.keys(outdated).length === 0;

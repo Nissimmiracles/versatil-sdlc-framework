@@ -555,7 +555,7 @@ export class ConversationBackupManager {
    */
   private async getCurrentGitBranch(projectPath: string): Promise<string | undefined> {
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
       const branch = execSync('git branch --show-current', {
         cwd: projectPath,
         encoding: 'utf-8'
@@ -571,7 +571,7 @@ export class ConversationBackupManager {
    */
   private async getCurrentGitCommit(projectPath: string): Promise<string | undefined> {
     try {
-      const { execSync } = require('child_process');
+      import { execSync } from 'child_process';
       const commit = execSync('git rev-parse --short HEAD', {
         cwd: projectPath,
         encoding: 'utf-8'

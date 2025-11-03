@@ -73,7 +73,7 @@ class VERSATILDevelopmentIntegration extends EventEmitter {
   private async setupRealFileWatching(): Promise<void> {
     try {
       // Check if chokidar is available for better file watching
-      const chokidar = require('chokidar');
+      import chokidar from 'chokidar';
 
       const watcher = chokidar.watch(this.context.projectRoot, {
         ignored: [
@@ -106,7 +106,7 @@ class VERSATILDevelopmentIntegration extends EventEmitter {
    * Fallback to native Node.js file watching
    */
   private setupNativeFileWatching(): void {
-    const fs = require('fs');
+    import fs from 'fs';
 
     try {
       fs.watch(this.context.projectRoot, { recursive: true }, (eventType: string, filename: string) => {

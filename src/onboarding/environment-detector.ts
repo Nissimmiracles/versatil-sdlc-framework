@@ -605,7 +605,7 @@ EXECUTE FUNCTION update_updated_at();
  */
 
 const fs = require('fs').promises;
-const path = require('path');
+import path from 'path';
 
 async function enhanceAgents() {
   const agentLocation = '${this.detectedEnvironment.agents.location}';

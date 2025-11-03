@@ -87,7 +87,7 @@ export class CredentialWizard {
     }
 
     // Ensure .versatil directory exists (synchronous for constructor)
-    const fsSync = require('fs');
+    import fsSync from 'fs';
     if (!fsSync.existsSync(this.versatilHome)) {
       fsSync.mkdirSync(this.versatilHome, { recursive: true });
     }

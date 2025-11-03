@@ -519,7 +519,7 @@ export class PythonAdapter extends BaseLanguageAdapter {
     const pyproject = join(this.rootPath, 'pyproject.toml');
     if (existsSync(pyproject)) {
       try {
-        const toml = require('@iarna/toml');
+        import toml from '@iarna/toml';
         const content = readFileSync(pyproject, 'utf-8');
         const parsed: any = toml.parse(content);
 
