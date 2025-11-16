@@ -25,6 +25,8 @@ Systematically execute implementation plans using VERSATIL's OPERA agents with d
 - `--monitor`: Run continuous health monitoring during work (`/assess --continuous`)
 - `--quality-gates`: Pause at each quality gate for validation before continuing
 - `--timeout=Nh`: Maximum execution time (safety, e.g., `--timeout=8h`)
+- `--validate`: Run progressive validation (Level 1→2→3) after each subtask completion (+70% iterative fixing)
+- `--skip-validation`: Skip progressive validation (backward compatibility, not recommended)
 
 ## Usage Examples
 
@@ -43,6 +45,15 @@ Systematically execute implementation plans using VERSATIL's OPERA agents with d
 
 # All flags combined (maximum safety)
 /work --monitor --quality-gates --timeout=28h "Complete auth system"
+
+# With progressive validation (Level 1→2→3 quality gates)
+/work --validate "Feature: User authentication"
+
+# Progressive validation + monitoring
+/work --validate --monitor "Feature: Payment processing"
+
+# Skip validation for quick prototyping (not recommended)
+/work --skip-validation "Feature: Experimental prototype"
 ```
 
 ## Work Target
@@ -572,6 +583,138 @@ Implement [task description from todo file].
 5. **Consistent Format**: Structured output enables automation, reporting, and quality tracking
 6. **Tool Integration**: Agents use MCP tools (65 available) - direct execution can't access these
 
+**Wave-Based Execution (if orchestration includes execution_waves):**
+
+If the plan contains `execution_waves` (from `/plan` with Sarah-PM orchestration), execute using wave-based parallel workflow for 40%+ time savings:
+
+```typescript
+// Import WaveExecutor
+import { WaveExecutor, Wave } from '../src/orchestration/wave-executor.js';
+
+const waveExecutor = new WaveExecutor();
+
+// Execute waves sequentially (waves contain parallel tasks)
+for (const wave of orchestration.execution_waves) {
+  console.log(`\n${'═'.repeat(80)}`);
+  console.log(`## Wave ${wave.wave_number}: ${wave.wave_name}`);
+  console.log(`Duration: ${wave.wave_duration_estimate}min`);
+  console.log(`Parallel Execution: ${wave.parallel_execution ? 'YES' : 'NO'}`);
+  console.log(`Agents: ${wave.agents.join(', ')}`);
+  console.log(`Tasks: ${wave.tasks.length}`);
+  console.log(`${'═'.repeat(80)}\n`);
+
+  // Check wave dependencies satisfied
+  const dependenciesSatisfied = wave.dependencies.every(depWave => {
+    // Check if dependent wave completed successfully
+    const depResult = waveExecutor.getWaveResult(depWave);
+    return depResult && depResult.status === 'completed';
+  });
+
+  if (!dependenciesSatisfied) {
+    console.log(`❌ Wave ${wave.wave_number} dependencies not satisfied`);
+    console.log(`   Required waves: ${wave.dependencies.join(', ')}`);
+    break; // Stop execution
+  }
+
+  // Execute wave (parallel or sequential based on wave config)
+  const waveResult = await waveExecutor.executeWave(wave);
+
+  // Display wave results
+  console.log(`\n✅ Wave ${wave.wave_number} complete:`);
+  console.log(`   Status: ${waveResult.status}`);
+  console.log(`   Duration: ${Math.round((waveResult.actual_duration || 0) / 60000)}min`);
+
+  if (waveResult.time_savings && waveResult.time_savings > 0) {
+    console.log(`   ⚡ Time Saved: ${Math.round(waveResult.time_savings / 60000)}min (parallel execution)`);
+  }
+
+  // Check for coordination checkpoint
+  if (wave.coordination_checkpoint && waveResult.checkpoint_result) {
+    const cp = waveResult.checkpoint_result;
+    const icon = cp.passed ? '✅' : (cp.blocking ? '⛔' : '⚠️');
+
+    console.log(`\n${icon} Checkpoint: ${cp.name}`);
+    console.log(`   Status: ${cp.passed ? 'PASSED' : 'FAILED'}`);
+    console.log(`   Blocking: ${cp.blocking ? 'YES' : 'NO'}`);
+
+    // Display quality gate results
+    cp.quality_gate_results.forEach(gate => {
+      const gateIcon = gate.passed ? '✅' : '❌';
+      console.log(`   ${gateIcon} ${gate.gate}: ${gate.message}`);
+    });
+
+    // Show warnings
+    if (cp.warnings.length > 0) {
+      console.log(`\n   ⚠️ Warnings:`);
+      cp.warnings.forEach(w => console.log(`      - ${w}`));
+    }
+
+    // Show errors
+    if (cp.errors.length > 0) {
+      console.log(`\n   ❌ Errors:`);
+      cp.errors.forEach(e => console.log(`      - ${e}`));
+    }
+
+    // BLOCK if checkpoint failed and is blocking
+    if (!cp.passed && cp.blocking) {
+      console.log(`\n⛔ Wave ${wave.wave_number + 1} BLOCKED - fix checkpoint errors before proceeding`);
+      console.log(`\n💡 Recommendations:`);
+      console.log(`   1. Fix errors listed above`);
+      console.log(`   2. Run validation: npm test && npm run coverage`);
+      console.log(`   3. Re-run /work to resume from Wave ${wave.wave_number + 1}`);
+      break; // Stop execution
+    }
+
+    // WARN if checkpoint failed but non-blocking
+    if (!cp.passed && !cp.blocking) {
+      console.log(`\n⚠️ Wave ${wave.wave_number + 1} will proceed with warnings`);
+    }
+  }
+
+  // Check if wave failed
+  if (waveResult.status === 'failed') {
+    console.log(`\n❌ Wave ${wave.wave_number} FAILED: ${waveResult.error}`);
+    console.log(`\n💡 Failed tasks:`);
+
+    const failedTasks = Array.from(waveResult.task_results.values())
+      .filter(t => t.status === 'failed');
+
+    failedTasks.forEach(task => {
+      console.log(`   - ${task.taskId}: ${task.error?.message || 'Unknown error'}`);
+    });
+
+    break; // Stop execution
+  }
+
+  // Update TodoWrite for all tasks in wave
+  wave.tasks.forEach(taskId => {
+    const taskResult = waveResult.task_results.get(taskId);
+    if (taskResult && taskResult.status === 'completed') {
+      // Mark todo as complete (will be handled by individual task execution)
+    }
+  });
+}
+
+// Show final wave plan results
+const wavePlanResult = await waveExecutor.executePlan(orchestration.execution_waves);
+
+console.log(`\n${'═'.repeat(80)}`);
+console.log(`## Wave Plan Execution Complete`);
+console.log(`${'═'.repeat(80)}\n`);
+console.log(`📊 Results:`);
+console.log(`   Waves Completed: ${wavePlanResult.waves_completed}/${orchestration.execution_waves.length}`);
+console.log(`   Waves Failed: ${wavePlanResult.waves_failed}`);
+console.log(`   Sequential Time: ${Math.round(wavePlanResult.sequential_time / 60000)}min`);
+console.log(`   Parallel Time: ${Math.round(wavePlanResult.parallel_time / 60000)}min`);
+console.log(`   Time Saved: ${Math.round(wavePlanResult.total_time_savings / 60000)}min (${wavePlanResult.percentage_faster.toFixed(1)}% faster)`);
+console.log(`   Overall Status: ${wavePlanResult.overall_status.toUpperCase()}`);
+console.log(``);
+```
+
+**Fallback: Sequential Execution (if no execution_waves)**
+
+If the plan does NOT contain `execution_waves`, fall back to sequential task-by-task execution:
+
 **Implementation Workflow:**
 
 ```yaml
@@ -591,6 +734,25 @@ For_Each_Subtask:
     - Check code quality
     - Verify acceptance criteria
     - Test integration points
+
+  Step_3A_Progressive_Validation_Optional:
+    # Only runs if --validate flag is present (opt-in feature)
+    - Import: ProgressiveValidator from src/validation/progressive-validator.ts
+    - Create validator with default config (Level 1→2→3)
+    - Run progressive validation:
+      * Level 1: Syntax & Style (ESLint, TypeScript, Prettier) - AUTO-FIX
+      * Level 2: Unit & Integration Tests (Vitest, coverage, npm audit)
+      * Level 3: E2E & System Tests (Playwright, accessibility)
+    - Display results with pass/fail for each level
+    - If ANY level fails:
+      * Show detailed errors from validation output
+      * Update TodoWrite with "blocked" status
+      * STOP execution - do NOT proceed to next task
+      * Show user: "❌ Quality gates failed - fix issues before proceeding"
+      * Wait for user to fix issues manually
+    - If ALL levels pass:
+      * Show "✅ Progressive validation passed (Level 1→2→3)"
+      * Continue to Step_4_Mark_Complete
 
   Step_4_Mark_Complete:
     - TodoWrite: Set task status to completed
@@ -634,6 +796,61 @@ TodoWrite:
 ⏳ 4. Add security features (Marcus-Backend)
 ⏳ 5. Create test suite (Maria-QA)
 ⏳ 6. Update documentation (Sarah-PM)
+```
+
+**Example with Progressive Validation (--validate flag):**
+
+```typescript
+// After agent completes implementation:
+import { ProgressiveValidator } from '../src/validation/progressive-validator.js';
+
+if (flags.validate && !flags.skipValidation) {
+  console.log(chalk.blue('\n🔄 Running Progressive Validation (Level 1→2→3)...\n'));
+
+  const validator = new ProgressiveValidator(
+    ProgressiveValidator.createDefaultConfig()
+  );
+
+  const results = await validator.validate();
+
+  // Check if all levels passed
+  const allPassed = results.every(r => r.passed);
+
+  if (!allPassed) {
+    // Validation failed - block next task
+    console.log(chalk.red.bold('\n❌ Quality Gates Failed\n'));
+    console.log(chalk.yellow('Fix the issues above before proceeding to the next task.\n'));
+
+    // Update TodoWrite to reflect blocked status
+    TodoWrite({
+      todos: [
+        { content: currentTask.content, status: 'in_progress', activeForm: 'Blocked - fixing validation errors' },
+        ...remainingTasks
+      ]
+    });
+
+    // STOP execution - do NOT proceed to next task
+    throw new Error('Progressive validation failed - quality gates not met');
+  } else {
+    // All levels passed
+    console.log(chalk.green.bold('\n✅ Progressive Validation Passed (All Levels)\n'));
+
+    // Show summary
+    results.forEach(r => {
+      console.log(chalk.green(`  ✅ ${r.level}: PASSED`) + chalk.gray(` (${r.executionTime}ms)`));
+    });
+
+    // Continue to mark task complete
+  }
+}
+
+// If validation passed (or --validate not set), mark complete:
+TodoWrite({
+  todos: [
+    { content: currentTask.content, status: 'completed', activeForm: 'Completing task' },
+    ...remainingTasks
+  ]
+});
 ```
 
 ### 4. Agent Collaboration Patterns
