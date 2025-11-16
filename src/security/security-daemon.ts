@@ -8,9 +8,9 @@
  */
 
 import { promises as fs } from 'fs';
-import { join, dirname, resolve, relative } from 'path';
+import { join, resolve, relative } from 'path';
 import { EventEmitter } from 'events';
-import { spawn, exec } from 'child_process';
+import { exec } from 'child_process';
 import { promisify } from 'util';
 import chokidar from 'chokidar';
 import { IntegratedSecurityOrchestrator } from './integrated-security-orchestrator.js';

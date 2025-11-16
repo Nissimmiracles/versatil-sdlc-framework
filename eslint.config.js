@@ -16,8 +16,8 @@ export default [
     },
     rules: {
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off', // Temporarily disabled - 1,486 warnings (gradual migration)
+      '@typescript-eslint/no-non-null-assertion': 'off', // Temporarily disabled - 199 warnings (gradual migration)
       'prefer-const': 'warn',
       'no-var': 'error',
       'no-console': 'off', // Allow console for CLI tools

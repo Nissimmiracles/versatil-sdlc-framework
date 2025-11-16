@@ -13,7 +13,7 @@
  */
 
 import { EventEmitter } from 'events';
-import type { TaskPlan, Task } from './task-plan-manager.js';
+import type { TaskPlan } from './task-plan-manager.js';
 
 // ============================================================================
 // TYPE DEFINITIONS

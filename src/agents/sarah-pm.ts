@@ -226,7 +226,7 @@ export class SarahPM {
       quality_gates: string[];
     }
   ): Promise<void> {
-    console.log(`🎯 Coordinating ${agents.length} agents: ${agents.join(', ')}`);
+    console.log(`🎯 Coordinating ${agents.length} _agents: ${agents.join(', ')}`);
     console.log(`   Goal: ${context.goal}`);
     console.log(`   Strategy: ${context.coordination_strategy}`);
 

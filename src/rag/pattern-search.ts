@@ -27,7 +27,7 @@
  */
 
 import { GraphRAGQuery, GraphRAGResult } from '../lib/graphrag-store.js';
-import { EnhancedVectorMemoryStore, RAGQuery, RAGResult } from './enhanced-vector-memory-store.js';
+import { EnhancedVectorMemoryStore, RAGQuery } from './enhanced-vector-memory-store.js';
 import { RAGRouter, getRAGRouter, RAGSearchResult } from './rag-router.js';
 
 /**

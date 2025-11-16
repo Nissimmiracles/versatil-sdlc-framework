@@ -202,7 +202,7 @@ export class VERSATILMCPHTTPServer {
             });
         });
         // Error handler
-        this.app.use((err, req, res, next) => {
+        this.app.use((err, req, res, _next) => {
             this.logger.error('[MCP HTTP] Unhandled error:', err);
             res.status(500).json({
                 error: 'Internal Server Error',

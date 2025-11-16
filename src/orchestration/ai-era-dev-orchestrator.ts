@@ -11,7 +11,7 @@
  */
 
 import { AgentRegistry } from '../agents/core/agent-registry.js';
-import { BaseAgent, AgentResponse, AgentActivationContext } from '../agents/core/base-agent.js';
+import { AgentResponse, AgentActivationContext } from '../agents/core/base-agent.js';
 import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';
 import { AgentRAGSynchronization, EnrichedContext } from './agent-rag-sync.js';
 import { PatternLearningSystem } from '../rag/pattern-learning-system.js';

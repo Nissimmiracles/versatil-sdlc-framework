@@ -21,7 +21,7 @@
  * ```
  */
 
-import { GraphRAGQuery, GraphRAGResult, PatternNode } from '../lib/graphrag-store.js';
+import { GraphRAGResult, PatternNode } from '../lib/graphrag-store.js';
 
 export interface CloudRunQueryRequest {
   query: string;

@@ -7,7 +7,7 @@
 
 import { VERSATILLogger } from '../utils/logger.js';
 import { AgentRegistry } from '../agents/core/agent-registry.js';
-import { BaseAgent, AgentActivationContext } from '../agents/core/base-agent.js';
+import { AgentActivationContext } from '../agents/core/base-agent.js';
 
 export interface SDLCPhase {
   id: string;

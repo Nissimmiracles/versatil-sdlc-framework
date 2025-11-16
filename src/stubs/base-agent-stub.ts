@@ -20,21 +20,21 @@ export abstract class BaseAgent {
   abstract id: string;
   abstract specialization: string;
   
-  abstract activate(context: AgentActivationContext): Promise<AgentResponse>;
+  abstract activate(_context: AgentActivationContext): Promise<AgentResponse>;
   
-  protected async runStandardValidation(context: any): Promise<any> {
+  protected async runStandardValidation(_context: any): Promise<any> {
     return { score: 100, issues: [], warnings: [], recommendations: [] };
   }
   
-  protected async runAgentSpecificValidation(context: any): Promise<any> {
+  protected async runAgentSpecificValidation(_context: any): Promise<any> {
     return {};
   }
   
-  protected generateStandardRecommendations(results: any): any[] {
+  protected generateStandardRecommendations(_results: any): any[] {
     return [];
   }
   
-  protected calculateStandardPriority(results: any): string {
+  protected calculateStandardPriority(_results: any): string {
     return 'medium';
   }
 }

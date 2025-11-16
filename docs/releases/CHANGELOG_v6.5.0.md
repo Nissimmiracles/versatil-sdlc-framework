@@ -120,7 +120,7 @@ VERSATIL is now an **official Claude Code plugin**, installable with a single co
 - Priority roadmap generation
 
 **Documentation Updates**
-- Migrated from BMAD commands to native npm scripts
+- Migrated from legacy commands to native npm scripts
 - Updated `.claude/commands/` references
 - Added plugin-specific documentation
 

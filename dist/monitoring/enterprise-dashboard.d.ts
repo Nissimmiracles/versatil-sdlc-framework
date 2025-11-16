@@ -3,7 +3,6 @@
  * Real-time monitoring, metrics collection, and business intelligence
  */
 import { EventEmitter } from 'events';
-import { EnvironmentType } from '../environment/environment-manager.js';
 export interface MetricPoint {
     timestamp: number;
     value: number;
@@ -229,7 +228,7 @@ export declare class EnterpriseDashboard extends EventEmitter {
         metricsCount: number;
         activeAlerts: number;
         totalAlerts: number;
-        environment: EnvironmentType;
+        environment: import("../environment/environment-manager.js").EnvironmentType;
         uptime: number;
         lastUpdate: number;
     };

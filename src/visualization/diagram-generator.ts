@@ -19,7 +19,7 @@
 
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import type { TaskPlan, Task, TaskDependency } from '../planning/task-plan-manager.js';
+import type { TaskPlan, Task } from '../planning/task-plan-manager.js';
 import type { ScanResult } from '../agents/opera/oliver-mcp/project-scanner.js';
 
 // ============================================================================

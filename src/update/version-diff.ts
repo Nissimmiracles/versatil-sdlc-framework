@@ -4,7 +4,7 @@
  */
 
 import { GitHubReleaseChecker, ReleaseInfo } from './github-release-checker.js';
-import { parseVersion, compareVersions } from './semantic-version.js';
+import { parseVersion } from './semantic-version.js';
 
 export interface VersionDiff {
   fromVersion: string;

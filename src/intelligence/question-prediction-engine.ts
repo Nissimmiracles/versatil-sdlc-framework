@@ -56,7 +56,7 @@ export class QuestionPredictionEngine {
   /**
    * Record question in sequence
    */
-  public recordQuestion(category: QuestionCategory, conversationId: string): void {
+  public recordQuestion(_category: QuestionCategory, _conversationId: string): void {
     // Implementation would track questions in active conversations
     // For now, we'll build from historical patterns
   }

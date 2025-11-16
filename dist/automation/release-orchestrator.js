@@ -165,7 +165,7 @@ Highlight any violations of OPERA methodology or framework conventions.
                 this.bugDatabase.set(bug.id, bug);
             }
             this.logger.info('Bug collection completed', { collected: processedBugs.length });
-            this.emit('bugs:collected', processedBugs);
+            this.emit('_bugs:collected', processedBugs);
             return processedBugs;
         }
         catch (error) {
@@ -301,7 +301,7 @@ Highlight any violations of OPERA methodology or framework conventions.
      * Automatically create and publish release
      */
     async createAutomaticRelease(candidate) {
-        this.logger.info('Creating automatic release', { version: candidate.version });
+        this.logger.info('Creating automatic release', { _version: candidate.version });
         try {
             // Validate release candidate
             const validation = await this.validateReleaseCandidate(candidate);

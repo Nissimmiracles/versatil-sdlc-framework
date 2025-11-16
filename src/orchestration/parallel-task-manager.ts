@@ -178,7 +178,7 @@ export class ParallelTaskManager extends EventEmitter {
    * Add a task to the execution queue with collision detection
    */
   async addTask(task: Task): Promise<string> {
-    this.emit('task:added', { taskId: task.id, task });
+    this.emit('_task:added', { taskId: task.id, task });
 
     // Validate task
     const validation = await this.validateTask(task);
@@ -248,7 +248,7 @@ export class ParallelTaskManager extends EventEmitter {
             resourceUsage: []
           };
           results.set(taskId, execution);
-          this.emit('task:failed', { taskId, error: result.reason });
+          this.emit('_task:failed', { taskId, error: result.reason });
         }
       });
     }
@@ -336,7 +336,7 @@ export class ParallelTaskManager extends EventEmitter {
    * Handle collisions with intelligent resolution strategies
    */
   private async handleCollision(task: Task, collision: CollisionDetectionResult): Promise<void> {
-    this.emit('collision:detected', { task, collision });
+    this.emit('_collision:detected', { task, collision });
 
     switch (collision.recommendation) {
       case CollisionRecommendation.SERIALIZE:
@@ -460,7 +460,7 @@ export class ParallelTaskManager extends EventEmitter {
     };
 
     this.executions.set(taskId, execution);
-    this.emit('task:started', { taskId, task });
+    this.emit('_task:started', { taskId, task });
 
     // Emit TodoWrite event for task start
     if (this.todoWriteEnabled) {
@@ -501,7 +501,7 @@ export class ParallelTaskManager extends EventEmitter {
       execution.progress = 100;
       execution.result = result;
 
-      this.emit('task:completed', { taskId, task, result });
+      this.emit('_task:completed', { taskId, task, result });
 
       // Emit TodoWrite event for task completion
       if (this.todoWriteEnabled) {
@@ -519,7 +519,7 @@ export class ParallelTaskManager extends EventEmitter {
       execution.status = ExecutionStatus.FAILED;
       execution.error = error as Error;
 
-      this.emit('task:failed', { taskId, task, error });
+      this.emit('_task:failed', { taskId, task, error });
 
       // Emit TodoWrite event for task failure
       if (this.todoWriteEnabled) {

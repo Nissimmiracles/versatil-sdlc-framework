@@ -18,7 +18,7 @@
  */
 
 import { EventEmitter } from 'events';
-import type { TaskPlan, Task, PlanStatusSnapshot } from '../planning/task-plan-manager.js';
+import type { Task, PlanStatusSnapshot } from '../planning/task-plan-manager.js';
 
 export interface AgentProgress {
   agentId: string;

@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { MCPToolRouter, ToolCallRequest, ToolCallResponse } from './mcp-tool-router';
+import { MCPToolRouter, ToolCallRequest } from './mcp-tool-router';
 
 describe('MCPToolRouter', () => {
   let router: MCPToolRouter;

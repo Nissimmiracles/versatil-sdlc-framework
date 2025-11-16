@@ -467,7 +467,7 @@ export class PathTraversalPrevention extends EventEmitter {
     return 'low';
   }
 
-  private getAttackIndicators(inputPath: string, attackType: PathTraversalAttempt['attack_type']): string[] {
+  private getAttackIndicators(inputPath: string, _attackType: PathTraversalAttempt['attack_type']): string[] {
     const indicators: string[] = [];
 
     if (inputPath.includes('../')) indicators.push('dot-dot-slash sequence');

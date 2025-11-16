@@ -4,8 +4,8 @@
  */
 
 import { watch } from 'fs';
-import { readFile, appendFile, mkdir } from 'fs/promises';
-import { join, basename, extname, dirname } from 'path';
+import { appendFile } from 'fs/promises';
+import { join } from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { homedir } from 'os';

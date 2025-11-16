@@ -13,7 +13,7 @@
 
 import { promises as fs } from 'fs';
 import path from 'path';
-import { SecurityLogger, SecurityEventType, SecuritySeverity } from './docs-security-logger.js';
+import { SecurityLogger } from './docs-security-logger.js';
 
 /**
  * Access control modes

@@ -17,7 +17,7 @@
 
 import { GraphRAGStore, PatternNode, GraphRAGQuery, GraphRAGResult } from '../lib/graphrag-store.js';
 import { CloudRunRAGClient, getCloudRunClient } from './cloudrun-rag-client.js';
-import { SanitizationPolicy, getSanitizationPolicy, PatternClassification, StorageDestination } from './sanitization-policy.js';
+import { SanitizationPolicy, getSanitizationPolicy, PatternClassification } from './sanitization-policy.js';
 import { PrivacyAuditor, getPrivacyAuditor } from './privacy-auditor.js';
 
 export interface PatternInput {

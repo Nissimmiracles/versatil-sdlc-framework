@@ -13,7 +13,7 @@
 
 import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
-import { join, relative, resolve } from 'path';
+import { join, resolve } from 'path';
 import { createHash } from 'crypto';
 import { watch, FSWatcher } from 'chokidar';
 

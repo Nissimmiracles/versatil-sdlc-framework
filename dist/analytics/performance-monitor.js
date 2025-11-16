@@ -226,7 +226,7 @@ export class PerformanceMonitor extends EventEmitter {
     /**
      * Calculate performance trend
      */
-    calculateTrend(agentId, current) {
+    calculateTrend(agentId, _current) {
         const recentMetrics = this.getRecentMetrics(agentId, 10);
         if (recentMetrics.length < 5)
             return 'stable';

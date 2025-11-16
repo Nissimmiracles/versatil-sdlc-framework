@@ -36,11 +36,11 @@ This software includes the following components and methodologies:
    - Integration with Model Context Protocol for browser testing
    - Chrome MCP is subject to its own licensing terms
 
-4. Quality Gates Framework
+3. Quality Gates Framework
    - Automated quality assurance and testing protocols
    - Licensed under MIT License
 
-5. Context Preservation System
+4. Context Preservation System
    - Zero-context-loss agent handoff system
    - Licensed under MIT License
 

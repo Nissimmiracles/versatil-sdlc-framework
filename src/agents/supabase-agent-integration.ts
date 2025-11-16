@@ -326,7 +326,7 @@ export class SupabaseRAGAgent {
   /**
    * Get comprehensive insights about Supabase RAG performance
    */
-  private async getSupabaseInsights(context: AgentActivationContext): Promise<SupabaseRAGInsights> {
+  private async getSupabaseInsights(_context: AgentActivationContext): Promise<SupabaseRAGInsights> {
     const metrics = await this.supabaseStore.getPerformanceMetrics();
 
     return {

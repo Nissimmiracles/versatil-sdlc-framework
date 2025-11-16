@@ -45,7 +45,7 @@ export class TestGenerator {
    */
   async generateTestSuite(
     promises: FrameworkPromise[],
-    config: TestGenerationConfig = this.getDefaultConfig()
+    _config: TestGenerationConfig = this.getDefaultConfig()
   ): Promise<GeneratedTestSuite[]> {
 
     this.logger.info('🧪 Generating autonomous test suite', {

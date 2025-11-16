@@ -853,7 +853,7 @@ Provide query execution plans with optimization strategies.`,
             title: 'Activate OPERA Agent',
             readOnlyHint: true,
             destructiveHint: false,
-            agentId: z.enum([
+            _agentId: z.enum([
                 // Core OPERA agents
                 'maria-qa',
                 'james-frontend',
@@ -964,7 +964,7 @@ Provide query execution plans with optimization strategies.`,
                 'improvement',
             ]),
             filePath: z.string(),
-            strictMode: z.boolean().optional(),
+            _strictMode: z.boolean().optional(),
         }, async ({ phase, filePath, strictMode = true }) => {
             // Lazy initialization on first tool use
             if (this.config.lazyInit && !this.lazyInitialized) {
@@ -1103,7 +1103,7 @@ Provide query execution plans with optimization strategies.`,
             include: z
                 .array(z.enum(['agents', 'flywheel', 'performance', 'quality', 'deployment', 'feedback']))
                 .optional(),
-            detailed: z.boolean().optional(),
+            _detailed: z.boolean().optional(),
         }, async ({ include = ['agents', 'flywheel', 'performance'], detailed = false }) => {
             // Lazy initialization on first tool use
             if (this.config.lazyInit && !this.lazyInitialized) {
@@ -1132,9 +1132,9 @@ Provide query execution plans with optimization strategies.`,
             title: 'Get Adaptive Insights',
             readOnlyHint: true,
             destructiveHint: false,
-            agentId: z.string().optional(),
-            timeRange: z.enum(['hour', 'day', 'week', 'month', 'all']).optional(),
-            includeRecommendations: z.boolean().optional(),
+            _agentId: z.string().optional(),
+            _timeRange: z.enum(['hour', 'day', 'week', 'month', 'all']).optional(),
+            _includeRecommendations: z.boolean().optional(),
         }, async ({ agentId, timeRange = 'day', includeRecommendations = true }) => {
             // Lazy initialization on first tool use
             if (this.config.lazyInit && !this.lazyInitialized) {
@@ -1358,7 +1358,7 @@ Provide query execution plans with optimization strategies.`,
             title: 'Get Agent Documentation',
             readOnlyHint: true,
             destructiveHint: false,
-            agentId: z.enum([
+            _agentId: z.enum([
                 'maria-qa', 'james-frontend', 'marcus-backend', 'alex-ba', 'sarah-pm', 'dr-ai-ml', 'oliver-mcp', 'dana-database',
                 'james-react', 'james-vue', 'james-nextjs', 'james-angular', 'james-svelte',
                 'marcus-node', 'marcus-python', 'marcus-rails', 'marcus-go', 'marcus-java'

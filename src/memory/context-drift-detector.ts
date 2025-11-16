@@ -22,7 +22,7 @@
  */
 
 import { VERSATILLogger } from '../utils/logger.js';
-import { ContextStatsTracker, MemoryOperation } from './context-stats-tracker.js';
+import { ContextStatsTracker } from './context-stats-tracker.js';
 
 /**
  * Drift severity levels

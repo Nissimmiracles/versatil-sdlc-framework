@@ -6,6 +6,6 @@ export const environmentScanner = {
         return { projectInfo: {}, technology: {}, structure: {} };
     },
     // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-    watchForChanges(callback) { }
+    watchForChanges(_callback) { }
 };
 //# sourceMappingURL=environment-scanner.js.map

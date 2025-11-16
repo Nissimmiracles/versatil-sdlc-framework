@@ -201,7 +201,7 @@ export class SupabaseConfig {
   /**
    * Get configuration for a specific agent
    */
-  getAgentConfig(agentId: string): SupabaseRAGConfig {
+  getAgentConfig(_agentId: string): SupabaseRAGConfig {
     return {
       supabaseUrl: this.config.supabaseUrl,
       supabaseKey: this.config.supabaseAnonKey,

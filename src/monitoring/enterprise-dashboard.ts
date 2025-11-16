@@ -6,7 +6,7 @@
 
 import { EventEmitter } from 'events';
 import { VERSATILLogger } from '../utils/logger.js';
-import { environmentManager, EnvironmentType } from '../environment/environment-manager.js';
+import { environmentManager } from '../environment/environment-manager.js';
 
 export interface MetricPoint {
   timestamp: number;

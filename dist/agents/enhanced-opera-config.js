@@ -756,7 +756,7 @@ export class EnhancedOPERAConfigManager extends EventEmitter {
     /**
      * Handle Rule 1 triggers (Parallel Task Execution)
      */
-    handleRule1Trigger(event) {
+    handleRule1Trigger(_event) {
         for (const [agentId, config] of this.agentConfigs) {
             if (!config.rules.rule1_parallel_tasks.enabled)
                 continue;
@@ -770,7 +770,7 @@ export class EnhancedOPERAConfigManager extends EventEmitter {
     /**
      * Handle Rule 2 triggers (Stress Testing)
      */
-    handleRule2Trigger(event) {
+    handleRule2Trigger(_event) {
         for (const [agentId, config] of this.agentConfigs) {
             if (!config.rules.rule2_stress_testing.enabled)
                 continue;
@@ -964,7 +964,7 @@ export class EnhancedOPERAConfigManager extends EventEmitter {
         }
     }
     // Pattern matching helpers
-    matchesTriggerPattern(event, pattern, condition) {
+    matchesTriggerPattern(_event, _pattern, _condition) {
         // Simple pattern matching implementation
         // In real implementation, use more sophisticated pattern matching
         return true;
@@ -1011,7 +1011,7 @@ export class EnhancedOPERAConfigManager extends EventEmitter {
     /**
      * Get current performance metrics for an agent
      */
-    getCurrentMetrics(agentId) {
+    getCurrentMetrics(_agentId) {
         // In real implementation, this would fetch actual metrics
         return {
             cpu: Math.random() * 100,

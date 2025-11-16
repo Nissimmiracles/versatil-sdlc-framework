@@ -9,8 +9,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { FrameworkEfficiencyMonitor, FrameworkMetrics } from './framework-efficiency-monitor.js';
-import { IntrospectiveMetaAgent, SystemMetrics } from '../agents/meta/introspective-meta-agent.js';
+import { FrameworkEfficiencyMonitor } from './framework-efficiency-monitor.js';
+import { IntrospectiveMetaAgent } from '../agents/meta/introspective-meta-agent.js';
 import { ProactiveAgentOrchestrator } from '../orchestration/proactive-agent-orchestrator.js';
 import { AgenticRAGOrchestrator } from '../orchestration/agentic-rag-orchestrator.js';
 import { PlanFirstOpera } from '../orchestration/plan-first-opera.js';

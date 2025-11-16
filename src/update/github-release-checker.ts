@@ -3,7 +3,7 @@
  * Fetch and parse GitHub releases for framework updates
  */
 
-import { parseVersion, compareVersions, SemanticVersion } from './semantic-version.js';
+import { parseVersion, compareVersions } from './semantic-version.js';
 
 export interface ReleaseAsset {
   name: string;

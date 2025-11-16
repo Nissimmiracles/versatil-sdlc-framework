@@ -4,5 +4,5 @@ export declare class DeploymentOrchestrator extends BaseAgent {
     id: string;
     specialization: string;
     systemPrompt: string;
-    activate(context: AgentActivationContext): Promise<AgentResponse>;
+    activate(_context: AgentActivationContext): Promise<AgentResponse>;
 }

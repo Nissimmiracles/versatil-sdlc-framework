@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { VERSATILLogger } from '../utils/logger.js';
-import { MicrosegmentationFramework, ProjectSecurityContext } from './microsegmentation-framework.js';
+import { MicrosegmentationFramework } from './microsegmentation-framework.js';
 import { ZeroTrustProjectIsolation } from './zero-trust-project-isolation.js';
 import { BoundaryEnforcementEngine } from './boundary-enforcement-engine.js';
 import { PathTraversalPrevention } from './path-traversal-prevention.js';

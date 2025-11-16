@@ -126,7 +126,7 @@ export class VectorStoreMigration {
     };
 
     try {
-      this.logger.info('Starting vector store migration', { options: opts }, 'migration');
+      this.logger.info('Starting vector store migration', { _options: opts }, 'migration');
 
       // Phase 1: Pre-migration validation
       await this.phase1PreValidation(opts);

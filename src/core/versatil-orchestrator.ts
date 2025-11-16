@@ -15,9 +15,9 @@
 
 import { EventEmitter } from 'events';
 import { ParallelTaskManager, Task, TaskType, Priority, SDLCPhase } from '../orchestration/parallel-task-manager.js';
-import { AutomatedStressTestGenerator, StressTestConfig, TargetType } from '../testing/automated-stress-test-generator.js';
-import { DailyAuditSystem, AuditConfig, AuditType } from '../audit/daily-audit-system.js';
-import { EnhancedOPERAConfigManager, EnhancedAgentConfig } from '../agents/enhanced-opera-config.js';
+import { AutomatedStressTestGenerator, TargetType } from '../testing/automated-stress-test-generator.js';
+import { DailyAuditSystem } from '../audit/daily-audit-system.js';
+import { EnhancedOPERAConfigManager } from '../agents/enhanced-opera-config.js';
 import { EnvironmentManager } from '../environment/environment-manager.js';
 import { executeWithSDK, type SDKExecutionResult } from '../agents/sdk/versatil-query.js';
 import { EnhancedVectorMemoryStore } from '../rag/enhanced-vector-memory-store.js';

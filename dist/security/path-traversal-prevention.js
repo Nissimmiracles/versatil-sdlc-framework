@@ -386,7 +386,7 @@ export class PathTraversalPrevention extends EventEmitter {
         }
         return 'low';
     }
-    getAttackIndicators(inputPath, attackType) {
+    getAttackIndicators(inputPath, _attackType) {
         const indicators = [];
         if (inputPath.includes('../'))
             indicators.push('dot-dot-slash sequence');

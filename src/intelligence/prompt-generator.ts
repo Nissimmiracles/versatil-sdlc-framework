@@ -8,7 +8,7 @@
  * - User intent guided by proven solutions
  */
 
-import { AnalysisResult, PatternMatch, RAGContext } from './pattern-analyzer.js';
+import { AnalysisResult, RAGContext } from './pattern-analyzer.js';
 
 export interface PromptContext {
   filePath: string;

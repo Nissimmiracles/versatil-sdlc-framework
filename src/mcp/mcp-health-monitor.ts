@@ -174,7 +174,7 @@ export class MCPHealthMonitor extends EventEmitter {
   /**
    * Execute MCP action (to be implemented by actual MCP executors)
    */
-  private async executeMCP(mcpId: string, action: string, params: any): Promise<any> {
+  private async executeMCP(mcpId: string, action: string, _params: any): Promise<any> {
     // This is a placeholder - actual implementation would call the real MCP executor
     // For now, simulate execution
     await this.sleep(Math.random() * 100); // Simulate latency

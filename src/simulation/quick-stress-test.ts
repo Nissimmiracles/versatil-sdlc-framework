@@ -6,7 +6,7 @@
  * without hanging on complex filesystem operations.
  */
 
-import { SimulationScenario, CapabilityMatrix } from '../agents/opera/maria-qa/simulation-qa.js';
+import { CapabilityMatrix } from '../agents/opera/maria-qa/simulation-qa.js';
 
 async function runQuickStressTest() {
   console.log('⚡ Quick SimulationQA Stress Test...\n');

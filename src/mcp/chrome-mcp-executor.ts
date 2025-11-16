@@ -4,7 +4,7 @@
  */
 
 import { chromium, Browser, BrowserContext, Page } from 'playwright';
-import type { ChromeMCPConfig, AccessibilityReport, PerformanceMetrics } from './chrome-mcp-config.js';
+import type { ChromeMCPConfig } from './chrome-mcp-config.js';
 import { DEFAULT_CHROME_MCP_CONFIG } from './chrome-mcp-config.js';
 import { getConsoleErrorMonitor, type ConsoleMonitoringResult } from '../agents/opera/maria-qa/console-error-monitor.js';
 import { getNetworkRequestTracker, type NetworkAnalysis } from '../agents/opera/maria-qa/network-request-tracker.js';

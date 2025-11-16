@@ -9,7 +9,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { SynchronizationDashboard, SyncIssue, SyncStatus } from './synchronization-dashboard.js';
+import { SynchronizationDashboard, SyncIssue } from './synchronization-dashboard.js';
 import { FrameworkEfficiencyMonitor } from './framework-efficiency-monitor.js';
 import { ProactiveAgentOrchestrator } from '../orchestration/proactive-agent-orchestrator.js';
 import { AgenticRAGOrchestrator } from '../orchestration/agentic-rag-orchestrator.js';

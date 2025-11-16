@@ -91,16 +91,16 @@ versatil cursor:init
 - Plugin manifest declares all available commands
 
 **User Impact**:
-- VERSSAI team couldn't use BMad features
+- VERSSAI team couldn't use VERSATIL features
 - Had to search codebase to find available commands
 - Unclear syntax and usage patterns
 
 **What Users Expected**:
 ```bash
 # Expected to find:
-versatil bmad --help
+versatil --help
 # OR
-docs/BMAD_COMMANDS.md with:
+docs/reference/commands.md with:
   - Complete command list
   - Usage examples
   - Output explanations
@@ -108,13 +108,13 @@ docs/BMAD_COMMANDS.md with:
 
 **What Actually Happened**:
 ```bash
-versatil bmad --help
+versatil --help
 # → No such command
 
 # Documentation searched:
-# - README.md: Mentions "BMad methodology" - no commands
-# - GET_STARTED.md: No BMad command reference
-# - CLAUDE.md: Mentions BMad - no command list
+# - README.md: Mentions "VERSATIL methodology" - no commands
+# - GET_STARTED.md: No command reference
+# - CLAUDE.md: Mentions VERSATIL - no command list
 ```
 
 **Native Commands Available** (`.claude/commands/framework/`):
@@ -409,7 +409,7 @@ versatil migrate
 1. ✅ **COMPLETED** - `docs/CURSOR_INTEGRATION.md` created
 2. ⏳ **IN PROGRESS** - Save this report to Maria's docs
 3. ⏳ Create `.cursorrules` template
-4. ⏳ Create `docs/BMAD_COMMANDS.md`
+4. ⏳ Create `docs/reference/commands.md`
 5. ⏳ Create `docs/AGENT_ACTIVATION_TROUBLESHOOTING.md`
 6. ⏳ Add `versatil cursor:init` command
 7. ⏳ Add `versatil test-activation` command
@@ -621,7 +621,7 @@ Error: MCP server connection timeout after 30s
 
 **Gaps Closed**:
 - ✅ Cursor integration: Complete guide created
-- ⏳ BMad commands: Reference pending
+- ⏳ VERSATIL commands: Reference pending
 - ⏳ Agent activation: Troubleshooting guide pending
 - ⏳ Installation: Troubleshooting guide pending
 - ⏳ Quality gates: Enforcement guide pending
@@ -686,7 +686,7 @@ Error: MCP server connection timeout after 30s
 **Team Allocation**:
 - 2 devs: Auto-activation fixes + diagnostic commands
 - 1 dev: Binary naming simplification + installation fixes
-- 2 devs: Documentation (BMad, troubleshooting, migration)
+- 2 devs: Documentation (commands, troubleshooting, migration)
 - 1 dev: Quality gates auto-installation
 - Maria-QA: Continuous validation + testing
 
@@ -700,7 +700,7 @@ Error: MCP server connection timeout after 30s
 - [x] `docs/CURSOR_INTEGRATION.md` - ✅ CREATED
 - [x] `docs/agents/maria-qa/VERSSAI_FIRST_USER_REPORT_ROADMAP.md` - ✅ THIS FILE
 - [ ] `docs/templates/cursor/.cursorrules` - Template file
-- [ ] `docs/BMAD_COMMANDS.md` - Complete command reference
+- [ ] `docs/reference/commands.md` - Complete command reference
 - [ ] `docs/AGENT_ACTIVATION_TROUBLESHOOTING.md` - Debug guide
 - [ ] `docs/INSTALLATION_TROUBLESHOOTING.md` - PATH fixes
 

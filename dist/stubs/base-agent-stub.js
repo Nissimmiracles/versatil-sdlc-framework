@@ -1,14 +1,14 @@
 export class BaseAgent {
-    async runStandardValidation(context) {
+    async runStandardValidation(_context) {
         return { score: 100, issues: [], warnings: [], recommendations: [] };
     }
-    async runAgentSpecificValidation(context) {
+    async runAgentSpecificValidation(_context) {
         return {};
     }
-    generateStandardRecommendations(results) {
+    generateStandardRecommendations(_results) {
         return [];
     }
-    calculateStandardPriority(results) {
+    calculateStandardPriority(_results) {
         return 'medium';
     }
 }

@@ -16,11 +16,11 @@ export declare abstract class BaseAgent {
     abstract name: string;
     abstract id: string;
     abstract specialization: string;
-    abstract activate(context: AgentActivationContext): Promise<AgentResponse>;
-    protected runStandardValidation(context: any): Promise<any>;
-    protected runAgentSpecificValidation(context: any): Promise<any>;
-    protected generateStandardRecommendations(results: any): any[];
-    protected calculateStandardPriority(results: any): string;
+    abstract activate(_context: AgentActivationContext): Promise<AgentResponse>;
+    protected runStandardValidation(_context: any): Promise<any>;
+    protected runAgentSpecificValidation(_context: any): Promise<any>;
+    protected generateStandardRecommendations(_results: any): any[];
+    protected calculateStandardPriority(_results: any): string;
 }
 export declare const log: {
     info: {

@@ -14,7 +14,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { Task, TaskType, Priority, SDLCPhase, CollisionRisk } from '../orchestration/parallel-task-manager.js';
+import { Priority } from '../orchestration/parallel-task-manager.js';
 import { AutomatedStressTestGenerator, StressTestType, TargetType } from '../testing/automated-stress-test-generator.js';
 import { DailyAuditSystem, AuditType, CheckCategory } from '../audit/daily-audit-system.js';
 
@@ -928,7 +928,7 @@ export class EnhancedOPERAConfigManager extends EventEmitter {
   /**
    * Handle Rule 1 triggers (Parallel Task Execution)
    */
-  private handleRule1Trigger(event: any): void {
+  private handleRule1Trigger(_event: any): void {
     for (const [agentId, config] of this.agentConfigs) {
       if (!config.rules.rule1_parallel_tasks.enabled) continue;
 
@@ -943,7 +943,7 @@ export class EnhancedOPERAConfigManager extends EventEmitter {
   /**
    * Handle Rule 2 triggers (Stress Testing)
    */
-  private handleRule2Trigger(event: any): void {
+  private handleRule2Trigger(_event: any): void {
     for (const [agentId, config] of this.agentConfigs) {
       if (!config.rules.rule2_stress_testing.enabled) continue;
 
@@ -1168,7 +1168,7 @@ export class EnhancedOPERAConfigManager extends EventEmitter {
   }
 
   // Pattern matching helpers
-  private matchesTriggerPattern(event: any, pattern: string, condition: string): boolean {
+  private matchesTriggerPattern(_event: any, _pattern: string, _condition: string): boolean {
     // Simple pattern matching implementation
     // In real implementation, use more sophisticated pattern matching
     return true;
@@ -1222,7 +1222,7 @@ export class EnhancedOPERAConfigManager extends EventEmitter {
   /**
    * Get current performance metrics for an agent
    */
-  private getCurrentMetrics(agentId: string): any {
+  private getCurrentMetrics(_agentId: string): any {
     // In real implementation, this would fetch actual metrics
     return {
       cpu: Math.random() * 100,

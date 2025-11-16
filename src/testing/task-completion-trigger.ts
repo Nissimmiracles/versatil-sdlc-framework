@@ -351,7 +351,7 @@ export class TaskCompletionTrigger extends EventEmitter {
   /**
    * Parse test results from stdout/stderr
    */
-  private parseTestResults(stdout: string, stderr: string): any[] {
+  private parseTestResults(stdout: string, _stderr: string): any[] {
     // Simple parser - in production, use proper test reporter
     const results: any[] = [];
 

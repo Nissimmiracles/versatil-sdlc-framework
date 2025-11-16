@@ -242,7 +242,7 @@ export class SupabaseRAGAgent {
     /**
      * Get comprehensive insights about Supabase RAG performance
      */
-    async getSupabaseInsights(context) {
+    async getSupabaseInsights(_context) {
         const metrics = await this.supabaseStore.getPerformanceMetrics();
         return {
             patternsFound: metrics?.patterns?.total || 0,

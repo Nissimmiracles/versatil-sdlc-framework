@@ -440,7 +440,7 @@ export class AutomatedStressTestGenerator extends EventEmitter {
         const newFeatures = await this.detectNewFeatures();
 
         if (newFeatures.length > 0) {
-          this.emit('continuous:new_features', { features: newFeatures });
+          this.emit('continuous:new_features', { _features: newFeatures });
 
           // Generate stress tests for new features
           for (const feature of newFeatures) {

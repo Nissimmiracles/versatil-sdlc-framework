@@ -7,7 +7,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { VERSATILLogger } from '../utils/logger.js';
-import { ObservatoryScanResult, ObservatoryTestResult, SecurityHeaderValidation } from './observatory-scanner.js';
+import { ObservatoryScanResult, SecurityHeaderValidation } from './observatory-scanner.js';
 
 export interface SecurityReport {
   id: string;

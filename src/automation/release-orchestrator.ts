@@ -270,7 +270,7 @@ Highlight any violations of OPERA methodology or framework conventions.
       }
 
       this.logger.info('Bug collection completed', { collected: processedBugs.length });
-      this.emit('bugs:collected', processedBugs);
+      this.emit('_bugs:collected', processedBugs);
 
       return processedBugs;
 
@@ -438,7 +438,7 @@ Highlight any violations of OPERA methodology or framework conventions.
     releaseUrl?: string;
     errors?: string[];
   }> {
-    this.logger.info('Creating automatic release', { version: candidate.version });
+    this.logger.info('Creating automatic release', { _version: candidate.version });
 
     try {
       // Validate release candidate

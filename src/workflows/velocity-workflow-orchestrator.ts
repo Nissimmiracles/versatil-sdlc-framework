@@ -15,7 +15,7 @@ import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 import { VERSATILLogger } from '../utils/logger.js';
 import { VelocityWorkflowStateMachine, WorkflowState, WorkflowPhase } from './velocity-workflow-state-machine.js';
-import { VelocityPhaseTransitions, TransitionResult } from './velocity-phase-transitions.js';
+import { VelocityPhaseTransitions } from './velocity-phase-transitions.js';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -162,7 +162,7 @@ export class VelocityWorkflowOrchestrator extends EventEmitter {
   async startWorkflow(config: VelocityWorkflowConfig): Promise<string> {
     const workflowId = config.workflowId || uuidv4();
 
-    this.logger.info(`Starting VELOCITY workflow: ${workflowId}`, { target: config.target });
+    this.logger.info(`Starting VELOCITY workflow: ${workflowId}`, { _target: config.target });
 
     // Initialize workflow context
     const context: WorkflowContext = {

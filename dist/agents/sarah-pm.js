@@ -137,7 +137,7 @@ export class SarahPM {
      * @param context Coordination context
      */
     async coordinateAgents(agents, context) {
-        console.log(`🎯 Coordinating ${agents.length} agents: ${agents.join(', ')}`);
+        console.log(`🎯 Coordinating ${agents.length} _agents: ${agents.join(', ')}`);
         console.log(`   Goal: ${context.goal}`);
         console.log(`   Strategy: ${context.coordination_strategy}`);
         // Activate orchestrator for agent coordination

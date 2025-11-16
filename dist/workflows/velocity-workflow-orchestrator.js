@@ -36,7 +36,7 @@ export class VelocityWorkflowOrchestrator extends EventEmitter {
      */
     async startWorkflow(config) {
         const workflowId = config.workflowId || uuidv4();
-        this.logger.info(`Starting VELOCITY workflow: ${workflowId}`, { target: config.target });
+        this.logger.info(`Starting VELOCITY workflow: ${workflowId}`, { _target: config.target });
         // Initialize workflow context
         const context = {
             target: config.target,

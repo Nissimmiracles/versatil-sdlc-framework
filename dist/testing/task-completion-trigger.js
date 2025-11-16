@@ -250,7 +250,7 @@ export class TaskCompletionTrigger extends EventEmitter {
     /**
      * Parse test results from stdout/stderr
      */
-    parseTestResults(stdout, stderr) {
+    parseTestResults(stdout, _stderr) {
         // Simple parser - in production, use proper test reporter
         const results = [];
         // Look for Jest/Vitest output patterns

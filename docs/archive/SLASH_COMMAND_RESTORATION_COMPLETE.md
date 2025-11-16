@@ -113,16 +113,16 @@ allowed-tools:
 ---
 
 ### Issue 4: Legacy Files Not Cleaned Up
-**Problem**: Deprecated `.json` agent files, legacy hooks, and bmad commands were staged for deletion but not committed.
+**Problem**: Deprecated `.json` agent files, legacy hooks, and legacy commands were staged for deletion but not committed.
 
 **Solution**:
 - ✅ Deleted 6 legacy `.json` agent files (`.claude/agents/*.json`)
 - ✅ Deleted 20 legacy hook files (`.claude/hooks/**`)
-- ✅ Deleted 3 deprecated bmad commands (`.claude/commands/bmad/*.md`)
+- ✅ Deleted 3 deprecated legacy commands (`.claude/commands/legacy/*.md`)
 - ✅ Cleaned up entire `.claude/` directory structure
 
 **Commits**:
-- `dea8901` - "chore: complete cleanup - remove legacy .json agents, hooks, and bmad commands"
+- `dea8901` - "chore: complete cleanup - remove legacy .json agents, hooks, and commands"
 
 ---
 
@@ -447,10 +447,10 @@ When users install VERSATIL Opera v6.4.0, they immediately get:
    - Added frontmatter to 6 workflow commands
    - Restored full Task tool invocation
 
-2. **dea8901** - "chore: complete cleanup - remove legacy .json agents, hooks, and bmad commands"
+2. **dea8901** - "chore: complete cleanup - remove legacy .json agents, hooks, and commands"
    - Deleted 6 legacy `.json` agent files
    - Deleted 20 legacy hook files
-   - Deleted 3 deprecated bmad commands
+   - Deleted 3 deprecated legacy commands
    - Cleaned up `.claude/` directory
 
 3. **09ccbb6** - "fix(distribution): add .claude/ and .claude-plugin/ to npm package files"

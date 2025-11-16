@@ -15,5 +15,5 @@ export const environmentScanner = {
     return { projectInfo: {}, technology: {}, structure: {} };
   },
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  watchForChanges(callback: Function): void {}
+  watchForChanges(_callback: Function): void {}
 };

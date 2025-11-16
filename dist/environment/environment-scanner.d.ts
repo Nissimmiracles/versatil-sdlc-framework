@@ -9,5 +9,5 @@ export interface ProjectContext {
 export declare const environmentScanner: {
     scanEnvironment(): Promise<ProjectContext>;
     getLatestScan(): Promise<ProjectContext | null>;
-    watchForChanges(callback: Function): void;
+    watchForChanges(_callback: Function): void;
 };

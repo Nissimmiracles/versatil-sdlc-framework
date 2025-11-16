@@ -50,7 +50,7 @@ export declare class SupabaseConfig {
     /**
      * Get configuration for a specific agent
      */
-    getAgentConfig(agentId: string): SupabaseRAGConfig;
+    getAgentConfig(_agentId: string): SupabaseRAGConfig;
     /**
      * Get edge function URL for specific agent
      */

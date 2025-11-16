@@ -33,7 +33,7 @@ export declare class QuestionPredictionEngine {
     /**
      * Record question in sequence
      */
-    recordQuestion(category: QuestionCategory, conversationId: string): void;
+    recordQuestion(_category: QuestionCategory, _conversationId: string): void;
     /**
      * Predict next question
      */

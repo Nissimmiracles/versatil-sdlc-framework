@@ -315,7 +315,7 @@ export class PerformanceMonitor extends EventEmitter {
   /**
    * Calculate performance trend
    */
-  private calculateTrend(agentId: string, current: AgentPerformanceData): 'improving' | 'stable' | 'declining' {
+  private calculateTrend(agentId: string, _current: AgentPerformanceData): 'improving' | 'stable' | 'declining' {
     const recentMetrics = this.getRecentMetrics(agentId, 10);
     if (recentMetrics.length < 5) return 'stable';
 

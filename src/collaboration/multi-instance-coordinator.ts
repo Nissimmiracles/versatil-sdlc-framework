@@ -15,7 +15,7 @@
 import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import { join, resolve } from 'path';
-import { createHash, randomUUID } from 'crypto';
+import { randomUUID } from 'crypto';
 
 export interface CollaborationInstance {
   id: string;

@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { MCPHealthMonitor, MCPHealth, RetryConfig } from './mcp-health-monitor';
+import { MCPHealthMonitor } from './mcp-health-monitor';
 
 describe('MCPHealthMonitor', () => {
   let monitor: MCPHealthMonitor;

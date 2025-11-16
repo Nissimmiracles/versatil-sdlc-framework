@@ -13,7 +13,7 @@
 
 import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
-import { join, resolve, relative } from 'path';
+import { join, resolve } from 'path';
 import { createHash } from 'crypto';
 import { projectVisionManager, ProjectVision, ProjectHistory, MarketAnalysis } from '../project/project-vision-manager.js';
 

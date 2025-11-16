@@ -3,7 +3,7 @@
  * Real component analysis using ts-morph AST parsing
  */
 
-import { Project, SourceFile, SyntaxKind } from 'ts-morph';
+import { Project, SyntaxKind } from 'ts-morph';
 import { glob } from 'glob';
 import * as path from 'path';
 import * as fs from 'fs';

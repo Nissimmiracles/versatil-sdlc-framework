@@ -11,7 +11,7 @@
  */
 
 import * as path from 'path';
-import { getCredentialEncryptor, EncryptionContext, DecryptedCredentials } from './credential-encryptor.js';
+import { getCredentialEncryptor, EncryptionContext } from './credential-encryptor.js';
 import { getCredentialAuditLogger, CredentialAccessEvent } from './credential-audit-logger.js';
 import { VERSATILLogger } from '../utils/logger.js';
 

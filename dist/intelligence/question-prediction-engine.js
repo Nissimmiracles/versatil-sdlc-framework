@@ -30,7 +30,7 @@ export class QuestionPredictionEngine {
     /**
      * Record question in sequence
      */
-    recordQuestion(category, conversationId) {
+    recordQuestion(_category, _conversationId) {
         // Implementation would track questions in active conversations
         // For now, we'll build from historical patterns
     }

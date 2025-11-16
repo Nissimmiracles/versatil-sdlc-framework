@@ -7,7 +7,7 @@ export class DeploymentOrchestrator extends BaseAgent {
         this.specialization = 'Specialized Agent';
         this.systemPrompt = '';
     }
-    async activate(context) {
+    async activate(_context) {
         return {
             agentId: this.id,
             message: `${this.name} activated`,

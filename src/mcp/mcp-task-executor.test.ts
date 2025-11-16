@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { MCPTaskExecutor, Task, MCPToolInference, MCPExecutionResult } from './mcp-task-executor';
+import { MCPTaskExecutor, Task } from './mcp-task-executor';
 
 describe('MCPTaskExecutor', () => {
   let executor: MCPTaskExecutor;

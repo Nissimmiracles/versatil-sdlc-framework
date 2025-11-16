@@ -25,7 +25,7 @@
 import { EventEmitter } from 'events';
 import { createHash } from 'crypto';
 import { VERSATILLogger } from '../utils/logger.js';
-import type { RAGQuery, RAGResult, MemoryDocument } from './enhanced-vector-memory-store.js';
+import type { RAGQuery, RAGResult } from './enhanced-vector-memory-store.js';
 
 export interface CRGCacheConfig {
   enabled: boolean;

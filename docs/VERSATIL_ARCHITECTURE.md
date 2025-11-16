@@ -688,7 +688,7 @@ const code = await codeGenerator.generate({
 
 ## Quality Standards
 
-### BMAD (Best Measured Automated Defensively)
+### VERSATIL Quality Standards
 
 #### Coverage Requirements
 - **Minimum**: 80% (all code)
