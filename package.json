@@ -417,9 +417,6 @@
     "CONTRIBUTING.md",
     "LICENSE",
     "tsconfig.json",
-    "config/jest.config.js",
-    "init-opera-mcp.js",
-    "test-opera-mcp.js",
-    "OPERA_MCP_DOCUMENTATION.md"
+    "config/jest.config.js"
   ]
 }
