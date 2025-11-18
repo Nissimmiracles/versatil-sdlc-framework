@@ -1,57 +1,58 @@
 ---
-name: Bug report
-about: Create a report to help us improve VERSATIL SDLC Framework
+name: Bug Report
+about: Create a report to help us improve VERSATIL
 title: '[BUG] '
-labels: 'bug'
+labels: bug
 assignees: ''
-
 ---
 
-**🐛 Bug Description**
+## 🐛 Bug Description
+
 A clear and concise description of what the bug is.
 
-**🔄 Reproduction Steps**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## 📋 To Reproduce
 
-**✅ Expected Behavior**
+Steps to reproduce the behavior:
+
+1. Run command `...`
+2. Execute action `...`
+3. See error
+
+## ✅ Expected Behavior
+
 A clear and concise description of what you expected to happen.
 
-**📸 Screenshots**
+## ❌ Actual Behavior
+
+What actually happened.
+
+## 🖼️ Screenshots
+
 If applicable, add screenshots to help explain your problem.
 
-**🤖 Agent Information**
-Which VERSATIL agent is affected:
-- [ ] Maria-QA (Quality Assurance)
-- [ ] James-Frontend (Frontend)
-- [ ] Marcus-Backend (Backend)
-- [ ] Sarah-PM (Project Management)
-- [ ] Alex-BA (Business Analysis)
-- [ ] Dr.AI-ML (AI/ML)
-- [ ] Framework Core
-- [ ] Chrome MCP Integration
+## 💻 Environment
 
-**💻 Environment**
-- OS: [e.g. macOS, Windows, Linux]
-- Node.js version: [e.g. 18.17.0]
-- npm version: [e.g. 9.6.7]
-- VERSATIL version: [e.g. 1.0.0]
-- IDE: [e.g. Cursor, VS Code]
+- **VERSATIL Version**: [e.g., v7.16.2]
+- **Node.js Version**: [e.g., v20.10.0]
+- **pnpm Version**: [e.g., 10.17.0]
+- **Operating System**: [e.g., macOS 14.1, Ubuntu 22.04, Windows 11]
+- **IDE**: [e.g., Cursor, VS Code, Claude Desktop]
 
-**📋 Additional Context**
-Add any other context about the problem here.
+## 📝 Logs
 
-**🔍 Error Logs**
+Please attach relevant logs from `~/.versatil/logs/`:
+
 ```
-Paste any relevant error logs here
+Paste logs here
 ```
 
-**📊 Quality Gates Status**
-If applicable, include output from:
-```bash
-npm run versatil:validate
-npm run maria:report
-```
+## 🔍 Additional Context
+
+Add any other context about the problem here:
+- Did this work before?
+- What changed recently?
+- Specific agents or features affected?
+
+## 🔗 Related Issues
+
+Link any related issues or PRs.

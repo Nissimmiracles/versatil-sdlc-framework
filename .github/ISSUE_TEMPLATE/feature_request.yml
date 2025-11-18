@@ -1,145 +1,65 @@
-name: ✨ Feature Request
-description: Suggest a new feature for the VERSATIL SDLC Framework
-title: "[Feature] "
-labels: ["enhancement", "needs-triage"]
+name: Feature Request
+description: Suggest a new feature for VERSATIL
+title: "[FEATURE]: "
+labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for suggesting a feature for the VERSATIL SDLC Framework!
-        We're always looking for ways to improve the AI-native development experience.
+        Thanks for suggesting a new feature!
 
-  - type: dropdown
-    id: category
+  - type: textarea
+    id: feature-description
     attributes:
-      label: Feature Category
-      description: What area of the framework would this feature enhance?
-      options:
-        - Agent System (New agents or agent improvements)
-        - OPERA Methodology (Business process enhancements)
-        - Quality Gates (Testing and validation improvements)
-        - MCP Integration (Claude Desktop enhancements)
-        - CLI Tools (Command-line interface improvements)
-        - Automation (Version management, changelog, backup)
-        - Context Validation (Enhanced clarity detection)
-        - Emergency Response (Crisis management improvements)
-        - Documentation (User experience improvements)
-        - Performance (Speed and efficiency improvements)
-        - Security (Safety and protection enhancements)
-        - Integration (Third-party tool connections)
-        - Other
+      label: Feature Description
+      description: A clear description of the feature
     validations:
       required: true
 
   - type: textarea
-    id: problem
+    id: use-case
     attributes:
-      label: Problem Statement
-      description: What problem does this feature solve? What use case does it address?
+      label: Use Case
+      description: When and why would this be useful?
       placeholder: |
-        Describe the current limitation or missing capability that this feature would address.
-        Include real-world scenarios where this would be helpful.
+        As a [type of user], I want [feature] so that [benefit]
     validations:
       required: true
 
   - type: textarea
-    id: solution
+    id: proposed-solution
     attributes:
       label: Proposed Solution
-      description: Describe your proposed solution in detail.
-      placeholder: |
-        How should this feature work?
-        What would the user experience look like?
-        How would it integrate with existing framework components?
+      description: How should this work?
     validations:
       required: true
 
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternative Solutions
-      description: Have you considered any alternative approaches?
-      placeholder: |
-        What other ways could this problem be solved?
-        Are there existing workarounds?
+      label: Alternatives Considered
+      description: What other approaches did you consider?
 
   - type: dropdown
-    id: priority
+    id: category
     attributes:
-      label: Priority Level
-      description: How important is this feature to your workflow?
+      label: Feature Category
       options:
-        - Low (Nice to have)
-        - Medium (Would improve productivity)
-        - High (Blocking current work)
-        - Critical (Essential for adoption)
+        - Agent Enhancement
+        - New Agent
+        - Skill Enhancement
+        - New Skill
+        - Wave 4 Coordination
+        - RAG/Memory
+        - Documentation
+        - Testing
+        - Performance
+        - Other
     validations:
       required: true
 
-  - type: checkboxes
-    id: target-users
-    attributes:
-      label: Target Users
-      description: Who would benefit from this feature?
-      options:
-        - label: Individual developers
-        - label: Development teams
-        - label: DevOps engineers
-        - label: QA engineers
-        - label: Project managers
-        - label: Business analysts
-        - label: Enterprise organizations
-        - label: Open source contributors
-        - label: AI/ML practitioners
-
   - type: textarea
-    id: examples
-    attributes:
-      label: Usage Examples
-      description: Provide examples of how this feature would be used.
-      placeholder: |
-        ```bash
-        # Example command usage
-        versatil new-feature --option value
-        ```
-
-        Example scenario:
-        1. User runs command X
-        2. Framework does Y
-        3. Result is Z
-
-  - type: checkboxes
-    id: implementation
-    attributes:
-      label: Implementation Considerations
-      description: Check any implementation aspects that should be considered.
-      options:
-        - label: Should work with Claude Desktop MCP integration
-        - label: Needs to integrate with existing OPERA agents
-        - label: Requires quality gate validation
-        - label: Should support emergency response protocols
-        - label: Needs comprehensive documentation
-        - label: Requires CLI command interface
-        - label: Should work across different operating systems
-        - label: Needs automated testing coverage
-
-  - type: textarea
-    id: additional
+    id: additional-context
     attributes:
       label: Additional Context
-      description: Any other context, mockups, or references that would help understand this feature.
-      placeholder: |
-        - Links to similar features in other tools
-        - Mockups or diagrams
-        - Related issues or discussions
-        - Technical constraints to consider
-
-  - type: checkboxes
-    id: contribution
-    attributes:
-      label: Contribution Interest
-      options:
-        - label: I would be interested in contributing to this feature implementation
-        - label: I have technical expertise relevant to this feature
-        - label: I can help with testing and feedback during development
-        - label: I can contribute documentation for this feature
+      description: Mockups, examples, related features

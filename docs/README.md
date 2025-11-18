@@ -11,18 +11,25 @@ Welcome to the **VERSATIL SDLC Framework** documentation! Transform your develop
 - [Troubleshooting](./getting-started/troubleshooting.md) - Common issues and solutions
 
 ### Meet the Agents
-**Discover the 6 OPERA agents that power your workflow:**
-- [Agents Overview](./agents/overview.md) - Introduction to all 6 agents
-- [Maria-QA](./agents/maria-qa/) - Quality Guardian (85%+ test coverage)
+**Discover the 13 OPERA agents that power your workflow:**
+- [Agents Overview](./agents/overview.md) - Introduction to all 13 agents
+- [Alex-BA](./agents/overview.md#alex-ba) - Business Analyst (Requirements)
+- [Sarah-PM](./agents/overview.md#sarah-pm) - Project Coordinator (OPERA Orchestration)
 - [James-Frontend](./agents/overview.md#james-frontend) - UI/UX Specialist (WCAG 2.1 AA)
 - [Marcus-Backend](./agents/overview.md#marcus-backend) - API Architect (OWASP Top 10)
-- [Sarah-PM](./agents/overview.md#sarah-pm) - Project Coordinator
-- [Alex-BA](./agents/overview.md#alex-ba) - Business Analyst
-- [Dr.AI-ML](./agents/overview.md#dr-ai-ml) - AI/ML Expert
+- [Dana-Database](./agents/overview.md#dana-database) - Database Lead (Schema, RLS, <50ms)
+- [Maria-QA](./agents/maria-qa/) - Quality Guardian (80%+ test coverage)
+- [Dr.AI-ML](./agents/overview.md#dr-ai-ml) - AI/ML Expert (RAG, Embeddings)
+- [Oliver-MCP](./agents/overview.md#oliver-mcp) - MCP Orchestration (12 servers)
+- [Iris-Guardian](./agents/overview.md#iris-guardian) - Health Monitoring (Auto-remediation)
+- [Victor-Verifier](./agents/overview.md#victor-verifier) - Verification (Anti-hallucination)
 
 ### Core Features
 **Explore what makes VERSATIL unique:**
+- [Wave 4 Coordination](./features/wave-4-coordination.md) - Parallel multi-agent execution
 - [RAG Memory System](./features/rag-memory.md) - Zero context loss
+- [Test Remediation](./features/test-remediation.md) - Automated test fixing (861+ tests)
+- [Skills Catalog](./skills/README.md) - 44+ specialized skills
 - [MCP Ecosystem](./features/mcp-ecosystem.md) - 11 strategic integrations
 - [Quality Gates](./features/quality-gates.md) - Automated quality enforcement
 - [MCP-Agent Mapping](./features/mcp-agent-mapping.md) - How agents use MCPs

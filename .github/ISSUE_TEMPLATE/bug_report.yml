@@ -1,108 +1,87 @@
-name: 🐛 Bug Report
-description: Report a bug in the VERSATIL SDLC Framework
-title: "[Bug] "
-labels: ["bug", "needs-triage"]
+name: Bug Report
+description: File a bug report to help us improve
+title: "[BUG]: "
+labels: ["bug", "triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to report a bug in the VERSATIL SDLC Framework!
-        Please fill out this form to help us understand and fix the issue.
+        Thanks for taking the time to fill out this bug report!
 
-        **Before submitting:**
-        1. Run `/framework:debug` to generate a debug report
-        2. Try `npm run recover` to see if auto-fix resolves it
-        3. Search existing issues to avoid duplicates
-
-  - type: checkboxes
-    id: framework-components
+  - type: textarea
+    id: what-happened
     attributes:
-      label: Affected Components
-      description: Which parts of the VERSATIL framework are affected?
-      options:
-        - label: Agent Dispatcher (Auto-agent activation)
-        - label: OPERA Agents (Maria, James, Marcus, Sarah, Alex, Dr.AI)
-        - label: Quality Gates System
-        - label: Emergency Response Protocol
-        - label: Version Management
-        - label: Changelog Generation
-        - label: Git Backup System
-        - label: MCP Integration (Claude Desktop)
-        - label: CLI Tools (versatil, versatil-mcp)
-        - label: Context Validation
-        - label: Documentation
+      label: What happened?
+      description: A clear description of the bug
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this?
+      placeholder: |
+        1. Run command '...'
+        2. Execute action '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
 
   - type: input
     id: version
     attributes:
-      label: Framework Version
-      description: What version of VERSATIL are you using?
-      placeholder: "1.0.0"
+      label: VERSATIL Version
+      placeholder: "v7.16.2"
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js Version
+      placeholder: "v20.10.0"
+    validations:
+      required: true
+
+  - type: input
+    id: pnpm-version
+    attributes:
+      label: pnpm Version
+      placeholder: "10.17.0"
     validations:
       required: true
 
   - type: dropdown
-    id: environment
+    id: os
     attributes:
-      label: Environment
-      description: Where are you running VERSATIL?
+      label: Operating System
       options:
         - macOS
+        - Ubuntu/Linux
         - Windows
-        - Linux
-        - Claude Desktop
-        - VS Code
-        - Cursor
-        - Other (specify in description)
-    validations:
-      required: true
-
-  - type: textarea
-    id: description
-    attributes:
-      label: Bug Description
-      description: A clear and concise description of what the bug is.
-      placeholder: Describe what happened and what you expected to happen.
-    validations:
-      required: true
-
-  - type: textarea
-    id: steps
-    attributes:
-      label: Steps to Reproduce
-      description: Steps to reproduce the behavior
-      placeholder: |
-        1. Run command '...'
-        2. Activate agent '...'
-        3. See error
+        - Other
     validations:
       required: true
 
   - type: textarea
     id: logs
     attributes:
-      label: Error Logs
-      description: Please copy and paste any relevant log output or error messages.
+      label: Relevant Logs
+      description: Please paste relevant logs from ~/.versatil/logs/
       render: shell
 
   - type: textarea
-    id: additional
+    id: context
     attributes:
       label: Additional Context
-      description: Add any other context about the problem here.
-      placeholder: |
-        - Did this work in a previous version?
-        - Are there any workarounds?
-        - Related configuration details?
-
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: Pre-submission Checklist
-      options:
-        - label: I have searched existing issues for similar problems
-          required: true
-        - label: I have tried the latest version of VERSATIL
-          required: true
-        - label: I have included relevant error logs and context
-          required: true
+      description: Any other context about the problem

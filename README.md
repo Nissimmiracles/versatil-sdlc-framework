@@ -9,6 +9,10 @@
 [![npm version](https://img.shields.io/npm/v/@versatil/sdlc-framework.svg)](https://www.npmjs.com/package/@versatil/sdlc-framework)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/Nissimmiracles/versatil-sdlc-framework/ci.yml?branch=main)](https://github.com/Nissimmiracles/versatil-sdlc-framework/actions)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-10.17+-green.svg)](https://pnpm.io/)
+[![Agents](https://img.shields.io/badge/Agents-13-purple.svg)](docs/agents/agents-overview.md)
+[![Skills](https://img.shields.io/badge/Skills-44+-orange.svg)](docs/skills/README.md)
 
 **[📖 Installation](#-installation)** • **[🤖 Features](#-key-features)** • **[📚 Documentation](docs/README.md)** • **[🎥 Examples](docs/EXAMPLES.md)**
 
@@ -20,7 +24,7 @@
 
 ```bash
 # Run VERSATIL MCP Server (Recommended)
-npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2 versatil-mcp
+npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework versatil-mcp
 
 # This installs in seconds and enables 59 AI tools in Claude Desktop + Cursor IDE
 ```
@@ -41,7 +45,7 @@ npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2 versat
 
 ## 🎯 What is VERSATIL?
 
-VERSATIL gives you **23+ specialized AI agents** that **learn YOUR coding style** and work like a senior dev team:
+VERSATIL gives you **13 specialized AI agents** that **learn YOUR coding style** and work like a senior dev team:
 
 ```mermaid
 graph LR
@@ -62,6 +66,13 @@ graph LR
 - 🧠 **Zero context loss** - 98%+ retention via RAG memory
 - 🚀 **Compounding** - Each feature makes the next 40% faster
 - 🔒 **Privacy first** - Public + Private RAG architecture
+
+**What's New in v7.16+**:
+- ✨ **Wave 4 Coordination** - Parallel multi-agent execution with collision detection
+- 🔧 **pnpm Migration** - 945+ references updated, faster installs
+- 🧪 **Test Remediation** - Automated fixing for 861 failing tests
+- 📊 **44+ Skills** - Comprehensive skill library for specialized tasks
+- 🛡️ **Enhanced Guardian** - Proactive monitoring and auto-remediation
 
 ---
 
@@ -103,8 +114,9 @@ Each feature teaches the framework, making the next feature **40% faster**:
 
 ---
 
-### 3. 🤖 23+ Specialized Agents (OPERA)
+### 3. 🤖 13 Specialized Agents (OPERA)
 
+**7 Core Development Agents:**
 | Agent | Role | Key Capability |
 |-------|------|----------------|
 | **Alex-BA** | Business Analyst | Requirements extraction, RAG search |
@@ -114,9 +126,16 @@ Each feature teaches the framework, making the next feature **40% faster**:
 | **Dana-Database** | Database Lead | Schema design, <50ms queries |
 | **Maria-QA** | Quality Guardian | 80%+ coverage enforcement |
 | **Dr.AI-ML** | ML Engineer | RAG systems, embeddings |
-| **Oliver-MCP** | Integrations | MCP orchestration, 12 MCPs |
 
-**+ 10 specialized sub-agents** (James-React, Marcus-Node, etc.)
+**6 Infrastructure Agents:**
+| Agent | Role | Key Capability |
+|-------|------|----------------|
+| **Oliver-MCP** | MCP Orchestration | 12 MCP servers, intelligent routing |
+| **Iris-Guardian** | Health Monitoring | Auto-remediation, framework health |
+| **Victor-Verifier** | Verification | Chain-of-Verification, hallucination detection |
+| **Feedback-Codifier** | Learning System | Pattern codification, agent enhancement |
+| **Inventory-Manager** | Resource Management | Stock tracking, supply chain |
+| **Explore/Plan** | Codebase Analysis | Fast exploration, planning |
 
 **[→ See All Agents](docs/agents/README.md)**
 
@@ -137,7 +156,33 @@ Each feature teaches the framework, making the next feature **40% faster**:
 
 ---
 
-### 5. 🛡️ Guardian Auto-Monitoring
+### 5. 🌊 Wave 4 Coordination Patterns
+
+**Parallel Multi-Agent Execution** with intelligent conflict resolution:
+
+```bash
+/work "Add authentication feature"
+
+# VERSATIL automatically:
+# ✅ Parallel execution: Dana (DB) + Marcus (API) + James (UI)
+# ✅ Collision detection: Prevents agent conflicts
+# ✅ Checkpoint system: Resume from last successful state
+# ✅ Resource locking: Ensures data consistency
+```
+
+**Key Features:**
+- **Wave Execution**: Group related tasks into coordinated waves
+- **Dependency Resolution**: Automatic detection and ordering
+- **Conflict Prevention**: Agent collision detection and avoidance
+- **State Management**: Checkpoint-based recovery system
+
+**Result**: 2-3x faster development through parallel coordination.
+
+**[→ See Wave 4 Architecture](docs/features/wave-4-coordination.md)**
+
+---
+
+### 6. 🛡️ Guardian Auto-Monitoring
 
 **Automatic TODO creation** for detected issues:
 
@@ -161,7 +206,7 @@ Each feature teaches the framework, making the next feature **40% faster**:
 
 ```bash
 # Quick start - no installation needed
-npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2 versatil-mcp
+npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework versatil-mcp
 
 # Add to Claude Desktop config
 {
@@ -170,7 +215,7 @@ npx --yes --package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2 versat
       "command": "npx",
       "args": [
         "--yes",
-        "--package=github:Nissimmiracles/versatil-sdlc-framework#v7.16.2",
+        "--package=github:Nissimmiracles/versatil-sdlc-framework",
         "versatil-mcp"
       ]
     }
