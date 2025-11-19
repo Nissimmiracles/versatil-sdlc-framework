@@ -5,6 +5,12 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: true, // Run tests in single thread to avoid resource exhaustion
+      }
+    },
     testTimeout: 10000, // Increased from default 5000ms to reduce timeout failures
     hookTimeout: 10000, // Increased hook timeout to match test timeout
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}', 'tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],

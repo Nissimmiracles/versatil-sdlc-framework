@@ -1,0 +1,43 @@
+name: Single Test File
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_file:
+        description: 'Test file path (e.g., src/mcp/mcp-health-monitor.test.ts)'
+        required: true
+        type: string
+
+jobs:
+  test:
+    name: Test ${{ inputs.test_file }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Run test
+        run: pnpm vitest run ${{ inputs.test_file }} --reporter=verbose
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Test summary
+        if: always()
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**File**: \`${{ inputs.test_file }}\`" >> $GITHUB_STEP_SUMMARY

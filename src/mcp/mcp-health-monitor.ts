@@ -412,6 +412,127 @@ export class MCPHealthMonitor extends EventEmitter {
     });
     return result;
   }
+
+  /**
+   * Check if currently monitoring
+   */
+  isMonitoring(): boolean {
+    return this.monitoringInterval !== null;
+  }
+
+  /**
+   * Open circuit for an MCP (stop sending requests)
+   */
+  openCircuit(mcpId: string): void {
+    const health = this.healthStatus.get(mcpId);
+    if (health) {
+      health.circuitOpen = true;
+      health.status = 'unhealthy';
+      this.emit('circuit-opened', { mcpId, health });
+      console.log(`⛔ Circuit opened for ${mcpId}`);
+    }
+  }
+
+  /**
+   * Close circuit for an MCP (resume sending requests)
+   */
+  closeCircuit(mcpId: string): void {
+    const health = this.healthStatus.get(mcpId);
+    if (health) {
+      health.circuitOpen = false;
+      health.consecutiveFailures = 0;
+      health.status = 'healthy';
+      this.emit('circuit-closed', { mcpId, health });
+      console.log(`✅ Circuit closed for ${mcpId}`);
+    }
+  }
+
+  /**
+   * Set circuit to half-open (testing recovery)
+   */
+  halfOpenCircuit(mcpId: string): void {
+    const health = this.healthStatus.get(mcpId);
+    if (health) {
+      health.circuitOpen = false;
+      health.status = 'degraded';
+      this.emit('circuit-half-open', { mcpId, health });
+      console.log(`⚠️  Circuit half-open for ${mcpId} (testing recovery)`);
+    }
+  }
+
+  /**
+   * Get circuit breaker statistics
+   */
+  getCircuitBreakerStats(): {
+    total: number;
+    open: number;
+    closed: number;
+    halfOpen: number;
+  } {
+    let open = 0;
+    let closed = 0;
+    let halfOpen = 0;
+
+    this.healthStatus.forEach(health => {
+      if (health.circuitOpen) {
+        open++;
+      } else if (health.status === 'degraded') {
+        halfOpen++;
+      } else {
+        closed++;
+      }
+    });
+
+    return {
+      total: this.healthStatus.size,
+      open,
+      closed,
+      halfOpen
+    };
+  }
+
+  /**
+   * Generate comprehensive health report
+   */
+  generateHealthReport(): {
+    timestamp: Date;
+    overallHealth: number;
+    mcps: MCPHealth[];
+    circuitBreakers: ReturnType<typeof this.getCircuitBreakerStats>;
+    recommendations: string[];
+  } {
+    const mcps = Array.from(this.healthStatus.values());
+    const circuitBreakers = this.getCircuitBreakerStats();
+    const overallHealth = this.getSystemHealthPercentage();
+    const recommendations: string[] = [];
+
+    // Generate recommendations
+    if (circuitBreakers.open > 0) {
+      recommendations.push(`${circuitBreakers.open} MCPs have open circuits - investigate and fix`);
+    }
+
+    const unhealthyMCPs = mcps.filter(m => m.status === 'unhealthy');
+    if (unhealthyMCPs.length > 0) {
+      recommendations.push(`Unhealthy MCPs: ${unhealthyMCPs.map(m => m.mcpId).join(', ')}`);
+    }
+
+    const degradedMCPs = mcps.filter(m => m.status === 'degraded');
+    if (degradedMCPs.length > 0) {
+      recommendations.push(`Degraded MCPs: ${degradedMCPs.map(m => m.mcpId).join(', ')}`);
+    }
+
+    if (overallHealth < 80) {
+      recommendations.push('System health below 80% - immediate action required');
+    }
+
+    return {
+      timestamp: new Date(),
+      overallHealth,
+      mcps,
+      circuitBreakers,
+      recommendations
+    };
+  }
 }
 
 // Export singleton instance
