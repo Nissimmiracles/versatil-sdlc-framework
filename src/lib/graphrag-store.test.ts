@@ -9,7 +9,15 @@ import { GraphRAGStore, type GraphNode, type GraphEdge, type PatternNode, type G
 // Mock Firestore
 vi.mock('@google-cloud/firestore', () => {
   const mockDoc = {
-    get: vi.fn().mockResolvedValue({ exists: false, data: () => ({}) }),
+    get: vi.fn().mockResolvedValue({
+      exists: true,
+      data: () => ({
+        id: 'mock-node-1',
+        type: 'entity',
+        label: 'Test Entity',
+        properties: { name: 'Test' }
+      })
+    }),
     set: vi.fn().mockResolvedValue({}),
     update: vi.fn().mockResolvedValue({}),
     delete: vi.fn().mockResolvedValue({}),
@@ -18,21 +26,47 @@ vi.mock('@google-cloud/firestore', () => {
   const mockCollection = {
     doc: vi.fn(() => mockDoc),
     where: vi.fn().mockReturnThis(),
-    get: vi.fn().mockResolvedValue({ docs: [], empty: true, size: 0 }),
+    get: vi.fn().mockResolvedValue({
+      docs: [{
+        id: 'mock-node-1',
+        data: () => ({
+          id: 'mock-node-1',
+          type: 'entity',
+          label: 'Test Entity',
+          properties: { name: 'Test' }
+        })
+      }],
+      empty: false,
+      size: 1
+    }),
     add: vi.fn().mockResolvedValue({ id: 'mock-id' }),
   };
 
-  return {
-    Firestore: vi.fn(() => ({
-      collection: vi.fn(() => mockCollection),
-      batch: vi.fn(() => ({
-        set: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn(),
+  class MockFirestore {
+    constructor(config?: any) {
+      // Constructor accepts config but doesn't use it in mock
+    }
+
+    collection(name: string) {
+      return mockCollection;
+    }
+
+    batch() {
+      return {
+        set: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
         commit: vi.fn().mockResolvedValue([]),
-      })),
-      terminate: vi.fn().mockResolvedValue(undefined),
-    })),
+      };
+    }
+
+    async terminate() {
+      return undefined;
+    }
+  }
+
+  return {
+    Firestore: MockFirestore,
   };
 });
 
