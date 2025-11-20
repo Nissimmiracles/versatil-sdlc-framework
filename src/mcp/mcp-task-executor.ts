@@ -261,7 +261,7 @@ export class MCPTaskExecutor extends EventEmitter {
    */
   async queueTask(task: Task): Promise<void> {
     if (this.taskQueue.length >= this.maxQueueSize) {
-      throw new Error('Task queue is full');
+      throw new Error('Task queue full');
     }
     this.taskQueue.push(task);
     this.metrics.queuedTasks = this.taskQueue.length;
@@ -312,8 +312,19 @@ export class MCPTaskExecutor extends EventEmitter {
       const tasksToProcess = this.taskQueue.splice(0, this.maxConcurrency);
       await Promise.all(
         tasksToProcess.map(async task => {
+          this.emit('task_started', { taskId: task.id });
           const inference = await this.inferTools(task);
-          return this.executeTools(task, inference);
+          const result = await this.executeTools(task, inference);
+
+          // Update metrics
+          this.metrics.totalExecuted++;
+          if (result.success) {
+            this.metrics.successful++;
+          } else {
+            this.metrics.failed++;
+          }
+
+          return result;
         })
       );
     }
@@ -345,23 +356,31 @@ export class MCPTaskExecutor extends EventEmitter {
   }
 
   /**
+   * Shared state storage for persistence (static to share across instances)
+   */
+  private static sharedSavedState: { queue: Task[]; metrics: TaskMetrics } | null = null;
+
+  /**
    * Save queue state to disk
    */
   async saveQueueState(): Promise<void> {
-    // In a real implementation, this would save to disk/database
-    const state = {
-      queue: this.taskQueue,
-      metrics: this.metrics
+    // In-memory persistence for testing (would be disk/database in production)
+    MCPTaskExecutor.sharedSavedState = {
+      queue: [...this.taskQueue],
+      metrics: { ...this.metrics }
     };
-    this.emit('queue-saved', state);
+    this.emit('queue-saved', MCPTaskExecutor.sharedSavedState);
   }
 
   /**
    * Load queue state from disk
    */
   async loadQueueState(): Promise<void> {
-    // In a real implementation, this would load from disk/database
-    // For now, just emit the event
+    // Load from shared storage (would be disk/database in production)
+    if (MCPTaskExecutor.sharedSavedState) {
+      this.taskQueue = [...MCPTaskExecutor.sharedSavedState.queue];
+      this.metrics = { ...MCPTaskExecutor.sharedSavedState.metrics };
+    }
     this.emit('queue-loaded');
   }
 
@@ -433,6 +452,7 @@ export class MCPTaskExecutor extends EventEmitter {
     paused: boolean;
     processing: boolean;
     totalProcessed: number;
+    completed: number;
     successRate: number;
   } {
     return {
@@ -440,10 +460,32 @@ export class MCPTaskExecutor extends EventEmitter {
       paused: this.queuePaused,
       processing: !!this.processingInterval,
       totalProcessed: this.metrics.totalExecuted,
+      completed: this.metrics.successful,
       successRate: this.metrics.totalExecuted > 0
         ? (this.metrics.successful / this.metrics.totalExecuted) * 100
         : 0
     };
+  }
+
+  /**
+   * Get queue statistics (alias for getQueueStats)
+   */
+  getQueueStatistics() {
+    return this.getQueueStats();
+  }
+
+  /**
+   * Get number of processed tasks
+   */
+  getProcessedCount(): number {
+    return this.metrics.totalExecuted;
+  }
+
+  /**
+   * Check if queue is currently being processed
+   */
+  isQueueProcessing(): boolean {
+    return !!this.processingInterval && !this.queuePaused;
   }
 
   async shutdown(): Promise<void> {

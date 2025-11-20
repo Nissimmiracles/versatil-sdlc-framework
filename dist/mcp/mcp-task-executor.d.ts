@@ -114,6 +114,10 @@ export declare class MCPTaskExecutor extends EventEmitter {
      */
     initialize(): Promise<void>;
     /**
+     * Shared state storage for persistence (static to share across instances)
+     */
+    private static sharedSavedState;
+    /**
      * Save queue state to disk
      */
     saveQueueState(): Promise<void>;
@@ -151,8 +155,28 @@ export declare class MCPTaskExecutor extends EventEmitter {
         paused: boolean;
         processing: boolean;
         totalProcessed: number;
+        completed: number;
         successRate: number;
     };
+    /**
+     * Get queue statistics (alias for getQueueStats)
+     */
+    getQueueStatistics(): {
+        queueSize: number;
+        paused: boolean;
+        processing: boolean;
+        totalProcessed: number;
+        completed: number;
+        successRate: number;
+    };
+    /**
+     * Get number of processed tasks
+     */
+    getProcessedCount(): number;
+    /**
+     * Check if queue is currently being processed
+     */
+    isQueueProcessing(): boolean;
     shutdown(): Promise<void>;
 }
 export default MCPTaskExecutor;
