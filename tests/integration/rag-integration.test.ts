@@ -18,7 +18,7 @@ import { EnhancedMarcus } from '../../src/agents/opera/marcus-backend/enhanced-m
 import { SarahPm } from '../../src/agents/opera/sarah-pm/sarah-pm.js';
 import { AlexBa } from '../../src/agents/opera/alex-ba/alex-ba.js';
 import { DrAiMl } from '../../src/agents/opera/dr-ai-ml/dr-ai-ml.js';
-import { AgentPool } from '../../src/agents/agent-pool.js';
+import { AgentPool } from '../../src/agents/core/agent-pool.js';
 import { EnhancedVectorMemoryStore } from '../../src/rag/enhanced-vector-memory-store.js';
 import { AgentActivationContext } from '../../src/agents/core/base-agent.js';
 

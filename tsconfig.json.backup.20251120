@@ -29,21 +29,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "moduleResolution": "node",
-    "downlevelIteration": true,
-    
-    // ========================================
-    // Performance Optimizations (Added: 2025-11-20)
-    // ========================================
-    
-    // Incremental compilation - 60-80% faster rebuilds
-    "incremental": true,
-    "tsBuildInfoFile": "./.tsbuildinfo",
-    
-    // Faster type checking
-    "assumeChangesOnlyAffectDirectDependencies": true,
-    
-    // Reduce memory usage for large projects
-    "disableSizeLimit": false
+    "downlevelIteration": true
   },
   "include": [
     "src/**/*"

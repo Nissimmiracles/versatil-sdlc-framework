@@ -7,7 +7,7 @@ import {
   TestFileSystemProvider,
   TestCommandExecutor
 } from '../../src/agents/meta/introspective/introspective-agent';
-import { agentRegistry } from '../../src/agents/agent-registry';
+import { agentRegistry } from '../../src/agents/core/agent-registry';
 import { createIntrospectiveScheduler } from '../../src/utils/introspective-scheduler';
 
 describe('IntrospectiveAgent Integration', () => {

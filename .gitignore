@@ -180,3 +180,4 @@ vulnerability-reports/
 artifacts/
 versatil/
 .venv-python/
+/.tsbuildinfo
