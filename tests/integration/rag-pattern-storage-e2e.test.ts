@@ -10,7 +10,7 @@
  * 6. Compounding Engineering validation (40% time savings)
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { EnhancedVectorMemoryStore } from '../../src/rag/enhanced-vector-memory-store.js';
 import { PatternLearningSystem, WinningPattern } from '../../src/rag/pattern-learning-system.js';
 import { PatternLearningRepository, Pattern, PatternCategory, PatternType } from '../../src/learning/pattern-learning-repository.js';

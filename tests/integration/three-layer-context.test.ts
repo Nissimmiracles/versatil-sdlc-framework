@@ -3,7 +3,7 @@
  * Tests the complete context priority system: User > Team > Project > Framework
  */
 
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { userContextManager, type UserCodingPreferences } from '../../src/user/user-context-manager.js';
 import { teamContextManager, type TeamConventions } from '../../src/team/team-context-manager.js';
 import { projectVisionManager } from '../../src/project/project-vision-manager.js';

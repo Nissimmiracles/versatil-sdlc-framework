@@ -12,6 +12,7 @@
  * Critical for v5.0 release - verifies 40% improvement in code suggestions
  */
 
+import { describe, it as test, expect, beforeAll, afterAll } from 'vitest';
 import { EnhancedMaria } from '../../src/agents/opera/maria-qa/enhanced-maria.js';
 import { EnhancedJames } from '../../src/agents/opera/james-frontend/enhanced-james.js';
 import { EnhancedMarcus } from '../../src/agents/opera/marcus-backend/enhanced-marcus.js';

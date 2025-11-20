@@ -11,7 +11,7 @@
  * Coverage Target: 85%+
  */
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { EnhancedMarcus } from '../../src/agents/opera/marcus-backend/enhanced-marcus.js';
 import { EnhancedJames } from '../../src/agents/opera/james-frontend/enhanced-james.js';
 import { EnhancedVectorMemoryStore } from '../../src/rag/enhanced-vector-memory-store.js';

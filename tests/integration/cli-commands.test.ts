@@ -3,7 +3,7 @@
  * End-to-end tests for CLI commands: versatil, versatil-update, versatil-rollback, versatil-config, versatil doctor
  */
 
-import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
+import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import {
   execCommand,
   execShellCommand,

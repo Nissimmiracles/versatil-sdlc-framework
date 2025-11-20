@@ -11,7 +11,7 @@
  * It's more of a "live integration test" than a unit test.
  */
 
-import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, test, expect, beforeAll, afterAll } from 'vitest';
 import { writeFileSync, unlinkSync, existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
@@ -35,7 +35,7 @@ describe('Live Agent Auto-Activation (v7.2.0)', () => {
   test('Test 1: Creating test file triggers Maria-QA suggestion', () => {
     // Arrange: Create new test file
     const testContent = `
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect } from 'vitest';
 
 describe('Inventory', () => {
   test('should add item', () => {

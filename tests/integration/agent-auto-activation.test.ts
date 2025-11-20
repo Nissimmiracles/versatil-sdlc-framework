@@ -15,7 +15,7 @@
  * @version 1.0.0
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { SubAgentSelector } from '../../src/agents/core/sub-agent-selector.js';
 import { TechStackDetector } from '../../src/agents/core/tech-stack-detector.js';
 import * as fs from 'fs/promises';

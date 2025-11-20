@@ -11,7 +11,7 @@
  * Coverage Target: 85%+
  */
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { DanaSDKAgent } from '../../src/agents/opera/dana-database/dana-sdk-agent.js';
 import { EnhancedMarcus } from '../../src/agents/opera/marcus-backend/enhanced-marcus.js';
 import { EnhancedVectorMemoryStore } from '../../src/rag/enhanced-vector-memory-store.js';

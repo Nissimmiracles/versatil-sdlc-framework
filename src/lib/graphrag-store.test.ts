@@ -6,6 +6,36 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GraphRAGStore, type GraphNode, type GraphEdge, type PatternNode, type GraphRAGQuery, type GraphRAGResult } from './graphrag-store.js';
 
+// Mock Firestore
+vi.mock('@google-cloud/firestore', () => {
+  const mockDoc = {
+    get: vi.fn().mockResolvedValue({ exists: false, data: () => ({}) }),
+    set: vi.fn().mockResolvedValue({}),
+    update: vi.fn().mockResolvedValue({}),
+    delete: vi.fn().mockResolvedValue({}),
+  };
+
+  const mockCollection = {
+    doc: vi.fn(() => mockDoc),
+    where: vi.fn().mockReturnThis(),
+    get: vi.fn().mockResolvedValue({ docs: [], empty: true, size: 0 }),
+    add: vi.fn().mockResolvedValue({ id: 'mock-id' }),
+  };
+
+  return {
+    Firestore: vi.fn(() => ({
+      collection: vi.fn(() => mockCollection),
+      batch: vi.fn(() => ({
+        set: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
+        commit: vi.fn().mockResolvedValue([]),
+      })),
+      terminate: vi.fn().mockResolvedValue(undefined),
+    })),
+  };
+});
+
 describe('GraphRAGStore', () => {
   let store: GraphRAGStore;
 

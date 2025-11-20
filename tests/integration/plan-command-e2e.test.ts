@@ -3,6 +3,7 @@
  * Tests the full workflow: pattern search → template matching → plan generation → dual todo creation
  */
 
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { PatternSearchService } from '../../src/rag/pattern-search';
 import { TemplateMatcher } from '../../src/templates/template-matcher';
 import { TodoFileGenerator, TodoFileSpec } from '../../src/planning/todo-file-generator';

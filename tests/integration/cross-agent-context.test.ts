@@ -3,6 +3,7 @@
  * Sprint 1 Day 5-6: Verify RAG context is preserved across agent handoffs
  */
 
+import { describe, it as test, expect, beforeAll, afterAll } from 'vitest';
 import { EnhancedMaria } from '../../src/agents/opera/maria-qa/enhanced-maria';
 import { EnhancedJames } from '../../src/agents/opera/james-frontend/enhanced-james';
 import { EnhancedMarcus } from '../../src/agents/opera/marcus-backend/enhanced-marcus';

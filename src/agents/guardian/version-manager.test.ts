@@ -152,21 +152,21 @@ describe('VersionManager', () => {
 
   describe('Version Bumping', () => {
     it('should validate major bump', () => {
-      const isValid = versionManager.validateVersionBump('major' as VersionBumpType);
+      const isValid = versionManager.validateVersionBump('7.16.2', '8.0.0', 'major' as VersionBumpType);
 
-      expect(typeof isValid).toBe('boolean');
+      expect(isValid).toBe(true);
     });
 
     it('should validate minor bump', () => {
-      const isValid = versionManager.validateVersionBump('minor' as VersionBumpType);
+      const isValid = versionManager.validateVersionBump('7.16.2', '7.17.0', 'minor' as VersionBumpType);
 
-      expect(typeof isValid).toBe('boolean');
+      expect(isValid).toBe(true);
     });
 
     it('should validate patch bump', () => {
-      const isValid = versionManager.validateVersionBump('patch' as VersionBumpType);
+      const isValid = versionManager.validateVersionBump('7.16.2', '7.16.3', 'patch' as VersionBumpType);
 
-      expect(typeof isValid).toBe('boolean');
+      expect(isValid).toBe(true);
     });
   });
 
@@ -214,7 +214,7 @@ describe('VersionManager', () => {
     it('should reject invalid version formats', () => {
       expect(versionManager.isValidSemanticVersion('1.0')).toBe(false);
       expect(versionManager.isValidSemanticVersion('v1.0.0')).toBe(false);
-      expect(versionManager.isValidSemanticVersion('1.0.0-beta')).toBe(false);
+      expect(versionManager.isValidSemanticVersion('not-a-version')).toBe(false);
     });
 
     it('should compare version numbers', () => {
