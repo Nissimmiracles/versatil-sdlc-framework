@@ -972,3 +972,106 @@ function generateContextFix(
 
   return 'Apply context preferences according to priority: User > Team > Project > Framework';
 }
+
+/**
+ * ContextVerifier Class (Singleton)
+ * Wraps the functional context verification API in a class for testing
+ */
+export class ContextVerifier {
+  private static instance: ContextVerifier;
+  private currentContext: 'FRAMEWORK_CONTEXT' | 'PROJECT_CONTEXT' = 'PROJECT_CONTEXT';
+
+  private constructor() {
+    // Private constructor for singleton
+  }
+
+  /**
+   * Get singleton instance
+   */
+  public static getInstance(): ContextVerifier {
+    if (!ContextVerifier.instance) {
+      ContextVerifier.instance = new ContextVerifier();
+    }
+    return ContextVerifier.instance;
+  }
+
+  /**
+   * Get current context
+   */
+  public getCurrentContext(): 'FRAMEWORK_CONTEXT' | 'PROJECT_CONTEXT' {
+    return this.currentContext;
+  }
+
+  /**
+   * Set current context
+   */
+  public setContext(context: 'FRAMEWORK_CONTEXT' | 'PROJECT_CONTEXT'): void {
+    this.currentContext = context;
+  }
+
+  /**
+   * Detect context from file path
+   */
+  public detectContextFromPath(filePath: string): 'FRAMEWORK_CONTEXT' | 'PROJECT_CONTEXT' {
+    // Check if path contains framework identifiers
+    const frameworkIdentifiers = [
+      'versatil-sdlc-framework',
+      'versatil-sdlc-fw',
+      '@versatil/sdlc-framework',
+      '/src/agents/guardian/',
+      '/src/agents/opera/',
+      '/src/intelligence/',
+      '/src/orchestration/'
+    ];
+
+    const isFramework = frameworkIdentifiers.some(id => filePath.includes(id));
+    return isFramework ? 'FRAMEWORK_CONTEXT' : 'PROJECT_CONTEXT';
+  }
+
+  /**
+   * Verify context issue (delegates to functional API)
+   */
+  public async verifyContextIssue(
+    issue: HealthIssue,
+    workingDir: string,
+    userId?: string,
+    teamId?: string,
+    projectId?: string,
+    resolvedContext?: any
+  ): Promise<ContextVerificationResult> {
+    return verifyContextIssue(issue, workingDir, userId, teamId, projectId, resolvedContext);
+  }
+
+  /**
+   * Validate context operations
+   */
+  public validateContextOperation(operation: string, targetContext: 'FRAMEWORK_CONTEXT' | 'PROJECT_CONTEXT'): {
+    allowed: boolean;
+    reason?: string;
+  } {
+    // Prevent framework modifications from project context
+    if (this.currentContext === 'PROJECT_CONTEXT' && targetContext === 'FRAMEWORK_CONTEXT') {
+      return {
+        allowed: false,
+        reason: 'Cannot modify framework files from project context'
+      };
+    }
+
+    return { allowed: true };
+  }
+
+  /**
+   * Detect context leaks
+   */
+  public detectContextLeak(sourceContext: string, targetContext: string, operation: string): boolean {
+    // Context leak occurs when project code tries to modify framework
+    return sourceContext === 'PROJECT_CONTEXT' && targetContext === 'FRAMEWORK_CONTEXT' && operation.includes('modify');
+  }
+
+  /**
+   * Reset singleton (for testing)
+   */
+  public static resetInstance(): void {
+    ContextVerifier.instance = null as any;
+  }
+}

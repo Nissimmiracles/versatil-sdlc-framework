@@ -64,3 +64,4 @@ export declare function getTodoStatistics(todosDir: string): {
     avg_age_hours: number;
     oldest_age_hours: number;
 };
+export { calculateTodoFingerprint, areTodosSimilar, deduplicateTodos } from './todo-deduplicator-exports.js';

@@ -458,7 +458,9 @@ export class RAGEnabledAgent extends BaseAgent {
             suggestions,
             priority: this.calculatePriorityWithRAG(analysis, ragContext),
             handoffTo,
-            context: responseMetadata
+            context: responseMetadata,
+            success: true, // Activation succeeded
+            status: 'success'
         };
     }
     /**

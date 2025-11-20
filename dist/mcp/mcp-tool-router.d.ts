@@ -124,5 +124,9 @@ export declare class MCPToolRouter extends EventEmitter {
      * Cleanup
      */
     destroy(): Promise<void>;
+    /**
+     * Shutdown (alias for destroy)
+     */
+    shutdown(): Promise<void>;
 }
 export declare function getMCPToolRouter(): MCPToolRouter;

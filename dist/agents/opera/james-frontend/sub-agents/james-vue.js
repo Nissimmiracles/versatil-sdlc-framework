@@ -48,6 +48,9 @@ export class JamesVue extends EnhancedJames {
      * Analyze Vue-specific patterns
      */
     async analyzeVuePatterns(context) {
+        return this.internalAnalyzeVuePatterns(context);
+    }
+    async internalAnalyzeVuePatterns(context) {
         const content = context.content || '';
         const suggestions = [];
         const bestPractices = {
@@ -226,6 +229,82 @@ export class JamesVue extends EnhancedJames {
             suggestions,
             bestPractices
         };
+    }
+    // API Pattern Detection Methods
+    hasOptionsAPI(content) {
+        return this.usesOptionsAPI(content);
+    }
+    hasCompositionAPI(content) {
+        return /setup\s*\(/.test(content) || /<script\s+setup/.test(content);
+    }
+    hasScriptSetup(content) {
+        return this.usesScriptSetup(content);
+    }
+    // Reactivity System Methods
+    hasRefUsage(content) {
+        return /ref\s*\(/.test(content);
+    }
+    hasReactiveUsage(content) {
+        return /reactive\s*\(/.test(content);
+    }
+    hasComputedUsage(content) {
+        return /computed\s*\(/.test(content);
+    }
+    hasMissingValueAccess(content) {
+        const hasRef = this.hasRefUsage(content);
+        const scriptSection = content.match(/<script[^>]*>([\s\S]*?)<\/script>/);
+        if (scriptSection && hasRef) {
+            const script = scriptSection[1];
+            return /const\s+\w+\s*=\s*ref\(/.test(script) && !script.includes('.value');
+        }
+        return false;
+    }
+    hasReactiveDestructuring(content) {
+        return /const\s*\{[^}]+\}\s*=\s*reactive\s*\(/.test(content);
+    }
+    // Lifecycle Hooks
+    hasLifecycleHook(content, hookName) {
+        return new RegExp(`${hookName}\\s*\\(`).test(content);
+    }
+    hasWatchEffect(content) {
+        return /watchEffect\s*\(/.test(content);
+    }
+    hasWatch(content) {
+        return /watch\s*\(/.test(content);
+    }
+    // Component Best Practices
+    hasDefineProps(content) {
+        return /defineProps/.test(content);
+    }
+    hasDefineEmits(content) {
+        return /defineEmits/.test(content);
+    }
+    hasMissingVForKey(content) {
+        return this.hasMissingVForKeys(content);
+    }
+    // Composables
+    hasComposableUsage(content) {
+        return /use[A-Z]\w+\s*\(/.test(content);
+    }
+    hasProperComposableNaming(content) {
+        return /function\s+use[A-Z]\w+/.test(content);
+    }
+    // Template Patterns
+    hasVIf(content) {
+        return /v-if/.test(content);
+    }
+    hasVModel(content) {
+        return /v-model/.test(content);
+    }
+    hasSlot(content) {
+        return /<slot/.test(content);
+    }
+    hasScopedSlot(content) {
+        return /<slot\s+[^>]*:[\w]+/.test(content) || /#[\w]+="/.test(content);
+    }
+    // Performance
+    hasUnnecessaryReactive(content) {
+        return /reactive\s*\(\s*\{[^}]*API_URL|CONFIG|CONST/.test(content);
     }
     /**
      * Detect Options API usage

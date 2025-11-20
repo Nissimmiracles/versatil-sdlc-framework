@@ -8,6 +8,7 @@ export interface AgentResponse {
     priority: string;
     handoffTo: string[];
     context: any;
+    success?: boolean;
     data?: any;
     analysis?: any;
     status?: 'success' | 'error' | 'warning';

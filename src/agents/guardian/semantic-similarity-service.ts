@@ -25,10 +25,21 @@ export interface SemanticSimilarityResult {
 }
 
 export class SemanticSimilarityService {
+  private static instance: SemanticSimilarityService;
   private vectorStore: EnhancedVectorMemoryStore;
 
   constructor() {
     this.vectorStore = new EnhancedVectorMemoryStore();
+  }
+
+  /**
+   * Get singleton instance
+   */
+  public static getInstance(): SemanticSimilarityService {
+    if (!SemanticSimilarityService.instance) {
+      SemanticSimilarityService.instance = new SemanticSimilarityService();
+    }
+    return SemanticSimilarityService.instance;
   }
 
   /**

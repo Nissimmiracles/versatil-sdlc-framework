@@ -101,4 +101,16 @@ export declare class VersionManager {
      * Generate release notes
      */
     generateReleaseNotes(version: string): Promise<string>;
+    /**
+     * Validate version bump is appropriate
+     */
+    validateVersionBump(currentVersion: string, newVersion: string, bumpType: VersionBumpType): boolean;
+    /**
+     * Generate release information
+     */
+    generateReleaseInfo(version: string): Promise<ReleaseInfo>;
+    /**
+     * Check if version is valid semantic version
+     */
+    isValidSemanticVersion(version: string): boolean;
 }

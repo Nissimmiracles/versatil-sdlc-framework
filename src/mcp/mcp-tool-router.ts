@@ -486,6 +486,13 @@ export class MCPToolRouter extends EventEmitter {
 
     this.removeAllListeners();
   }
+
+  /**
+   * Shutdown (alias for destroy)
+   */
+  async shutdown(): Promise<void> {
+    return this.destroy();
+  }
 }
 
 // Export singleton instance

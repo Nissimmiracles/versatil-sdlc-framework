@@ -3,14 +3,14 @@
  * Sprint 1 Day 5-6: Verify RAG context is preserved across agent handoffs
  */
 
-import { EnhancedMaria } from '../../src/agents/enhanced-maria';
-import { EnhancedJames } from '../../src/agents/enhanced-james';
-import { EnhancedMarcus } from '../../src/agents/enhanced-marcus';
-import { AlexBa } from '../../src/agents/alex-ba';
-import { SarahPm } from '../../src/agents/sarah-pm';
-import { DrAiMl } from '../../src/agents/dr-ai-ml';
+import { EnhancedMaria } from '../../src/agents/opera/maria-qa/enhanced-maria';
+import { EnhancedJames } from '../../src/agents/opera/james-frontend/enhanced-james';
+import { EnhancedMarcus } from '../../src/agents/opera/marcus-backend/enhanced-marcus';
+import { AlexBa } from '../../src/agents/opera/alex-ba/alex-ba';
+import { SarahPm } from '../../src/agents/opera/sarah-pm/sarah-pm';
+import { DrAiMl } from '../../src/agents/opera/dr-ai-ml/dr-ai-ml';
 import { EnhancedVectorMemoryStore } from '../../src/rag/enhanced-vector-memory-store';
-import { AgentActivationContext } from '../../src/agents/base-agent';
+import { AgentActivationContext } from '../../src/agents/core/base-agent';
 
 describe('Cross-Agent Context Preservation', () => {
   let vectorStore: EnhancedVectorMemoryStore;

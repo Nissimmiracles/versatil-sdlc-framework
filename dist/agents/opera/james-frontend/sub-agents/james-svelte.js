@@ -109,7 +109,7 @@ export class JamesSvelte extends EnhancedJames {
             bestPractices.reactivePatterns.push('Use correct syntax for your Svelte version');
         }
         // Check for missing TypeScript
-        if (!this.hasTypeScript(content)) {
+        if (!this.checkTypeScript(content)) {
             score -= 5;
             suggestions.push({
                 type: 'type-safety',
@@ -233,6 +233,115 @@ export class JamesSvelte extends EnhancedJames {
             bestPractices
         };
     }
+    // Svelte 5 Runes Detection Methods
+    hasStateRune(content) {
+        return /\$state\s*\(/.test(content);
+    }
+    hasDerivedRune(content) {
+        return /\$derived\s*\(/.test(content);
+    }
+    hasEffectRune(content) {
+        return /\$effect\s*\(/.test(content);
+    }
+    hasPropsRune(content) {
+        return /\$props\s*\(/.test(content);
+    }
+    // Legacy Reactivity Detection
+    hasReactiveDeclaration(content) {
+        return /\$:\s*\w+\s*=/.test(content);
+    }
+    hasReactiveStatement(content) {
+        return /\$:\s+/.test(content) && !/:=/.test(content);
+    }
+    hasReactiveBlock(content) {
+        return /\$:\s*\{/.test(content);
+    }
+    // Component Patterns
+    hasScript(content) {
+        return /<script/.test(content);
+    }
+    hasTypeScript(content) {
+        return this.checkTypeScript(content);
+    }
+    checkTypeScript(content) {
+        return /<script\s+lang=["']ts["']/.test(content);
+    }
+    hasEventHandler(content) {
+        return /on:\w+/.test(content);
+    }
+    hasEventDispatcher(content) {
+        return /createEventDispatcher/.test(content);
+    }
+    // Store Patterns
+    hasWritableStore(content) {
+        return /writable\s*\(/.test(content);
+    }
+    hasReadableStore(content) {
+        return /readable\s*\(/.test(content);
+    }
+    hasDerivedStore(content) {
+        return /derived\s*\(/.test(content);
+    }
+    hasStoreSubscription(content) {
+        return /\.subscribe\s*\(/.test(content);
+    }
+    // SvelteKit Routing
+    isPageFile(filePath) {
+        return /\+page\.svelte$/.test(filePath);
+    }
+    isLayoutFile(filePath) {
+        return /\+layout\.svelte$/.test(filePath);
+    }
+    isServerFile(filePath) {
+        return /\+page\.server\.(ts|js)$/.test(filePath) || /\+layout\.server\.(ts|js)$/.test(filePath);
+    }
+    hasLoadFunction(content) {
+        return /export\s+(async\s+)?function\s+load/.test(content) || /export\s+const\s+load/.test(content);
+    }
+    hasFormAction(content) {
+        return /export\s+const\s+actions/.test(content);
+    }
+    // Template Syntax
+    hasIfBlock(content) {
+        return /\{#if\s/.test(content);
+    }
+    hasEachBlock(content) {
+        return /\{#each\s/.test(content);
+    }
+    hasAwaitBlock(content) {
+        return /\{#await\s/.test(content);
+    }
+    hasKeyBlock(content) {
+        return /\{#key\s/.test(content);
+    }
+    hasMissingKeyedEach(content) {
+        const hasEach = this.hasEachBlock(content);
+        const hasKey = /\{#each\s+[^}]+\([^)]+\)/.test(content);
+        return hasEach && !hasKey;
+    }
+    // Lifecycle and Special Elements
+    hasOnMount(content) {
+        return /onMount\s*\(/.test(content);
+    }
+    hasOnDestroy(content) {
+        return /onDestroy\s*\(/.test(content);
+    }
+    hasBeforeUpdate(content) {
+        return /beforeUpdate\s*\(/.test(content);
+    }
+    hasAfterUpdate(content) {
+        return /afterUpdate\s*\(/.test(content);
+    }
+    hasSvelteWindow(content) {
+        return /<svelte:window/.test(content);
+    }
+    hasSvelteComponent(content) {
+        return /<svelte:component/.test(content);
+    }
+    // Performance
+    hasImmutable(content) {
+        return /<svelte:options\s+immutable/.test(content);
+    }
     /**
      * Check for improper reactive statements
      */
@@ -269,18 +378,6 @@ export class JamesSvelte extends EnhancedJames {
      */
     usesSvelte5Runes(content) {
         return content.includes('$state') || content.includes('$derived') || content.includes('$effect');
-    }
-    /**
-     * Check if Svelte 5 project
-     */
-    isSvelte5(content) {
-        return content.includes('svelte@5') || content.includes('svelte/stores') && content.includes('$state');
-    }
-    /**
-     * Check for TypeScript
-     */
-    hasTypeScript(content) {
-        return content.includes('lang="ts"') || content.includes("lang='ts'");
     }
     /**
      * Check for improper prop binding
@@ -437,6 +534,9 @@ export class JamesSvelte extends EnhancedJames {
      * Detect Svelte version
      */
     detectSvelteVersion(content) {
+        return this.checkSvelteVersion(content);
+    }
+    checkSvelteVersion(content) {
         if (content.includes('$state') || content.includes('$derived'))
             return 'Svelte 5 (Runes)';
         if (content.includes('SvelteKit'))
@@ -456,6 +556,9 @@ export class JamesSvelte extends EnhancedJames {
         if (content.includes('context'))
             return 'Context API';
         return 'Component State';
+    }
+    isSvelte5(content) {
+        return content.includes('svelte@5') || (content.includes('svelte/stores') && content.includes('$state'));
     }
 }
 //# sourceMappingURL=james-svelte.js.map

@@ -396,3 +396,6 @@ export function getTodoStatistics(todosDir: string): {
 
   return stats;
 }
+
+// Re-export utility functions for testing
+export { calculateTodoFingerprint, areTodosSimilar, deduplicateTodos } from './todo-deduplicator-exports.js';

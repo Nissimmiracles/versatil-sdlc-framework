@@ -308,4 +308,6 @@ export function getTodoStatistics(todosDir) {
     }
     return stats;
 }
+// Re-export utility functions for testing
+export { calculateTodoFingerprint, areTodosSimilar, deduplicateTodos } from './todo-deduplicator-exports.js';
 //# sourceMappingURL=todo-deduplicator.js.map

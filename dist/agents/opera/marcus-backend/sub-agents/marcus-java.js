@@ -190,5 +190,125 @@ export class MarcusJava extends EnhancedMarcus {
             maxExamples: 5
         };
     }
+    // Spring Boot Pattern Detection Methods
+    hasRestController(content) {
+        return content.includes('@RestController');
+    }
+    hasService(content) {
+        return content.includes('@Service');
+    }
+    hasRepository(content) {
+        return content.includes('@Repository');
+    }
+    hasAutowired(content) {
+        return content.includes('@Autowired');
+    }
+    // JPA/Hibernate Methods
+    hasEntity(content) {
+        return content.includes('@Entity');
+    }
+    hasNPlusOne(content) {
+        return this.hasNPlusOnePattern(content);
+    }
+    hasEntityGraph(content) {
+        return content.includes('@EntityGraph');
+    }
+    // Security Methods
+    detectSQLInjection(content) {
+        return this.hasSQLInjectionRisk(content);
+    }
+    hasParameterizedQuery(content) {
+        return /setParameter\s*\(/.test(content) || /:[\w]+/.test(content);
+    }
+    hasPreAuthorize(content) {
+        return content.includes('@PreAuthorize');
+    }
+    hasMissingAuth(content) {
+        const isDeleteMapping = /@DeleteMapping/.test(content) || /@PutMapping/.test(content);
+        const hasAuth = content.includes('@PreAuthorize') || content.includes('@Secured');
+        return isDeleteMapping && !hasAuth;
+    }
+    hasPasswordEncoder(content) {
+        return /PasswordEncoder|BCryptPasswordEncoder/.test(content);
+    }
+    hasHardcodedSecrets(content) {
+        const patterns = [
+            /["']sk_live_[\w]+["']/,
+            /["']api[_-]?key["']\s*[:=]\s*["'][\w]+["']/i,
+            /password\s*=\s*["'][\w]+["']/i
+        ];
+        return patterns.some(pattern => pattern.test(content));
+    }
+    // Exception Handling Methods
+    hasControllerAdvice(content) {
+        return content.includes('@ControllerAdvice');
+    }
+    hasCustomException(content) {
+        return /class\s+\w+Exception\s+extends/.test(content);
+    }
+    hasEmptyCatch(content) {
+        return /catch\s*\([^)]+\)\s*\{\s*\}/.test(content) || /catch\s*\([^)]+\)\s*\{\s*\/\//.test(content);
+    }
+    // Java 17+ Feature Methods
+    hasRecord(content) {
+        return /public\s+record\s+\w+/.test(content);
+    }
+    hasSealed(content) {
+        return /sealed\s+class/.test(content) || /sealed\s+interface/.test(content);
+    }
+    hasPatternMatching(content) {
+        return /instanceof\s+\w+\s+\w+/.test(content);
+    }
+    hasTextBlock(content) {
+        return /"""\s*\n/.test(content);
+    }
+    hasSwitchExpression(content) {
+        return /=\s*switch\s*\(/.test(content) || /switch.*->/.test(content);
+    }
+    // Performance Methods
+    hasStreamAPI(content) {
+        return /\.stream\(\)/.test(content);
+    }
+    hasCacheable(content) {
+        return content.includes('@Cacheable');
+    }
+    hasPagination(content) {
+        return /Pageable|PageRequest/.test(content);
+    }
+    hasMissingPagination(content) {
+        const isGetAllEndpoint = /@GetMapping.*findAll/.test(content) || /\.findAll\(\)/.test(content);
+        const hasPaging = this.hasPagination(content);
+        return isGetAllEndpoint && !hasPaging;
+    }
+    // REST API Methods
+    hasValidation(content) {
+        return content.includes('@Valid');
+    }
+    hasResponseEntity(content) {
+        return content.includes('ResponseEntity');
+    }
+    // Testing Methods
+    hasSpringBootTest(content) {
+        return content.includes('@SpringBootTest');
+    }
+    hasWebMvcTest(content) {
+        return content.includes('@WebMvcTest');
+    }
+    hasMockBean(content) {
+        return content.includes('@MockBean');
+    }
+    hasTest(content) {
+        return content.includes('@Test');
+    }
+    hasParameterizedTest(content) {
+        return content.includes('@ParameterizedTest');
+    }
+    // Code Quality Methods
+    hasJavadoc(content) {
+        return /\/\*\*[\s\S]*?\*\//.test(content);
+    }
+    hasOptional(content) {
+        return /Optional</.test(content);
+    }
 }
 //# sourceMappingURL=marcus-java.js.map

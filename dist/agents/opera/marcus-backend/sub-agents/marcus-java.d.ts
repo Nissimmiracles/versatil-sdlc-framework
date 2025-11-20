@@ -20,7 +20,15 @@ export declare class MarcusJava extends EnhancedMarcus {
     systemPrompt: string;
     constructor(vectorStore?: EnhancedVectorMemoryStore);
     activate(context: AgentActivationContext): Promise<AgentResponse>;
-    private analyzeJavaPatterns;
+    analyzeJavaPatterns(context: AgentActivationContext): Promise<{
+        score: number;
+        suggestions: {
+            type: string;
+            message: string;
+            priority: string;
+        }[];
+        component: string;
+    }>;
     private hasSQLInjectionRisk;
     private hasNPlusOnePattern;
     private needsTransactional;
@@ -37,4 +45,38 @@ export declare class MarcusJava extends EnhancedMarcus {
         similarityThreshold: number;
         enableLearning: boolean;
     };
+    hasRestController(content: string): boolean;
+    hasService(content: string): boolean;
+    hasRepository(content: string): boolean;
+    hasAutowired(content: string): boolean;
+    hasEntity(content: string): boolean;
+    hasNPlusOne(content: string): boolean;
+    hasEntityGraph(content: string): boolean;
+    detectSQLInjection(content: string): boolean;
+    hasParameterizedQuery(content: string): boolean;
+    hasPreAuthorize(content: string): boolean;
+    hasMissingAuth(content: string): boolean;
+    hasPasswordEncoder(content: string): boolean;
+    hasHardcodedSecrets(content: string): boolean;
+    hasControllerAdvice(content: string): boolean;
+    hasCustomException(content: string): boolean;
+    hasEmptyCatch(content: string): boolean;
+    hasRecord(content: string): boolean;
+    hasSealed(content: string): boolean;
+    hasPatternMatching(content: string): boolean;
+    hasTextBlock(content: string): boolean;
+    hasSwitchExpression(content: string): boolean;
+    hasStreamAPI(content: string): boolean;
+    hasCacheable(content: string): boolean;
+    hasPagination(content: string): boolean;
+    hasMissingPagination(content: string): boolean;
+    hasValidation(content: string): boolean;
+    hasResponseEntity(content: string): boolean;
+    hasSpringBootTest(content: string): boolean;
+    hasWebMvcTest(content: string): boolean;
+    hasMockBean(content: string): boolean;
+    hasTest(content: string): boolean;
+    hasParameterizedTest(content: string): boolean;
+    hasJavadoc(content: string): boolean;
+    hasOptional(content: string): boolean;
 }

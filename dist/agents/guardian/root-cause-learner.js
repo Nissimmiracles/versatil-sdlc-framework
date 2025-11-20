@@ -43,6 +43,15 @@ export class RootCauseLearner {
         this.loadPatternsCache();
     }
     /**
+     * Get singleton instance
+     */
+    static getInstance(config) {
+        if (!RootCauseLearner.instance) {
+            RootCauseLearner.instance = new RootCauseLearner(config);
+        }
+        return RootCauseLearner.instance;
+    }
+    /**
      * Analyze health check history to detect recurring patterns
      */
     async analyzeHealthCheckHistory(healthHistory, currentWorkingDir) {

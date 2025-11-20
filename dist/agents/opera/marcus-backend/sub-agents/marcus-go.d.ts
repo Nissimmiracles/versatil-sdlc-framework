@@ -20,7 +20,15 @@ export declare class MarcusGo extends EnhancedMarcus {
     systemPrompt: string;
     constructor(vectorStore?: EnhancedVectorMemoryStore);
     activate(context: AgentActivationContext): Promise<AgentResponse>;
-    private analyzeGoPatterns;
+    analyzeGoPatterns(context: AgentActivationContext): Promise<{
+        score: number;
+        suggestions: {
+            type: string;
+            message: string;
+            priority: string;
+        }[];
+        framework: string;
+    }>;
     private hasMissingErrorHandling;
     private hasGoroutineLeakRisk;
     private hasRaceConditionRisk;
@@ -33,4 +41,35 @@ export declare class MarcusGo extends EnhancedMarcus {
         similarityThreshold: number;
         enableLearning: boolean;
     };
+    hasGoroutine(content: string): boolean;
+    hasChannel(content: string): boolean;
+    hasSelectStatement(content: string): boolean;
+    hasUnbufferedChannelRisk(content: string): boolean;
+    hasMissingGoroutineCleanup(content: string): boolean;
+    hasWaitGroup(content: string): boolean;
+    hasIgnoredError(content: string): boolean;
+    hasErrorWrapping(content: string): boolean;
+    hasCustomErrorType(content: string): boolean;
+    hasPanic(content: string): boolean;
+    hasRecover(content: string): boolean;
+    hasInterface(content: string): boolean;
+    hasTypeAssertion(content: string): boolean;
+    hasSlicePreallocation(content: string): boolean;
+    hasStringBuilder(content: string): boolean;
+    hasStringConcatInLoop(content: string): boolean;
+    hasSyncPool(content: string): boolean;
+    detectSQLInjection(content: string): boolean;
+    hasParameterizedQuery(content: string): boolean;
+    hasHardcodedCredentials(content: string): boolean;
+    hasCryptoUsage(content: string): boolean;
+    hasUnsafePointer(content: string): boolean;
+    hasDefer(content: string): boolean;
+    hasMissingDefer(content: string): boolean;
+    hasContext(content: string): boolean;
+    hasContextTimeout(content: string): boolean;
+    hasTestFunction(content: string): boolean;
+    hasTableDrivenTest(content: string): boolean;
+    hasTestHelper(content: string): boolean;
+    hasExportedDocumentation(content: string): boolean;
+    hasMissingExportedDoc(content: string): boolean;
 }

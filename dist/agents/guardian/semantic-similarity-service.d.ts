@@ -20,8 +20,13 @@ export interface SemanticSimilarityResult {
     method: string;
 }
 export declare class SemanticSimilarityService {
+    private static instance;
     private vectorStore;
     constructor();
+    /**
+     * Get singleton instance
+     */
+    static getInstance(): SemanticSimilarityService;
     /**
      * Calculate semantic similarity between a query and multiple candidates
      *

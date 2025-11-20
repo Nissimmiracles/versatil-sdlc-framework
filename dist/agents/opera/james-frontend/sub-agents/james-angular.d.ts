@@ -33,7 +33,40 @@ export declare class JamesAngular extends EnhancedJames {
     /**
      * Analyze Angular-specific patterns
      */
-    private analyzeAngularPatterns;
+    analyzeAngularPatterns(context: AgentActivationContext): Promise<{
+        score: number;
+        suggestions: Array<{
+            type: string;
+            message: string;
+            priority: string;
+        }>;
+        bestPractices: AngularBestPractices;
+    }>;
+    hasStandaloneComponent(content: string): boolean;
+    hasModuleBasedComponent(content: string): boolean;
+    hasSignal(content: string): boolean;
+    hasComputedSignal(content: string): boolean;
+    hasEffect(content: string): boolean;
+    hasInjectFunction(content: string): boolean;
+    hasConstructorInjection(content: string): boolean;
+    hasObservableSubscription(content: string): boolean;
+    hasMissingUnsubscribe(content: string): boolean;
+    hasAsyncPipe(content: string): boolean;
+    hasTakeUntil(content: string): boolean;
+    hasNgRxStore(content: string): boolean;
+    hasNgRxAction(content: string): boolean;
+    hasNgRxEffect(content: string): boolean;
+    hasNgRxSelector(content: string): boolean;
+    hasOnPushChangeDetection(content: string): boolean;
+    hasTrackBy(content: string): boolean;
+    hasMissingTrackBy(content: string): boolean;
+    private detectMissingTrackBy;
+    hasStructuralDirective(content: string): boolean;
+    hasNewControlFlow(content: string): boolean;
+    hasTemplateReference(content: string): boolean;
+    hasLifecycleHook(content: string, hookName: string): boolean;
+    hasTestBed(content: string): boolean;
+    hasComponentFixture(content: string): boolean;
     /**
      * Check for NgModule usage
      */
@@ -66,10 +99,6 @@ export declare class JamesAngular extends EnhancedJames {
      * Check for template-driven forms
      */
     private usesTemplateDrivenForms;
-    /**
-     * Check for missing trackBy
-     */
-    private hasMissingTrackBy;
     /**
      * Check if component is a container
      */

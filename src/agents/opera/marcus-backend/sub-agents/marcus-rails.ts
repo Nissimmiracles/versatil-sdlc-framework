@@ -47,7 +47,7 @@ export class MarcusRails extends EnhancedMarcus {
     return response;
   }
 
-  private async analyzeRailsPatterns(context: AgentActivationContext) {
+  public async analyzeRailsPatterns(context: AgentActivationContext) {
     const content = context.content || '';
     const suggestions: Array<{ type: string; message: string; priority: string }> = [];
     let score = 100;
@@ -165,5 +165,173 @@ export class MarcusRails extends EnhancedMarcus {
       agentDomain: 'backend-rails',
       maxExamples: 5
     };
+  }
+
+  // ActiveRecord Pattern Detection Methods
+  public hasActiveRecordModel(content: string): boolean {
+    return /class\s+\w+\s*<\s*ApplicationRecord/.test(content) || /class\s+\w+\s*<\s*ActiveRecord::Base/.test(content);
+  }
+
+  public hasAssociations(content: string): boolean {
+    return /has_many|belongs_to|has_one|has_and_belongs_to_many/.test(content);
+  }
+
+  public hasValidations(content: string): boolean {
+    return /validates|validates_presence_of|validates_uniqueness_of/.test(content);
+  }
+
+  public hasNPlusOne(content: string): boolean {
+    return /\.each.*\.\w+\./.test(content) && !content.includes('includes');
+  }
+
+  public hasIncludes(content: string): boolean {
+    return /\.includes\(/.test(content);
+  }
+
+  public hasScopes(content: string): boolean {
+    return /scope\s+:\w+/.test(content);
+  }
+
+  // Controller Pattern Detection Methods
+  public hasController(content: string): boolean {
+    return /class\s+\w+Controller\s*<\s*ApplicationController/.test(content);
+  }
+
+  public hasBeforeAction(content: string): boolean {
+    return /before_action/.test(content);
+  }
+
+  public hasStrongParams(content: string): boolean {
+    return /params\.require\(/.test(content) && /\.permit\(/.test(content);
+  }
+
+  public hasMissingStrongParams(content: string): boolean {
+    const hasParams = /params\[/.test(content);
+    const hasStrong = this.hasStrongParams(content);
+    return hasParams && !hasStrong;
+  }
+
+  // Security Methods
+  public detectSQLInjection(content: string): boolean {
+    return /where\(['"]\w+\s*=.*#\{/.test(content) || /where\(".*\+/.test(content);
+  }
+
+  public hasParameterizedQuery(content: string): boolean {
+    return /where\(\[/.test(content) || /where\(\?\)/.test(content);
+  }
+
+  public hasCSRFProtection(content: string): boolean {
+    return /protect_from_forgery/.test(content);
+  }
+
+  public hasAuthentication(content: string): boolean {
+    return /devise|authenticate_user|current_user/.test(content);
+  }
+
+  public hasPundit(content: string): boolean {
+    return /authorize\s+@|policy\(/.test(content);
+  }
+
+  public hasExposedSecrets(content: string): boolean {
+    const patterns = [
+      /password\s*=\s*["'][^"']+["']/,
+      /api_key\s*=\s*["'][^"']+["']/,
+      /secret\s*=\s*["'][^"']+["']/
+    ];
+    return patterns.some(pattern => pattern.test(content));
+  }
+
+  // Ruby 3+ Features
+  public hasPatternMatching(content: string): boolean {
+    return /case\s+\w+\s+in\s+/.test(content);
+  }
+
+  public hasEndlessMethod(content: string): boolean {
+    return /def\s+\w+\([^)]*\)\s*=/.test(content);
+  }
+
+  public hasKeywordArgs(content: string): boolean {
+    return /def\s+\w+\([^)]*:\s*\w+/.test(content);
+  }
+
+  public hasSafeNavigation(content: string): boolean {
+    return /&\./.test(content);
+  }
+
+  // Performance Methods
+  public hasCounterCache(content: string): boolean {
+    return /counter_cache:/.test(content);
+  }
+
+  public hasCaching(content: string): boolean {
+    return /Rails\.cache|cache\(/.test(content);
+  }
+
+  public hasFragmentCache(content: string): boolean {
+    return /<% cache /.test(content);
+  }
+
+  public hasSelect(content: string): boolean {
+    return /\.select\(/.test(content);
+  }
+
+  public hasPluck(content: string): boolean {
+    return /\.pluck\(/.test(content);
+  }
+
+  public hasFindEach(content: string): boolean {
+    return /\.find_each\(/.test(content);
+  }
+
+  // Background Job Methods
+  public hasActiveJob(content: string): boolean {
+    return /class\s+\w+Job\s*<\s*ApplicationJob/.test(content) || /perform_later/.test(content);
+  }
+
+  public hasSidekiq(content: string): boolean {
+    return /include\s+Sidekiq::Worker/.test(content);
+  }
+
+  // Testing Methods
+  public hasRSpec(content: string): boolean {
+    return /RSpec\.describe|describe\s+['"]/.test(content);
+  }
+
+  public hasMinitest(content: string): boolean {
+    return /class\s+\w+Test\s*</.test(content) || /test\s+["']/.test(content);
+  }
+
+  public hasFactoryBot(content: string): boolean {
+    return /FactoryBot\.create|create\(:\w+/.test(content);
+  }
+
+  public hasFixtures(content: string, filePath?: string): boolean {
+    return /fixtures\s+:/.test(content) || (filePath?.includes('fixtures') ?? false);
+  }
+
+  // Ruby Idioms
+  public hasBlocks(content: string): boolean {
+    return /\{.*\}|do\s+\|.*\|\s+end/.test(content);
+  }
+
+  public hasSymbols(content: string): boolean {
+    return /:\w+/.test(content);
+  }
+
+  public hasStringInterpolation(content: string): boolean {
+    return /#\{\w+\}/.test(content);
+  }
+
+  // Migration Methods
+  public hasMigration(content: string): boolean {
+    return /class\s+\w+\s*<\s*ActiveRecord::Migration/.test(content);
+  }
+
+  public hasIndex(content: string): boolean {
+    return /add_index|index:/.test(content);
+  }
+
+  public hasForeignKey(content: string): boolean {
+    return /add_foreign_key|foreign_key:/.test(content);
   }
 }

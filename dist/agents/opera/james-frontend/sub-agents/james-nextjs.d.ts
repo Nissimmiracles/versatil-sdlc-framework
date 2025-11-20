@@ -33,7 +33,44 @@ export declare class JamesNextJS extends EnhancedJames {
     /**
      * Analyze Next.js-specific patterns
      */
+    analyzeNextPatterns(context: AgentActivationContext): Promise<{
+        score: number;
+        suggestions: Array<{
+            type: string;
+            message: string;
+            priority: string;
+        }>;
+        bestPractices: NextJSBestPractices;
+    }>;
     private analyzeNextJSPatterns;
+    hasAppRouter(filePath: string): boolean;
+    hasPagesRouter(filePath: string): boolean;
+    hasUseClient(content: string): boolean;
+    hasUseServer(content: string): boolean;
+    hasClientHookInServerComponent(content: string, filePath: string): boolean;
+    hasServerAction(content: string): boolean;
+    hasFormAction(content: string): boolean;
+    hasAsyncComponent(content: string): boolean;
+    private checkAsyncComponent;
+    hasGetServerSideProps(content: string): boolean;
+    hasGetStaticProps(content: string): boolean;
+    hasLinkComponent(content: string): boolean;
+    hasUseRouter(content: string): boolean;
+    hasRedirect(content: string): boolean;
+    hasDynamicRoute(filePath: string): boolean;
+    hasImageComponent(content: string): boolean;
+    hasDynamicImport(content: string): boolean;
+    hasSuspense(content: string): boolean;
+    hasLoadingFile(filePath: string): boolean;
+    hasMetadata(content: string): boolean;
+    private checkMetadata;
+    hasGenerateMetadata(content: string): boolean;
+    hasSitemap(filePath: string): boolean;
+    hasRobots(filePath: string): boolean;
+    hasLayout(filePath: string): boolean;
+    hasErrorBoundary(filePath: string): boolean;
+    private checkHasErrorBoundary;
+    hasNotFound(filePath: string): boolean;
     /**
      * Check if using Pages Router
      */
@@ -63,21 +100,9 @@ export declare class JamesNextJS extends EnhancedJames {
      */
     private hasFontLinks;
     /**
-     * Check if file is a page component
-     */
-    private isPageComponent;
-    /**
-     * Check for metadata export
-     */
-    private hasMetadata;
-    /**
      * Check for loading state file
      */
     private hasLoadingState;
-    /**
-     * Check for error boundary file
-     */
-    private hasErrorBoundary;
     /**
      * Check for form submission
      */
@@ -87,17 +112,9 @@ export declare class JamesNextJS extends EnhancedJames {
      */
     private usesServerActions;
     /**
-     * Check if component is async
-     */
-    private hasAsyncComponent;
-    /**
      * Check if component is large (heuristic)
      */
     private hasLargeComponent;
-    /**
-     * Check if file is a route handler
-     */
-    private isRouteHandler;
     /**
      * Check for proper route handler exports
      */
@@ -110,14 +127,6 @@ export declare class JamesNextJS extends EnhancedJames {
      * Check for parallel routes usage
      */
     private usesParallelRoutes;
-    /**
-     * Check if file is middleware
-     */
-    private isMiddleware;
-    /**
-     * Check for proper middleware patterns
-     */
-    private hasProperMiddlewarePatterns;
     /**
      * Generate Next.js-specific recommendations
      */

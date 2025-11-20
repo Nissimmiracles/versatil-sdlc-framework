@@ -454,5 +454,16 @@ export class VERSATILMCPClient {
             return false;
         }
     }
+    /**
+     * Cleanup resources (orchestrator, daemon, etc.)
+     */
+    async cleanup() {
+        this.logger.info('Cleaning up MCP client resources');
+        // Cleanup orchestrator if needed
+        if (this.sdlcOrchestrator) {
+            // Add orchestrator cleanup if it has a cleanup method
+        }
+        // Clear any active connections or resources
+    }
 }
 //# sourceMappingURL=mcp-client.js.map

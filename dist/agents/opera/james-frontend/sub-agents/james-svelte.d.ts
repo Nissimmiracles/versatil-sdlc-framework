@@ -33,7 +33,48 @@ export declare class JamesSvelte extends EnhancedJames {
     /**
      * Analyze Svelte-specific patterns
      */
-    private analyzeSveltePatterns;
+    analyzeSveltePatterns(context: AgentActivationContext): Promise<{
+        score: number;
+        suggestions: Array<{
+            type: string;
+            message: string;
+            priority: string;
+        }>;
+        bestPractices: SvelteBestPractices;
+    }>;
+    hasStateRune(content: string): boolean;
+    hasDerivedRune(content: string): boolean;
+    hasEffectRune(content: string): boolean;
+    hasPropsRune(content: string): boolean;
+    hasReactiveDeclaration(content: string): boolean;
+    hasReactiveStatement(content: string): boolean;
+    hasReactiveBlock(content: string): boolean;
+    hasScript(content: string): boolean;
+    hasTypeScript(content: string): boolean;
+    private checkTypeScript;
+    hasEventHandler(content: string): boolean;
+    hasEventDispatcher(content: string): boolean;
+    hasWritableStore(content: string): boolean;
+    hasReadableStore(content: string): boolean;
+    hasDerivedStore(content: string): boolean;
+    hasStoreSubscription(content: string): boolean;
+    isPageFile(filePath: string): boolean;
+    isLayoutFile(filePath: string): boolean;
+    isServerFile(filePath: string): boolean;
+    hasLoadFunction(content: string): boolean;
+    hasFormAction(content: string): boolean;
+    hasIfBlock(content: string): boolean;
+    hasEachBlock(content: string): boolean;
+    hasAwaitBlock(content: string): boolean;
+    hasKeyBlock(content: string): boolean;
+    hasMissingKeyedEach(content: string): boolean;
+    hasOnMount(content: string): boolean;
+    hasOnDestroy(content: string): boolean;
+    hasBeforeUpdate(content: string): boolean;
+    hasAfterUpdate(content: string): boolean;
+    hasSvelteWindow(content: string): boolean;
+    hasSvelteComponent(content: string): boolean;
+    hasImmutable(content: string): boolean;
     /**
      * Check for improper reactive statements
      */
@@ -54,14 +95,6 @@ export declare class JamesSvelte extends EnhancedJames {
      * Check for Svelte 5 runes
      */
     private usesSvelte5Runes;
-    /**
-     * Check if Svelte 5 project
-     */
-    private isSvelte5;
-    /**
-     * Check for TypeScript
-     */
-    private hasTypeScript;
     /**
      * Check for improper prop binding
      */
@@ -147,8 +180,10 @@ export declare class JamesSvelte extends EnhancedJames {
      * Detect Svelte version
      */
     detectSvelteVersion(content: string): string;
+    private checkSvelteVersion;
     /**
      * Detect state management solution
      */
     detectStateManagement(content: string): string;
+    private isSvelte5;
 }

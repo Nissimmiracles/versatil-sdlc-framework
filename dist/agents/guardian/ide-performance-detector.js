@@ -25,6 +25,15 @@ export class IDEPerformanceDetector {
         this.projectRoot = projectRoot;
     }
     /**
+     * Get singleton instance
+     */
+    static getInstance(projectRoot) {
+        if (!IDEPerformanceDetector.instance) {
+            IDEPerformanceDetector.instance = new IDEPerformanceDetector(projectRoot);
+        }
+        return IDEPerformanceDetector.instance;
+    }
+    /**
      * Detect IDE crash risk
      * Returns comprehensive analysis with confidence scoring
      */

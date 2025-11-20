@@ -23,7 +23,7 @@ export class MarcusPython extends EnhancedMarcus {
 - Python 3.11+ features (match/case, improved error messages, faster runtime)
 - FastAPI and Django framework best practices
 - Async/await patterns with asyncio
-- Type hints and Pydantic models
+- type hints and Pydantic models
 - Poetry and pip dependency management
 - Virtual environments (venv, conda)
 - PEP 8 style guidelines
@@ -47,7 +47,7 @@ export class MarcusPython extends EnhancedMarcus {
     return response;
   }
 
-  private async analyzePythonPatterns(context: AgentActivationContext) {
+  public async analyzePythonPatterns(context: AgentActivationContext) {
     const content = context.content || '';
     const suggestions: Array<{ type: string; message: string; priority: string }> = [];
     let score = 100;
@@ -123,7 +123,13 @@ export class MarcusPython extends EnhancedMarcus {
     return {
       score: Math.max(score, 0),
       suggestions,
-      framework: this.detectPythonFramework(content)
+      framework: this.detectPythonFramework(content),
+      bestPractices: {
+        hasTypeHints: this.hasTypeHints(content),
+        hasAsyncAwait: /async\s+def/.test(content),
+        usesPydantic: content.includes('BaseModel'),
+        hasDependencyInjection: /Depends\s*\(/.test(content)
+      }
     };
   }
 
@@ -141,7 +147,9 @@ export class MarcusPython extends EnhancedMarcus {
       /execute\(['"]\s*SELECT.*%s/,
       /execute\(['"]\s*SELECT.*\+/,
       /execute\(f['"]\s*SELECT/,
-      /\.raw\(['"]\s*SELECT.*%s/
+      /\.raw\(['"]\s*SELECT.*%s/,
+      /f"SELECT.*\{/,  // f-string with variables in SELECT
+      /query\s*=\s*f["'].*SELECT.*\{/  // query variable with f-string
     ];
 
     return sqlPatterns.some(pattern => pattern.test(content));
@@ -152,6 +160,119 @@ export class MarcusPython extends EnhancedMarcus {
     if (content.includes('from django') || content.includes('import django')) return 'Django';
     if (content.includes('from flask') || content.includes('import flask')) return 'Flask';
     return 'Python (no framework)';
+  }
+
+  // Public pattern detection methods for testing and external use
+  public detectSQLInjection(content: string): boolean {
+    return this.hasSQLInjectionRisk(content);
+  }
+
+  public detectHardcodedSecrets(content: string): boolean {
+    const secretPatterns = [
+      /API_KEY\s*=\s*["'][^"']+["']/i,
+      /SECRET\s*=\s*["'][^"']+["']/i,
+      /PASSWORD\s*=\s*["'][^"']+["']/i,
+      /TOKEN\s*=\s*["'][^"']+["']/i,
+      /sk_live_/i,
+      /sk_test_/i
+    ];
+    return secretPatterns.some(pattern => pattern.test(content));
+  }
+
+  public detectMissingValidation(content: string): boolean {
+    // Check if FastAPI endpoint accepts dict without Pydantic model
+    return /def\s+\w+\([^)]*:\s*dict[^)]*\)/.test(content) &&
+           content.includes('@app.');
+  }
+
+  public detectUnsafeEval(content: string): boolean {
+    return /\beval\s*\(/.test(content) || /\bexec\s*\(/.test(content);
+  }
+
+  public detectMissingAuth(content: string): boolean {
+    // Check for admin/delete endpoints without Depends
+    const hasAdminEndpoint = /@app\.(delete|put|patch).*["']\/admin/.test(content);
+    const hasAuthDependency = /Depends\s*\(/.test(content);
+    return hasAdminEndpoint && !hasAuthDependency;
+  }
+
+  public hasDependencyInjection(content: string): boolean {
+    return /Depends\s*\(/.test(content);
+  }
+
+  public hasResponseModel(content: string): boolean {
+    return /response_model\s*=/.test(content);
+  }
+
+  public hasMissingTypeHints(content: string): boolean {
+    // Check for function definitions without type hints
+    // Look for parameters without type annotations
+    const funcWithNoHints = /def\s+\w+\s*\(\s*\w+\s*\)(?!\s*->)/;
+    return funcWithNoHints.test(content);
+  }
+
+  public hasFieldValidators(content: string): boolean {
+    return /Field\s*\(/.test(content) && /from pydantic import/.test(content);
+  }
+
+  public hasAsyncAwait(content: string): boolean {
+    return /async\s+def/.test(content) && /await\s+/.test(content);
+  }
+
+  public hasMissingAwait(content: string): boolean {
+    // Check for async function that might be missing await
+    const hasAsyncDef = /async\s+def/.test(content);
+    const hasAwait = /await\s+/.test(content);
+    const hasFunctionCall = /\w+\s*\([^)]*\)/.test(content);
+    return hasAsyncDef && !hasAwait && hasFunctionCall;
+  }
+
+  public hasBlockingIO(content: string): boolean {
+    const blockingPatterns = [
+      /with\s+open\s*\(/,
+      /open\s*\([^)]*,\s*["']r["']\)/,
+      /json\.load\s*\(/,
+      /pickle\.load\s*\(/
+    ];
+    return /async\s+def/.test(content) &&
+           blockingPatterns.some(pattern => pattern.test(content));
+  }
+
+  public hasBareExcept(content: string): boolean {
+    return /except\s*:/.test(content) && !/except\s+\w+\s*:/.test(content);
+  }
+
+  public hasCustomExceptionHandler(content: string): boolean {
+    return /@app\.exception_handler/.test(content);
+  }
+
+  public hasMissingSessionManagement(content: string): boolean {
+    const hasSessionLocal = /SessionLocal\s*\(\)/.test(content);
+    const hasTryFinally = /try:[\s\S]*finally:/.test(content);
+    return hasSessionLocal && !hasTryFinally;
+  }
+
+  public hasNPlusOne(content: string): boolean {
+    // Simplified detection: for loop with query inside
+    return /for\s+\w+\s+in\s+[\s\S]*db\.query\(/.test(content);
+  }
+
+  public hasListComprehension(content: string): boolean {
+    return /\[[^\]]+for\s+\w+\s+in\s+[^\]]+\]/.test(content);
+  }
+
+  public hasCaching(content: string): boolean {
+    return /@lru_cache/.test(content) || /@cache/.test(content);
+  }
+
+  public hasDocstring(content: string): boolean {
+    // Check for docstrings after function definition (handles indentation)
+    return /def\s+\w+.*?:[\s\n]+"""/s.test(content) ||
+           /def\s+\w+.*?:[\s\n]+'''/s.test(content);
+  }
+
+  public hasFStrings(content: string): boolean {
+    return /f["']/.test(content);
   }
 
   protected getDefaultRAGConfig() {

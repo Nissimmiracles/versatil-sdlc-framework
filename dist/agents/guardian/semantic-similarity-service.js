@@ -12,6 +12,15 @@ export class SemanticSimilarityService {
         this.vectorStore = new EnhancedVectorMemoryStore();
     }
     /**
+     * Get singleton instance
+     */
+    static getInstance() {
+        if (!SemanticSimilarityService.instance) {
+            SemanticSimilarityService.instance = new SemanticSimilarityService();
+        }
+        return SemanticSimilarityService.instance;
+    }
+    /**
      * Calculate semantic similarity between a query and multiple candidates
      *
      * @param query - The text to compare (e.g., feature description)

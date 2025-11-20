@@ -12,15 +12,15 @@
  * Critical for v5.0 release - verifies 40% improvement in code suggestions
  */
 
-import { EnhancedMaria } from '../../src/agents/enhanced-maria.js';
-import { EnhancedJames } from '../../src/agents/enhanced-james.js';
-import { EnhancedMarcus } from '../../src/agents/enhanced-marcus.js';
-import { SarahPm } from '../../src/agents/sarah-pm.js';
-import { AlexBa } from '../../src/agents/alex-ba.js';
-import { DrAiMl } from '../../src/agents/dr-ai-ml.js';
+import { EnhancedMaria } from '../../src/agents/opera/maria-qa/enhanced-maria.js';
+import { EnhancedJames } from '../../src/agents/opera/james-frontend/enhanced-james.js';
+import { EnhancedMarcus } from '../../src/agents/opera/marcus-backend/enhanced-marcus.js';
+import { SarahPm } from '../../src/agents/opera/sarah-pm/sarah-pm.js';
+import { AlexBa } from '../../src/agents/opera/alex-ba/alex-ba.js';
+import { DrAiMl } from '../../src/agents/opera/dr-ai-ml/dr-ai-ml.js';
 import { AgentPool } from '../../src/agents/agent-pool.js';
 import { EnhancedVectorMemoryStore } from '../../src/rag/enhanced-vector-memory-store.js';
-import { AgentActivationContext } from '../../src/agents/base-agent.js';
+import { AgentActivationContext } from '../../src/agents/core/base-agent.js';
 
 describe('RAG Integration - All 6 OPERA Agents', () => {
   let vectorStore: EnhancedVectorMemoryStore;

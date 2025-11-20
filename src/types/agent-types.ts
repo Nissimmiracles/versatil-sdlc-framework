@@ -27,6 +27,7 @@ export interface AgentResponse {
   priority: 'low' | 'medium' | 'high' | 'critical';
   handoffTo: string[];
   context: Record<string, any>;
+  success?: boolean; // Indicates if activation was successful
   result?: any;
   status?: 'success' | 'error' | 'warning';
   timestamp?: string;

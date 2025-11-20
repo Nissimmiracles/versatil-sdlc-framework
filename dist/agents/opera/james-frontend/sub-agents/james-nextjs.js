@@ -48,6 +48,9 @@ export class JamesNextJS extends EnhancedJames {
     /**
      * Analyze Next.js-specific patterns
      */
+    async analyzeNextPatterns(context) {
+        return this.analyzeNextJSPatterns(context);
+    }
     async analyzeNextJSPatterns(context) {
         const content = context.content || '';
         const filePath = context.filePath || '';
@@ -141,7 +144,7 @@ export class JamesNextJS extends EnhancedJames {
             bestPractices.performanceOptimizations.push('Use next/font for automatic font optimization');
         }
         // Check for metadata API
-        if (this.isPageComponent(filePath) && !this.hasMetadata(content)) {
+        if (filePath.includes('/page.') && !this.checkMetadata(content)) {
             score -= 5;
             suggestions.push({
                 type: 'seo',
@@ -151,7 +154,7 @@ export class JamesNextJS extends EnhancedJames {
             bestPractices.seoPatterns.push('Export metadata or generateMetadata from page components');
         }
         // Check for loading UI
-        if (this.isPageComponent(filePath) && !this.hasLoadingState(filePath)) {
+        if (filePath.includes('/page.') && !this.hasLoadingState(filePath)) {
             suggestions.push({
                 type: 'ux',
                 message: 'Page missing loading.tsx. Add loading UI for better UX during Suspense.',
@@ -160,7 +163,7 @@ export class JamesNextJS extends EnhancedJames {
             bestPractices.appRouterPatterns.push('Create loading.tsx for loading states');
         }
         // Check for error handling
-        if (this.isPageComponent(filePath) && !this.hasErrorBoundary(filePath)) {
+        if (filePath.includes('/page.') && !this.checkHasErrorBoundary(filePath)) {
             suggestions.push({
                 type: 'error-handling',
                 message: 'Page missing error.tsx. Add error boundary for better error handling.',
@@ -179,7 +182,7 @@ export class JamesNextJS extends EnhancedJames {
             bestPractices.dataFetchingPatterns.push('Use Server Actions for form mutations');
         }
         // Check for streaming with Suspense
-        if (this.hasAsyncComponent(content) && !content.includes('Suspense')) {
+        if (this.checkAsyncComponent(content) && !content.includes('Suspense')) {
             score -= 10;
             suggestions.push({
                 type: 'performance',
@@ -198,7 +201,7 @@ export class JamesNextJS extends EnhancedJames {
             bestPractices.performanceOptimizations.push('Use next/dynamic for code splitting large components');
         }
         // Check for route handlers best practices
-        if (this.isRouteHandler(filePath)) {
+        if (filePath.includes('/route.')) {
             if (!this.hasProperRouteHandlerExports(content)) {
                 score -= 10;
                 suggestions.push({
@@ -219,7 +222,7 @@ export class JamesNextJS extends EnhancedJames {
             bestPractices.appRouterPatterns.push('Use parallel routes for independent UI sections');
         }
         // Check for middleware patterns
-        if (this.isMiddleware(filePath) && !this.hasProperMiddlewarePatterns(content)) {
+        if (filePath.includes('middleware.') && !(content.includes('NextResponse') && content.includes('export const config'))) {
             score -= 10;
             suggestions.push({
                 type: 'middleware',
@@ -233,6 +236,100 @@ export class JamesNextJS extends EnhancedJames {
             suggestions,
             bestPractices
         };
+    }
+    // Router Detection
+    hasAppRouter(filePath) {
+        return this.isAppRouter(filePath);
+    }
+    hasPagesRouter(filePath) {
+        return this.usesPagesRouter(filePath);
+    }
+    // Client/Server Component Detection
+    hasUseClient(content) {
+        return /["']use client["']/.test(content);
+    }
+    hasUseServer(content) {
+        return /["']use server["']/.test(content);
+    }
+    hasClientHookInServerComponent(content, filePath) {
+        const isServerComponent = this.isAppRouter(filePath) && !this.hasUseClient(content);
+        const hasClientHooks = /useState|useEffect|useContext/.test(content);
+        return isServerComponent && hasClientHooks;
+    }
+    // Server Actions
+    hasServerAction(content) {
+        return this.usesServerActions(content);
+    }
+    hasFormAction(content) {
+        return /action=\{/.test(content) || /<form\s+action=/.test(content);
+    }
+    // Data Fetching
+    hasAsyncComponent(content) {
+        return this.checkAsyncComponent(content);
+    }
+    checkAsyncComponent(content) {
+        return /export default async function/.test(content) || /export async function/.test(content);
+    }
+    hasGetServerSideProps(content) {
+        return /export\s+(async\s+)?function\s+getServerSideProps/.test(content);
+    }
+    hasGetStaticProps(content) {
+        return /export\s+(async\s+)?function\s+getStaticProps/.test(content);
+    }
+    // Navigation
+    hasLinkComponent(content) {
+        return /import.*Link.*from\s+['"]next\/link['"]/.test(content) || /<Link/.test(content);
+    }
+    hasUseRouter(content) {
+        return /useRouter\s*\(/.test(content);
+    }
+    hasRedirect(content) {
+        return /redirect\s*\(/.test(content) || /permanentRedirect\s*\(/.test(content);
+    }
+    hasDynamicRoute(filePath) {
+        return /\[[\w]+\]/.test(filePath);
+    }
+    // Performance
+    hasImageComponent(content) {
+        return /import.*Image.*from\s+['"]next\/image['"]/.test(content) || /<Image/.test(content);
+    }
+    hasDynamicImport(content) {
+        return /dynamic\s*\(/.test(content) || /import\s*\(/.test(content);
+    }
+    hasSuspense(content) {
+        return /<Suspense/.test(content);
+    }
+    hasLoadingFile(filePath) {
+        return /loading\.(tsx?|jsx?)$/.test(filePath);
+    }
+    // SEO
+    hasMetadata(content) {
+        return this.checkMetadata(content);
+    }
+    checkMetadata(content) {
+        return content.includes('export const metadata') || content.includes('export async function generateMetadata');
+    }
+    hasGenerateMetadata(content) {
+        return /export\s+(async\s+)?function\s+generateMetadata/.test(content);
+    }
+    hasSitemap(filePath) {
+        return /sitemap\.(xml|ts|tsx|js|jsx)$/.test(filePath);
+    }
+    hasRobots(filePath) {
+        return /robots\.(txt|ts|tsx|js|jsx)$/.test(filePath);
+    }
+    // File Conventions
+    hasLayout(filePath) {
+        return /layout\.(tsx?|jsx?)$/.test(filePath);
+    }
+    hasErrorBoundary(filePath) {
+        return this.checkHasErrorBoundary(filePath);
+    }
+    checkHasErrorBoundary(filePath) {
+        return /error\.(tsx?|jsx?)$/.test(filePath);
+    }
+    hasNotFound(filePath) {
+        return /not-found\.(tsx?|jsx?)$/.test(filePath);
     }
     /**
      * Check if using Pages Router
@@ -282,30 +379,11 @@ export class JamesNextJS extends EnhancedJames {
         return content.includes('fonts.googleapis.com') || content.includes('link rel="preload"');
     }
     /**
-     * Check if file is a page component
-     */
-    isPageComponent(filePath) {
-        return filePath.includes('/page.tsx') || filePath.includes('/page.ts');
-    }
-    /**
-     * Check for metadata export
-     */
-    hasMetadata(content) {
-        return content.includes('export const metadata') || content.includes('export async function generateMetadata');
-    }
-    /**
      * Check for loading state file
      */
     hasLoadingState(filePath) {
         const dir = filePath.substring(0, filePath.lastIndexOf('/'));
         return false; // In real implementation, check if ${dir}/loading.tsx exists
-    }
-    /**
-     * Check for error boundary file
-     */
-    hasErrorBoundary(filePath) {
-        const dir = filePath.substring(0, filePath.lastIndexOf('/'));
-        return false; // In real implementation, check if ${dir}/error.tsx exists
     }
     /**
      * Check for form submission
@@ -320,22 +398,10 @@ export class JamesNextJS extends EnhancedJames {
         return content.includes('"use server"') || content.includes('action=');
     }
     /**
-     * Check if component is async
-     */
-    hasAsyncComponent(content) {
-        return /export default async function/.test(content) || /export async function/.test(content);
-    }
-    /**
      * Check if component is large (heuristic)
      */
     hasLargeComponent(content) {
         return content.length > 2000; // Lines of code
-    }
-    /**
-     * Check if file is a route handler
-     */
-    isRouteHandler(filePath) {
-        return filePath.includes('/route.ts') || filePath.includes('/route.tsx');
     }
     /**
      * Check for proper route handler exports
@@ -357,18 +423,6 @@ export class JamesNextJS extends EnhancedJames {
         return filePath.includes('/@');
     }
     /**
-     * Check if file is middleware
-     */
-    isMiddleware(filePath) {
-        return filePath.includes('middleware.ts') || filePath.includes('middleware.tsx');
-    }
-    /**
-     * Check for proper middleware patterns
-     */
-    hasProperMiddlewarePatterns(content) {
-        return content.includes('NextResponse') && content.includes('export const config');
-    }
-    /**
      * Generate Next.js-specific recommendations
      */
     generateNextJSRecommendations(content) {
@@ -382,7 +436,7 @@ export class JamesNextJS extends EnhancedJames {
             recommendations.push('Configure fetch caching strategy (force-cache, no-store, revalidate)');
         }
         // Incremental Static Regeneration
-        if (this.isPageComponent(content)) {
+        if (content.includes('export default')) {
             recommendations.push('Consider ISR with revalidate for pages with dynamic but cacheable content');
         }
         // Edge Runtime

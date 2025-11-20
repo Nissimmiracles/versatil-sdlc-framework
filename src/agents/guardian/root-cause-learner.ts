@@ -73,6 +73,7 @@ export interface RootCauseAnalysisConfig {
  * Root Cause Learning Engine
  */
 export class RootCauseLearner {
+  private static instance: RootCauseLearner;
   private logger: GuardianLogger;
   private config: RootCauseAnalysisConfig;
   private patternsFile: string;
@@ -98,6 +99,16 @@ export class RootCauseLearner {
 
     this.patternsFile = path.join(patternsDir, 'patterns.jsonl');
     this.loadPatternsCache();
+  }
+
+  /**
+   * Get singleton instance
+   */
+  public static getInstance(config?: Partial<RootCauseAnalysisConfig>): RootCauseLearner {
+    if (!RootCauseLearner.instance) {
+      RootCauseLearner.instance = new RootCauseLearner(config);
+    }
+    return RootCauseLearner.instance;
   }
 
   /**

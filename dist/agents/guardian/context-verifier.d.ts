@@ -55,3 +55,47 @@ export interface ContextVerificationResult {
  * @param resolvedContext - Optional resolved context from Context Priority Resolver (v7.8.0)
  */
 export declare function verifyContextIssue(issue: HealthIssue, workingDir: string, userId?: string, teamId?: string, projectId?: string, resolvedContext?: any): Promise<ContextVerificationResult>;
+/**
+ * ContextVerifier Class (Singleton)
+ * Wraps the functional context verification API in a class for testing
+ */
+export declare class ContextVerifier {
+    private static instance;
+    private currentContext;
+    private constructor();
+    /**
+     * Get singleton instance
+     */
+    static getInstance(): ContextVerifier;
+    /**
+     * Get current context
+     */
+    getCurrentContext(): 'FRAMEWORK_CONTEXT' | 'PROJECT_CONTEXT';
+    /**
+     * Set current context
+     */
+    setContext(context: 'FRAMEWORK_CONTEXT' | 'PROJECT_CONTEXT'): void;
+    /**
+     * Detect context from file path
+     */
+    detectContextFromPath(filePath: string): 'FRAMEWORK_CONTEXT' | 'PROJECT_CONTEXT';
+    /**
+     * Verify context issue (delegates to functional API)
+     */
+    verifyContextIssue(issue: HealthIssue, workingDir: string, userId?: string, teamId?: string, projectId?: string, resolvedContext?: any): Promise<ContextVerificationResult>;
+    /**
+     * Validate context operations
+     */
+    validateContextOperation(operation: string, targetContext: 'FRAMEWORK_CONTEXT' | 'PROJECT_CONTEXT'): {
+        allowed: boolean;
+        reason?: string;
+    };
+    /**
+     * Detect context leaks
+     */
+    detectContextLeak(sourceContext: string, targetContext: string, operation: string): boolean;
+    /**
+     * Reset singleton (for testing)
+     */
+    static resetInstance(): void;
+}

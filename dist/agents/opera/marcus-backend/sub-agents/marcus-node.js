@@ -46,6 +46,9 @@ export class MarcusNode extends EnhancedMarcus {
     /**
      * Analyze Node.js-specific patterns
      */
+    async analyzeNodePatterns(context) {
+        return this.analyzeNodeJSPatterns(context);
+    }
     async analyzeNodeJSPatterns(context) {
         const content = context.content || '';
         const suggestions = [];
@@ -308,6 +311,62 @@ export class MarcusNode extends EnhancedMarcus {
         if (content.includes('hapi'))
             return 'Hapi';
         return 'Node.js (no framework)';
+    }
+    // Security Pattern Detection Methods
+    detectSQLInjection(content) {
+        const hasQuery = /\.query\(/.test(content) || /\.execute\(/.test(content);
+        const hasStringConcat = /\+\s*req\.|`\$\{req\./.test(content);
+        return hasQuery && hasStringConcat;
+    }
+    detectMissingValidation(content) {
+        const hasReqBody = /req\.body/.test(content);
+        const hasValidation = /express-validator|joi|yup|zod/.test(content);
+        return hasReqBody && !hasValidation;
+    }
+    detectExposedSecrets(content) {
+        const patterns = [
+            /API_KEY\s*=\s*["'][^"']+["']/,
+            /PASSWORD\s*=\s*["'][^"']+["']/,
+            /sk_live_[\w]+/,
+            /ghp_[\w]+/
+        ];
+        return patterns.some(pattern => pattern.test(content));
+    }
+    detectMissingAuth(content) {
+        const isDeleteRoute = /app\.(delete|put)\(/.test(content) || /router\.(delete|put)\(/.test(content);
+        const hasAuth = /authenticate|requireAuth|isAuth/.test(content);
+        return isDeleteRoute && !hasAuth;
+    }
+    detectMissingErrorHandling(content) {
+        const hasAsync = /async\s+\(/.test(content);
+        const hasTryCatch = /try\s*\{/.test(content);
+        const hasNext = /next\(/.test(content);
+        return hasAsync && !hasTryCatch && !hasNext;
+    }
+    detectNPlusOne(content) {
+        return /forEach|map.*await/.test(content) && /\.(find|get|fetch)/.test(content);
+    }
+    detectBlockingOperations(content) {
+        return this.hasBlockingOperations(content);
+    }
+    detectMissingSecurityMiddleware(content) {
+        const hasExpress = /express\(\)/.test(content);
+        const hasHelmet = content.includes('helmet');
+        const hasCors = content.includes('cors');
+        return hasExpress && (!hasHelmet || !hasCors);
+    }
+    detectMissingEnvValidation(content) {
+        const usesEnv = /process\.env\./.test(content);
+        const hasValidation = /dotenv-safe|envalid|joi\.validate/.test(content);
+        return usesEnv && !hasValidation;
+    }
+    detectMissingConnectionPooling(content) {
+        const hasNewClient = /new\s+Client\s*\(/.test(content);
+        const hasPool = /Pool|pool/.test(content);
+        return hasNewClient && !hasPool;
+    }
+    hasGlobalErrorHandler(content) {
+        return this.hasErrorMiddleware(content);
     }
 }
 //# sourceMappingURL=marcus-node.js.map

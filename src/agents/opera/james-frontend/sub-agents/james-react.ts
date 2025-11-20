@@ -65,7 +65,7 @@ export class JamesReact extends EnhancedJames {
   /**
    * Analyze React-specific patterns
    */
-  private async analyzeReactPatterns(context: AgentActivationContext): Promise<{
+  public async analyzeReactPatterns(context: AgentActivationContext): Promise<{
     score: number;
     suggestions: Array<{ type: string; message: string; priority: string }>;
     bestPractices: ReactBestPractices;
@@ -246,14 +246,14 @@ export class JamesReact extends EnhancedJames {
   /**
    * Detect class components
    */
-  private hasClassComponents(content: string): boolean {
+  public hasClassComponents(content: string): boolean {
     return content.includes('extends React.Component') || content.includes('extends Component');
   }
 
   /**
    * Detect conditional Hook calls
    */
-  private hasConditionalHooks(content: string): boolean {
+  public hasConditionalHooks(content: string): boolean {
     const lines = content.split('\n');
     let inCondition = false;
 
@@ -277,7 +277,7 @@ export class JamesReact extends EnhancedJames {
   /**
    * Detect missing dependency arrays
    */
-  private hasMissingDependencies(content: string): boolean {
+  public hasMissingDependencies(content: string): boolean {
     // Check for useEffect without second argument
     const useEffectWithoutDeps = /useEffect\s*\(\s*\([^)]*\)\s*=>\s*\{[\s\S]*?\}\s*\)/g;
     return useEffectWithoutDeps.test(content);
@@ -286,7 +286,7 @@ export class JamesReact extends EnhancedJames {
   /**
    * Detect unnecessary re-renders
    */
-  private hasUnnecessaryRerenders(content: string): boolean {
+  public hasUnnecessaryRerenders(content: string): boolean {
     // Check for expensive computations without useMemo
     return content.includes('.map(') && !content.includes('useMemo') && !content.includes('React.memo');
   }

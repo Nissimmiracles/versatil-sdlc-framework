@@ -64,6 +64,14 @@ export class MarcusNode extends EnhancedMarcus {
   /**
    * Analyze Node.js-specific patterns
    */
+  public async analyzeNodePatterns(context: AgentActivationContext): Promise<{
+    score: number;
+    suggestions: Array<{ type: string; message: string; priority: string }>;
+    bestPractices: NodeJSBestPractices;
+  }> {
+    return this.analyzeNodeJSPatterns(context);
+  }
+
   private async analyzeNodeJSPatterns(context: AgentActivationContext): Promise<{
     score: number;
     suggestions: Array<{ type: string; message: string; priority: string }>;
@@ -361,5 +369,72 @@ export class MarcusNode extends EnhancedMarcus {
     if (content.includes('@nestjs')) return 'NestJS';
     if (content.includes('hapi')) return 'Hapi';
     return 'Node.js (no framework)';
+  }
+
+  // Security Pattern Detection Methods
+  public detectSQLInjection(content: string): boolean {
+    const hasQuery = /\.query\(/.test(content) || /\.execute\(/.test(content);
+    const hasStringConcat = /\+\s*req\.|`\$\{req\./.test(content);
+    return hasQuery && hasStringConcat;
+  }
+
+  public detectMissingValidation(content: string): boolean {
+    const hasReqBody = /req\.body/.test(content);
+    const hasValidation = /express-validator|joi|yup|zod/.test(content);
+    return hasReqBody && !hasValidation;
+  }
+
+  public detectExposedSecrets(content: string): boolean {
+    const patterns = [
+      /API_KEY\s*=\s*["'][^"']+["']/,
+      /PASSWORD\s*=\s*["'][^"']+["']/,
+      /sk_live_[\w]+/,
+      /ghp_[\w]+/
+    ];
+    return patterns.some(pattern => pattern.test(content));
+  }
+
+  public detectMissingAuth(content: string): boolean {
+    const isDeleteRoute = /app\.(delete|put)\(/.test(content) || /router\.(delete|put)\(/.test(content);
+    const hasAuth = /authenticate|requireAuth|isAuth/.test(content);
+    return isDeleteRoute && !hasAuth;
+  }
+
+  public detectMissingErrorHandling(content: string): boolean {
+    const hasAsync = /async\s+\(/.test(content);
+    const hasTryCatch = /try\s*\{/.test(content);
+    const hasNext = /next\(/.test(content);
+    return hasAsync && !hasTryCatch && !hasNext;
+  }
+
+  public detectNPlusOne(content: string): boolean {
+    return /forEach|map.*await/.test(content) && /\.(find|get|fetch)/.test(content);
+  }
+
+  public detectBlockingOperations(content: string): boolean {
+    return this.hasBlockingOperations(content);
+  }
+
+  public detectMissingSecurityMiddleware(content: string): boolean {
+    const hasExpress = /express\(\)/.test(content);
+    const hasHelmet = content.includes('helmet');
+    const hasCors = content.includes('cors');
+    return hasExpress && (!hasHelmet || !hasCors);
+  }
+
+  public detectMissingEnvValidation(content: string): boolean {
+    const usesEnv = /process\.env\./.test(content);
+    const hasValidation = /dotenv-safe|envalid|joi\.validate/.test(content);
+    return usesEnv && !hasValidation;
+  }
+
+  public detectMissingConnectionPooling(content: string): boolean {
+    const hasNewClient = /new\s+Client\s*\(/.test(content);
+    const hasPool = /Pool|pool/.test(content);
+    return hasNewClient && !hasPool;
+  }
+
+  public hasGlobalErrorHandler(content: string): boolean {
+    return this.hasErrorMiddleware(content);
   }
 }

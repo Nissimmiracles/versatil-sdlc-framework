@@ -66,7 +66,7 @@ export class JamesSvelte extends EnhancedJames {
   /**
    * Analyze Svelte-specific patterns
    */
-  private async analyzeSveltePatterns(context: AgentActivationContext): Promise<{
+  public async analyzeSveltePatterns(context: AgentActivationContext): Promise<{
     score: number;
     suggestions: Array<{ type: string; message: string; priority: string }>;
     bestPractices: SvelteBestPractices;
@@ -139,7 +139,7 @@ export class JamesSvelte extends EnhancedJames {
     }
 
     // Check for missing TypeScript
-    if (!this.hasTypeScript(content)) {
+    if (!this.checkTypeScript(content)) {
       score -= 5;
       suggestions.push({
         type: 'type-safety',
@@ -276,6 +276,148 @@ export class JamesSvelte extends EnhancedJames {
     };
   }
 
+  // Svelte 5 Runes Detection Methods
+  public hasStateRune(content: string): boolean {
+    return /\$state\s*\(/.test(content);
+  }
+
+  public hasDerivedRune(content: string): boolean {
+    return /\$derived\s*\(/.test(content);
+  }
+
+  public hasEffectRune(content: string): boolean {
+    return /\$effect\s*\(/.test(content);
+  }
+
+  public hasPropsRune(content: string): boolean {
+    return /\$props\s*\(/.test(content);
+  }
+
+  // Legacy Reactivity Detection
+  public hasReactiveDeclaration(content: string): boolean {
+    return /\$:\s*\w+\s*=/.test(content);
+  }
+
+  public hasReactiveStatement(content: string): boolean {
+    return /\$:\s+/.test(content) && !/:=/.test(content);
+  }
+
+  public hasReactiveBlock(content: string): boolean {
+    return /\$:\s*\{/.test(content);
+  }
+
+  // Component Patterns
+  public hasScript(content: string): boolean {
+    return /<script/.test(content);
+  }
+
+  public hasTypeScript(content: string): boolean {
+    return this.checkTypeScript(content);
+  }
+
+  private checkTypeScript(content: string): boolean {
+    return /<script\s+lang=["']ts["']/.test(content);
+  }
+
+  public hasEventHandler(content: string): boolean {
+    return /on:\w+/.test(content);
+  }
+
+  public hasEventDispatcher(content: string): boolean {
+    return /createEventDispatcher/.test(content);
+  }
+
+  // Store Patterns
+  public hasWritableStore(content: string): boolean {
+    return /writable\s*\(/.test(content);
+  }
+
+  public hasReadableStore(content: string): boolean {
+    return /readable\s*\(/.test(content);
+  }
+
+  public hasDerivedStore(content: string): boolean {
+    return /derived\s*\(/.test(content);
+  }
+
+  public hasStoreSubscription(content: string): boolean {
+    return /\.subscribe\s*\(/.test(content);
+  }
+
+  // SvelteKit Routing
+  public isPageFile(filePath: string): boolean {
+    return /\+page\.svelte$/.test(filePath);
+  }
+
+  public isLayoutFile(filePath: string): boolean {
+    return /\+layout\.svelte$/.test(filePath);
+  }
+
+  public isServerFile(filePath: string): boolean {
+    return /\+page\.server\.(ts|js)$/.test(filePath) || /\+layout\.server\.(ts|js)$/.test(filePath);
+  }
+
+  public hasLoadFunction(content: string): boolean {
+    return /export\s+(async\s+)?function\s+load/.test(content) || /export\s+const\s+load/.test(content);
+  }
+
+  public hasFormAction(content: string): boolean {
+    return /export\s+const\s+actions/.test(content);
+  }
+
+  // Template Syntax
+  public hasIfBlock(content: string): boolean {
+    return /\{#if\s/.test(content);
+  }
+
+  public hasEachBlock(content: string): boolean {
+    return /\{#each\s/.test(content);
+  }
+
+  public hasAwaitBlock(content: string): boolean {
+    return /\{#await\s/.test(content);
+  }
+
+  public hasKeyBlock(content: string): boolean {
+    return /\{#key\s/.test(content);
+  }
+
+  public hasMissingKeyedEach(content: string): boolean {
+    const hasEach = this.hasEachBlock(content);
+    const hasKey = /\{#each\s+[^}]+\([^)]+\)/.test(content);
+    return hasEach && !hasKey;
+  }
+
+  // Lifecycle and Special Elements
+  public hasOnMount(content: string): boolean {
+    return /onMount\s*\(/.test(content);
+  }
+
+  public hasOnDestroy(content: string): boolean {
+    return /onDestroy\s*\(/.test(content);
+  }
+
+  public hasBeforeUpdate(content: string): boolean {
+    return /beforeUpdate\s*\(/.test(content);
+  }
+
+  public hasAfterUpdate(content: string): boolean {
+    return /afterUpdate\s*\(/.test(content);
+  }
+
+  public hasSvelteWindow(content: string): boolean {
+    return /<svelte:window/.test(content);
+  }
+
+  public hasSvelteComponent(content: string): boolean {
+    return /<svelte:component/.test(content);
+  }
+
+  // Performance
+  public hasImmutable(content: string): boolean {
+    return /<svelte:options\s+immutable/.test(content);
+  }
+
   /**
    * Check for improper reactive statements
    */
@@ -318,19 +460,6 @@ export class JamesSvelte extends EnhancedJames {
     return content.includes('$state') || content.includes('$derived') || content.includes('$effect');
   }
 
-  /**
-   * Check if Svelte 5 project
-   */
-  private isSvelte5(content: string): boolean {
-    return content.includes('svelte@5') || content.includes('svelte/stores') && content.includes('$state');
-  }
-
-  /**
-   * Check for TypeScript
-   */
-  private hasTypeScript(content: string): boolean {
-    return content.includes('lang="ts"') || content.includes("lang='ts'");
-  }
 
   /**
    * Check for improper prop binding
@@ -509,6 +638,10 @@ export class JamesSvelte extends EnhancedJames {
    * Detect Svelte version
    */
   detectSvelteVersion(content: string): string {
+    return this.checkSvelteVersion(content);
+  }
+
+  private checkSvelteVersion(content: string): string {
     if (content.includes('$state') || content.includes('$derived')) return 'Svelte 5 (Runes)';
     if (content.includes('SvelteKit')) return 'Svelte 4 (SvelteKit)';
     if (content.includes('$:')) return 'Svelte 4';
@@ -523,5 +656,9 @@ export class JamesSvelte extends EnhancedJames {
     if (content.includes('writable') || content.includes('readable')) return 'Svelte Stores';
     if (content.includes('context')) return 'Context API';
     return 'Component State';
+  }
+
+  private isSvelte5(content: string): boolean {
+    return content.includes('svelte@5') || (content.includes('svelte/stores') && content.includes('$state'));
   }
 }

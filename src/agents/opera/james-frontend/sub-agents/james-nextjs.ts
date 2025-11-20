@@ -67,6 +67,14 @@ export class JamesNextJS extends EnhancedJames {
   /**
    * Analyze Next.js-specific patterns
    */
+  public async analyzeNextPatterns(context: AgentActivationContext): Promise<{
+    score: number;
+    suggestions: Array<{ type: string; message: string; priority: string }>;
+    bestPractices: NextJSBestPractices;
+  }> {
+    return this.analyzeNextJSPatterns(context);
+  }
+
   private async analyzeNextJSPatterns(context: AgentActivationContext): Promise<{
     score: number;
     suggestions: Array<{ type: string; message: string; priority: string }>;
@@ -174,7 +182,7 @@ export class JamesNextJS extends EnhancedJames {
     }
 
     // Check for metadata API
-    if (this.isPageComponent(filePath) && !this.hasMetadata(content)) {
+    if (filePath.includes('/page.') && !this.checkMetadata(content)) {
       score -= 5;
       suggestions.push({
         type: 'seo',
@@ -185,7 +193,7 @@ export class JamesNextJS extends EnhancedJames {
     }
 
     // Check for loading UI
-    if (this.isPageComponent(filePath) && !this.hasLoadingState(filePath)) {
+    if (filePath.includes('/page.') && !this.hasLoadingState(filePath)) {
       suggestions.push({
         type: 'ux',
         message: 'Page missing loading.tsx. Add loading UI for better UX during Suspense.',
@@ -195,7 +203,7 @@ export class JamesNextJS extends EnhancedJames {
     }
 
     // Check for error handling
-    if (this.isPageComponent(filePath) && !this.hasErrorBoundary(filePath)) {
+    if (filePath.includes('/page.') && !this.checkHasErrorBoundary(filePath)) {
       suggestions.push({
         type: 'error-handling',
         message: 'Page missing error.tsx. Add error boundary for better error handling.',
@@ -216,7 +224,7 @@ export class JamesNextJS extends EnhancedJames {
     }
 
     // Check for streaming with Suspense
-    if (this.hasAsyncComponent(content) && !content.includes('Suspense')) {
+    if (this.checkAsyncComponent(content) && !content.includes('Suspense')) {
       score -= 10;
       suggestions.push({
         type: 'performance',
@@ -237,7 +245,7 @@ export class JamesNextJS extends EnhancedJames {
     }
 
     // Check for route handlers best practices
-    if (this.isRouteHandler(filePath)) {
+    if (filePath.includes('/route.')) {
       if (!this.hasProperRouteHandlerExports(content)) {
         score -= 10;
         suggestions.push({
@@ -260,7 +268,7 @@ export class JamesNextJS extends EnhancedJames {
     }
 
     // Check for middleware patterns
-    if (this.isMiddleware(filePath) && !this.hasProperMiddlewarePatterns(content)) {
+    if (filePath.includes('middleware.') && !(content.includes('NextResponse') && content.includes('export const config'))) {
       score -= 10;
       suggestions.push({
         type: 'middleware',
@@ -275,6 +283,128 @@ export class JamesNextJS extends EnhancedJames {
       suggestions,
       bestPractices
     };
+  }
+
+  // Router Detection
+  public hasAppRouter(filePath: string): boolean {
+    return this.isAppRouter(filePath);
+  }
+
+  public hasPagesRouter(filePath: string): boolean {
+    return this.usesPagesRouter(filePath);
+  }
+
+  // Client/Server Component Detection
+  public hasUseClient(content: string): boolean {
+    return /["']use client["']/.test(content);
+  }
+
+  public hasUseServer(content: string): boolean {
+    return /["']use server["']/.test(content);
+  }
+
+  public hasClientHookInServerComponent(content: string, filePath: string): boolean {
+    const isServerComponent = this.isAppRouter(filePath) && !this.hasUseClient(content);
+    const hasClientHooks = /useState|useEffect|useContext/.test(content);
+    return isServerComponent && hasClientHooks;
+  }
+
+  // Server Actions
+  public hasServerAction(content: string): boolean {
+    return this.usesServerActions(content);
+  }
+
+  public hasFormAction(content: string): boolean {
+    return /action=\{/.test(content) || /<form\s+action=/.test(content);
+  }
+
+  // Data Fetching
+  public hasAsyncComponent(content: string): boolean {
+    return this.checkAsyncComponent(content);
+  }
+
+  private checkAsyncComponent(content: string): boolean {
+    return /export default async function/.test(content) || /export async function/.test(content);
+  }
+
+  public hasGetServerSideProps(content: string): boolean {
+    return /export\s+(async\s+)?function\s+getServerSideProps/.test(content);
+  }
+
+  public hasGetStaticProps(content: string): boolean {
+    return /export\s+(async\s+)?function\s+getStaticProps/.test(content);
+  }
+
+  // Navigation
+  public hasLinkComponent(content: string): boolean {
+    return /import.*Link.*from\s+['"]next\/link['"]/.test(content) || /<Link/.test(content);
+  }
+
+  public hasUseRouter(content: string): boolean {
+    return /useRouter\s*\(/.test(content);
+  }
+
+  public hasRedirect(content: string): boolean {
+    return /redirect\s*\(/.test(content) || /permanentRedirect\s*\(/.test(content);
+  }
+
+  public hasDynamicRoute(filePath: string): boolean {
+    return /\[[\w]+\]/.test(filePath);
+  }
+
+  // Performance
+  public hasImageComponent(content: string): boolean {
+    return /import.*Image.*from\s+['"]next\/image['"]/.test(content) || /<Image/.test(content);
+  }
+
+  public hasDynamicImport(content: string): boolean {
+    return /dynamic\s*\(/.test(content) || /import\s*\(/.test(content);
+  }
+
+  public hasSuspense(content: string): boolean {
+    return /<Suspense/.test(content);
+  }
+
+  public hasLoadingFile(filePath: string): boolean {
+    return /loading\.(tsx?|jsx?)$/.test(filePath);
+  }
+
+  // SEO
+  public hasMetadata(content: string): boolean {
+    return this.checkMetadata(content);
+  }
+
+  private checkMetadata(content: string): boolean {
+    return content.includes('export const metadata') || content.includes('export async function generateMetadata');
+  }
+
+  public hasGenerateMetadata(content: string): boolean {
+    return /export\s+(async\s+)?function\s+generateMetadata/.test(content);
+  }
+
+  public hasSitemap(filePath: string): boolean {
+    return /sitemap\.(xml|ts|tsx|js|jsx)$/.test(filePath);
+  }
+
+  public hasRobots(filePath: string): boolean {
+    return /robots\.(txt|ts|tsx|js|jsx)$/.test(filePath);
+  }
+
+  // File Conventions
+  public hasLayout(filePath: string): boolean {
+    return /layout\.(tsx?|jsx?)$/.test(filePath);
+  }
+
+  public hasErrorBoundary(filePath: string): boolean {
+    return this.checkHasErrorBoundary(filePath);
+  }
+
+  private checkHasErrorBoundary(filePath: string): boolean {
+    return /error\.(tsx?|jsx?)$/.test(filePath);
+  }
+
+  public hasNotFound(filePath: string): boolean {
+    return /not-found\.(tsx?|jsx?)$/.test(filePath);
   }
 
   /**
@@ -333,20 +463,6 @@ export class JamesNextJS extends EnhancedJames {
   }
 
   /**
-   * Check if file is a page component
-   */
-  private isPageComponent(filePath: string): boolean {
-    return filePath.includes('/page.tsx') || filePath.includes('/page.ts');
-  }
-
-  /**
-   * Check for metadata export
-   */
-  private hasMetadata(content: string): boolean {
-    return content.includes('export const metadata') || content.includes('export async function generateMetadata');
-  }
-
-  /**
    * Check for loading state file
    */
   private hasLoadingState(filePath: string): boolean {
@@ -354,13 +470,6 @@ export class JamesNextJS extends EnhancedJames {
     return false; // In real implementation, check if ${dir}/loading.tsx exists
   }
 
-  /**
-   * Check for error boundary file
-   */
-  private hasErrorBoundary(filePath: string): boolean {
-    const dir = filePath.substring(0, filePath.lastIndexOf('/'));
-    return false; // In real implementation, check if ${dir}/error.tsx exists
-  }
 
   /**
    * Check for form submission
@@ -376,25 +485,12 @@ export class JamesNextJS extends EnhancedJames {
     return content.includes('"use server"') || content.includes('action=');
   }
 
-  /**
-   * Check if component is async
-   */
-  private hasAsyncComponent(content: string): boolean {
-    return /export default async function/.test(content) || /export async function/.test(content);
-  }
 
   /**
    * Check if component is large (heuristic)
    */
   private hasLargeComponent(content: string): boolean {
     return content.length > 2000; // Lines of code
-  }
-
-  /**
-   * Check if file is a route handler
-   */
-  private isRouteHandler(filePath: string): boolean {
-    return filePath.includes('/route.ts') || filePath.includes('/route.tsx');
   }
 
   /**
@@ -420,20 +516,6 @@ export class JamesNextJS extends EnhancedJames {
   }
 
   /**
-   * Check if file is middleware
-   */
-  private isMiddleware(filePath: string): boolean {
-    return filePath.includes('middleware.ts') || filePath.includes('middleware.tsx');
-  }
-
-  /**
-   * Check for proper middleware patterns
-   */
-  private hasProperMiddlewarePatterns(content: string): boolean {
-    return content.includes('NextResponse') && content.includes('export const config');
-  }
-
-  /**
    * Generate Next.js-specific recommendations
    */
   generateNextJSRecommendations(content: string): string[] {
@@ -450,7 +532,7 @@ export class JamesNextJS extends EnhancedJames {
     }
 
     // Incremental Static Regeneration
-    if (this.isPageComponent(content)) {
+    if (content.includes('export default')) {
       recommendations.push('Consider ISR with revalidate for pages with dynamic but cacheable content');
     }
 

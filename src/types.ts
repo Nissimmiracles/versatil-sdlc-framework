@@ -9,6 +9,7 @@ export interface AgentResponse {
   priority: string;
   handoffTo: string[];
   context: any;
+  success?: boolean; // Indicates if activation was successful
   data?: any;
   analysis?: any;
   status?: 'success' | 'error' | 'warning';

@@ -211,6 +211,92 @@ export class JamesAngular extends EnhancedJames {
             bestPractices
         };
     }
+    // Component Patterns
+    hasStandaloneComponent(content) {
+        return /standalone:\s*true/.test(content);
+    }
+    hasModuleBasedComponent(content) {
+        return content.includes('@NgModule') && content.includes('declarations:');
+    }
+    // Signals API
+    hasSignal(content) {
+        return /signal\s*\(/.test(content);
+    }
+    hasComputedSignal(content) {
+        return /computed\s*\(/.test(content);
+    }
+    hasEffect(content) {
+        return /effect\s*\(/.test(content);
+    }
+    // Dependency Injection
+    hasInjectFunction(content) {
+        return /inject\s*\(/.test(content);
+    }
+    hasConstructorInjection(content) {
+        return this.usesConstructorInjection(content);
+    }
+    // RxJS Patterns
+    hasObservableSubscription(content) {
+        return /\.subscribe\s*\(/.test(content);
+    }
+    hasMissingUnsubscribe(content) {
+        return this.hasUnsubscribedObservables(content);
+    }
+    hasAsyncPipe(content) {
+        return /\|\s*async/.test(content);
+    }
+    hasTakeUntil(content) {
+        return /takeUntil\s*\(/.test(content) || /takeUntilDestroyed\s*\(/.test(content);
+    }
+    // NgRx
+    hasNgRxStore(content) {
+        return /Store</.test(content) || content.includes('this.store');
+    }
+    hasNgRxAction(content) {
+        return /createAction\s*\(/.test(content) || /props</.test(content);
+    }
+    hasNgRxEffect(content) {
+        return /@Effect\(\)/.test(content) || /createEffect\s*\(/.test(content);
+    }
+    hasNgRxSelector(content) {
+        return /createSelector\s*\(/.test(content) || /createFeatureSelector/.test(content);
+    }
+    // Performance
+    hasOnPushChangeDetection(content) {
+        return /ChangeDetectionStrategy\.OnPush/.test(content);
+    }
+    hasTrackBy(content) {
+        return /trackBy/.test(content);
+    }
+    hasMissingTrackBy(content) {
+        return this.detectMissingTrackBy(content);
+    }
+    detectMissingTrackBy(content) {
+        const hasNgFor = /\*ngFor/.test(content);
+        const hasTrackBy = this.hasTrackBy(content);
+        return hasNgFor && !hasTrackBy;
+    }
+    // Directives and Templates
+    hasStructuralDirective(content) {
+        return /\*ng(If|For|Switch)/.test(content);
+    }
+    hasNewControlFlow(content) {
+        return /@(if|for|switch)\s*\(/.test(content);
+    }
+    hasTemplateReference(content) {
+        return /#\w+/.test(content);
+    }
+    // Lifecycle Hooks
+    hasLifecycleHook(content, hookName) {
+        return new RegExp(`${hookName}\\s*\\(`).test(content) || new RegExp(`implements\\s+[^{]*${hookName.replace('ng', '')}`).test(content);
+    }
+    // Testing
+    hasTestBed(content) {
+        return /TestBed\./.test(content);
+    }
+    hasComponentFixture(content) {
+        return /ComponentFixture</.test(content);
+    }
     /**
      * Check for NgModule usage
      */
@@ -263,14 +349,6 @@ export class JamesAngular extends EnhancedJames {
      */
     usesTemplateDrivenForms(content) {
         return content.includes('ngModel') || content.includes('FormsModule');
-    }
-    /**
-     * Check for missing trackBy
-     */
-    hasMissingTrackBy(content) {
-        const hasNgFor = content.includes('*ngFor');
-        const hasTrackBy = content.includes('trackBy');
-        return hasNgFor && !hasTrackBy;
     }
     /**
      * Check if component is a container

@@ -168,5 +168,121 @@ export class MarcusGo extends EnhancedMarcus {
             maxExamples: 5
         };
     }
+    // Concurrency Pattern Detection Methods
+    hasGoroutine(content) {
+        return /go\s+func\(/.test(content) || /go\s+\w+\(/.test(content);
+    }
+    hasChannel(content) {
+        return /make\s*\(\s*chan\s/.test(content) || /<-/.test(content);
+    }
+    hasSelectStatement(content) {
+        return /select\s*\{/.test(content);
+    }
+    hasUnbufferedChannelRisk(content) {
+        return /make\s*\(\s*chan\s+\w+\s*\)/.test(content) && !content.includes(', ');
+    }
+    hasMissingGoroutineCleanup(content) {
+        const hasGoroutine = this.hasGoroutine(content);
+        const hasContext = content.includes('context.') || content.includes('ctx.');
+        const hasDoneChannel = content.includes('done') || content.includes('quit');
+        return hasGoroutine && !hasContext && !hasDoneChannel;
+    }
+    hasWaitGroup(content) {
+        return content.includes('sync.WaitGroup') || /wg\.(Add|Wait|Done)/.test(content);
+    }
+    // Error Handling Methods
+    hasIgnoredError(content) {
+        return /,\s*_\s*:=/.test(content) && content.includes('err');
+    }
+    hasErrorWrapping(content) {
+        return /fmt\.Errorf\([^)]*%w/.test(content);
+    }
+    hasCustomErrorType(content) {
+        return /type\s+\w+Error\s+struct/.test(content) && /func\s*\([^)]*\)\s*Error\(\)/.test(content);
+    }
+    hasPanic(content) {
+        return /panic\s*\(/.test(content);
+    }
+    hasRecover(content) {
+        return /recover\s*\(\)/.test(content);
+    }
+    // Interface Design Methods
+    hasInterface(content) {
+        return /type\s+\w+\s+interface\s*\{/.test(content);
+    }
+    hasTypeAssertion(content) {
+        return /\.\([^)]+\)/.test(content);
+    }
+    // Performance Methods
+    hasSlicePreallocation(content) {
+        return /make\s*\(\s*\[\]\w+\s*,\s*\d+\s*,\s*\d+\s*\)/.test(content);
+    }
+    hasStringBuilder(content) {
+        return content.includes('strings.Builder');
+    }
+    hasStringConcatInLoop(content) {
+        const hasLoop = /for\s+/.test(content);
+        const hasStringConcat = /\w+\s*\+=/.test(content) && !content.includes('strings.Builder');
+        return hasLoop && hasStringConcat;
+    }
+    hasSyncPool(content) {
+        return content.includes('sync.Pool');
+    }
+    // Security Methods
+    detectSQLInjection(content) {
+        return this.hasSQLInjectionRisk(content);
+    }
+    hasParameterizedQuery(content) {
+        return /Query\([^)]*\$\d+/.test(content) || /Query\([^)]*\?/.test(content);
+    }
+    hasHardcodedCredentials(content) {
+        const patterns = [
+            /password\s*[:=]\s*["'][^"']+["']/i,
+            /apikey\s*[:=]\s*["'][^"']+["']/i,
+            /secret\s*[:=]\s*["'][^"']+["']/i,
+            /token\s*[:=]\s*["'][^"']+["']/i
+        ];
+        return patterns.some(pattern => pattern.test(content));
+    }
+    hasCryptoUsage(content) {
+        return /import\s+"crypto\//.test(content);
+    }
+    hasUnsafePointer(content) {
+        return content.includes('unsafe.Pointer');
+    }
+    // Memory Management Methods
+    hasDefer(content) {
+        return /defer\s+\w+/.test(content);
+    }
+    hasMissingDefer(content) {
+        const hasResourceOpen = /\w+\s*,\s*err\s*:=\s*os\.Open/.test(content) || /\w+\s*,\s*err\s*:=\s*\w+\.Open/.test(content);
+        const hasDefer = this.hasDefer(content);
+        return hasResourceOpen && !hasDefer;
+    }
+    hasContext(content) {
+        return /context\.Context/.test(content) || /ctx\s+context\.Context/.test(content);
+    }
+    hasContextTimeout(content) {
+        return /context\.WithTimeout/.test(content) || /context\.WithDeadline/.test(content);
+    }
+    // Testing Methods
+    hasTestFunction(content) {
+        return /func\s+Test\w+\s*\(/.test(content);
+    }
+    hasTableDrivenTest(content) {
+        return /tests\s*:=\s*\[\]struct/.test(content) || /tt\s+:=\s+range\s+tests/.test(content);
+    }
+    hasTestHelper(content) {
+        return /t\.Helper\(\)/.test(content);
+    }
+    // Code Quality Methods
+    hasExportedDocumentation(content) {
+        return /\/\/\s*\w+\s+\w+/.test(content) && /func\s+[A-Z]/.test(content);
+    }
+    hasMissingExportedDoc(content) {
+        const hasExportedFunc = /func\s+[A-Z]\w+/.test(content);
+        const hasDoc = this.hasExportedDocumentation(content);
+        return hasExportedFunc && !hasDoc;
+    }
 }
 //# sourceMappingURL=marcus-go.js.map

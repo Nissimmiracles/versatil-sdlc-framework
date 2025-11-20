@@ -33,7 +33,38 @@ export declare class JamesVue extends EnhancedJames {
     /**
      * Analyze Vue-specific patterns
      */
-    private analyzeVuePatterns;
+    analyzeVuePatterns(context: AgentActivationContext): Promise<{
+        score: number;
+        suggestions: Array<{
+            type: string;
+            message: string;
+            priority: string;
+        }>;
+        bestPractices: VueBestPractices;
+        recommendations?: string[];
+    }>;
+    private internalAnalyzeVuePatterns;
+    hasOptionsAPI(content: string): boolean;
+    hasCompositionAPI(content: string): boolean;
+    hasScriptSetup(content: string): boolean;
+    hasRefUsage(content: string): boolean;
+    hasReactiveUsage(content: string): boolean;
+    hasComputedUsage(content: string): boolean;
+    hasMissingValueAccess(content: string): boolean;
+    hasReactiveDestructuring(content: string): boolean;
+    hasLifecycleHook(content: string, hookName: string): boolean;
+    hasWatchEffect(content: string): boolean;
+    hasWatch(content: string): boolean;
+    hasDefineProps(content: string): boolean;
+    hasDefineEmits(content: string): boolean;
+    hasMissingVForKey(content: string): boolean;
+    hasComposableUsage(content: string): boolean;
+    hasProperComposableNaming(content: string): boolean;
+    hasVIf(content: string): boolean;
+    hasVModel(content: string): boolean;
+    hasSlot(content: string): boolean;
+    hasScopedSlot(content: string): boolean;
+    hasUnnecessaryReactive(content: string): boolean;
     /**
      * Detect Options API usage
      */

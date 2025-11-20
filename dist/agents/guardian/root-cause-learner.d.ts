@@ -63,11 +63,16 @@ export interface RootCauseAnalysisConfig {
  * Root Cause Learning Engine
  */
 export declare class RootCauseLearner {
+    private static instance;
     private logger;
     private config;
     private patternsFile;
     private patternsCache;
     constructor(config?: Partial<RootCauseAnalysisConfig>);
+    /**
+     * Get singleton instance
+     */
+    static getInstance(config?: Partial<RootCauseAnalysisConfig>): RootCauseLearner;
     /**
      * Analyze health check history to detect recurring patterns
      */

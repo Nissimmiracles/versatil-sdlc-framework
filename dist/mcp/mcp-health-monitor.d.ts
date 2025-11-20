@@ -105,5 +105,40 @@ export declare class MCPHealthMonitor extends EventEmitter {
     getOverallHealth(): Record<string, MCPHealth & {
         healthy: boolean;
     }>;
+    /**
+     * Check if currently monitoring
+     */
+    isMonitoring(): boolean;
+    /**
+     * Open circuit for an MCP (stop sending requests)
+     */
+    openCircuit(mcpId: string): void;
+    /**
+     * Close circuit for an MCP (resume sending requests)
+     */
+    closeCircuit(mcpId: string): void;
+    /**
+     * Set circuit to half-open (testing recovery)
+     */
+    halfOpenCircuit(mcpId: string): void;
+    /**
+     * Get circuit breaker statistics
+     */
+    getCircuitBreakerStats(): {
+        total: number;
+        open: number;
+        closed: number;
+        halfOpen: number;
+    };
+    /**
+     * Generate comprehensive health report
+     */
+    generateHealthReport(): {
+        timestamp: Date;
+        overallHealth: number;
+        mcps: MCPHealth[];
+        circuitBreakers: ReturnType<typeof this.getCircuitBreakerStats>;
+        recommendations: string[];
+    };
 }
 export declare const globalMCPHealthMonitor: MCPHealthMonitor;

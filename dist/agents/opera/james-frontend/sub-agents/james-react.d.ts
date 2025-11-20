@@ -33,23 +33,31 @@ export declare class JamesReact extends EnhancedJames {
     /**
      * Analyze React-specific patterns
      */
-    private analyzeReactPatterns;
+    analyzeReactPatterns(context: AgentActivationContext): Promise<{
+        score: number;
+        suggestions: Array<{
+            type: string;
+            message: string;
+            priority: string;
+        }>;
+        bestPractices: ReactBestPractices;
+    }>;
     /**
      * Detect class components
      */
-    private hasClassComponents;
+    hasClassComponents(content: string): boolean;
     /**
      * Detect conditional Hook calls
      */
-    private hasConditionalHooks;
+    hasConditionalHooks(content: string): boolean;
     /**
      * Detect missing dependency arrays
      */
-    private hasMissingDependencies;
+    hasMissingDependencies(content: string): boolean;
     /**
      * Detect unnecessary re-renders
      */
-    private hasUnnecessaryRerenders;
+    hasUnnecessaryRerenders(content: string): boolean;
     /**
      * Detect inline objects in JSX
      */

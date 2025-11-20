@@ -51,10 +51,21 @@ export interface DirectorySize {
  * Analyzes IDE crash risk and suggests optimizations
  */
 export class IDEPerformanceDetector {
+  private static instance: IDEPerformanceDetector;
   private projectRoot: string;
 
   constructor(projectRoot: string = process.cwd()) {
     this.projectRoot = projectRoot;
+  }
+
+  /**
+   * Get singleton instance
+   */
+  public static getInstance(projectRoot?: string): IDEPerformanceDetector {
+    if (!IDEPerformanceDetector.instance) {
+      IDEPerformanceDetector.instance = new IDEPerformanceDetector(projectRoot);
+    }
+    return IDEPerformanceDetector.instance;
   }
 
   /**

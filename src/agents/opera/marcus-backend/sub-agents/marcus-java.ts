@@ -47,7 +47,7 @@ export class MarcusJava extends EnhancedMarcus {
     return response;
   }
 
-  private async analyzeJavaPatterns(context: AgentActivationContext) {
+  public async analyzeJavaPatterns(context: AgentActivationContext) {
     const content = context.content || '';
     const suggestions: Array<{ type: string; message: string; priority: string }> = [];
     let score = 100;
@@ -215,5 +215,159 @@ export class MarcusJava extends EnhancedMarcus {
       agentDomain: 'backend-java',
       maxExamples: 5
     };
+  }
+
+  // Spring Boot Pattern Detection Methods
+  public hasRestController(content: string): boolean {
+    return content.includes('@RestController');
+  }
+
+  public hasService(content: string): boolean {
+    return content.includes('@Service');
+  }
+
+  public hasRepository(content: string): boolean {
+    return content.includes('@Repository');
+  }
+
+  public hasAutowired(content: string): boolean {
+    return content.includes('@Autowired');
+  }
+
+  // JPA/Hibernate Methods
+  public hasEntity(content: string): boolean {
+    return content.includes('@Entity');
+  }
+
+  public hasNPlusOne(content: string): boolean {
+    return this.hasNPlusOnePattern(content);
+  }
+
+  public hasEntityGraph(content: string): boolean {
+    return content.includes('@EntityGraph');
+  }
+
+  // Security Methods
+  public detectSQLInjection(content: string): boolean {
+    return this.hasSQLInjectionRisk(content);
+  }
+
+  public hasParameterizedQuery(content: string): boolean {
+    return /setParameter\s*\(/.test(content) || /:[\w]+/.test(content);
+  }
+
+  public hasPreAuthorize(content: string): boolean {
+    return content.includes('@PreAuthorize');
+  }
+
+  public hasMissingAuth(content: string): boolean {
+    const isDeleteMapping = /@DeleteMapping/.test(content) || /@PutMapping/.test(content);
+    const hasAuth = content.includes('@PreAuthorize') || content.includes('@Secured');
+    return isDeleteMapping && !hasAuth;
+  }
+
+  public hasPasswordEncoder(content: string): boolean {
+    return /PasswordEncoder|BCryptPasswordEncoder/.test(content);
+  }
+
+  public hasHardcodedSecrets(content: string): boolean {
+    const patterns = [
+      /["']sk_live_[\w]+["']/,
+      /["']api[_-]?key["']\s*[:=]\s*["'][\w]+["']/i,
+      /password\s*=\s*["'][\w]+["']/i
+    ];
+    return patterns.some(pattern => pattern.test(content));
+  }
+
+  // Exception Handling Methods
+  public hasControllerAdvice(content: string): boolean {
+    return content.includes('@ControllerAdvice');
+  }
+
+  public hasCustomException(content: string): boolean {
+    return /class\s+\w+Exception\s+extends/.test(content);
+  }
+
+  public hasEmptyCatch(content: string): boolean {
+    return /catch\s*\([^)]+\)\s*\{\s*\}/.test(content) || /catch\s*\([^)]+\)\s*\{\s*\/\//.test(content);
+  }
+
+  // Java 17+ Feature Methods
+  public hasRecord(content: string): boolean {
+    return /public\s+record\s+\w+/.test(content);
+  }
+
+  public hasSealed(content: string): boolean {
+    return /sealed\s+class/.test(content) || /sealed\s+interface/.test(content);
+  }
+
+  public hasPatternMatching(content: string): boolean {
+    return /instanceof\s+\w+\s+\w+/.test(content);
+  }
+
+  public hasTextBlock(content: string): boolean {
+    return /"""\s*\n/.test(content);
+  }
+
+  public hasSwitchExpression(content: string): boolean {
+    return /=\s*switch\s*\(/.test(content) || /switch.*->/.test(content);
+  }
+
+  // Performance Methods
+  public hasStreamAPI(content: string): boolean {
+    return /\.stream\(\)/.test(content);
+  }
+
+  public hasCacheable(content: string): boolean {
+    return content.includes('@Cacheable');
+  }
+
+  public hasPagination(content: string): boolean {
+    return /Pageable|PageRequest/.test(content);
+  }
+
+  public hasMissingPagination(content: string): boolean {
+    const isGetAllEndpoint = /@GetMapping.*findAll/.test(content) || /\.findAll\(\)/.test(content);
+    const hasPaging = this.hasPagination(content);
+    return isGetAllEndpoint && !hasPaging;
+  }
+
+  // REST API Methods
+  public hasValidation(content: string): boolean {
+    return content.includes('@Valid');
+  }
+
+  public hasResponseEntity(content: string): boolean {
+    return content.includes('ResponseEntity');
+  }
+
+  // Testing Methods
+  public hasSpringBootTest(content: string): boolean {
+    return content.includes('@SpringBootTest');
+  }
+
+  public hasWebMvcTest(content: string): boolean {
+    return content.includes('@WebMvcTest');
+  }
+
+  public hasMockBean(content: string): boolean {
+    return content.includes('@MockBean');
+  }
+
+  public hasTest(content: string): boolean {
+    return content.includes('@Test');
+  }
+
+  public hasParameterizedTest(content: string): boolean {
+    return content.includes('@ParameterizedTest');
+  }
+
+  // Code Quality Methods
+  public hasJavadoc(content: string): boolean {
+    return /\/\*\*[\s\S]*?\*\//.test(content);
+  }
+
+  public hasOptional(content: string): boolean {
+    return /Optional</.test(content);
   }
 }

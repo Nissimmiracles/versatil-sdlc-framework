@@ -43,8 +43,13 @@ export interface DirectorySize {
  * Analyzes IDE crash risk and suggests optimizations
  */
 export declare class IDEPerformanceDetector {
+    private static instance;
     private projectRoot;
     constructor(projectRoot?: string);
+    /**
+     * Get singleton instance
+     */
+    static getInstance(projectRoot?: string): IDEPerformanceDetector;
     /**
      * Detect IDE crash risk
      * Returns comprehensive analysis with confidence scoring

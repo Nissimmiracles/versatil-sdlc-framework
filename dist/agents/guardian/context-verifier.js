@@ -770,4 +770,84 @@ function generateContextFix(issue, verifications) {
     }
     return 'Apply context preferences according to priority: User > Team > Project > Framework';
 }
+/**
+ * ContextVerifier Class (Singleton)
+ * Wraps the functional context verification API in a class for testing
+ */
+export class ContextVerifier {
+    constructor() {
+        this.currentContext = 'PROJECT_CONTEXT';
+        // Private constructor for singleton
+    }
+    /**
+     * Get singleton instance
+     */
+    static getInstance() {
+        if (!ContextVerifier.instance) {
+            ContextVerifier.instance = new ContextVerifier();
+        }
+        return ContextVerifier.instance;
+    }
+    /**
+     * Get current context
+     */
+    getCurrentContext() {
+        return this.currentContext;
+    }
+    /**
+     * Set current context
+     */
+    setContext(context) {
+        this.currentContext = context;
+    }
+    /**
+     * Detect context from file path
+     */
+    detectContextFromPath(filePath) {
+        // Check if path contains framework identifiers
+        const frameworkIdentifiers = [
+            'versatil-sdlc-framework',
+            'versatil-sdlc-fw',
+            '@versatil/sdlc-framework',
+            '/src/agents/guardian/',
+            '/src/agents/opera/',
+            '/src/intelligence/',
+            '/src/orchestration/'
+        ];
+        const isFramework = frameworkIdentifiers.some(id => filePath.includes(id));
+        return isFramework ? 'FRAMEWORK_CONTEXT' : 'PROJECT_CONTEXT';
+    }
+    /**
+     * Verify context issue (delegates to functional API)
+     */
+    async verifyContextIssue(issue, workingDir, userId, teamId, projectId, resolvedContext) {
+        return verifyContextIssue(issue, workingDir, userId, teamId, projectId, resolvedContext);
+    }
+    /**
+     * Validate context operations
+     */
+    validateContextOperation(operation, targetContext) {
+        // Prevent framework modifications from project context
+        if (this.currentContext === 'PROJECT_CONTEXT' && targetContext === 'FRAMEWORK_CONTEXT') {
+            return {
+                allowed: false,
+                reason: 'Cannot modify framework files from project context'
+            };
+        }
+        return { allowed: true };
+    }
+    /**
+     * Detect context leaks
+     */
+    detectContextLeak(sourceContext, targetContext, operation) {
+        // Context leak occurs when project code tries to modify framework
+        return sourceContext === 'PROJECT_CONTEXT' && targetContext === 'FRAMEWORK_CONTEXT' && operation.includes('modify');
+    }
+    /**
+     * Reset singleton (for testing)
+     */
+    static resetInstance() {
+        ContextVerifier.instance = null;
+    }
+}
 //# sourceMappingURL=context-verifier.js.map

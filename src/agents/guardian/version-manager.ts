@@ -503,4 +503,92 @@ export class VersionManager {
 
     return notes;
   }
+
+  /**
+   * Validate version bump is appropriate
+   */
+  public validateVersionBump(currentVersion: string, newVersion: string, bumpType: VersionBumpType): boolean {
+    const [currentMajor, currentMinor, currentPatch] = currentVersion.split('.').map(Number);
+    const [newMajor, newMinor, newPatch] = newVersion.split('.').map(Number);
+
+    switch (bumpType) {
+      case 'major':
+        return newMajor === currentMajor + 1 && newMinor === 0 && newPatch === 0;
+      case 'minor':
+        return newMajor === currentMajor && newMinor === currentMinor + 1 && newPatch === 0;
+      case 'patch':
+        return newMajor === currentMajor && newMinor === currentMinor && newPatch === currentPatch + 1;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Generate release information
+   */
+  public async generateReleaseInfo(version: string): Promise<ReleaseInfo> {
+    try {
+      // Get commits since last tag
+      const { stdout: commits } = await execAsync(
+        `git log $(git describe --tags --abbrev=0)..HEAD --oneline`,
+        { cwd: this.frameworkRoot }
+      );
+
+      const commitLines = commits.trim().split('\n').filter(l => l);
+      const features: string[] = [];
+      const fixes: string[] = [];
+      const breaking_changes: string[] = [];
+      const deprecations: string[] = [];
+
+      for (const line of commitLines) {
+        if (line.includes('feat:') || line.includes('feature:')) {
+          features.push(line.replace(/^[a-f0-9]+ /, ''));
+        } else if (line.includes('fix:')) {
+          fixes.push(line.replace(/^[a-f0-9]+ /, ''));
+        } else if (line.includes('BREAKING')) {
+          breaking_changes.push(line.replace(/^[a-f0-9]+ /, ''));
+        } else if (line.includes('deprecate')) {
+          deprecations.push(line.replace(/^[a-f0-9]+ /, ''));
+        }
+      }
+
+      // Get contributors
+      const { stdout: contributorsStr } = await execAsync(
+        `git log $(git describe --tags --abbrev=0)..HEAD --format='%an' | sort -u`,
+        { cwd: this.frameworkRoot }
+      );
+      const contributors = contributorsStr.trim().split('\n').filter(c => c);
+
+      return {
+        version,
+        date: new Date().toISOString().split('T')[0],
+        features,
+        fixes,
+        breaking_changes,
+        deprecations,
+        commits: commitLines.length,
+        contributors
+      };
+    } catch (error) {
+      this.logger.error('Failed to generate release info', { error });
+      return {
+        version,
+        date: new Date().toISOString().split('T')[0],
+        features: [],
+        fixes: [],
+        breaking_changes: [],
+        deprecations: [],
+        commits: 0,
+        contributors: []
+      };
+    }
+  }
+
+  /**
+   * Check if version is valid semantic version
+   */
+  public isValidSemanticVersion(version: string): boolean {
+    const semverRegex = /^(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z0-9.-]+))?(?:\+([a-zA-Z0-9.-]+))?$/;
+    return semverRegex.test(version);
+  }
 }

@@ -3,7 +3,7 @@
  */
 
 import { AgentIntelligenceManager, IntelligentAgentWrapper } from '../../src/intelligence/agent-intelligence';
-import { BaseAgent, AgentActivationContext, AgentResponse } from '../../src/agents/base-agent';
+import { BaseAgent, AgentActivationContext, AgentResponse } from '../../src/agents/core/base-agent';
 
 // Mock dependencies
 jest.mock('../../src/intelligence/usage-analytics', () => ({

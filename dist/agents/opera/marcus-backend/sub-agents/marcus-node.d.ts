@@ -32,6 +32,15 @@ export declare class MarcusNode extends EnhancedMarcus {
     /**
      * Analyze Node.js-specific patterns
      */
+    analyzeNodePatterns(context: AgentActivationContext): Promise<{
+        score: number;
+        suggestions: Array<{
+            type: string;
+            message: string;
+            priority: string;
+        }>;
+        bestPractices: NodeJSBestPractices;
+    }>;
     private analyzeNodeJSPatterns;
     /**
      * Detect callback hell pattern
@@ -82,4 +91,15 @@ export declare class MarcusNode extends EnhancedMarcus {
      * Detect Node.js framework
      */
     detectNodeFramework(content: string): string;
+    detectSQLInjection(content: string): boolean;
+    detectMissingValidation(content: string): boolean;
+    detectExposedSecrets(content: string): boolean;
+    detectMissingAuth(content: string): boolean;
+    detectMissingErrorHandling(content: string): boolean;
+    detectNPlusOne(content: string): boolean;
+    detectBlockingOperations(content: string): boolean;
+    detectMissingSecurityMiddleware(content: string): boolean;
+    detectMissingEnvValidation(content: string): boolean;
+    detectMissingConnectionPooling(content: string): boolean;
+    hasGlobalErrorHandler(content: string): boolean;
 }

@@ -81,4 +81,8 @@ export declare class VERSATILMCPClient {
      * Health check for MCP integration
      */
     healthCheck(): Promise<boolean>;
+    /**
+     * Cleanup resources (orchestrator, daemon, etc.)
+     */
+    cleanup(): Promise<void>;
 }
