@@ -53,6 +53,7 @@ export declare class MCPTaskExecutor extends EventEmitter {
     private maxQueueSize;
     private metrics;
     private executionSummaries;
+    private cancelledTasks;
     constructor();
     inferTools(task: Task): Promise<MCPToolInference>;
     executeTools(task: Task, inference: MCPToolInference): Promise<MCPExecutionResult>;

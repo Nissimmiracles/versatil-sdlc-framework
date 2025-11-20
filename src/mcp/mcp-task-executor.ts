@@ -63,6 +63,7 @@ export class MCPTaskExecutor extends EventEmitter {
     queuedTasks: 0
   };
   private executionSummaries: Map<string, ExecutionSummary> = new Map();
+  private cancelledTasks: Set<string> = new Set();
 
   constructor() {
     super();
@@ -91,12 +92,47 @@ export class MCPTaskExecutor extends EventEmitter {
   }
 
   async executeTools(task: Task, inference: MCPToolInference): Promise<MCPExecutionResult> {
+    // Check if task was cancelled before execution
+    if (this.cancelledTasks.has(task.id)) {
+      return {
+        success: false,
+        toolsExecuted: [],
+        results: new Map(),
+        errors: [{ tool: 'executor', error: 'Task was cancelled before execution' }]
+      };
+    }
+
     // Stub: simulate successful execution
     const results = new Map<string, any>();
 
-    inference.inferredTools.forEach(tool => {
+    // Emit progress event for each tool
+    let progress = 0;
+    const totalTools = inference.inferredTools.length;
+
+    for (const tool of inference.inferredTools) {
+      // Check for cancellation during execution
+      if (this.cancelledTasks.has(task.id)) {
+        return {
+          success: false,
+          toolsExecuted: Array.from(results.keys()),
+          results,
+          errors: [{ tool: 'executor', error: 'Task cancelled during execution' }]
+        };
+      }
+
+      // Simulate async tool execution with delay to allow cancellation
+      await new Promise(resolve => setTimeout(resolve, 20));
+
       results.set(tool, { status: 'success', output: `${tool} executed successfully (stub)` });
-    });
+      progress++;
+      this.emit('execution_progress', {
+        taskId: task.id,
+        progress: (progress / totalTools) * 100,
+        currentTool: tool,
+        completedTools: progress,
+        totalTools
+      });
+    }
 
     return {
       success: true,
@@ -108,6 +144,8 @@ export class MCPTaskExecutor extends EventEmitter {
 
   async cancelTask(taskId: string): Promise<void> {
     console.log(`[MCPTaskExecutor] Task ${taskId} cancelled (stub)`);
+    // Mark task as cancelled
+    this.cancelledTasks.add(taskId);
     // Remove from queue
     this.taskQueue = this.taskQueue.filter(t => t.id !== taskId);
     // Record cancellation

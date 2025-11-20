@@ -77,3 +77,137 @@ export declare function createVerifiedTodos(verifiedIssues: VerifiedIssue[], out
  * Export verification summary for logging
  */
 export declare function generateVerificationSummary(result: VerificationPipelineResult): string;
+/**
+ * Singleton wrapper class for VerifiedIssueDetector
+ * Provides class-based API for testing while delegating to functional implementation
+ */
+export declare class VerifiedIssueDetector {
+    private static instance;
+    private confidenceThreshold;
+    private verificationDepth;
+    private autoTODOCreation;
+    private constructor();
+    /**
+     * Get singleton instance
+     */
+    static getInstance(): VerifiedIssueDetector;
+    /**
+     * Detect and verify a suspected issue
+     */
+    detectAndVerify(issue: any, options?: {
+        timeout?: number;
+    }): Promise<{
+        isVerified: boolean;
+        confidence: number;
+        evidence: any;
+    }>;
+    /**
+     * Perform multi-step verification
+     */
+    performVerificationSteps(issue: any): Promise<Array<{
+        step: string;
+        result: any;
+    }>>;
+    /**
+     * Verify file exists
+     */
+    verifyFileExists(issue: any): Promise<boolean>;
+    /**
+     * Verify error is reproducible
+     */
+    verifyReproducible(issue: any): Promise<boolean>;
+    /**
+     * Collect evidence for issue
+     */
+    collectEvidence(issue: any): Promise<any>;
+    /**
+     * Validate evidence quality (0-100)
+     */
+    validateEvidenceQuality(evidence: any): number;
+    /**
+     * Cross-reference multiple evidence sources
+     */
+    crossReferenceEvidence(evidence: any): Promise<{
+        consistent: boolean;
+    }>;
+    /**
+     * Verify evidence timestamp
+     */
+    verifyEvidenceTimestamp(evidence: any): boolean;
+    /**
+     * Filter out false positives
+     */
+    filterFalsePositives(issues: any[]): Promise<any[]>;
+    /**
+     * Check if issue is a false positive
+     */
+    isFalsePositive(issue: any): Promise<boolean>;
+    /**
+     * Verify against source code
+     */
+    verifyAgainstSourceCode(issue: any): Promise<boolean>;
+    /**
+     * Check if issue is stale
+     */
+    isStaleIssue(issue: any): Promise<boolean>;
+    /**
+     * Calculate priority score
+     */
+    calculatePriorityScore(issue: any): number;
+    /**
+     * Rank issues by priority
+     */
+    rankByPriority(issues: any[]): any[];
+    /**
+     * Create verified TODO from issue
+     */
+    createVerifiedTODO(issue: any): Promise<any>;
+    /**
+     * Assign agent based on issue type
+     */
+    private assignAgent;
+    /**
+     * Classify issue type
+     */
+    classifyIssue(issue: any): {
+        type: string;
+        category: string;
+    };
+    /**
+     * Check if issue is security-related
+     */
+    isSecurityIssue(issue: any): boolean;
+    /**
+     * Check if issue is performance-related
+     */
+    isPerformanceIssue(issue: any): boolean;
+    /**
+     * Categorize by affected area
+     */
+    categorizeByArea(issue: any): string;
+    /**
+     * Detect issues in files
+     */
+    detectIssuesInFiles(sources: string[]): Promise<any[]>;
+    /**
+     * Verify batch of issues
+     */
+    verifyBatch(issues: any[]): Promise<any[]>;
+    /**
+     * Aggregate verification results
+     */
+    aggregateResults(issues: any[]): any;
+    /**
+     * Generate verification report
+     */
+    generateVerificationReport(issue: any): Promise<any>;
+    /**
+     * Configuration methods
+     */
+    setConfidenceThreshold(threshold: number): void;
+    getConfidenceThreshold(): number;
+    setVerificationDepth(depth: 'basic' | 'thorough'): void;
+    getVerificationDepth(): 'basic' | 'thorough';
+    setAutoTODOCreation(enabled: boolean): void;
+    isAutoTODOCreationEnabled(): boolean;
+}
