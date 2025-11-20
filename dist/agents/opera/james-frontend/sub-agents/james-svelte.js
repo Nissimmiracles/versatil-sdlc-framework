@@ -558,7 +558,9 @@ export class JamesSvelte extends EnhancedJames {
         return 'Component State';
     }
     isSvelte5(content) {
-        return content.includes('svelte@5') || (content.includes('svelte/stores') && content.includes('$state'));
+        // Check for Svelte 5 runes ($state, $derived, $effect, $props)
+        return content.includes('svelte@5') ||
+            /\$state\(|\$derived\(|\$effect\(|\$props\(/.test(content);
     }
 }
 //# sourceMappingURL=james-svelte.js.map

@@ -90,7 +90,7 @@ export declare class MCPHealthMonitor extends EventEmitter {
     /**
      * Get health status for all MCPs
      */
-    getAllHealthStatus(): MCPHealth[];
+    getAllHealthStatus(): Map<string, MCPHealth>;
     /**
      * Get unhealthy MCPs
      */

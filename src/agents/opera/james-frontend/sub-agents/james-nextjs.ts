@@ -411,7 +411,8 @@ export class JamesNextJS extends EnhancedJames {
    * Check if using Pages Router
    */
   private usesPagesRouter(filePath: string): boolean {
-    return filePath.includes('/pages/') && !filePath.includes('/app/');
+    return (filePath.includes('/pages/') || filePath.startsWith('pages/')) &&
+           !filePath.includes('/app/') && !filePath.startsWith('app/');
   }
 
   /**
@@ -431,7 +432,7 @@ export class JamesNextJS extends EnhancedJames {
    * Check if in App Router context
    */
   private isAppRouter(filePath: string): boolean {
-    return filePath.includes('/app/');
+    return filePath.includes('/app/') || filePath.startsWith('app/');
   }
 
   /**
@@ -482,7 +483,7 @@ export class JamesNextJS extends EnhancedJames {
    * Check for Server Actions usage
    */
   private usesServerActions(content: string): boolean {
-    return content.includes('"use server"') || content.includes('action=');
+    return /['"]use server['"];?/.test(content) || content.includes('action=');
   }
 
 

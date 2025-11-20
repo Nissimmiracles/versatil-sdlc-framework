@@ -21,7 +21,7 @@ export class MarcusRails extends EnhancedMarcus {
   specialization = 'Ruby on Rails 7+ Specialist';
   systemPrompt = `You are Marcus-Rails, a specialized Ruby on Rails expert with deep knowledge of:
 - Rails 7+ features (Hotwire, Turbo, Stimulus)
-- Active Record patterns and query optimization
+- ActiveRecord patterns and query optimization
 - Rails conventions and best practices
 - RESTful routing and resourceful controllers
 - Strong parameters and security
@@ -181,7 +181,11 @@ export class MarcusRails extends EnhancedMarcus {
   }
 
   public hasNPlusOne(content: string): boolean {
-    return /\.each.*\.\w+\./.test(content) && !content.includes('includes');
+    // Check for .each or .map with association access inside the block
+    const hasLoop = /\.each\s+do\s*\||\. map\s*\{/.test(content);
+    const hasAssociationAccess = /\|\s*\w+\s*\|[^}]*\.\w+\./.test(content) || /user\.\w+|post\.\w+|comment\.\w+/.test(content);
+    const hasEagerLoading = content.includes('includes') || content.includes('eager_load');
+    return hasLoop && hasAssociationAccess && !hasEagerLoading;
   }
 
   public hasIncludes(content: string): boolean {
@@ -217,7 +221,7 @@ export class MarcusRails extends EnhancedMarcus {
   }
 
   public hasParameterizedQuery(content: string): boolean {
-    return /where\(\[/.test(content) || /where\(\?\)/.test(content);
+    return /where\([^)]*\?/.test(content) || /where\(\[/.test(content);
   }
 
   public hasCSRFProtection(content: string): boolean {
@@ -302,7 +306,7 @@ export class MarcusRails extends EnhancedMarcus {
   }
 
   public hasFactoryBot(content: string): boolean {
-    return /FactoryBot\.create|create\(:\w+/.test(content);
+    return /FactoryBot\.(create|define|build)|create\(:\w+/.test(content);
   }
 
   public hasFixtures(content: string, filePath?: string): boolean {
@@ -311,7 +315,7 @@ export class MarcusRails extends EnhancedMarcus {
 
   // Ruby Idioms
   public hasBlocks(content: string): boolean {
-    return /\{.*\}|do\s+\|.*\|\s+end/.test(content);
+    return /\{.*\}|do\s+\|.*\|\s+end|yield/.test(content);
   }
 
   public hasSymbols(content: string): boolean {

@@ -327,7 +327,92 @@ export class MCPTaskExecutor extends EventEmitter {
     this.emit('queue-loaded');
   }
 
+  /**
+   * Process queue by priority
+   */
+  async processQueueByPriority(): Promise<void> {
+    // Sort queue by priority (assuming higher priority first)
+    this.taskQueue.sort((a, b) => {
+      const priorityA = (a as any).priority || 0;
+      const priorityB = (b as any).priority || 0;
+      return priorityB - priorityA;
+    });
+
+    await this.processQueue();
+  }
+
+  /**
+   * Pause queue processing
+   */
+  private queuePaused: boolean = false;
+
+  pauseQueue(): void {
+    this.queuePaused = true;
+    this.emit('queue-paused');
+  }
+
+  /**
+   * Resume queue processing
+   */
+  resumeQueue(): void {
+    this.queuePaused = false;
+    this.emit('queue-resumed');
+  }
+
+  /**
+   * Start processing queue automatically
+   */
+  private processingInterval?: NodeJS.Timeout;
+
+  startProcessingQueue(intervalMs: number = 1000): void {
+    if (this.processingInterval) {
+      return; // Already processing
+    }
+
+    this.processingInterval = setInterval(async () => {
+      if (!this.queuePaused && this.taskQueue.length > 0) {
+        await this.processQueue();
+      }
+    }, intervalMs);
+
+    this.emit('queue-processing-started');
+  }
+
+  /**
+   * Clear the task queue
+   */
+  clearQueue(): void {
+    this.taskQueue = [];
+    this.metrics.queuedTasks = 0;
+    this.emit('queue-cleared');
+  }
+
+  /**
+   * Get queue statistics
+   */
+  getQueueStats(): {
+    queueSize: number;
+    paused: boolean;
+    processing: boolean;
+    totalProcessed: number;
+    successRate: number;
+  } {
+    return {
+      queueSize: this.taskQueue.length,
+      paused: this.queuePaused,
+      processing: !!this.processingInterval,
+      totalProcessed: this.metrics.totalExecuted,
+      successRate: this.metrics.totalExecuted > 0
+        ? (this.metrics.successful / this.metrics.totalExecuted) * 100
+        : 0
+    };
+  }
+
   async shutdown(): Promise<void> {
+    if (this.processingInterval) {
+      clearInterval(this.processingInterval);
+      this.processingInterval = undefined;
+    }
     this.taskQueue = [];
     this.removeAllListeners();
   }

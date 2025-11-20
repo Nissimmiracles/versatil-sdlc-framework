@@ -659,6 +659,8 @@ export class JamesSvelte extends EnhancedJames {
   }
 
   private isSvelte5(content: string): boolean {
-    return content.includes('svelte@5') || (content.includes('svelte/stores') && content.includes('$state'));
+    // Check for Svelte 5 runes ($state, $derived, $effect, $props)
+    return content.includes('svelte@5') ||
+           /\$state\(|\$derived\(|\$effect\(|\$props\(/.test(content);
   }
 }

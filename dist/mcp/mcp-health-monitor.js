@@ -295,7 +295,7 @@ export class MCPHealthMonitor extends EventEmitter {
      * Get health status for all MCPs
      */
     getAllHealthStatus() {
-        return Array.from(this.healthStatus.values());
+        return this.healthStatus;
     }
     /**
      * Get unhealthy MCPs

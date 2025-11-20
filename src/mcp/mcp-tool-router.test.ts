@@ -11,6 +11,11 @@ describe('MCPToolRouter', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+
+    // Mock environment variables to prevent initialization failures
+    process.env.GITHUB_TOKEN = 'mock-github-token';
+    process.env.EXA_API_KEY = 'mock-exa-api-key';
+
     router = new MCPToolRouter();
     await router.initialize();
   });
@@ -19,6 +24,10 @@ describe('MCPToolRouter', () => {
     if (router) {
       router.shutdown();
     }
+
+    // Clean up mock environment variables
+    delete process.env.GITHUB_TOKEN;
+    delete process.env.EXA_API_KEY;
   });
 
   // ============================================================================

@@ -29,7 +29,7 @@ export class MarcusNode extends EnhancedMarcus {
   systemPrompt = `You are Marcus-Node, a specialized Node.js backend expert with deep knowledge of:
 - Node.js 18+ features (native fetch, test runner, watch mode)
 - Express.js and Fastify framework best practices
-- Async/await patterns and error handling
+- async/await patterns and error handling
 - NPM package management and security
 - CommonJS vs ESM module systems
 - Event loop optimization
@@ -144,7 +144,7 @@ export class MarcusNode extends EnhancedMarcus {
     }
 
     // Check for environment variable handling
-    if (!this.hasProperEnvHandling(content)) {
+    if (content.includes('process.env') && !this.hasProperEnvHandling(content)) {
       score -= 5;
       suggestions.push({
         type: 'configuration',
@@ -237,11 +237,13 @@ export class MarcusNode extends EnhancedMarcus {
    * Detect unhandled promises
    */
   private hasUnhandledPromises(content: string): boolean {
-    // Check for promises without .catch() or try/catch
+    // Check for promises without .catch() or try/catch in function context
     const hasPromises = content.includes('.then(') || content.includes('await ');
     const hasCatch = content.includes('.catch(') || content.includes('try {');
+    const inFunction = /async\s+function|async\s*\(/.test(content) || /function.*\{[\s\S]*await/.test(content);
 
-    return hasPromises && !hasCatch;
+    // Only penalize if we're in a function context and missing error handling
+    return hasPromises && !hasCatch && inFunction;
   }
 
   /**
@@ -408,7 +410,9 @@ export class MarcusNode extends EnhancedMarcus {
   }
 
   public detectNPlusOne(content: string): boolean {
-    return /forEach|map.*await/.test(content) && /\.(find|get|fetch)/.test(content);
+    const hasLoop = /forEach|map/.test(content);
+    const hasAsyncCall = /await\s+\w*[Gg]et|await\s+\w*[Ff]ind|await\s+\w*[Ff]etch|await\s+\.\w+/.test(content);
+    return hasLoop && hasAsyncCall;
   }
 
   public detectBlockingOperations(content: string): boolean {
@@ -416,9 +420,9 @@ export class MarcusNode extends EnhancedMarcus {
   }
 
   public detectMissingSecurityMiddleware(content: string): boolean {
-    const hasExpress = /express\(\)/.test(content);
-    const hasHelmet = content.includes('helmet');
-    const hasCors = content.includes('cors');
+    const hasExpress = content.includes('express()');
+    const hasHelmet = /helmet\(|use\s*\(\s*helmet/.test(content);
+    const hasCors = /cors\(|use\s*\(\s*cors/.test(content);
     return hasExpress && (!hasHelmet || !hasCors);
   }
 

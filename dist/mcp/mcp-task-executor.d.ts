@@ -120,6 +120,38 @@ export declare class MCPTaskExecutor extends EventEmitter {
      * Load queue state from disk
      */
     loadQueueState(): Promise<void>;
+    /**
+     * Process queue by priority
+     */
+    processQueueByPriority(): Promise<void>;
+    /**
+     * Pause queue processing
+     */
+    private queuePaused;
+    pauseQueue(): void;
+    /**
+     * Resume queue processing
+     */
+    resumeQueue(): void;
+    /**
+     * Start processing queue automatically
+     */
+    private processingInterval?;
+    startProcessingQueue(intervalMs?: number): void;
+    /**
+     * Clear the task queue
+     */
+    clearQueue(): void;
+    /**
+     * Get queue statistics
+     */
+    getQueueStats(): {
+        queueSize: number;
+        paused: boolean;
+        processing: boolean;
+        totalProcessed: number;
+        successRate: number;
+    };
     shutdown(): Promise<void>;
 }
 export default MCPTaskExecutor;

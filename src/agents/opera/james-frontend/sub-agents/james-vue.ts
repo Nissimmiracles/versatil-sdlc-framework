@@ -29,7 +29,7 @@ export class JamesVue extends EnhancedJames {
   specialization = 'Vue 3 Frontend Specialist';
   systemPrompt = `You are James-Vue, a specialized Vue 3 frontend expert with deep knowledge of:
 - Vue 3 Composition API (setup, ref, reactive, computed, watch)
-- Reactivity system (ref, reactive, toRefs, unref)
+- reactivity system (ref, reactive, toRefs, unref)
 - Component lifecycle (onMounted, onUnmounted, watchEffect)
 - Pinia for state management
 - VeeValidate for form validation
@@ -79,6 +79,7 @@ export class JamesVue extends EnhancedJames {
     score: number;
     suggestions: Array<{ type: string; message: string; priority: string }>;
     bestPractices: VueBestPractices;
+    recommendations?: string[];
   }> {
     const content = context.content || '';
     const suggestions: Array<{ type: string; message: string; priority: string }> = [];
@@ -271,10 +272,20 @@ export class JamesVue extends EnhancedJames {
       bestPractices.testingStrategies.push('Write tests using Vue Test Utils and Vitest');
     }
 
+    // Generate recommendations based on best practices
+    const recommendations: string[] = [];
+    if (bestPractices.compositionAPIPatterns.length > 0) {
+      recommendations.push(...bestPractices.compositionAPIPatterns);
+    }
+    if (bestPractices.reactivityPatterns.length > 0) {
+      recommendations.push(...bestPractices.reactivityPatterns);
+    }
+
     return {
       score: Math.max(score, 0),
       suggestions,
-      bestPractices
+      bestPractices,
+      recommendations: recommendations.length > 0 ? recommendations : undefined
     };
   }
 

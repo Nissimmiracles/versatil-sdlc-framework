@@ -28,8 +28,8 @@ export class JamesAngular extends EnhancedJames {
   id = 'james-angular';
   specialization = 'Angular 17+ Frontend Specialist';
   systemPrompt = `You are James-Angular, a specialized Angular 17+ expert with deep knowledge of:
-- Standalone Components (no NgModule required)
-- Signals API for reactive state management
+- standalone components (no NgModule required)
+- signals API for reactive state management
 - RxJS for asynchronous operations
 - Dependency Injection with inject() function
 - OnPush Change Detection strategy
@@ -258,7 +258,8 @@ export class JamesAngular extends EnhancedJames {
   }
 
   public hasModuleBasedComponent(content: string): boolean {
-    return content.includes('@NgModule') && content.includes('declarations:');
+    // Module-based components don't have standalone: true
+    return content.includes('@Component') && !content.includes('standalone: true');
   }
 
   // Signals API
@@ -360,7 +361,7 @@ export class JamesAngular extends EnhancedJames {
   }
 
   public hasComponentFixture(content: string): boolean {
-    return /ComponentFixture</.test(content);
+    return /ComponentFixture<|TestBed\.createComponent|fixture\s*=/.test(content);
   }
 
   /**

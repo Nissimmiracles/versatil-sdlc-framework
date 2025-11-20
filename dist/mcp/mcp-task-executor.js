@@ -23,6 +23,10 @@ export class MCPTaskExecutor extends EventEmitter {
             queuedTasks: 0
         };
         this.executionSummaries = new Map();
+        /**
+         * Pause queue processing
+         */
+        this.queuePaused = false;
     }
     async inferTools(task) {
         // Stub: infer basic tools based on task type
@@ -239,7 +243,67 @@ export class MCPTaskExecutor extends EventEmitter {
         // For now, just emit the event
         this.emit('queue-loaded');
     }
+    /**
+     * Process queue by priority
+     */
+    async processQueueByPriority() {
+        // Sort queue by priority (assuming higher priority first)
+        this.taskQueue.sort((a, b) => {
+            const priorityA = a.priority || 0;
+            const priorityB = b.priority || 0;
+            return priorityB - priorityA;
+        });
+        await this.processQueue();
+    }
+    pauseQueue() {
+        this.queuePaused = true;
+        this.emit('queue-paused');
+    }
+    /**
+     * Resume queue processing
+     */
+    resumeQueue() {
+        this.queuePaused = false;
+        this.emit('queue-resumed');
+    }
+    startProcessingQueue(intervalMs = 1000) {
+        if (this.processingInterval) {
+            return; // Already processing
+        }
+        this.processingInterval = setInterval(async () => {
+            if (!this.queuePaused && this.taskQueue.length > 0) {
+                await this.processQueue();
+            }
+        }, intervalMs);
+        this.emit('queue-processing-started');
+    }
+    /**
+     * Clear the task queue
+     */
+    clearQueue() {
+        this.taskQueue = [];
+        this.metrics.queuedTasks = 0;
+        this.emit('queue-cleared');
+    }
+    /**
+     * Get queue statistics
+     */
+    getQueueStats() {
+        return {
+            queueSize: this.taskQueue.length,
+            paused: this.queuePaused,
+            processing: !!this.processingInterval,
+            totalProcessed: this.metrics.totalExecuted,
+            successRate: this.metrics.totalExecuted > 0
+                ? (this.metrics.successful / this.metrics.totalExecuted) * 100
+                : 0
+        };
+    }
     async shutdown() {
+        if (this.processingInterval) {
+            clearInterval(this.processingInterval);
+            this.processingInterval = undefined;
+        }
         this.taskQueue = [];
         this.removeAllListeners();
     }

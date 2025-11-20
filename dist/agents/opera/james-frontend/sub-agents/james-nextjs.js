@@ -335,7 +335,8 @@ export class JamesNextJS extends EnhancedJames {
      * Check if using Pages Router
      */
     usesPagesRouter(filePath) {
-        return filePath.includes('/pages/') && !filePath.includes('/app/');
+        return (filePath.includes('/pages/') || filePath.startsWith('pages/')) &&
+            !filePath.includes('/app/') && !filePath.startsWith('app/');
     }
     /**
      * Check if component needs "use client"
@@ -352,7 +353,7 @@ export class JamesNextJS extends EnhancedJames {
      * Check if in App Router context
      */
     isAppRouter(filePath) {
-        return filePath.includes('/app/');
+        return filePath.includes('/app/') || filePath.startsWith('app/');
     }
     /**
      * Check for client-side data fetching
@@ -395,7 +396,7 @@ export class JamesNextJS extends EnhancedJames {
      * Check for Server Actions usage
      */
     usesServerActions(content) {
-        return content.includes('"use server"') || content.includes('action=');
+        return /['"]use server['"];?/.test(content) || content.includes('action=');
     }
     /**
      * Check if component is large (heuristic)

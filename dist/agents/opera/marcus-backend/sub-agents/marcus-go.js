@@ -20,7 +20,7 @@ export class MarcusGo extends EnhancedMarcus {
         this.systemPrompt = `You are Marcus-Go, a specialized Go backend expert with deep knowledge of:
 - Go 1.21+ features (generics, improved error handling)
 - Gin and Echo framework best practices
-- Goroutines and channels for concurrency
+- goroutines and channels for concurrency
 - Context for timeout and cancellation
 - Go modules and dependency management
 - Error handling patterns (no exceptions)
@@ -48,6 +48,15 @@ export class MarcusGo extends EnhancedMarcus {
                 type: 'error-handling',
                 message: 'Missing error handling. Always check errors returned from functions.',
                 priority: 'critical'
+            });
+        }
+        // Check for explicitly ignored errors (blank identifier)
+        if (this.hasIgnoredError(content)) {
+            score -= 15;
+            suggestions.push({
+                type: 'error-handling',
+                message: 'Error is explicitly ignored using blank identifier (_). Consider handling errors properly.',
+                priority: 'high'
             });
         }
         // Check for goroutine leaks
@@ -192,7 +201,7 @@ export class MarcusGo extends EnhancedMarcus {
     }
     // Error Handling Methods
     hasIgnoredError(content) {
-        return /,\s*_\s*:=/.test(content) && content.includes('err');
+        return /,\s*_\s*:=/.test(content);
     }
     hasErrorWrapping(content) {
         return /fmt\.Errorf\([^)]*%w/.test(content);

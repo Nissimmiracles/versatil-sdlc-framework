@@ -126,14 +126,19 @@ export class MarcusJava extends EnhancedMarcus {
         };
     }
     hasSQLInjectionRisk(content) {
-        // Check for string concatenation in @Query
-        return content.includes('@Query') && (content.includes('+ "') || content.includes('+ \''));
+        // Check for string concatenation in SQL queries
+        const hasQueryMethod = content.includes('createQuery') || content.includes('@Query');
+        const hasConcatenation = /["']\s*\+|[+]\s*["']/.test(content);
+        return hasQueryMethod && hasConcatenation;
     }
     hasNPlusOnePattern(content) {
         // Check for lazy loading patterns without fetch strategies
-        return (content.includes('@OneToMany') || content.includes('@ManyToOne')) &&
+        const hasLazyAnnotation = (content.includes('@OneToMany') || content.includes('@ManyToOne')) &&
             !content.includes('fetch = FetchType.EAGER') &&
             !content.includes('@EntityGraph');
+        // Check for loop patterns that call getter methods (classic N+1)
+        const hasLoopWithGetter = /for\s*\([^)]*\)\s*\{[^}]*\.get[A-Z]\w+\(\)/.test(content);
+        return hasLazyAnnotation || hasLoopWithGetter;
     }
     needsTransactional(content) {
         return content.includes('.save(') ||
