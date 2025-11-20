@@ -29,7 +29,7 @@
     "validate:update": "node scripts/validate-update.cjs",
     "recover": "node scripts/recover-framework.cjs",
     "typecheck": "tsc --noEmit",
-    "build": "node scripts/show-framework-active.cjs --quick && tsc && ~/.versatil/hooks/afterBuild.sh",
+    "build": "node scripts/show-framework-active.cjs --quick && tsc && (test -f ~/.versatil/hooks/afterBuild.sh && ~/.versatil/hooks/afterBuild.sh || echo '✅ Build completed successfully')",
     "build:hooks": "bash scripts/build-hooks.sh",
     "build:security": "node scripts/show-framework-active.cjs --quick && tsc && echo 'Security modules compiled'",
     "build:watch": "node scripts/show-framework-active.cjs --quick && tsc --watch",
