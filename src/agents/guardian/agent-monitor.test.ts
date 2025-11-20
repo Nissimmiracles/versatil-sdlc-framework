@@ -34,12 +34,24 @@ vi.mock('fs', () => ({
     readFileSync: vi.fn().mockReturnValue(''),
     appendFileSync: vi.fn(),
     writeFileSync: vi.fn(),
+    createWriteStream: vi.fn().mockReturnValue({
+      write: vi.fn(),
+      end: vi.fn(),
+      on: vi.fn()
+    }),
+    unlinkSync: vi.fn()
   },
   existsSync: vi.fn().mockReturnValue(true),
   mkdirSync: vi.fn(),
   readFileSync: vi.fn().mockReturnValue(''),
   appendFileSync: vi.fn(),
   writeFileSync: vi.fn(),
+  createWriteStream: vi.fn().mockReturnValue({
+    write: vi.fn(),
+    end: vi.fn(),
+    on: vi.fn()
+  }),
+  unlinkSync: vi.fn()
 }));
 
 // Mock child_process
@@ -54,6 +66,7 @@ describe('AgentMonitor', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    AgentMonitor.resetInstance(); // Reset singleton state between tests
     monitor = AgentMonitor.getInstance();
   });
 
@@ -169,16 +182,17 @@ describe('AgentMonitor', () => {
     });
 
     it('should include timestamp in activation', async () => {
-      const beforeTime = new Date().toISOString();
+      const beforeTime = Date.now();
       await monitor.trackAgentActivation('alex-ba', true, 140);
-      const afterTime = new Date().toISOString();
+      const afterTime = Date.now();
 
       const history = monitor['activationHistory'];
       const lastActivation = history[history.length - 1];
 
       expect(lastActivation.timestamp).toBeDefined();
-      expect(lastActivation.timestamp).toBeGreaterThanOrEqual(beforeTime);
-      expect(lastActivation.timestamp).toBeLessThanOrEqual(afterTime);
+      const activationTime = new Date(lastActivation.timestamp).getTime();
+      expect(activationTime).toBeGreaterThanOrEqual(beforeTime);
+      expect(activationTime).toBeLessThanOrEqual(afterTime);
     });
   });
 
@@ -290,28 +304,30 @@ describe('AgentMonitor', () => {
     });
 
     it('should track last activation timestamp', async () => {
-      const beforeTime = new Date().toISOString();
+      const beforeTime = Date.now();
       await monitor.trackAgentActivation('test-agent', true, 100);
-      const afterTime = new Date().toISOString();
+      const afterTime = Date.now();
 
       const health = monitor['calculateAgentHealth']('test-agent');
 
       expect(health.last_activation).toBeDefined();
-      expect(health.last_activation).toBeGreaterThanOrEqual(beforeTime);
-      expect(health.last_activation).toBeLessThanOrEqual(afterTime);
+      const activationTime = new Date(health.last_activation!).getTime();
+      expect(activationTime).toBeGreaterThanOrEqual(beforeTime);
+      expect(activationTime).toBeLessThanOrEqual(afterTime);
     });
 
     it('should track last failure timestamp', async () => {
       await monitor.trackAgentActivation('test-agent', true, 100);
-      const beforeFailure = new Date().toISOString();
+      const beforeFailure = Date.now();
       await monitor.trackAgentActivation('test-agent', false, 150, 'Error');
-      const afterFailure = new Date().toISOString();
+      const afterFailure = Date.now();
 
       const health = monitor['calculateAgentHealth']('test-agent');
 
       expect(health.last_failure).toBeDefined();
-      expect(health.last_failure).toBeGreaterThanOrEqual(beforeFailure);
-      expect(health.last_failure).toBeLessThanOrEqual(afterFailure);
+      const failureTime = new Date(health.last_failure!).getTime();
+      expect(failureTime).toBeGreaterThanOrEqual(beforeFailure);
+      expect(failureTime).toBeLessThanOrEqual(afterFailure);
     });
 
     it('should detect unhealthy agent', async () => {

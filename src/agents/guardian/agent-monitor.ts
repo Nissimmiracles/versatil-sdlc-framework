@@ -185,7 +185,10 @@ export class AgentMonitor {
 
     // Calculate health metrics for each agent
     const agentHealthMap: Record<string, AgentHealth> = {};
-    const allAgents = [...this.coreAgents, ...this.subAgents];
+
+    // Include predefined agents AND any agents from activation history
+    const agentsFromHistory = [...new Set(this.activationHistory.map(a => a.agent))];
+    const allAgents = [...new Set([...this.coreAgents, ...this.subAgents, ...agentsFromHistory])];
 
     for (const agentName of allAgents) {
       agentHealthMap[agentName] = this.calculateAgentHealth(agentName);
@@ -663,6 +666,17 @@ export class AgentMonitor {
     this.activationHistory = [];
     if (fs.existsSync(this.historyFile)) {
       fs.unlinkSync(this.historyFile);
+    }
+  }
+
+  /**
+   * Reset singleton instance (for testing only)
+   * @internal
+   */
+  public static resetInstance(): void {
+    if (AgentMonitor.instance) {
+      AgentMonitor.instance.activationHistory = [];
+      AgentMonitor.instance = null;
     }
   }
 

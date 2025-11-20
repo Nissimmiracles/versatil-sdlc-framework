@@ -127,6 +127,11 @@ export declare class AgentMonitor {
      */
     clearHistory(): void;
     /**
+     * Reset singleton instance (for testing only)
+     * @internal
+     */
+    static resetInstance(): void;
+    /**
      * Get recent failures for specific agent
      */
     getRecentFailures(agent: string, limit?: number): AgentActivation[];
