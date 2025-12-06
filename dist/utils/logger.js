@@ -48,8 +48,14 @@ export class VERSATILLogger {
     formatMessage(level, message, context, component) {
         const comp = component || this.component || 'VERSATIL';
         let formatted = `[${comp}] ${level}: ${message}`;
-        if (context && Object.keys(context).length > 0) {
-            formatted += ` ${JSON.stringify(context)}`;
+        if (context && typeof context === 'object' && Object.keys(context).length > 0) {
+            try {
+                formatted += ` ${JSON.stringify(context)}`;
+            }
+            catch {
+                // Handle circular references or other JSON.stringify errors
+                formatted += ` [Object with circular reference or non-serializable content]`;
+            }
         }
         return formatted;
     }

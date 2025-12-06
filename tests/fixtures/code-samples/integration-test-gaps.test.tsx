@@ -5,7 +5,8 @@
  * Target Agents: enhanced-maria
  */
 
-describe('Navigation Tests', () => {
+// NOTE: This is a fixture file showing test gap examples, not actual tests
+describe.skip('Navigation Tests (Example Fixture)', () => {
   test('should navigate to dashboard', () => {
     // Basic unit test only
     render(<Dashboard />);

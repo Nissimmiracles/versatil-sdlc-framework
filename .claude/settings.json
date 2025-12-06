@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/dist/post-file-edit.cjs"
+            "command": ".claude/hooks/run-hook.sh post-file-edit"
           }
         ]
       },
@@ -15,16 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/dist/post-build.cjs"
-          }
-        ]
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/dist/post-agent-response.cjs"
+            "command": ".claude/hooks/run-hook.sh post-build"
           }
         ]
       }
@@ -35,11 +26,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/dist/subagent-stop.cjs"
+            "command": ".claude/hooks/run-hook.sh subagent-stop"
           },
           {
             "type": "command",
-            "command": ".claude/hooks/dist/post-action-validator.cjs"
+            "command": ".claude/hooks/run-hook.sh post-action-validator"
           }
         ]
       }
@@ -50,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/dist/session-codify.cjs"
+            "command": ".claude/hooks/run-hook.sh session-codify"
           }
         ]
       }
@@ -61,7 +52,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/dist/before-prompt.cjs"
+            "command": ".claude/hooks/run-hook.sh before-prompt"
           }
         ]
       }
@@ -72,7 +63,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/dist/session-start.cjs"
+            "command": ".claude/hooks/run-hook.sh session-start"
           }
         ]
       }
@@ -81,6 +72,7 @@
   "permissions": {
     "allow": [
       "Bash(npm:*)",
+      "Bash(pnpm:*)",
       "Bash(git:*)",
       "Bash(node:*)",
       "Bash(npx:*)",

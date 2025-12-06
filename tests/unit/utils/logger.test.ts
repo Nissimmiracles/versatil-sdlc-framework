@@ -5,25 +5,29 @@
  * Testing framework's own logging system
  */
 
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { VERSATILLogger } from '../../../src/utils/logger';
 
 describe('VERSATILLogger', () => {
   let logger: VERSATILLogger;
-  let consoleLogSpy: jest.SpyInstance;
-  let consoleWarnSpy: jest.SpyInstance;
-  let consoleErrorSpy: jest.SpyInstance;
+  let consoleLogSpy: ReturnType<typeof vi.spyOn>;
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
+    // Reset singleton for clean tests
+    (VERSATILLogger as any).instance = undefined;
     logger = new VERSATILLogger();
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
-    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     consoleLogSpy.mockRestore();
     consoleWarnSpy.mockRestore();
     consoleErrorSpy.mockRestore();
+    vi.clearAllMocks();
   });
 
   describe('Logging Methods', () => {
