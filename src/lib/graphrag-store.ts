@@ -105,6 +105,16 @@ export interface SoftDeletionResult {
   acceptedAt: number; restoreUntil?: number;
 }
 
+export interface SoftDeletedTarget {
+  kind: 'node' | 'edge'; id: string; label: string;
+  deletedAt: string; restorationGuaranteedUntil: string; originalAvailable: boolean;
+  relatedMaskedEdgeIds?: string[]; maskedEndpointIds?: string[];
+}
+export interface GraphRAGStoreOptions {
+  softDeletion?: { clock?: () => Date };
+  storage?: { projectId: string; databaseId: string };
+}
+
 export class GraphRAGStore extends EventEmitter {
   private firestore: Firestore;
   private projectId: string;
@@ -397,6 +407,48 @@ export class GraphRAGStore extends EventEmitter {
     return this.applySoftDeletion(await this.planOldPatterns({ cutoff, ids: request.ids }));
   }
 
+  /** Trusted in-process recovery view; metadata selectors do not establish caller authorization. */
+  async listSoftDeletedTargets(options: { offset?: number; limit?: number } = {}): Promise<{ items: SoftDeletedTarget[]; total: number }> {
+    this.requireSoftMode();
+    if (!options || typeof options !== 'object' || Array.isArray(options) ||
+        ![Object.prototype, null].includes(Object.getPrototypeOf(options)) ||
+        Reflect.ownKeys(options).some(key => key !== 'offset' && key !== 'limit')) throw new Error('Invalid GraphRAG recovery pagination');
+    const read = (key: 'offset' | 'limit', fallback: number): number => {
+      const descriptor = Object.getOwnPropertyDescriptor(options, key);
+      if (descriptor && !('value' in descriptor)) throw new Error('Invalid GraphRAG recovery pagination accessor');
+      return descriptor?.value === undefined ? fallback : descriptor.value;
+    };
+    const offset = read('offset', 0); const limit = read('limit', 50);
+    if (!Number.isSafeInteger(offset) || offset < 0 || offset > 10000 ||
+        !Number.isSafeInteger(limit) || limit < 1 || limit > 100) throw new Error('Invalid GraphRAG recovery pagination bounds');
+    return this.serializeNodeWrite(async () => {
+      // Always observe a fresh consistent source transaction, even with a healthy query cache.
+      await this.loadSoftGraph();
+      const markers = [...this.deletions.values()].filter(marker => marker.active)
+        .sort((a, b) => a.deletedAt.toMillis() - b.deletedAt.toMillis() || (a.kind < b.kind ? -1 : a.kind > b.kind ? 1 : 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+      const items = markers.slice(offset, offset + limit).map(marker => {
+        const original = marker.kind === 'node' ? this.rawNodes.get(marker.id) : this.rawEdges.get(marker.id);
+        const item: SoftDeletedTarget = {
+          kind: marker.kind, id: marker.id,
+          label: marker.kind === 'node' && original ? (original as GraphNode).label : marker.id,
+          deletedAt: new Date(marker.deletedAt.toMillis()).toISOString(),
+          restorationGuaranteedUntil: new Date(marker.restoreUntil.toMillis()).toISOString(),
+          originalAvailable: original !== undefined
+        };
+        if (marker.kind === 'node') {
+          const incident = [...this.rawEdges.values()].filter(edge => edge.source === marker.id || edge.target === marker.id);
+          // Includes virtual masks induced by this endpoint, without inventing edge markers.
+          item.relatedMaskedEdgeIds = incident.map(edge => edge.id).sort();
+        } else {
+          const edge = original as GraphEdge | undefined;
+          item.maskedEndpointIds = edge ? [...new Set([edge.source, edge.target].filter(id => this.isMasked('node', id)))].sort() : [];
+        }
+        return item;
+      });
+      return { items, total: markers.length };
+    });
+  }
+
   async restoreNode(id: string): Promise<SoftDeletionResult> { return this.restoreSoftTarget('node', id); }
   async restoreEdge(id: string): Promise<SoftDeletionResult> { return this.restoreSoftTarget('edge', id); }
 
@@ -413,7 +465,6 @@ export class GraphRAGStore extends EventEmitter {
           if (!snapshot.exists) return 'already-visible';
           const marker = this.parseDeletion(snapshot.data(), key);
           if (!marker.active) return 'already-visible';
-          if (acceptedAt > marker.restoreUntil.toMillis()) throw new Error('GraphRAG restoration window expired');
           transaction.set(ref, { ...marker, active: false });
           return 'restored';
         });
@@ -423,7 +474,7 @@ export class GraphRAGStore extends EventEmitter {
     });
   }
 
-  constructor(options: { softDeletion?: { clock?: () => Date } } = {}) {
+  constructor(options: GraphRAGStoreOptions = {}) {
     super();
     if (!options || typeof options !== 'object' || Array.isArray(options) ||
         ![Object.prototype, null].includes(Object.getPrototypeOf(options))) throw new Error('Invalid GraphRAG store options');
@@ -437,12 +488,24 @@ export class GraphRAGStore extends EventEmitter {
     if (clock && (!('value' in clock) || (clock.value !== undefined && typeof clock.value !== 'function'))) throw new Error('Invalid GraphRAG deletion clock dependency');
     this.softMode = config !== undefined;
     this.softClock = clock?.value ?? (() => new Date());
+    const storageDescriptor = Object.getOwnPropertyDescriptor(options, 'storage');
+    if (storageDescriptor && !('value' in storageDescriptor)) throw new Error('Invalid GraphRAG storage accessor');
+    const storage = storageDescriptor?.value;
+    let databaseId = 'versatil-rag';
     this.projectId = process.env.GOOGLE_CLOUD_PROJECT || 'centering-vine-454613-b3';
-
-    this.firestore = new Firestore({
-      projectId: this.projectId,
-      databaseId: 'versatil-rag'  // Same database as vector store
-    });
+    if (storage !== undefined) {
+      if (!storage || typeof storage !== 'object' || Array.isArray(storage) ||
+          ![Object.prototype, null].includes(Object.getPrototypeOf(storage)) ||
+          Reflect.ownKeys(storage).some(key => !['projectId', 'databaseId'].includes(key as string))) throw new Error('Invalid GraphRAG storage configuration');
+      const project = Object.getOwnPropertyDescriptor(storage, 'projectId');
+      const database = Object.getOwnPropertyDescriptor(storage, 'databaseId');
+      const validIdentifier = (value: unknown): value is string => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value);
+      if (!project || !('value' in project) || !validIdentifier(project.value) ||
+          !database || !('value' in database) || !(validIdentifier(database.value) || database.value === '(default)')) throw new Error('Invalid GraphRAG storage identifiers');
+      this.projectId = project.value;
+      databaseId = database.value;
+    }
+    this.firestore = new Firestore({ projectId: this.projectId, databaseId });
   }
 
   async initialize(): Promise<void> {

@@ -253,7 +253,28 @@ CREATE POLICY project_patterns_select ON project_patterns
 - **User patterns**: Kept indefinitely (you own your data)
 - **Team patterns**: Kept while team exists
 - **Project patterns**: Kept for 1 year after project archive
-- **Deleted patterns**: Soft-deleted, hard-deleted after 30 days
+- **Deleted patterns**: Originals remain masked with restoration guaranteed for 30 days. After that guarantee ends, retention and restoration remain possible until an explicitly authorized purge. There is no automatic purge or purge API.
+
+### Local operator recovery console
+
+Build the package, then run `versatil-graph-recovery --project PROJECT_ID --database DATABASE_ID`
+(or `node bin/graph-recovery.cjs --project PROJECT_ID --database DATABASE_ID` from the checkout).
+Both storage identifiers are required. The console uses the operator's existing Google
+Application Default Credentials and their permissions for that selected database.
+It does not provide public or team access, grant provider permissions, or configure tenant identity.
+
+Open the private `open.html` launcher path printed by the command. Its directory and file
+are restricted to the current POSIX user (0700/0600); Windows launch fails closed until
+an equivalent ACL boundary is implemented. The listener binds only to `127.0.0.1`.
+The short-lived session capability remains in browser memory and disappears from the URL
+before requests. Stop the command to invalidate the session and remove its launcher.
+
+The console lists active deletion markers and recovery metadata, with pagination, missing-original
+states and explicit confirmation before restoring a selected node or edge. Original properties
+and document contents are not returned. An edge may remain invisible after its own marker
+is restored while either endpoint is still masked; the confirmation receipt reports that state.
+The 30-day date is the end of the guaranteed recovery period, not an automatic purge deadline.
+Restoration remains possible after it when the original exists. No delete or purge action is exposed.
 
 ---
 

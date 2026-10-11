@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Timestamp } from '@google-cloud/firestore';
 import { GraphRAGStore, type GraphNode } from './graphrag-store.js';
+import { createRecoveryApp } from '../dashboard/graph-recovery-console.js';
+import type { Server } from 'node:http';
 
 const backend = vi.hoisted(() => ({
-  collections: new Map<string, Map<string, any>>(), operations: [] as any[], reads: [] as string[],
+  configurations: [] as any[], collections: new Map<string, Map<string, any>>(), operations: [] as any[], reads: [] as string[],
   failure: '' as string, loadFailure: '' as string, readGate: undefined as undefined | (() => Promise<void>), retry: false, attempts: 0,
   afterDiscard: undefined as undefined | (() => void), beforeCommit: undefined as undefined | (() => void),
 }));
@@ -33,6 +35,7 @@ vi.mock('@google-cloud/firestore', async importOriginal => {
     return { id: ref.id, exists: data !== undefined, data: () => copy(data) };
   };
   class MockFirestore {
+    constructor(configuration: any) { backend.configurations.push(configuration); }
     collection(name: string) {
       return { collection: name, get: async () => snapshot({ collection: name }), doc: (id: string) => ({
         collection: name, id,
@@ -89,7 +92,7 @@ const seed = () => {
 beforeEach(() => {
   clock = Date.UTC(2026, 9, 8); backend.collections.clear();
   for (const name of ['graphrag_nodes', 'graphrag_edges', 'graphrag_deletions']) backend.collections.set(name, new Map());
-  backend.operations = []; backend.reads = []; backend.failure = ''; backend.loadFailure = ''; backend.readGate = undefined; backend.retry = false; backend.attempts = 0; backend.afterDiscard = undefined; backend.beforeCommit = undefined;
+  backend.configurations = []; backend.operations = []; backend.reads = []; backend.failure = ''; backend.loadFailure = ''; backend.readGate = undefined; backend.retry = false; backend.attempts = 0; backend.afterDiscard = undefined; backend.beforeCommit = undefined;
 });
 
 describe('GraphRAG reversible explicit deletion', () => {
@@ -124,10 +127,10 @@ describe('GraphRAG reversible explicit deletion', () => {
     await store.restoreEdge('e1'); expect(store.getEdge('e1')).toBeUndefined();
     await store.deleteEdge('e1'); await store.restoreNode('p'); expect(store.getEdge('e1')).toBeUndefined(); expect(store.getEdge('e2')).toBeDefined();
   });
-  it.each([-1, 0, 1])('restoration boundary offset%s retains expired masks without auto purge', async offset => {
+  it.each([-1, 0, 1, day])('restores after guarantee boundary offset%s while retaining original records', async offset => {
     seed(); const store = make(); await store.deleteNode('p'); clock += 30 * day + offset;
-    if (offset <= 0) { await store.restoreNode('p'); expect(store.getNode('p')).toBeDefined(); }
-    else { await expect(store.restoreNode('p')).rejects.toThrow('expired'); const reloaded = make(); await reloaded.initialize(); expect(reloaded.getNode('p')).toBeUndefined(); }
+    const reloaded = make(); await reloaded.initialize(); expect(reloaded.getNode('p')).toBeUndefined();
+    await reloaded.restoreNode('p'); expect(reloaded.getNode('p')).toBeDefined();
     expect(documents().has('p')).toBe(true); expect(documents('graphrag_deletions').has('node_p')).toBe(true);
   });
   it('repeated active deletion preserves the window and redeletion after restore opens a new window', async () => {
@@ -302,4 +305,179 @@ describe('GraphRAG reversible explicit deletion', () => {
     await expect(make().deleteOldPatterns(new Date(clock), scope as any)).rejects.toThrow('accessor'); expect(calls).toBe(0); expect(backend.reads).toEqual([]);
   });
 
+});
+
+describe('Trusted recovery inventory and explicit storage configuration', () => {
+  it('lists active markers only with redacted metadata and virtual incident edge annotations', async () => {
+    seed(); const store = make(); await store.deleteNode('p'); await store.deleteEdge('e1');
+    const result = await store.listSoftDeletedTargets();
+    expect(result.total).toBe(2);
+    const maskedNode = result.items.find(item => item.kind === 'node')!;
+    expect(maskedNode).toEqual({ kind: 'node', id: 'p', label: 'p', originalAvailable: true,
+      deletedAt: new Date(clock).toISOString(), restorationGuaranteedUntil: new Date(clock + 30 * day).toISOString(),
+      relatedMaskedEdgeIds: ['e1', 'e2', 'incoming', 'self'] });
+    expect(result.items.find(item => item.kind === 'edge')).toMatchObject({ id: 'e1', maskedEndpointIds: ['p'], originalAvailable: true });
+    expect(JSON.stringify(result)).not.toContain('properties');
+    expect(JSON.stringify(result)).not.toContain('React cache');
+    await store.restoreEdge('e1');
+    expect((await store.listSoftDeletedTargets()).items).toHaveLength(1);
+    expect(store.getEdge('e1')).toBeUndefined(); // Endpoint mask remains authoritative.
+  });
+  it('includes missing original evidence without inventing recovery content', async () => {
+    seed(); const store = make(); await store.deleteNode('p'); documents().delete('p');
+    const inventory = await store.listSoftDeletedTargets();
+    expect(inventory.items[0]).toMatchObject({ id: 'p', label: 'p', originalAvailable: false });
+    expect((await store.restoreNode('p')).outcomes).toEqual([{ id: 'p', outcome: 'absent' }]);
+    expect((await store.listSoftDeletedTargets()).total).toBe(1);
+  });
+  it('keeps orphan edge markers discoverable without inventing endpoint information', async () => {
+    documents('graphrag_deletions').set('edge_orphan', { schemaVersion: 1, kind: 'edge', id: 'orphan', active: true,
+      deletedAt: Timestamp.fromMillis(clock), restoreUntil: Timestamp.fromMillis(clock + 30 * day) });
+    const store = make();
+    expect((await store.listSoftDeletedTargets()).items).toEqual([{ kind: 'edge', id: 'orphan', label: 'orphan',
+      originalAvailable: false, deletedAt: new Date(clock).toISOString(), restorationGuaranteedUntil: new Date(clock + 30 * day).toISOString(), maskedEndpointIds: [] }]);
+    expect((await store.restoreEdge('orphan')).outcomes).toEqual([{ id: 'orphan', outcome: 'absent' }]);
+    expect(backend.operations).toEqual([]);
+  });
+  it('applies the default page size and maximum page size without writing source records', async () => {
+    for (let index = 0; index < 101; index++) {
+      const id = `orphan-${String(index).padStart(3, '0')}`;
+      documents('graphrag_deletions').set(`node_${id}`, { schemaVersion: 1, kind: 'node', id, active: true,
+        deletedAt: Timestamp.fromMillis(clock), restoreUntil: Timestamp.fromMillis(clock + 30 * day) });
+    }
+    const store = make();
+    expect(await store.listSoftDeletedTargets()).toMatchObject({ total: 101 });
+    expect((await store.listSoftDeletedTargets()).items).toHaveLength(50);
+    expect((await store.listSoftDeletedTargets({ limit: 100 })).items).toHaveLength(100);
+    expect((await store.listSoftDeletedTargets({ offset: 100, limit: 100 })).items.map(item => item.id)).toEqual(['orphan-100']);
+    expect(backend.operations).toEqual([]);
+  });
+  it('retains the original guarantee end while restoration remains possible at J30+1 day', async () => {
+    seed(); const store = make(); const deletedAt = clock; await store.deleteNode('p');
+    clock += 31 * day;
+    const inventory = await store.listSoftDeletedTargets();
+    expect(inventory.items[0].restorationGuaranteedUntil).toBe(new Date(deletedAt + 30 * day).toISOString());
+    expect(store.getNode('p')).toBeUndefined();
+    await store.restoreNode('p'); expect(store.getNode('p')).toBeDefined();
+    expect((await store.listSoftDeletedTargets()).total).toBe(0);
+    expect(documents().has('p')).toBe(true);
+  });
+  it('paginates stable active markers and returns detached summaries', async () => {
+    seed(); const store = make(); await store.deleteEdge('e2'); await store.deleteNode('p'); await store.deleteEdge('e1');
+    const all = await store.listSoftDeletedTargets();
+    expect(all.total).toBe(3);
+    expect((await store.listSoftDeletedTargets({ offset: 1, limit: 1 })).items).toEqual(all.items.slice(1, 2));
+    expect(await store.listSoftDeletedTargets({ offset: 3, limit: 1 })).toEqual({ total: 3, items: [] });
+    all.items[0].label = 'mutated';
+    expect((await store.listSoftDeletedTargets()).items[0].label).not.toBe('mutated');
+  });
+  it('reloads latest raw state instead of returning a cached recovery inventory', async () => {
+    seed(); const first = make(); await first.initialize(); await first.query({ query: 'React' });
+    await make().deleteNode('p');
+    expect((await first.listSoftDeletedTargets()).items[0].id).toBe('p');
+    expect((await first.query({ query: 'React' })).map(item => item.pattern.id)).not.toContain('p');
+    await make().restoreNode('p'); expect((await first.listSoftDeletedTargets()).total).toBe(0);
+    expect((await first.query({ query: 'React' })).map(item => item.pattern.id)).toContain('p');
+  });
+  it('fails closed on inventory load errors and invalidates prior visible/query caches', async () => {
+    seed(); const store = make(); await store.initialize(); await store.query({ query: 'React' });
+    backend.loadFailure = 'graphrag_deletions';
+    await expect(store.listSoftDeletedTargets()).rejects.toThrow('LOAD_FAILED');
+    expect(() => store.getNode('p')).toThrow('not initialized');
+    expect(store['rawNodes'].size).toBe(0);
+    expect(store['queryResults'].size).toBe(0);
+  });
+  it.each([{ offset: -1 }, { offset: 10001 }, { offset: 0.5 }, { limit: 0 }, { limit: 101 }, { limit: NaN }, { limit: '1' }])('rejects invalid pagination before source reads: %j', async options => {
+    await expect(make().listSoftDeletedTargets(options as any)).rejects.toThrow('pagination');
+    expect(backend.reads).toEqual([]);
+  });
+  it('rejects pagination accessors without evaluating them and requires soft mode', async () => {
+    const getter = vi.fn(() => 1);
+    await expect(make().listSoftDeletedTargets(Object.defineProperty({}, 'limit', { get: getter }))).rejects.toThrow('accessor');
+    expect(getter).not.toHaveBeenCalled();
+    await expect(new GraphRAGStore().listSoftDeletedTargets()).rejects.toThrow('not admitted');
+    expect(backend.reads).toEqual([]);
+  });
+  it('uses explicit validated storage identifiers without changing old default selection', () => {
+    new GraphRAGStore({ storage: { projectId: 'operator-fixture', databaseId: 'recovery-fixture' }, softDeletion: {} });
+    expect(backend.configurations.at(-1)).toEqual({ projectId: 'operator-fixture', databaseId: 'recovery-fixture' });
+    new GraphRAGStore();
+    expect(backend.configurations.at(-1)).toEqual({ projectId: process.env.GOOGLE_CLOUD_PROJECT || 'centering-vine-454613-b3', databaseId: 'versatil-rag' });
+    expect(backend.reads).toEqual([]);
+  });
+  it.each([{ projectId: 'explicit-only' }, { projectId: '', databaseId: 'db' }, { projectId: '../escape', databaseId: 'db' }, { projectId: 'p', databaseId: ' db ' }, { projectId: 'p', databaseId: 'db', extra: true }])('rejects incomplete or malformed explicit storage: %j', storage => {
+    expect(() => new GraphRAGStore({ storage: storage as any })).toThrow('storage');
+    expect(backend.configurations).toEqual([]);
+  });
+  it('rejects storage accessors without evaluating them', () => {
+    const getter = vi.fn(() => 'project');
+    const storage = Object.defineProperty({ databaseId: 'db' }, 'projectId', { get: getter });
+    expect(() => new GraphRAGStore({ storage } as any)).toThrow('storage');
+    expect(() => new GraphRAGStore(Object.defineProperty({}, 'storage', { get: getter }))).toThrow('accessor');
+    expect(getter).not.toHaveBeenCalled(); expect(backend.configurations).toEqual([]);
+  });
+});
+
+describe('Recovery HTTP integration with the actual GraphRAG store', () => {
+  it('admits the operator capability, restores after J30, and reports actual endpoint-dependent visibility', async () => {
+    seed();
+    const originals = { nodes: structuredClone([...documents()]), edges: structuredClone([...documents('graphrag_edges')]) };
+    const target = { projectId: 'operator-fixture', databaseId: 'recovery-fixture' };
+    const store = new GraphRAGStore({ storage: target, softDeletion: { clock: () => new Date(clock) } });
+    await store.deleteNode('p'); await store.deleteEdge('e1');
+    clock += 31 * day;
+    const capability = 'c'.repeat(64);
+    let server: Server | undefined;
+    try {
+      server = await new Promise<Server>((resolve, reject) => {
+        const instance = createRecoveryApp({ store, capability, target }).listen(0, '127.0.0.1', () => resolve(instance));
+        instance.once('error', reject);
+      });
+      const address = server.address();
+      if (!address || typeof address === 'string') throw Error('Loopback test listener unavailable');
+      const url = `http://127.0.0.1:${address.port}`;
+      const headers = { 'X-Recovery-Capability': capability, Origin: url, 'Content-Type': 'application/json' };
+      const operationCount = backend.operations.length;
+      const readCount = backend.reads.length;
+      for (const rejectedHeaders of [
+        { ...headers, 'X-Recovery-Capability': 'd'.repeat(64) },
+        { ...headers, Origin: 'http://untrusted.example' }
+      ]) {
+        const response = await fetch(url + '/api/recovery/restore', { method: 'POST', headers: rejectedHeaders, body: JSON.stringify({ kind: 'node', id: 'p' }) });
+        expect(response.status).toBe(403);
+        await response.json();
+      }
+      const deniedInventory = await fetch(url + '/api/recovery/items');
+      expect(deniedInventory.status).toBe(403); await deniedInventory.json();
+      expect(backend.operations).toHaveLength(operationCount);
+      expect(backend.reads).toHaveLength(readCount);
+      expect(documents('graphrag_deletions').get('node_p').active).toBe(true);
+      expect(documents('graphrag_deletions').get('edge_e1').active).toBe(true);
+
+      const inventoryResponse = await fetch(url + '/api/recovery/items', { headers });
+      expect(inventoryResponse.status).toBe(200);
+      const inventory = await inventoryResponse.json();
+      expect(inventory).toMatchObject({ total: 2, target, offset: 0, limit: 50 });
+      expect(inventory.items.find((item: any) => item.kind === 'edge')).toMatchObject({ id: 'e1', maskedEndpointIds: ['p'] });
+      expect(new Date(inventory.items[0].restorationGuaranteedUntil).getTime()).toBeLessThan(clock);
+      expect(JSON.stringify(inventory)).not.toContain('React cache');
+
+      const edgeResponse = await fetch(url + '/api/recovery/restore', { method: 'POST', headers, body: JSON.stringify({ kind: 'edge', id: 'e1' }) });
+      expect(edgeResponse.status).toBe(200);
+      expect(await edgeResponse.json()).toEqual({ kind: 'edge', id: 'e1', outcome: 'restored', visible: false });
+      expect(store.getEdge('e1')).toBeUndefined();
+      const nodeResponse = await fetch(url + '/api/recovery/restore', { method: 'POST', headers, body: JSON.stringify({ kind: 'node', id: 'p' }) });
+      expect(nodeResponse.status).toBe(200);
+      expect(await nodeResponse.json()).toEqual({ kind: 'node', id: 'p', outcome: 'restored', visible: true });
+      expect(store.getEdge('e1')).toBeDefined();
+      const finalResponse = await fetch(url + '/api/recovery/items', { headers });
+      expect(finalResponse.status).toBe(200);
+      expect(await finalResponse.json()).toMatchObject({ total: 0, items: [] });
+      expect(structuredClone([...documents()])).toEqual(originals.nodes);
+      expect(structuredClone([...documents('graphrag_edges')])).toEqual(originals.edges);
+      expect(backend.operations.every(operation => operation.ref.collection === 'graphrag_deletions')).toBe(true);
+    } finally {
+      if (server) await new Promise<void>((resolve, reject) => server!.close(error => error ? reject(error) : resolve()));
+    }
+  });
 });
