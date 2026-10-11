@@ -52,7 +52,8 @@ export function createRecoveryApp(options: { store: RecoveryStore; capability: s
   app.post('/api/recovery/restore', express.json({ limit: '2kb', strict: true }), async (req, res) => {
     const body = req.body;
     if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).sort().join(',') !== 'id,kind' ||
-        !['node', 'edge'].includes(body.kind) || typeof body.id !== 'string' || !body.id || body.id.length > 512 || /[\/\x00-\x1f]/.test(body.id)) {
+        !['node', 'edge'].includes(body.kind) || typeof body.id !== 'string' || !body.id || body.id.length > 512 ||
+        body.id.includes('/') || Array.from(body.id as string).some(character => character.charCodeAt(0) < 32)) {
       res.status(400).json({ error: 'Explicit recovery target required' }); return;
     }
     try {

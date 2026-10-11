@@ -36,6 +36,11 @@ describe('local operator recovery boundary', () => {
     }
     expect((await fetch(url + '/API/recovery/restore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"kind":"node","id":"n1"}' })).status).toBe(403);
     expect(store.restoreNode).not.toHaveBeenCalled();
+    for (const id of ['bad/id', 'bad\u0000id', 'bad\u001fid']) {
+      const response = await fetch(url + '/api/recovery/restore', { method: 'POST', headers: { 'X-Recovery-Capability': capability, Origin: url, 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: 'node', id }) });
+      expect(response.status).toBe(400);
+    }
+    expect(store.restoreNode).not.toHaveBeenCalled();
   });
   it('rejects foreign Host even with capability', async () => {
     const { port, store } = await listen();
