@@ -28,6 +28,24 @@ describe('MCPTaskExecutor', () => {
   // Task Execution (12 tests)
   // ============================================================================
   describe('Task Execution', () => {
+    it('preserves completed writes and does not retry a structured refusal with read-only opt-in', async () => {
+      const operation = vi.fn(async (tool: string) => tool === 'Read'
+        ? { success: false, error: 'Authentication failed', retryable: false }
+        : { success: true, output: 'written' });
+      const native = new MCPTaskExecutor(operation);
+      try {
+        const task = { id: 'structured-no-retry', name: 'Write then read', type: 'development', files: [] };
+        const inference = { taskId: task.id, inferredTools: ['Write', 'Read'], confidence: 1, reasoning: 'fixture' };
+        const result = await native.executeToolsWithRetry(task, inference, 3, { retrySafeTools: { Read: 'read-only' } });
+        expect(result.success).toBe(false);
+        expect(operation.mock.calls.map(call => call[0])).toEqual(['Write', 'Read']);
+        expect([...result.results.keys()]).toEqual(['Write']);
+        expect(result.errors).toEqual([{ tool: 'Read', error: 'Authentication failed', retryable: false }]);
+      } finally {
+        await native.shutdown();
+      }
+    });
+
     it('preserves completed writes and never retries an unspecified failed mutation', async () => {
       const operation = vi.fn(async (tool: string) => {
         if (tool === 'Bash') throw new Error('Failed after mutation');

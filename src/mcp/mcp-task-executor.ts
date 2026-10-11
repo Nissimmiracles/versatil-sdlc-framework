@@ -134,7 +134,9 @@ export class MCPTaskExecutor extends EventEmitter {
         if (!this.executeTool) throw new Error(`No executor registered for ${tool}`);
         const result = await this.executeTool(tool, task);
         if (this.cancelledTasks.has(task.id)) throw new Error('Task cancelled during execution');
-        if (result?.success === false) throw new Error(result.error || `${tool} failed`);
+        if (result?.success === false) {
+          throw Object.assign(new Error(result.error || `${tool} failed`), { retryable: result.retryable });
+        }
         results.set(tool, result);
       } catch (error: any) { errors.push({ tool, error: error.message || String(error), retryable: error.retryable }); }
       progress++;

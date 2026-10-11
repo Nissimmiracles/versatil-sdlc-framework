@@ -24,6 +24,47 @@ describe('MCPHealthMonitor', () => {
   // Health Check Management (10 tests)
   // ============================================================================
   describe('Health Check Management', () => {
+    it('keeps unconfigured monitoring out of execution metrics and admits real callbacks after five cycles', async () => {
+      vi.useFakeTimers();
+      try {
+        const checked = vi.fn();
+        monitor.on('health:checked', checked);
+        monitor.startMonitoring(100);
+        await vi.advanceTimersByTimeAsync(400); // Initial check plus four periodic checks.
+        expect(checked).toHaveBeenCalledTimes(5);
+        expect(monitor.getHealthStatus('github_mcp')).toMatchObject({
+          status: 'unknown', consecutiveFailures: 0, circuitOpen: false
+        });
+        expect(monitor.getMetrics('github_mcp')).toMatchObject({
+          totalRequests: 0, failedRequests: 0, rejectedRequests: 0
+        });
+
+        const operation = vi.fn().mockResolvedValue({ success: true, data: 'observed' });
+        expect(await monitor.executeMCPWithRetry('github_mcp', operation)).toMatchObject({ success: true, data: 'observed' });
+        expect(operation).toHaveBeenCalledTimes(1);
+        const observedHealth = { ...monitor.getHealthStatus('github_mcp')! };
+        const observedMetrics = { ...monitor.getMetrics('github_mcp')! };
+        await vi.advanceTimersByTimeAsync(100);
+        expect(monitor.getHealthStatus('github_mcp')).toEqual(observedHealth);
+        expect(monitor.getMetrics('github_mcp')).toEqual(observedMetrics);
+
+        const failedOperation = vi.fn().mockRejectedValue(new Error('Observed adapter failure'));
+        for (let attempt = 0; attempt < 5; attempt++) {
+          expect((await monitor.executeMCPWithRetry('github_mcp', failedOperation)).success).toBe(false);
+        }
+        expect(failedOperation).toHaveBeenCalledTimes(5);
+        expect(monitor.getHealthStatus('github_mcp')).toMatchObject({ circuitOpen: true, consecutiveFailures: 5 });
+        expect((await monitor.executeMCPWithRetry('github_mcp', operation)).success).toBe(false);
+        expect(operation).toHaveBeenCalledTimes(1);
+        expect(monitor.getMetrics('github_mcp')).toMatchObject({
+          totalRequests: 7, successfulRequests: 1, failedRequests: 5, rejectedRequests: 1
+        });
+      } finally {
+        monitor.stopMonitoring();
+        vi.useRealTimers();
+      }
+    });
+
     it('fails closed when no native executor is registered', async () => {
       const result = await monitor.executeMCPWithRetry('github_mcp', 'health_check');
       expect(result.success).toBe(false);
@@ -598,9 +639,19 @@ describe('MCPHealthMonitor', () => {
         const error: any = new Error('Authentication failed');
         error.retryable = false;
         throw error;
-      });
+      }, { retrySafety: 'read-only' });
 
-      expect(attemptCount).toBe(1); // No retries
+      expect(attemptCount).toBe(1); // Adapter refusal overrides the retry opt-in.
+    });
+
+    it('does not retry a structured refusal even with idempotence opt-in', async () => {
+      const operation = vi.fn().mockResolvedValue({ success: false, error: 'Authentication failed', retryable: false });
+      const retried = vi.fn();
+      monitor.on('retry_attempted', retried);
+      const result = await monitor.executeMCPWithRetry('exa_mcp', operation, { retrySafety: 'idempotent' });
+      expect(result).toMatchObject({ success: false, error: 'Authentication failed', retriesUsed: 0 });
+      expect(operation).toHaveBeenCalledTimes(1);
+      expect(retried).not.toHaveBeenCalled();
     });
 
     it('should emit retry_attempted event', async () => {

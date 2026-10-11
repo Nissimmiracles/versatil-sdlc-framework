@@ -156,7 +156,9 @@ export class MCPHealthMonitor extends EventEmitter {
         const result = params.timeout ? await Promise.race([operation, new Promise((_, reject) => {
           timer = setTimeout(() => reject(Object.assign(new Error('MCP execution timeout'), { retryable: false })), params.timeout);
         })]) : await operation;
-        if (result?.success === false) throw new Error(result.error || 'MCP operation failed');
+        if (result?.success === false) {
+          throw Object.assign(new Error(result.error || 'MCP operation failed'), { retryable: result.retryable });
+        }
         const latency = result?.latency ?? Date.now() - started;
         metrics.successfulRequests++;
         metrics.lastLatency = latency;
@@ -199,8 +201,9 @@ export class MCPHealthMonitor extends EventEmitter {
   /**
    * Check health of individual MCP
    */
-  private async checkMCPHealth(mcpId: string): Promise<void> {
-    await this.executeMCPWithRetry(mcpId, 'health_check', {});
+  private async checkMCPHealth(_mcpId: string): Promise<void> {
+    // No native health probe is registered. Preserve the last observed state;
+    // missing monitoring configuration is not a failed adapter execution.
   }
 
   /**
