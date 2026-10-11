@@ -73,22 +73,22 @@ jobs:
 
               const comment = `## 🌍 Public RAG Contribution
 
-**Patterns Extracted**: ${summary.patternsExtracted}
-**Patterns Stored**: ${summary.patternsStored}
-**Sanitized**: ${summary.sanitized}
+            **Patterns Extracted**: ${summary.patternsExtracted}
+            **Patterns Stored**: ${summary.patternsStored}
+            **Sanitized**: ${summary.sanitized}
 
-### Top Contributions:
-${summary.topPatterns.map((p, i) => `${i + 1}. ${p.pattern} (${p.classification})`).join('\n')}
+            ### Top Contributions:
+            ${summary.topPatterns.map((p, i) => `${i + 1}. ${p.pattern} (${p.classification})`).join('\n')}
 
-✅ These patterns are now available to all VERSATIL users via Public RAG!
+            ✅ These patterns are now available to all VERSATIL users via Public RAG!
 
-<details>
-<summary>📊 Full Report</summary>
+            <details>
+            <summary>📊 Full Report</summary>
 
-\`\`\`json
-${JSON.stringify(summary, null, 2)}
-\`\`\`
-</details>`;
+            \`\`\`json
+            ${JSON.stringify(summary, null, 2)}
+            \`\`\`
+            </details>`;
 
               github.rest.issues.createComment({
                 issue_number: context.issue.number,

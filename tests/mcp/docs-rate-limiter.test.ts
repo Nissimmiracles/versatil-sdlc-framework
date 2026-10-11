@@ -11,6 +11,9 @@ import {
   createRateLimitError,
 } from '../../src/mcp/docs-rate-limiter.js';
 
+beforeEach(() => jest.useFakeTimers({ now: new Date('2025-02-01T00:00:00Z') }));
+afterEach(() => { jest.clearAllTimers(); jest.useRealTimers(); });
+
 describe('RateLimiter', () => {
   let limiter: RateLimiter;
 
@@ -83,6 +86,17 @@ describe('RateLimiter', () => {
   });
 
   describe('token refill', () => {
+    it('does not admit or consume a fractional token and admits exactly one full token', () => {
+      for (let i = 0; i < 5; i++) expect(limiter.check('user1').allowed).toBe(true);
+      jest.advanceTimersByTime(100); // 5 tokens/1000ms restores only 0.5 token.
+      expect(limiter.getStatus('user1')).toMatchObject({ allowed: false, remaining: 0 });
+      expect(limiter.check('user1')).toMatchObject({ allowed: false, remaining: 0 });
+      jest.advanceTimersByTime(100); // Now exactly one token; denied checks consumed none.
+      expect(limiter.getStatus('user1')).toMatchObject({ allowed: true, remaining: 1 });
+      expect(limiter.check('user1')).toMatchObject({ allowed: true, remaining: 0 });
+      expect(limiter.check('user1').allowed).toBe(false);
+    });
+
     it('should refill tokens after time window', async () => {
       // Use up all tokens
       for (let i = 0; i < 5; i++) {
@@ -94,7 +108,7 @@ describe('RateLimiter', () => {
       expect(result.allowed).toBe(false);
 
       // Wait for window to pass
-      await new Promise(resolve => setTimeout(resolve, 1100));
+      jest.advanceTimersByTime(1100);
 
       // Should be allowed again
       result = limiter.check('user1');
@@ -111,11 +125,11 @@ describe('RateLimiter', () => {
       expect(limiter.getStatus('user1').remaining).toBe(2);
 
       // Wait for half the window
-      await new Promise(resolve => setTimeout(resolve, 500));
+      jest.advanceTimersByTime(500);
 
       // Should have refilled some tokens
       const status = limiter.getStatus('user1');
-      expect(status.remaining).toBeGreaterThan(2);
+      expect(status.remaining).toBe(4);
     });
   });
 

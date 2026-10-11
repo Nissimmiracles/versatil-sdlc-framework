@@ -287,6 +287,7 @@ describe('RAGHealthMonitor', () => {
 
   describe('Auto-Remediation', () => {
     it('should have auto-remediation structure', async () => {
+      const now = vi.spyOn(Date, 'now').mockReturnValueOnce(1000).mockReturnValue(1025);
       const mockIssue: RAGIssue = {
         component: 'vector',
         severity: 'medium',
@@ -309,7 +310,8 @@ describe('RAGHealthMonitor', () => {
 
       expect(typeof result.success).toBe('boolean');
       expect(result.component).toBe('vector');
-      expect(result.duration_ms).toBeGreaterThan(0);
+      expect(result.duration_ms).toBe(25);
+      now.mockRestore();
     });
 
     it('should handle vector store connection loss', async () => {
@@ -394,6 +396,7 @@ describe('RAGHealthMonitor', () => {
     });
 
     it('should track remediation duration', async () => {
+      const now = vi.spyOn(Date, 'now').mockReturnValueOnce(1000).mockReturnValue(1025);
       const mockIssue: RAGIssue = {
         component: 'router',
         severity: 'medium',
@@ -405,7 +408,8 @@ describe('RAGHealthMonitor', () => {
       const result = await monitor.remediateIssue(mockIssue);
 
       expect(result.duration_ms).toBeGreaterThan(0);
-      expect(result.duration_ms).toBeLessThan(10000); // Should complete within 10 seconds
+      expect(result.duration_ms).toBe(25);
+      now.mockRestore();
     });
   });
 });

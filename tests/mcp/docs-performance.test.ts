@@ -307,13 +307,20 @@ describe('DocsPerformanceMonitor', () => {
   });
 
   describe('Uptime Tracking', () => {
-    it('should track uptime in milliseconds', async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+    it('should track uptime in milliseconds', () => {
+      jest.useFakeTimers({ now: new Date('2026-01-01T00:00:00Z') });
+      try {
+        monitor = new DocsPerformanceMonitor({ maxMetrics: 100 });
+        expect(monitor.getMetrics().uptimeMs).toBe(0);
 
-      const metrics = monitor.getMetrics();
+        jest.advanceTimersByTime(100);
+        expect(monitor.getMetrics().uptimeMs).toBe(100);
 
-      expect(metrics.uptimeMs).toBeGreaterThanOrEqual(100);
-      expect(metrics.uptimeMs).toBeLessThan(200); // Some buffer for test execution
+        jest.advanceTimersByTime(150);
+        expect(monitor.getMetrics().uptimeMs).toBe(250);
+      } finally {
+        jest.useRealTimers();
+      }
     });
 
     it('should export uptime in seconds for Prometheus', async () => {

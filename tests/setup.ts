@@ -35,21 +35,7 @@ try {
   // MCP SDK not available in test environment
 }
 
-// Mock file system operations
-jest.mock('fs/promises', () => ({
-  readFile: jest.fn(),
-  writeFile: jest.fn(),
-  access: jest.fn(),
-  mkdir: jest.fn(),
-  stat: jest.fn(),
-}));
-
-// Mock chokidar file watcher
-jest.mock('chokidar', () => ({
-  watch: jest.fn(() => ({
-    on: jest.fn(),
-    close: jest.fn(),
-  })),
-}));
+// Filesystem and watcher doubles belong to individual suites. Global doubles
+// silently disable persistence and invalidate temporary-directory integration tests.
 
 export {};

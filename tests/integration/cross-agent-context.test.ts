@@ -3,7 +3,11 @@
  * Sprint 1 Day 5-6: Verify RAG context is preserved across agent handoffs
  */
 
-import { describe, it as test, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it as test, expect, beforeAll, afterAll, vi } from 'vitest';
+vi.mock('../../src/rag/cag-prompt-cache.js', () => ({
+  cagPromptCache: { query: vi.fn().mockRejectedValue(new Error('Offline integration fixture: model provider unavailable')) },
+}));
+
 import { EnhancedMaria } from '../../src/agents/opera/maria-qa/enhanced-maria';
 import { EnhancedJames } from '../../src/agents/opera/james-frontend/enhanced-james';
 import { EnhancedMarcus } from '../../src/agents/opera/marcus-backend/enhanced-marcus';
@@ -260,18 +264,18 @@ describe('Cross-Agent Context Preservation', () => {
         timestamp: Date.now()
       };
 
-      // First activation - should query RAG
-      const start1 = Date.now();
+      const retrieval = vi.spyOn(james as any, 'retrieveSimilarCodePatterns');
+      // First activation populates the RAG cache.
       const response1 = await james.activate(context);
-      const duration1 = Date.now() - start1;
+      const queriesAfterFirst = retrieval.mock.calls.length;
+      expect(queriesAfterFirst).toBeGreaterThan(0);
 
       // Second activation (within 5min) - should use cache
-      const start2 = Date.now();
       const response2 = await james.activate(context);
-      const duration2 = Date.now() - start2;
 
-      // Cache should be faster
-      expect(duration2).toBeLessThanOrEqual(duration1);
+      // Observe reuse directly; wall-clock scheduling does not prove cache behavior.
+      expect(retrieval).toHaveBeenCalledTimes(queriesAfterFirst);
+      retrieval.mockRestore();
       expect(response1.agentId).toBe(response2.agentId);
 
       // Verify both responses are valid
@@ -289,16 +293,25 @@ describe('Cross-Agent Context Preservation', () => {
         timestamp: Date.now()
       };
 
-      // First activation
+      const retrieval = vi.spyOn(james as any, 'retrieveSimilarCodePatterns');
+      const now = Date.now();
+      const clock = vi.spyOn(Date, 'now').mockReturnValue(now);
       await james.activate(context);
 
       // Get cache stats
       const stats = (james as any).getRAGCacheStats();
       expect(stats.size).toBeGreaterThan(0);
 
-      // In real scenario, wait 5 minutes for cache to expire
-      // For testing, we can verify cache exists
       expect(stats.newest).toBeDefined();
+      const queriesBeforeExpiry = retrieval.mock.calls.length;
+      clock.mockReturnValue(now + 5 * 60 * 1000 + 1);
+      try {
+        await james.activate(context);
+        expect(retrieval).toHaveBeenCalledTimes(queriesBeforeExpiry + 1);
+      } finally {
+        clock.mockRestore();
+        retrieval.mockRestore();
+      }
     });
   });
 

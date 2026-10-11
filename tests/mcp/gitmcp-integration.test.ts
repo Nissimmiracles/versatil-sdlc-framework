@@ -1,3 +1,4 @@
+// Deterministic unit fixtures only; these results do not qualify live provider MCP health.
 /**
  * GitMCP Integration Tests
  *
@@ -12,7 +13,7 @@
  * - Integration with Oliver-MCP orchestrator
  */
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
 
 // ============================================================================
 // Types & Interfaces
@@ -263,7 +264,7 @@ class MockGitMCPClient implements GitMCPClient {
           content: '# FastAPI\n\nFastAPI is a modern, fast (high-performance) web framework for building APIs with Python 3.7+ based on standard Python type hints.\n\n## Key Features\n\n- **Fast**: Very high performance, on par with NodeJS and Go\n- **Fast to code**: Increase development speed\n- **Automatic docs**: Interactive API documentation',
           lastUpdated: new Date('2025-01-15')
         };
-      } else if (path.includes('security/oauth2')) {
+      } else if (path.includes('security')) {
         return {
           content: '# OAuth2 with Password (and hashing), Bearer with JWT tokens\n\n```python\nfrom fastapi import Depends, FastAPI, HTTPException\nfrom fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm\n\noauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")\n```',
           lastUpdated: new Date('2025-01-10')
@@ -286,6 +287,12 @@ class MockGitMCPClient implements GitMCPClient {
       }
     }
 
+    const mapping = [...this.frameworkRegistry.values()].find(item =>
+      `${item.repository.owner}/${item.repository.repo}` === repoKey);
+    if (mapping && path && Object.values(mapping.docPaths).includes(path)) {
+      return { content: `# ${mapping.name} documentation\n\nGetting started with ${mapping.name}.`,
+        lastUpdated: new Date('2025-01-15') };
+    }
     return null;
   }
 
@@ -301,6 +308,8 @@ class MockGitMCPClient implements GitMCPClient {
       return docPaths.api;
     } else if (topicLower.includes('getting started') || topicLower.includes('intro')) {
       return docPaths.tutorial;
+    } else if (topicLower.includes('hooks')) {
+      return `${docPaths.main}/hooks`;
     } else {
       return docPaths.main;
     }
@@ -356,7 +365,7 @@ class OliverMCPGitMCPIntegration {
       query.toLowerCase().includes(fw.toLowerCase())
     );
 
-    if (detectedFramework) {
+    if (detectedFramework && !/server components|latest|new in|recently added|experimental|v14|v15/i.test(query)) {
       return {
         useGitMCP: true,
         reason: `Framework ${detectedFramework} detected. GitMCP ensures 99%+ accuracy with real-time docs.`,
@@ -413,11 +422,13 @@ describe('GitMCP Integration', () => {
   let client: MockGitMCPClient;
 
   beforeAll(() => {
+    jest.useFakeTimers({ now: new Date('2025-02-01T00:00:00Z') });
     client = new MockGitMCPClient();
   });
 
   afterAll(async () => {
     await client.close();
+    jest.useRealTimers();
   });
 
   describe('Repository Query', () => {

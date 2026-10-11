@@ -17,6 +17,8 @@
  */
 
 import { join } from 'path';
+import { mkdtempSync, rmSync } from 'fs';
+import { tmpdir } from 'os';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ActivationTracker, getActivationTracker, resetActivationTracker } from '../../src/agents/activation-tracker.js';
 import { SubAgentSelector } from '../../src/agents/core/sub-agent-selector.js';
@@ -611,6 +613,27 @@ describe('Sub-Agent Activation Test Suite', () => {
 
       expect(selection.subAgentId).toBe('james-svelte');
       expect(selection.confidence).toBeGreaterThan(0.7);
+    });
+  });
+
+  describe('Selector route-path portability', () => {
+    it.each(['app', 'pages'])('keeps %s directory fallback equivalent across Windows and POSIX paths', async directory => {
+      const isolatedProject = mkdtempSync(join(tmpdir(), 'sub-agent-selector-'));
+      try {
+        for (const separator of ['/', '\\']) {
+          const filePath = ['project', directory, 'layout.tsx'].join(separator);
+          const result = await SubAgentSelector.selectFrontendSubAgent(filePath, '', isolatedProject);
+          expect(result).toMatchObject({ subAgentId: 'james-nextjs', baseAgentId: 'james-frontend', fallback: true });
+          expect(result.reason).toBe('Fallback: Next.js route detected');
+          const excludedPath = ['project', `${directory}-like`, 'layout.tsx'].join(separator);
+          const excluded = await SubAgentSelector.selectFrontendSubAgent(excludedPath, '', isolatedProject);
+          expect(excluded.subAgentId).toBe('james-react');
+          expect(excluded.fallback).toBe(true);
+        }
+      } finally {
+        rmSync(isolatedProject, { recursive: true, force: true });
+        SubAgentSelector.clearCache();
+      }
     });
   });
 

@@ -105,14 +105,12 @@ export async function verifyBrowserErrors(
   errors: BrowserError[]
 ): Promise<VerificationEvidence> {
   let confidence = 0;
-  let checks = 0;
 
   // Verification 1: File exists
   const fileExistsVerified = await fs.access(filePath).then(() => true).catch(() => false);
   if (fileExistsVerified) {
     confidence += 25;
   }
-  checks++;
 
   // Verification 2: Console errors are real (not empty)
   const consoleErrors = errors.filter(e => e.type === 'console');
@@ -120,7 +118,6 @@ export async function verifyBrowserErrors(
   if (consoleErrorsVerified || consoleErrors.length === 0) {
     confidence += 25;
   }
-  checks++;
 
   // Verification 3: Network errors have valid status codes
   const networkErrors = errors.filter(e => e.type === 'network');
@@ -130,20 +127,18 @@ export async function verifyBrowserErrors(
   if (networkErrorsVerified) {
     confidence += 25;
   }
-  checks++;
 
   // Verification 4: Errors have timestamps
   const hasTimestamps = errors.every(e => e.timestamp && e.timestamp.length > 0);
   if (hasTimestamps) {
     confidence += 25;
   }
-  checks++;
 
   return {
     consoleErrorsVerified,
     networkErrorsVerified,
     fileExistsVerified,
-    confidence: confidence / checks
+    confidence
   };
 }
 

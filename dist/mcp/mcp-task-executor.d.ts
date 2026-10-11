@@ -22,6 +22,7 @@ export interface MCPExecutionResult {
     errors: Array<{
         tool: string;
         error: string;
+        retryable?: boolean;
     }>;
 }
 export interface Task {
@@ -48,13 +49,17 @@ export interface ExecutionSummary {
     errors: string[];
 }
 export declare class MCPTaskExecutor extends EventEmitter {
+    private executeTool?;
     private taskQueue;
     private maxConcurrency;
     private maxQueueSize;
     private metrics;
     private executionSummaries;
     private cancelledTasks;
-    constructor();
+    private toolFeedback;
+    private parallelEfficiency;
+    constructor(executeTool?: (tool: string, task: Task) => Promise<any>);
+    validateTask(task: Task): Promise<void>;
     inferTools(task: Task): Promise<MCPToolInference>;
     executeTools(task: Task, inference: MCPToolInference): Promise<MCPExecutionResult>;
     cancelTask(taskId: string): Promise<void>;
@@ -63,9 +68,12 @@ export declare class MCPTaskExecutor extends EventEmitter {
      */
     executeToolsWithTimeout(task: Task, inference: MCPToolInference, timeoutMs?: number): Promise<MCPExecutionResult>;
     /**
-     * Execute tools with retry logic
+     * Retry only failed tools with an explicit adapter safety guarantee. Completed
+     * tools are retained and never replayed; unknown outcomes and timeouts stop retries.
      */
-    executeToolsWithRetry(task: Task, inference: MCPToolInference, maxRetries?: number): Promise<MCPExecutionResult>;
+    executeToolsWithRetry(task: Task, inference: MCPToolInference, maxRetries?: number, options?: {
+        retrySafeTools?: Record<string, 'read-only' | 'idempotent'>;
+    }): Promise<MCPExecutionResult>;
     /**
      * Execute tasks in parallel
      */
@@ -89,17 +97,19 @@ export declare class MCPTaskExecutor extends EventEmitter {
     /**
      * Get task metrics
      */
-    getTaskMetrics(): TaskMetrics;
+    getTaskMetrics(taskId?: string): any;
     /**
      * Get execution summary for a task
      */
-    getExecutionSummary(taskId: string): ExecutionSummary | undefined;
+    getExecutionSummary(taskId?: string): any;
     /**
      * Provide feedback on task execution
      */
     provideFeedback(taskId: string, feedback: {
-        rating: number;
+        rating?: number;
         comment?: string;
+        correctTools?: string[];
+        missingTools?: string[];
     }): Promise<void>;
     /**
      * Process queued tasks
@@ -118,11 +128,11 @@ export declare class MCPTaskExecutor extends EventEmitter {
      */
     private static sharedSavedState;
     /**
-     * Save queue state to disk
+     * Save queue state to process-local memory
      */
     saveQueueState(): Promise<void>;
     /**
-     * Load queue state from disk
+     * Load queue state from process-local memory
      */
     loadQueueState(): Promise<void>;
     /**
@@ -177,6 +187,9 @@ export declare class MCPTaskExecutor extends EventEmitter {
      * Check if queue is currently being processed
      */
     isQueueProcessing(): boolean;
+    getParallelEfficiency(): number;
+    executeTasksOptimized(tasks: Task[]): Promise<MCPExecutionResult[]>;
+    executeTasksWithDependencies(tasks: Task[]): Promise<MCPExecutionResult[]>;
     shutdown(): Promise<void>;
 }
 export default MCPTaskExecutor;

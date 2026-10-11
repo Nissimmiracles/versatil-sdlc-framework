@@ -25,10 +25,10 @@ on:
   workflow_dispatch:
     inputs:
       mcp-servers:
-        description: 'Comma-separated list of MCP servers to test'
+        description: 'Implemented probes: chrome,github. Other servers remain unverified.'
         required: false
         type: string
-        default: 'chrome,github,vertex-ai,supabase,n8n,semgrep,sentry,exa'
+        default: 'chrome,github'
 
 env:
   NODE_VERSION: '20'
@@ -37,6 +37,9 @@ jobs:
   health-check:
     name: MCP Health Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     outputs:
       chrome-healthy: ${{ steps.test-chrome.outputs.healthy }}
       github-healthy: ${{ steps.test-github.outputs.healthy }}
@@ -71,146 +74,75 @@ jobs:
         id: test-chrome
         if: contains(inputs.mcp-servers, 'chrome')
         run: |
-          echo "🧪 Testing Chrome MCP (Playwright browser automation)..."
-
-          node -e "
-          const { chromeMCPExecutor } = require('./dist/mcp/chrome-mcp-executor.js');
-
-          async function testChromeMCP() {
-            try {
-              console.log('1️⃣ Testing Chrome MCP initialization...');
-
-              // Test navigation to a simple URL
-              console.log('2️⃣ Testing browser navigation...');
-              const navResult = await chromeMCPExecutor.executeChromeMCP('navigate', {
-                url: 'https://example.com'
-              });
-
-              if (!navResult.success) {
-                throw new Error('Navigation failed: ' + navResult.error);
-              }
-
-              console.log('✅ Chrome MCP navigation successful');
-
-              // Test snapshot
-              console.log('3️⃣ Testing screenshot capture...');
-              const snapResult = await chromeMCPExecutor.executeChromeMCP('snapshot');
-
-              if (!snapResult.success) {
-                throw new Error('Snapshot failed: ' + snapResult.error);
-              }
-
-              console.log('✅ Chrome MCP snapshot successful');
-
-              // Cleanup
-              await chromeMCPExecutor.executeChromeMCP('close');
-
-              console.log('✅ Chrome MCP Health Check: PASSED');
-              process.exit(0);
-            } catch (error) {
-              console.error('❌ Chrome MCP Health Check FAILED:', error.message);
-              process.exit(1);
-            }
-          }
-
-          testChromeMCP();
-          " && echo "healthy=true" >> $GITHUB_OUTPUT || echo "healthy=false" >> $GITHUB_OUTPUT
+          if node scripts/ci/mcp-health-check.mjs chrome; then
+            echo "healthy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "healthy=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Test GitHub MCP
         id: test-github
         if: contains(inputs.mcp-servers, 'github')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          echo "🧪 Testing GitHub MCP (repository operations)..."
-
-          node -e "
-          const { GitHubMCPExecutor } = require('./dist/mcp/github-mcp-executor.js');
-
-          async function testGitHubMCP() {
-            try {
-              console.log('1️⃣ Testing GitHub MCP initialization...');
-              const executor = new GitHubMCPExecutor({
-                token: process.env.GITHUB_TOKEN
-              });
-
-              console.log('2️⃣ Testing repository metadata fetch...');
-              // Test basic API access
-              const result = await executor.executeAction('get_repository', {
-                owner: 'Nissimmiracles',
-                repo: 'versatil-sdlc-framework'
-              });
-
-              if (!result || !result.name) {
-                throw new Error('Failed to fetch repository metadata');
-              }
-
-              console.log('✅ GitHub MCP API access successful');
-              console.log('✅ GitHub MCP Health Check: PASSED');
-              process.exit(0);
-            } catch (error) {
-              console.error('❌ GitHub MCP Health Check FAILED:', error.message);
-              process.exit(1);
-            }
-          }
-
-          testGitHubMCP();
-          " && echo "healthy=true" >> $GITHUB_OUTPUT || echo "healthy=false" >> $GITHUB_OUTPUT
+          if node scripts/ci/mcp-health-check.mjs github; then
+            echo "healthy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "healthy=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Test Vertex AI MCP
         id: test-vertex-ai
         if: contains(inputs.mcp-servers, 'vertex-ai')
+        env:
+          GOOGLE_CLOUD_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
         run: |
           echo "🧪 Testing Vertex AI MCP (Google Cloud AI)..."
 
           # Check for credentials
-          if [ -z "${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}" ]; then
+          if [ -z "$GOOGLE_CLOUD_CREDENTIALS" ]; then
             echo "⚠️ Vertex AI MCP skipped: No Google Cloud credentials configured"
-            echo "healthy=skipped" >> $GITHUB_OUTPUT
+            echo "status=skipped" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "✅ Vertex AI MCP configuration present"
-          echo "healthy=true" >> $GITHUB_OUTPUT
+          echo "Vertex AI configuration present; API health unverified"
+          echo "status=unverified" >> "$GITHUB_OUTPUT"
 
       - name: Test Supabase MCP
         id: test-supabase
         if: contains(inputs.mcp-servers, 'supabase')
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           echo "🧪 Testing Supabase MCP (vector database)..."
 
           # Check for Supabase configuration
-          if [ -z "${{ secrets.SUPABASE_URL }}" ] || [ -z "${{ secrets.SUPABASE_ANON_KEY }}" ]; then
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
             echo "⚠️ Supabase MCP skipped: No Supabase credentials configured"
-            echo "healthy=skipped" >> $GITHUB_OUTPUT
+            echo "status=skipped" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          echo "✅ Supabase MCP configuration present"
-          echo "healthy=true" >> $GITHUB_OUTPUT
+          echo "Supabase configuration present; API health unverified"
+          echo "status=unverified" >> "$GITHUB_OUTPUT"
 
       - name: Summary
         id: summary
+        env:
+          MCP_SERVERS: ${{ inputs.mcp-servers }}
+          CHROME_HEALTHY: ${{ steps.test-chrome.outputs.healthy }}
+          GITHUB_HEALTHY: ${{ steps.test-github.outputs.healthy }}
         run: |
-          echo "📊 MCP Health Check Summary:"
-          echo "---"
-          echo "Chrome MCP: ${{ steps.test-chrome.outputs.healthy || 'not tested' }}"
-          echo "GitHub MCP: ${{ steps.test-github.outputs.healthy || 'not tested' }}"
-          echo "Vertex AI MCP: ${{ steps.test-vertex-ai.outputs.healthy || 'not tested' }}"
-          echo "Supabase MCP: ${{ steps.test-supabase.outputs.healthy || 'not tested' }}"
-          echo "---"
-
-          # Check if all tested MCPs are healthy
-          chrome_ok="${{ steps.test-chrome.outputs.healthy }}"
-          github_ok="${{ steps.test-github.outputs.healthy }}"
-
-          if [ "$chrome_ok" = "false" ] || [ "$github_ok" = "false" ]; then
-            echo "❌ Some MCP servers are unhealthy"
-            echo "all-healthy=false" >> $GITHUB_OUTPUT
-            exit 1
+          # Configuration presence or an untested server is not a successful probe.
+          if node scripts/ci/mcp-health-check.mjs summary; then
+            echo "all-healthy=true" >> "$GITHUB_OUTPUT"
           else
-            echo "✅ All tested MCP servers are healthy"
-            echo "all-healthy=true" >> $GITHUB_OUTPUT
+            echo "all-healthy=false" >> "$GITHUB_OUTPUT"
+            exit 1
           fi
 
       - name: Upload health report

@@ -3,14 +3,33 @@
  * Tests index building, rebuilding, TTL, and concurrent access
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, afterAll, jest } from '@jest/globals';
 import { DocsSearchEngine } from '../../src/mcp/docs-search-engine.js';
-import path from 'path';
+import { createDocsCorpus } from '../fixtures/docs-corpus/create.js';
+import { performance } from 'node:perf_hooks';
 
 describe('DocsSearchEngine - Index Management', () => {
-  const projectPath = path.join(process.cwd());
+  const corpus = createDocsCorpus();
+  const projectPath = corpus.root;
+  beforeEach(() => {
+    // Control Date only; native filesystem and glob scheduling stay active.
+    jest.useFakeTimers({ now: new Date('2025-02-01T00:00:00Z'), doNotFake: ['nextTick', 'setImmediate', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'] });
+  });
+  afterEach(() => jest.useRealTimers());
+  afterAll(() => corpus.cleanup());
 
   describe('Index Building', () => {
+    it('uses forward-slash glob syntax for Windows-style paths', async () => {
+      const globModule = jest.requireActual<typeof import('glob')>('glob');
+      const search = jest.spyOn(globModule, 'glob').mockResolvedValueOnce([]);
+      const engine = new DocsSearchEngine(projectPath);
+      engine['docsPath'] = 'C:\\fixture\\docs';
+      try {
+        await engine.buildIndex();
+        expect(search).toHaveBeenCalledWith('C:/fixture/docs/**/*.md', { absolute: true });
+      } finally { search.mockRestore(); }
+    });
+
     it('should build index on first use', async () => {
       const engine = new DocsSearchEngine(projectPath);
 
@@ -21,7 +40,7 @@ describe('DocsSearchEngine - Index Management', () => {
 
       const metadataAfter = engine.getIndexMetadata();
       expect(metadataAfter.built).toBe(true);
-      expect(metadataAfter.documentsCount).toBeGreaterThan(0);
+      expect(metadataAfter.documentsCount).toBe(corpus.count);
     });
 
     it('should not rebuild if index is fresh', async () => {
@@ -41,9 +60,9 @@ describe('DocsSearchEngine - Index Management', () => {
     it('should build within reasonable time', async () => {
       const engine = new DocsSearchEngine(projectPath);
 
-      const start = Date.now();
+      const start = performance.now();
       await engine.buildIndex();
-      const duration = Date.now() - start;
+      const duration = performance.now() - start;
 
       // Should complete within 10 seconds
       expect(duration).toBeLessThan(10000);
@@ -58,7 +77,7 @@ describe('DocsSearchEngine - Index Management', () => {
       const firstBuild = engine.getIndexMetadata().lastBuild;
 
       // Wait a moment
-      await new Promise(resolve => setTimeout(resolve, 100));
+      jest.setSystemTime(Date.now() + 100);
 
       // Force rebuild
       await engine.rebuildIndex();
@@ -91,9 +110,9 @@ describe('DocsSearchEngine - Index Management', () => {
 
       await engine.buildIndex();
       expect(engine.isIndexStale()).toBe(false);
-
-      // Wait for TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 150));
+      jest.setSystemTime(Date.now() + 99);
+      expect(engine.isIndexStale()).toBe(false);
+      jest.setSystemTime(Date.now() + 1);
 
       expect(engine.isIndexStale()).toBe(true);
     });
@@ -107,7 +126,7 @@ describe('DocsSearchEngine - Index Management', () => {
       const firstBuild = engine.getIndexMetadata().lastBuild;
 
       // Wait for TTL to expire
-      await new Promise(resolve => setTimeout(resolve, 150));
+      jest.setSystemTime(Date.now() + 150);
 
       // Next build should detect staleness and rebuild
       await engine.buildIndex();
@@ -202,9 +221,9 @@ describe('DocsSearchEngine - Index Management', () => {
 
       await engine.buildIndex();
 
-      const start = Date.now();
+      const start = performance.now();
       await engine.search('agent workflow');
-      const duration = Date.now() - start;
+      const duration = performance.now() - start;
 
       // Should complete within 1 second
       expect(duration).toBeLessThan(1000);
@@ -215,7 +234,7 @@ describe('DocsSearchEngine - Index Management', () => {
 
       await engine.buildIndex();
 
-      const start = Date.now();
+      const start = performance.now();
       await Promise.all([
         engine.search('maria'),
         engine.search('james'),
@@ -223,7 +242,7 @@ describe('DocsSearchEngine - Index Management', () => {
         engine.search('workflow'),
         engine.search('testing'),
       ]);
-      const duration = Date.now() - start;
+      const duration = performance.now() - start;
 
       // All 5 searches should complete within 5 seconds
       expect(duration).toBeLessThan(5000);

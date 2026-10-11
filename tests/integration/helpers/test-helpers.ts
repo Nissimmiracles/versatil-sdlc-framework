@@ -118,11 +118,14 @@ export async function execShellCommand(
   const startTime = Date.now();
 
   try {
-    const { stdout, stderr } = await execAsync(command, {
+    const execution = execAsync(command, {
       cwd: options.cwd || process.cwd(),
       env: { ...process.env, ...options.env },
       timeout: options.timeout || 30000,
     });
+    // Non-interactive commands must receive EOF, including eagerly created readline interfaces.
+    execution.child.stdin?.end();
+    const { stdout, stderr } = await execution;
 
     return {
       stdout,
@@ -183,7 +186,7 @@ export async function setupTestEnvironment(
 
   // Create cleanup function
   const cleanup = async () => {
-    process.chdir(originalCwd);
+    if (process.cwd() !== originalCwd) process.chdir(originalCwd);
     try {
       await fs.rm(tempDir, { recursive: true, force: true });
     } catch (error) {

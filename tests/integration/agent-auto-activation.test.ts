@@ -15,7 +15,7 @@
  * @version 1.0.0
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { SubAgentSelector } from '../../src/agents/core/sub-agent-selector.js';
 import { TechStackDetector } from '../../src/agents/core/tech-stack-detector.js';
 import * as fs from 'fs/promises';
@@ -25,12 +25,12 @@ import * as os from 'os';
 describe('Agent Auto-Activation Validation', () => {
   let tempDir: string;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Create temporary test directory
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'versatil-agent-activation-'));
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     // Cleanup temporary directory
     await fs.rm(tempDir, { recursive: true, force: true });
   });
@@ -53,7 +53,7 @@ describe('Agent Auto-Activation Validation', () => {
         );
 
         // Alex-BA should be recommended for requirements files
-        expect(result.detectedFiles).toContain('requirements/user-auth.md');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'requirements/user-auth.md'));
       });
 
       it('should activate on *.feature files', async () => {
@@ -62,7 +62,7 @@ describe('Agent Auto-Activation Validation', () => {
           'Feature: User Login\n  Scenario: Successful login\n    Given...'
         );
 
-        expect(result.detectedFiles).toContain('features/login.feature');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'features/login.feature'));
       });
 
       it('should activate on GitHub issues (keyword trigger)', () => {
@@ -81,7 +81,7 @@ describe('Agent Auto-Activation Validation', () => {
           'CREATE TABLE users (id UUID PRIMARY KEY, email TEXT UNIQUE);'
         );
 
-        expect(result.detectedFiles).toContain('schema.sql');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'schema.sql'));
       });
 
       it('should activate on migrations/** files', async () => {
@@ -90,7 +90,7 @@ describe('Agent Auto-Activation Validation', () => {
           'ALTER TABLE users ADD COLUMN created_at TIMESTAMPTZ;'
         );
 
-        expect(result.detectedFiles).toContain('migrations/001_create_users.sql');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'migrations/001_create_users.sql'));
       });
 
       it('should activate on supabase/** files', async () => {
@@ -99,7 +99,7 @@ describe('Agent Auto-Activation Validation', () => {
           'ALTER TABLE users ENABLE ROW LEVEL SECURITY;'
         );
 
-        expect(result.detectedFiles).toContain('supabase/migrations/001_rls_policies.sql');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'supabase/migrations/001_rls_policies.sql'));
       });
 
       it('should activate on prisma/** files', async () => {
@@ -109,7 +109,10 @@ describe('Agent Auto-Activation Validation', () => {
           'model User { id String @id @default(uuid()) email String @unique }'
         );
 
-        const result = await TechStackDetector.detectFromProject(tempDir);
+        const result = await TechStackDetector.detectFromFile(
+          path.join(tempDir, 'prisma/schema.prisma'),
+          await fs.readFile(path.join(tempDir, 'prisma/schema.prisma'), 'utf8')
+        );
 
         expect(result.detectedFiles).toEqual(
           expect.arrayContaining([expect.stringContaining('schema.prisma')])
@@ -131,7 +134,7 @@ describe('Agent Auto-Activation Validation', () => {
           'export const usersAPI = { login: async () => {} };'
         );
 
-        expect(result.detectedFiles).toContain('src/users.api.ts');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'src/users.api.ts'));
       });
 
       it('should activate on routes/** files', async () => {
@@ -140,7 +143,7 @@ describe('Agent Auto-Activation Validation', () => {
           'import { Router } from "express"; const router = Router();'
         );
 
-        expect(result.detectedFiles).toContain('routes/auth.ts');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'routes/auth.ts'));
       });
 
       it('should activate on controllers/** files', async () => {
@@ -149,7 +152,7 @@ describe('Agent Auto-Activation Validation', () => {
           'export class UserController { async index() {} }'
         );
 
-        expect(result.detectedFiles).toContain('controllers/UserController.ts');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'controllers/UserController.ts'));
       });
 
       it('should activate on API keywords', () => {
@@ -169,7 +172,7 @@ describe('Agent Auto-Activation Validation', () => {
         );
 
         expect(result.language).toBe('node');
-        expect(result.detectedFiles).toContain('components/Button.tsx');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'components/Button.tsx'));
       });
 
       it('should activate on *.jsx files', async () => {
@@ -179,7 +182,7 @@ describe('Agent Auto-Activation Validation', () => {
         );
 
         expect(result.language).toBe('node');
-        expect(result.detectedFiles).toContain('components/Card.jsx');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'components/Card.jsx'));
       });
 
       it('should activate on *.vue files', async () => {
@@ -188,7 +191,7 @@ describe('Agent Auto-Activation Validation', () => {
           '<template><div>Hello</div></template><script>export default {}</script>'
         );
 
-        expect(result.detectedFiles).toContain('components/Hero.vue');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'components/Hero.vue'));
       });
 
       it('should activate on *.css and *.scss files', async () => {
@@ -197,7 +200,7 @@ describe('Agent Auto-Activation Validation', () => {
           '.button { background: blue; }'
         );
 
-        expect(cssResult.detectedFiles).toContain('styles/main.css');
+        expect(cssResult.detectedFiles).toContain(path.join(tempDir, 'styles/main.css'));
       });
 
       it('should activate on component keywords', () => {
@@ -216,7 +219,7 @@ describe('Agent Auto-Activation Validation', () => {
           'describe("User", () => { it("should login", () => {}); });'
         );
 
-        expect(result.detectedFiles).toContain('users.test.ts');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'users.test.ts'));
       });
 
       it('should activate on __tests__/** files', async () => {
@@ -225,7 +228,7 @@ describe('Agent Auto-Activation Validation', () => {
           'test("authentication works", () => { expect(true).toBe(true); });'
         );
 
-        expect(result.detectedFiles).toContain('__tests__/auth.spec.ts');
+        expect(result.detectedFiles).toContain(path.join(tempDir, '__tests__/auth.spec.ts'));
       });
 
       it('should activate on *.spec.* files', async () => {
@@ -234,7 +237,7 @@ describe('Agent Auto-Activation Validation', () => {
           'describe("API", () => {});'
         );
 
-        expect(result.detectedFiles).toContain('api.spec.js');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'api.spec.js'));
       });
 
       it('should activate on test keywords', () => {
@@ -253,7 +256,7 @@ describe('Agent Auto-Activation Validation', () => {
           '# Architecture\n\nThis is the system architecture...'
         );
 
-        expect(result.detectedFiles).toContain('docs/architecture.md');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'docs/architecture.md'));
       });
 
       it('should activate on docs/** files', async () => {
@@ -262,7 +265,7 @@ describe('Agent Auto-Activation Validation', () => {
           '# Setup Guide\n\n1. Install dependencies...'
         );
 
-        expect(result.detectedFiles).toContain('docs/guides/setup.md');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'docs/guides/setup.md'));
       });
 
       it('should activate on project event keywords', () => {
@@ -282,7 +285,7 @@ describe('Agent Auto-Activation Validation', () => {
         );
 
         expect(result.language).toBe('python');
-        expect(result.detectedFiles).toContain('train_model.py');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'train_model.py'));
       });
 
       it('should activate on *.ipynb files', async () => {
@@ -291,7 +294,7 @@ describe('Agent Auto-Activation Validation', () => {
           '{"cells": [{"cell_type": "code"}]}'
         );
 
-        expect(result.detectedFiles).toContain('analysis.ipynb');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'analysis.ipynb'));
       });
 
       it('should activate on models/** files', async () => {
@@ -300,7 +303,7 @@ describe('Agent Auto-Activation Validation', () => {
           'from sklearn.ensemble import RandomForestClassifier'
         );
 
-        expect(result.detectedFiles).toContain('models/recommendation.py');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'models/recommendation.py'));
       });
 
       it('should activate on ML keywords', () => {
@@ -319,7 +322,7 @@ describe('Agent Auto-Activation Validation', () => {
           'export class MCPSelector {}'
         );
 
-        expect(result.detectedFiles).toContain('src/agents/mcp/selector.ts');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'src/agents/mcp/selector.ts'));
       });
 
       it('should activate on *.mcp.* files', async () => {
@@ -328,7 +331,7 @@ describe('Agent Auto-Activation Validation', () => {
           '{"mcpServers": {}}'
         );
 
-        expect(result.detectedFiles).toContain('config.mcp.json');
+        expect(result.detectedFiles).toContain(path.join(tempDir, 'config.mcp.json'));
       });
 
       it('should activate on MCP keywords', () => {
@@ -422,7 +425,7 @@ describe('Agent Auto-Activation Validation', () => {
         );
 
         expect(selection.subAgentId).toBe('marcus-python');
-        expect(selection.reason).toContain('Python');
+        expect(selection.techStack?.language).toBe('python');
         expect(selection.confidence).toBeGreaterThan(0.7);
       });
     });
@@ -591,9 +594,10 @@ describe('Agent Auto-Activation Validation', () => {
 
       const results = await Promise.all(
         testCases.map(async tc => {
-          await fs.writeFile(path.join(tempDir, tc.file), tc.content);
-          const result = await TechStackDetector.detectFromProject(tempDir);
-          await fs.unlink(path.join(tempDir, tc.file)); // Cleanup
+          const projectDir = await fs.mkdtemp(path.join(tempDir, 'stack-'));
+          await fs.writeFile(path.join(projectDir, tc.file), tc.content);
+          const result = await TechStackDetector.detectFromProject(projectDir);
+          await fs.rm(projectDir, { recursive: true, force: true });
 
           return {
             ...tc,
@@ -624,18 +628,21 @@ describe('Agent Auto-Activation Validation', () => {
         },
         {
           file: 'App.tsx',
-          content: 'import React from "react";\nexport const App = () => <div />;',
+          content: 'import React, { useState } from "react";\nexport const App = () => <div />;',
           expected: 'james-react'
         },
         {
           file: 'Component.vue',
-          content: '<template><div></div></template>\n<script>import { defineComponent } from "vue";</script>',
+          content: "<template><div></div></template>\n<script>import { defineComponent } from 'vue';</script>",
           expected: 'james-vue'
         }
       ];
 
       for (const test of routingTests) {
-        const selection = await SubAgentSelector.selectSubAgent(
+        const selector = test.expected.startsWith('james-')
+          ? SubAgentSelector.selectFrontendSubAgent.bind(SubAgentSelector)
+          : SubAgentSelector.selectBackendSubAgent.bind(SubAgentSelector);
+        const selection = await selector(
           path.join(tempDir, test.file),
           test.content,
           tempDir
@@ -694,29 +701,23 @@ describe('Agent Auto-Activation Validation', () => {
       expect(duration).toBeLessThan(200);
     });
 
-    it('should cache tech stack detection results', async () => {
+    it('should reuse cached detection and rescan after explicit invalidation', async () => {
       await fs.writeFile(path.join(tempDir, 'go.mod'), 'module test');
-
-      // First call (cache miss)
-      const start1 = Date.now();
-      await SubAgentSelector.selectBackendSubAgent(
-        path.join(tempDir, 'main.go'),
-        'package main',
-        tempDir
-      );
-      const duration1 = Date.now() - start1;
-
-      // Second call (cache hit)
-      const start2 = Date.now();
-      await SubAgentSelector.selectBackendSubAgent(
-        path.join(tempDir, 'api.go'),
-        'package main',
-        tempDir
-      );
-      const duration2 = Date.now() - start2;
-
-      // Cache hit should be faster (or equal if both very fast)
-      expect(duration2).toBeLessThanOrEqual(duration1);
+      const detect = vi.spyOn(TechStackDetector, 'detectFromProject');
+      try {
+        const first = await SubAgentSelector.selectBackendSubAgent(path.join(tempDir, 'main.txt'), '', tempDir);
+        expect(first.subAgentId).toBe('marcus-go');
+        expect(detect).toHaveBeenCalledTimes(1);
+        const hit = await SubAgentSelector.selectBackendSubAgent(path.join(tempDir, 'api.txt'), '', tempDir);
+        expect(hit.subAgentId).toBe(first.subAgentId);
+        expect(detect).toHaveBeenCalledTimes(1);
+        SubAgentSelector.clearCache();
+        const fresh = await SubAgentSelector.selectBackendSubAgent(path.join(tempDir, 'server.txt'), '', tempDir);
+        expect(fresh.subAgentId).toBe(first.subAgentId);
+        expect(detect).toHaveBeenCalledTimes(2);
+      } finally {
+        detect.mockRestore();
+      }
     });
   });
 

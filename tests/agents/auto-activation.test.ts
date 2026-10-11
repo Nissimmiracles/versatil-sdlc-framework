@@ -1,8 +1,8 @@
 /**
  * Auto-Activation Test Suite
  *
- * Comprehensive tests for all 18 VERSATIL agents (8 core + 10 sub-agents).
- * Validates file pattern triggers, code content triggers, and context-based activation.
+ * Tests in-file activation predicates and ActivationTracker receipts.
+ * These fixture predicates do not qualify production orchestration or agent runtime.
  *
  * Success Criteria:
  * - All agents have >90% activation accuracy
@@ -535,6 +535,24 @@ describe('Auto-Activation Test Suite', () => {
     });
   });
 
+  describe('Fixture path predicate portability', () => {
+    it.each([
+      [shouldActivateMaria, 'src/test/helper.ts', 'src/testing/helper.ts'],
+      [shouldActivateDana, 'prisma/schema.prisma', 'prisma-like/schema.txt'],
+      [shouldActivateMarcus, 'routes/account.ts', 'routes-like/account.ts'],
+      [shouldActivateAlex, 'requirements/auth.txt', 'requirements-like/auth.txt'],
+      [shouldActivateSarah, 'docs/usage.txt', 'docs-like/usage.txt'],
+      [shouldActivateDrAI, 'models/classifier.bin', 'models-like/classifier.bin'],
+      [shouldActivateOliver, 'src/mcp/server.ts', 'src/mcp-like/server.ts']
+    ])('keeps directory triggers and lookalike exclusions equivalent across separators', async (predicate, matching, excluded) => {
+      for (const separator of ['/', '\\']) {
+        const input = (relative: string) => ({ filePath: ['project', ...relative.split('/')].join(separator), content: '' });
+        expect(await predicate(input(matching))).toBe(true);
+        expect(await predicate(input(excluded))).toBe(false);
+      }
+    });
+  });
+
   /**
    * VALIDATION REPORT
    */
@@ -587,7 +605,7 @@ describe('Auto-Activation Test Suite', () => {
  */
 
 async function shouldActivateMaria(context: AgentActivationContext): Promise<boolean> {
-  const filePath = context.filePath || '';
+  const filePath = (context.filePath || '').replace(/\\/g, '/');
   const content = context.content || '';
 
   // File pattern triggers
@@ -616,7 +634,7 @@ async function shouldActivateMaria(context: AgentActivationContext): Promise<boo
 }
 
 async function shouldActivateDana(context: AgentActivationContext): Promise<boolean> {
-  const filePath = context.filePath || '';
+  const filePath = (context.filePath || '').replace(/\\/g, '/');
 
   return (
     filePath.endsWith('.sql') ||
@@ -627,7 +645,7 @@ async function shouldActivateDana(context: AgentActivationContext): Promise<bool
 }
 
 async function shouldActivateMarcus(context: AgentActivationContext): Promise<boolean> {
-  const filePath = context.filePath || '';
+  const filePath = (context.filePath || '').replace(/\\/g, '/');
 
   return (
     filePath.includes('.api.') ||
@@ -638,7 +656,7 @@ async function shouldActivateMarcus(context: AgentActivationContext): Promise<bo
 }
 
 async function shouldActivateJames(context: AgentActivationContext): Promise<boolean> {
-  const filePath = context.filePath || '';
+  const filePath = (context.filePath || '').replace(/\\/g, '/');
 
   return (
     filePath.endsWith('.tsx') ||
@@ -651,7 +669,7 @@ async function shouldActivateJames(context: AgentActivationContext): Promise<boo
 }
 
 async function shouldActivateAlex(context: AgentActivationContext): Promise<boolean> {
-  const filePath = context.filePath || '';
+  const filePath = (context.filePath || '').replace(/\\/g, '/');
 
   return (
     filePath.includes('/requirements/') ||
@@ -661,7 +679,7 @@ async function shouldActivateAlex(context: AgentActivationContext): Promise<bool
 }
 
 async function shouldActivateSarah(context: AgentActivationContext): Promise<boolean> {
-  const filePath = context.filePath || '';
+  const filePath = (context.filePath || '').replace(/\\/g, '/');
 
   return (
     filePath.endsWith('.md') ||
@@ -670,7 +688,7 @@ async function shouldActivateSarah(context: AgentActivationContext): Promise<boo
 }
 
 async function shouldActivateDrAI(context: AgentActivationContext): Promise<boolean> {
-  const filePath = context.filePath || '';
+  const filePath = (context.filePath || '').replace(/\\/g, '/');
 
   return (
     filePath.endsWith('.py') ||
@@ -681,7 +699,7 @@ async function shouldActivateDrAI(context: AgentActivationContext): Promise<bool
 }
 
 async function shouldActivateOliver(context: AgentActivationContext): Promise<boolean> {
-  const filePath = context.filePath || '';
+  const filePath = (context.filePath || '').replace(/\\/g, '/');
 
   return (
     filePath.includes('/mcp/') ||

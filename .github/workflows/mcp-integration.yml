@@ -281,65 +281,20 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Test MCP Integration Routing
-        run: |
-          node -e "
-          const { MCPIntegration } = require('./dist/mcp-integration.js');
-
-          async function testIntegration() {
-            const integration = new MCPIntegration();
-
-            console.log('✅ MCP Integration layer loaded');
-
-            // Test intelligent routing detection
-            const testContexts = [
-              { trigger: { type: 'file_edit', agent: 'Maria-QA' }, expectedMCP: 'playwright_mcp' },
-              { trigger: { type: 'file_edit', agent: 'Marcus-Backend' }, expectedMCP: 'semgrep_mcp' },
-              { trigger: { type: 'user_request', agent: 'Alex-BA' }, expectedMCP: 'exa_mcp' },
-              { trigger: { type: 'user_request', agent: 'Dr.AI-ML' }, expectedMCP: 'vertex_ai_mcp' },
-            ];
-
-            console.log('Testing intelligent routing for', testContexts.length, 'scenarios');
-            console.log('✅ MCP Integration routing - PASSED');
-
-            console.log('');
-            console.log('🎉 All MCP Integration Tests PASSED');
-          }
-
-          testIntegration().catch(err => {
-            console.error('❌ MCP Integration test failed:', err.message);
-            process.exit(1);
-          });
-          "
+      - name: Test MCP Integration Export and Rejection Contract
+        run: node --test tests/ci/mcp-integration-smoke.test.mjs
 
       - name: Generate MCP Integration Report
         run: |
-          echo "# MCP Integration Test Report" > mcp-test-report.md
-          echo "" >> mcp-test-report.md
-          echo "**Date**: $(date)" >> mcp-test-report.md
-          echo "**Commit**: ${{ github.sha }}" >> mcp-test-report.md
-          echo "" >> mcp-test-report.md
-          echo "## Tested MCPs (11 Total)" >> mcp-test-report.md
-          echo "" >> mcp-test-report.md
-          echo "✅ Playwright MCP Executor" >> mcp-test-report.md
-          echo "✅ GitHub MCP Executor" >> mcp-test-report.md
-          echo "✅ Exa Search MCP Executor" >> mcp-test-report.md
-          echo "✅ Vertex AI MCP Executor" >> mcp-test-report.md
-          echo "✅ Supabase MCP Executor" >> mcp-test-report.md
-          echo "✅ n8n MCP Executor" >> mcp-test-report.md
-          echo "✅ Semgrep MCP Executor" >> mcp-test-report.md
-          echo "✅ Sentry MCP Executor" >> mcp-test-report.md
-          echo "✅ Chrome MCP Executor (pre-existing)" >> mcp-test-report.md
-          echo "✅ Shadcn MCP Executor (pre-existing)" >> mcp-test-report.md
-          echo "" >> mcp-test-report.md
-          echo "## Integration Layer" >> mcp-test-report.md
-          echo "" >> mcp-test-report.md
-          echo "✅ MCP Integration routing and context detection" >> mcp-test-report.md
-          echo "" >> mcp-test-report.md
-          echo "## Conclusion" >> mcp-test-report.md
-          echo "" >> mcp-test-report.md
-          echo "All 11 MCP executors loaded successfully without requiring credentials." >> mcp-test-report.md
-          echo "Integration layer correctly routes requests to appropriate MCPs." >> mcp-test-report.md
+          cat > mcp-test-report.md << 'EOF'
+          # MCP Integration Smoke Report
+
+          The executor job loaded ten constructors without credentials.
+          The integration job verified the compiled MCPToolManager export and
+          rejection of unsupported tools without invoking a provider adapter.
+
+          Native provider execution, authenticated routing, and live health were not tested.
+          EOF
 
       - name: Upload Test Report
         uses: actions/upload-artifact@v4
@@ -348,26 +303,4 @@ jobs:
           path: mcp-test-report.md
 
       - name: Create Summary
-        run: |
-          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
-          ## 🎉 MCP Integration Tests - All Passed
-
-          **11 MCP Executors Tested:**
-          - ✅ Playwright MCP
-          - ✅ GitHub MCP
-          - ✅ Exa Search MCP
-          - ✅ Vertex AI MCP
-          - ✅ Supabase MCP
-          - ✅ n8n MCP
-          - ✅ Semgrep MCP
-          - ✅ Sentry MCP
-          - ✅ Chrome MCP
-          - ✅ Shadcn MCP
-
-          **Integration Layer:**
-          - ✅ Intelligent routing working correctly
-          - ✅ Context detection functional
-          - ✅ All executors load without credentials
-
-          All tests passed! The MCP ecosystem is healthy. ✨
-          EOF
+        run: cat mcp-test-report.md >> "$GITHUB_STEP_SUMMARY"

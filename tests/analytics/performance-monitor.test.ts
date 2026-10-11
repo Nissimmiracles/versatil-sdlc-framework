@@ -1,410 +1,248 @@
-/**
- * Tests for Performance Monitor System
+/** Tests the implemented monitor contract with virtual storage and deterministic timers.
+ * Host resource measurements and real account analytics files are not exercised.
  */
-
 import { PerformanceMonitor } from '../../src/analytics/performance-monitor';
 import { EventEmitter } from 'events';
+import * as fs from 'fs';
 
-// Mock VERSATILLogger
-jest.mock('../../src/utils/logger', () => ({
-  VERSATILLogger: jest.fn().mockImplementation(() => ({
-    info: jest.fn(),
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
-  }))
-}));
+jest.mock('os', () => ({ ...jest.requireActual('os'), homedir: () => '/unit-performance-home' }));
+jest.mock('fs', () => {
+  const files = new Map<string, string>();
+  return {
+    existsSync: jest.fn((file: string) => files.has(file)),
+    mkdirSync: jest.fn(),
+    writeFileSync: jest.fn((file: string, content: string) => files.set(file, content)),
+    readFileSync: jest.fn((file: string) => {
+      if (!files.has(file)) throw new Error('Fixture file not found');
+      return files.get(file);
+    }),
+    resetFixture: () => files.clear()
+  };
+});
 
-describe('PerformanceMonitor', () => {
-  let performanceMonitor: PerformanceMonitor;
-
+describe('PerformanceMonitor implemented contract', () => {
+  let monitor: PerformanceMonitor;
   beforeEach(() => {
-    performanceMonitor = new PerformanceMonitor();
+    jest.useFakeTimers({ now: new Date('2025-02-01T00:00:00Z') });
+    (fs as any).resetFixture();
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.spyOn(process, 'memoryUsage').mockReturnValue({ rss: 128 * 1024 ** 2, heapTotal: 96 * 1024 ** 2,
+      heapUsed: 64 * 1024 ** 2, external: 0, arrayBuffers: 0 });
+    jest.spyOn(process, 'cpuUsage').mockReturnValue({ user: 100000, system: 50000 });
+    monitor = new PerformanceMonitor();
   });
-
   afterEach(() => {
-    performanceMonitor.stop();
+    monitor.stopMonitoring();
+    jest.clearAllTimers();
+    jest.useRealTimers();
+    jest.restoreAllMocks();
   });
+  const record = (id = 'maria', duration = 1200, issues = 3, quality = 95, success = true) =>
+    monitor.recordAgentExecution(id, duration, issues, quality, success);
 
-  describe('Initialization', () => {
-    it('should initialize with correct properties', () => {
-      expect(performanceMonitor).toBeInstanceOf(PerformanceMonitor);
-      expect(performanceMonitor).toBeInstanceOf(EventEmitter);
-      expect(performanceMonitor['isMonitoring']).toBe(false);
-      expect(performanceMonitor['agentMetrics']).toBeDefined();
-      expect(performanceMonitor['systemMetrics']).toBeDefined();
+  describe('Initialization and control', () => {
+    it('initializes with empty agent summaries and the EventEmitter interface', () => {
+      expect(monitor).toBeInstanceOf(EventEmitter);
+      expect(monitor.getPerformanceDashboard().agents).toEqual([]);
+      expect(monitor.getAgentSummary('unknown')).toBeNull();
     });
-
-    it('should initialize with empty metrics', () => {
-      expect(performanceMonitor['agentMetrics'].size).toBe(0);
-      expect(performanceMonitor['systemMetrics'].cpuUsage).toBe(0);
-      expect(performanceMonitor['systemMetrics'].memoryUsage.used).toBe(0);
+    it('starts monitoring once and does not duplicate periodic timers', () => {
+      const started = jest.fn();
+      monitor.on('monitoring-started', started);
+      monitor.start();
+      const count = jest.getTimerCount();
+      monitor.start();
+      expect(count).toBe(3);
+      expect(jest.getTimerCount()).toBe(count);
+      expect(started).toHaveBeenCalledTimes(1);
     });
-  });
-
-  describe('Monitoring Control', () => {
-    it('should start monitoring successfully', () => {
-      performanceMonitor.start();
-      expect(performanceMonitor['isMonitoring']).toBe(true);
+    it('emits the implemented stop event and persists only to virtual fixture storage', () => {
+      const stopped = jest.fn();
+      monitor.on('monitoring-stopped', stopped);
+      monitor.stopMonitoring();
+      expect(stopped).toHaveBeenCalledTimes(1);
+      expect(fs.writeFileSync).toHaveBeenCalledWith(expect.stringContaining('analytics'), expect.any(String));
     });
-
-    it('should stop monitoring successfully', () => {
-      performanceMonitor.start();
-      performanceMonitor.stop();
-      expect(performanceMonitor['isMonitoring']).toBe(false);
+    it('stops all periodic collection and persistence after the final save', () => {
+      const event = jest.fn();
+      monitor.on('metric-recorded', event);
+      monitor.start();
+      monitor.stopMonitoring();
+      const saves = (fs.writeFileSync as jest.Mock).mock.calls.length;
+      expect(jest.getTimerCount()).toBe(0);
+      jest.advanceTimersByTime(3600000);
+      expect(event).not.toHaveBeenCalled();
+      expect(fs.writeFileSync).toHaveBeenCalledTimes(saves);
     });
-
-    it('should handle multiple start calls gracefully', () => {
-      performanceMonitor.start();
-      performanceMonitor.start();
-      expect(performanceMonitor['isMonitoring']).toBe(true);
+    it('can restart cleanly without retaining stopped timers', () => {
+      const event = jest.fn();
+      monitor.on('metric-recorded', event);
+      monitor.start(); monitor.stopMonitoring(); monitor.start();
+      expect(jest.getTimerCount()).toBe(3);
+      jest.advanceTimersByTime(30000);
+      expect(event).toHaveBeenCalledTimes(2);
     });
-
-    it('should handle stop without start gracefully', () => {
-      expect(() => performanceMonitor.stop()).not.toThrow();
-      expect(performanceMonitor['isMonitoring']).toBe(false);
-    });
-  });
-
-  describe('Agent Execution Recording', () => {
-    beforeEach(() => {
-      performanceMonitor.start();
-    });
-
-    it('should record agent execution successfully', () => {
-      performanceMonitor.recordAgentExecution('enhanced-maria', 1500, 3, 0.95);
-
-      const agentMetrics = performanceMonitor['agentMetrics'].get('enhanced-maria');
-      expect(agentMetrics).toBeDefined();
-      expect(agentMetrics?.activations).toBe(1);
-      expect(agentMetrics?.totalExecutionTime).toBe(1500);
-      expect(agentMetrics?.issuesDetected).toBe(3);
-      expect(agentMetrics?.avgQualityScore).toBe(0.95);
-    });
-
-    it('should accumulate multiple executions for same agent', () => {
-      performanceMonitor.recordAgentExecution('enhanced-maria', 1000, 2, 0.9);
-      performanceMonitor.recordAgentExecution('enhanced-maria', 2000, 4, 0.8);
-
-      const agentMetrics = performanceMonitor['agentMetrics'].get('enhanced-maria');
-      expect(agentMetrics?.activations).toBe(2);
-      expect(agentMetrics?.totalExecutionTime).toBe(3000);
-      expect(agentMetrics?.issuesDetected).toBe(6);
-      expect(agentMetrics?.avgQualityScore).toBe(0.85); // (0.9 + 0.8) / 2
-    });
-
-    it('should track different agents separately', () => {
-      performanceMonitor.recordAgentExecution('enhanced-maria', 1000, 2, 0.9);
-      performanceMonitor.recordAgentExecution('enhanced-james', 1500, 3, 0.85);
-
-      expect(performanceMonitor['agentMetrics'].size).toBe(2);
-
-      const mariaMetrics = performanceMonitor['agentMetrics'].get('enhanced-maria');
-      const jamesMetrics = performanceMonitor['agentMetrics'].get('enhanced-james');
-
-      expect(mariaMetrics?.activations).toBe(1);
-      expect(jamesMetrics?.activations).toBe(1);
-      expect(mariaMetrics?.avgQualityScore).toBe(0.9);
-      expect(jamesMetrics?.avgQualityScore).toBe(0.85);
-    });
-
-    it('should not record when monitoring is stopped', () => {
-      performanceMonitor.stop();
-      performanceMonitor.recordAgentExecution('enhanced-maria', 1000, 2, 0.9);
-
-      expect(performanceMonitor['agentMetrics'].size).toBe(0);
-    });
-
-    it('should emit performance_alert for slow executions', (done) => {
-      performanceMonitor.on('performance_alert', (alert) => {
-        expect(alert).toMatchObject({
-          type: 'slow_execution',
-          agentId: 'enhanced-maria',
-          executionTime: 10000,
-          threshold: 5000
-        });
-        done();
-      });
-
-      performanceMonitor.recordAgentExecution('enhanced-maria', 10000, 1, 0.9);
-    });
-
-    it('should emit performance_alert for low quality scores', (done) => {
-      performanceMonitor.on('performance_alert', (alert) => {
-        expect(alert).toMatchObject({
-          type: 'low_quality',
-          agentId: 'enhanced-maria',
-          qualityScore: 0.3,
-          threshold: 0.7
-        });
-        done();
-      });
-
-      performanceMonitor.recordAgentExecution('enhanced-maria', 1000, 1, 0.3);
+    it('accepts explicit execution records before periodic monitoring starts', () => {
+      record();
+      expect(monitor.getAgentSummary('maria')?.totalExecutions).toBe(1);
     });
   });
 
-  describe('System Metrics Collection', () => {
-    beforeEach(() => {
-      performanceMonitor.start();
+  describe('Execution aggregates and quality percentages', () => {
+    it('records execution, issues and 0..100 quality in a public agent summary', () => {
+      record();
+      expect(monitor.getAgentSummary('maria')).toMatchObject({ agentId: 'maria', totalExecutions: 1,
+        averageExecutionTime: 1200, minExecutionTime: 1200, maxExecutionTime: 1200,
+        issuesDetected: 3, averageQualityScore: 95, successRate: 1, lastExecution: Date.now() });
     });
-
-    it('should collect system metrics periodically', (done) => {
-      // Trigger system metrics collection manually
-      performanceMonitor['collectSystemMetrics']();
-
-      setTimeout(() => {
-        const systemMetrics = performanceMonitor['systemMetrics'];
-        expect(systemMetrics.uptime).toBeGreaterThan(0);
-        expect(systemMetrics.memoryUsage.total).toBeGreaterThan(0);
-        expect(systemMetrics.memoryUsage.used).toBeGreaterThanOrEqual(0);
-        expect(systemMetrics.memoryUsage.percentage).toBeGreaterThanOrEqual(0);
-        done();
-      }, 100);
+    it('accumulates durations, issues, quality and success rates independently', () => {
+      record('maria', 1000, 2, 90, true);
+      record('maria', 2000, 4, 80, false);
+      expect(monitor.getAgentSummary('maria')).toMatchObject({ totalExecutions: 2, averageExecutionTime: 1500,
+        minExecutionTime: 1000, maxExecutionTime: 2000, issuesDetected: 6, averageQualityScore: 85, successRate: 0.5 });
     });
-
-    it('should update system metrics over time', (done) => {
-      const initialUptime = performanceMonitor['systemMetrics'].uptime;
-
-      setTimeout(() => {
-        performanceMonitor['collectSystemMetrics']();
-        const updatedUptime = performanceMonitor['systemMetrics'].uptime;
-        expect(updatedUptime).toBeGreaterThanOrEqual(initialUptime);
-        done();
-      }, 100);
+    it('maintains independent aggregates for distinct agents', () => {
+      record('maria', 1000, 2, 90);
+      record('james', 1500, 3, 85);
+      expect(monitor.getPerformanceDashboard().agents).toHaveLength(2);
+      expect(monitor.getAgentSummary('maria')?.averageQualityScore).toBe(90);
+      expect(monitor.getAgentSummary('james')?.averageQualityScore).toBe(85);
     });
-  });
-
-  describe('Performance Dashboard', () => {
-    beforeEach(() => {
-      performanceMonitor.start();
-      // Add some test data
-      performanceMonitor.recordAgentExecution('enhanced-maria', 1200, 3, 0.95);
-      performanceMonitor.recordAgentExecution('enhanced-james', 800, 1, 0.88);
-      performanceMonitor.recordAgentExecution('enhanced-marcus', 1500, 5, 0.92);
+    it('emits agent-execution-recorded synchronously with its actual payload', () => {
+      const event = jest.fn();
+      monitor.on('agent-execution-recorded', event);
+      record();
+      expect(event).toHaveBeenCalledTimes(1);
+      expect(event).toHaveBeenCalledWith({ agentId: 'maria', executionTime: 1200, issuesDetected: 3, qualityScore: 95, success: true });
     });
-
-    it('should generate comprehensive dashboard data', () => {
-      const dashboard = performanceMonitor.getPerformanceDashboard();
-
-      expect(dashboard).toMatchObject({
-        timestamp: expect.any(String),
-        system: expect.objectContaining({
-          overallHealth: expect.any(Number),
-          uptime: expect.any(Number),
-          memoryUsage: expect.objectContaining({
-            used: expect.any(Number),
-            total: expect.any(Number),
-            percentage: expect.any(Number)
-          }),
-          cpuUsage: expect.any(Number),
-          responseTime: expect.any(Number)
-        }),
-        agents: expect.any(Array)
-      });
-    });
-
-    it('should include all recorded agents in dashboard', () => {
-      const dashboard = performanceMonitor.getPerformanceDashboard();
-
-      expect(dashboard.agents).toHaveLength(3);
-
-      const agentIds = dashboard.agents.map(agent => agent.agentId);
-      expect(agentIds).toContain('enhanced-maria');
-      expect(agentIds).toContain('enhanced-james');
-      expect(agentIds).toContain('enhanced-marcus');
-    });
-
-    it('should calculate correct agent metrics', () => {
-      const dashboard = performanceMonitor.getPerformanceDashboard();
-
-      const mariaAgent = dashboard.agents.find(agent => agent.agentId === 'enhanced-maria');
-      expect(mariaAgent).toMatchObject({
-        agentId: 'enhanced-maria',
-        activations: 1,
-        avgExecutionTime: 1200,
-        totalIssuesDetected: 3,
-        avgQualityScore: 0.95,
-        successRate: expect.any(Number),
-        lastActive: expect.any(String)
-      });
-    });
-
-    it('should calculate overall system health', () => {
-      const dashboard = performanceMonitor.getPerformanceDashboard();
-
-      expect(dashboard.system.overallHealth).toBeGreaterThan(0);
-      expect(dashboard.system.overallHealth).toBeLessThanOrEqual(100);
+    it('emits three metric-recorded events including context and thresholds', () => {
+      const event = jest.fn();
+      monitor.on('metric-recorded', event);
+      monitor.recordAgentExecution('maria', 1200, 3, 95, true, { fixture: true });
+      expect(event.mock.calls.map(([metric]) => metric.metricType)).toEqual(['execution_time', 'issue_detection', 'quality_score']);
+      expect(event.mock.calls[2][0]).toMatchObject({ agentId: 'maria', value: 95, threshold: 70, status: 'normal', context: { fixture: true } });
     });
   });
 
-  describe('Prometheus Metrics', () => {
-    beforeEach(() => {
-      performanceMonitor.start();
-      performanceMonitor.recordAgentExecution('enhanced-maria', 1200, 3, 0.95);
-      performanceMonitor.recordAgentExecution('enhanced-james', 800, 1, 0.88);
+  describe('Alert thresholds and event payloads', () => {
+    it.each([[5000, null], [5001, 'warning'], [10000, 'warning'], [10001, 'critical']] as const)('distinguishes execution threshold boundaries at %d milliseconds', (duration, severity) => {
+      const event = jest.fn();
+      monitor.on('alert-created', event);
+      record('maria', duration);
+      if (severity === null) expect(event).not.toHaveBeenCalled();
+      else {
+        expect(event).toHaveBeenCalledTimes(1);
+        expect(event.mock.calls[0][0]).toMatchObject({ metric: 'execution_time', value: duration, threshold: 5000, severity, agentId: 'maria', timestamp: Date.now() });
+      }
     });
-
-    it('should generate Prometheus-compatible metrics', () => {
-      const metrics = performanceMonitor.getPrometheusMetrics();
-
-      expect(metrics).toContain('# HELP');
-      expect(metrics).toContain('# TYPE');
-      expect(metrics).toContain('versatil_agent_activations_total');
-      expect(metrics).toContain('versatil_agent_execution_time_ms');
-      expect(metrics).toContain('versatil_agent_quality_score');
+    it.each([[70, null], [69, 'warning'], [35, 'warning'], [34, 'critical']] as const)('distinguishes quality threshold boundaries at %d percent', (quality, severity) => {
+      const event = jest.fn();
+      monitor.on('alert-created', event);
+      record('maria', 1000, 1, quality);
+      if (severity === null) expect(event).not.toHaveBeenCalled();
+      else {
+        expect(event).toHaveBeenCalledTimes(1);
+        expect(event.mock.calls[0][0]).toMatchObject({ metric: 'quality_score', value: quality, threshold: 70, severity });
+      }
     });
-
-    it('should include agent-specific metrics', () => {
-      const metrics = performanceMonitor.getPrometheusMetrics();
-
-      expect(metrics).toContain('enhanced-maria');
-      expect(metrics).toContain('enhanced-james');
-      expect(metrics).toContain('1200'); // Maria's execution time
-      expect(metrics).toContain('800');  // James's execution time
+    it('reports separate slow-execution and low-quality alerts with no asynchronous wait', () => {
+      const event = jest.fn();
+      monitor.on('alert-created', event);
+      record('maria', 8000, 1, 50);
+      expect(event.mock.calls.map(([alert]) => alert.metric)).toEqual(['execution_time', 'quality_score']);
+      expect(monitor.getActiveAlerts()).toHaveLength(2);
     });
-
-    it('should include system metrics', () => {
-      const metrics = performanceMonitor.getPrometheusMetrics();
-
-      expect(metrics).toContain('versatil_system_memory_usage_bytes');
-      expect(metrics).toContain('versatil_system_cpu_usage_percent');
-      expect(metrics).toContain('versatil_system_uptime_seconds');
+    it('reports excessive issues only beyond the configured threshold', () => {
+      record('maria', 1000, 10, 95);
+      expect(monitor.getActiveAlerts()).toEqual([]);
+      record('maria', 1000, 11, 95);
+      expect(monitor.getActiveAlerts()).toEqual([expect.objectContaining({ metric: 'issue_detection', value: 11, threshold: 10, severity: 'info' })]);
     });
+    it('limits retained alerts to the latest 1000 entries', () => {
+      for (let i = 0; i < 1001; i++) record(`agent-${i}`, 5001, 0, 95);
+      const alerts = monitor.getActiveAlerts();
+      expect(alerts).toHaveLength(1000);
+      expect(alerts[0].agentId).toBe('agent-1');
+      expect(alerts[999].agentId).toBe('agent-1000');
+    });
+  });
 
-    it('should format metrics correctly for Prometheus', () => {
-      const metrics = performanceMonitor.getPrometheusMetrics();
+  describe('Deterministic periodic metrics', () => {
+    it('records memory in MB and the implemented CPU approximation on the 30s interval', () => {
+      const event = jest.fn();
+      monitor.on('metric-recorded', event);
+      monitor.start();
+      jest.advanceTimersByTime(30000);
+      expect(event).toHaveBeenCalledTimes(2);
+      expect(event.mock.calls[0][0]).toMatchObject({ agentId: 'system', metricType: 'memory_usage', value: 64 });
+      expect(event.mock.calls[1][0]).toMatchObject({ agentId: 'system', metricType: 'cpu_usage', value: 0.15 });
+      expect(monitor.getPerformanceDashboard().system.memoryUsage).toBe(64);
+    });
+    it('timestamps each collection using the current controlled clock', () => {
+      const event = jest.fn();
+      monitor.on('metric-recorded', event);
+      monitor.start();
+      jest.advanceTimersByTime(60000);
+      expect(event).toHaveBeenCalledTimes(4);
+      expect(event.mock.calls[2][0].timestamp - event.mock.calls[0][0].timestamp).toBe(30000);
+    });
+    it('persists at five minutes without real filesystem access', () => {
+      monitor.start();
+      jest.advanceTimersByTime(300000);
+      expect(fs.writeFileSync).toHaveBeenCalled();
+      const saved = JSON.parse((fs.writeFileSync as jest.Mock).mock.calls.at(-1)![1]);
+      expect(saved.metrics.system).toHaveLength(20);
+      expect(saved.lastSaved).toBe(Date.now());
+    });
+    it('removes metrics older than seven days while retaining newer samples', () => {
+      record('old');
+      jest.advanceTimersByTime(8 * 24 * 60 * 60 * 1000);
+      record('new');
+      monitor['cleanupOldMetrics']();
+      expect(monitor['metrics'].get('old')).toEqual([]);
+      expect(monitor['metrics'].get('new')).toHaveLength(3);
+    });
+  });
 
-      // Check for proper Prometheus format
-      const lines = metrics.split('\n');
-      const metricLines = lines.filter(line => !line.startsWith('#') && line.trim() !== '');
-
-      metricLines.forEach(line => {
+  describe('Dashboard, reports and implemented Prometheus schema', () => {
+    beforeEach(() => { record('maria', 1200, 3, 95); record('james', 800, 1, 85); });
+    it('reports public system aggregates and percentage quality health', () => {
+      expect(monitor.getPerformanceDashboard().system).toMatchObject({ timestamp: Date.now(), overallHealth: 90,
+        totalAgentExecutions: 2, averageResponseTime: 1000, activeAgents: 2, criticalIssues: 0, highPriorityIssues: 0, qualityGateStatus: 'passing' });
+    });
+    it('exposes the same dashboard through getMetrics and JSON export', () => {
+      expect(monitor.getMetrics()).toEqual(monitor.getPerformanceDashboard());
+      expect(JSON.parse(monitor.exportReport())).toEqual(monitor.getPerformanceDashboard());
+    });
+    it('exports documented CSV values and success percentage', () => {
+      expect(monitor.exportReport('csv')).toContain('maria,1,1200.00,1200,100.0%,95.0,3,stable');
+    });
+    it('exports the actual system and agent Prometheus metric names and values', () => {
+      const output = monitor.getPrometheusMetrics();
+      for (const name of ['versatil_system_health', 'versatil_total_executions', 'versatil_response_time_avg', 'versatil_agent_executions', 'versatil_agent_quality_score', 'versatil_agent_issues_detected']) {
+        expect(output).toContain(`# HELP ${name} `);
+        expect(output).toContain(`# TYPE ${name} `);
+      }
+      expect(output).toContain('versatil_agent_quality_score{agent="maria"} 95');
+      expect(output).toContain('versatil_total_executions 2');
+      for (const line of output.split('\n').filter(line => line && !line.startsWith('#'))) {
         expect(line).toMatch(/^[a-zA-Z_:][a-zA-Z0-9_:]*(\{[^}]*\})?\s+[\d.]+$/);
-      });
-    });
-  });
-
-  describe('Performance Alerts', () => {
-    beforeEach(() => {
-      performanceMonitor.start();
-    });
-
-    it('should detect performance degradation', (done) => {
-      let alertCount = 0;
-
-      performanceMonitor.on('performance_alert', (alert) => {
-        alertCount++;
-        expect(alert.type).toBeDefined();
-        expect(alert.agentId).toBeDefined();
-
-        if (alertCount === 2) {
-          done();
-        }
-      });
-
-      // Trigger multiple alerts
-      performanceMonitor.recordAgentExecution('enhanced-maria', 8000, 1, 0.5); // Slow + low quality
-    });
-
-    it('should track agent performance trends', () => {
-      // Record multiple executions with declining performance
-      performanceMonitor.recordAgentExecution('enhanced-maria', 1000, 2, 0.9);
-      performanceMonitor.recordAgentExecution('enhanced-maria', 2000, 1, 0.8);
-      performanceMonitor.recordAgentExecution('enhanced-maria', 3000, 0, 0.7);
-
-      const dashboard = performanceMonitor.getPerformanceDashboard();
-      const mariaAgent = dashboard.agents.find(agent => agent.agentId === 'enhanced-maria');
-
-      expect(mariaAgent?.avgExecutionTime).toBe(2000); // (1000 + 2000 + 3000) / 3
-      expect(mariaAgent?.avgQualityScore).toBeCloseTo(0.8); // (0.9 + 0.8 + 0.7) / 3
-    });
-  });
-
-  describe('Memory Management', () => {
-    beforeEach(() => {
-      performanceMonitor.start();
-    });
-
-    it('should handle large numbers of agent executions', () => {
-      // Record many executions
-      for (let i = 0; i < 1000; i++) {
-        performanceMonitor.recordAgentExecution(`agent-${i % 10}`, 1000 + i, i % 5, 0.8 + (i % 20) * 0.01);
       }
-
-      const dashboard = performanceMonitor.getPerformanceDashboard();
-      expect(dashboard.agents.length).toBe(10); // 10 unique agents
     });
-
-    it('should clean up old metrics when needed', () => {
-      const initialMemory = process.memoryUsage().heapUsed;
-
-      // Add lots of data
-      for (let i = 0; i < 10000; i++) {
-        performanceMonitor.recordAgentExecution(`test-agent-${i}`, 1000, 1, 0.8);
-      }
-
-      const afterMemory = process.memoryUsage().heapUsed;
-      expect(afterMemory).toBeLessThan(initialMemory * 2); // Should not double memory usage
+    it('marks quality gates failing when a critical alert is active', () => {
+      record('critical', 1000, 0, 30);
+      expect(monitor.getPerformanceDashboard().system.qualityGateStatus).toBe('failing');
+      expect(monitor.getActiveAlerts()).toEqual([expect.objectContaining({ severity: 'critical', metric: 'quality_score' })]);
     });
-  });
-
-  describe('Error Handling', () => {
-    it('should handle invalid agent execution data', () => {
-      performanceMonitor.start();
-
-      expect(() => {
-        performanceMonitor.recordAgentExecution('', -1, -1, -1);
-      }).not.toThrow();
+    it('expires active alerts after an hour', () => {
+      record('slow', 8000);
+      jest.advanceTimersByTime(3600001);
+      expect(monitor.getActiveAlerts()).toEqual([]);
     });
-
-    it('should handle system metrics collection errors', () => {
-      performanceMonitor.start();
-
-      expect(() => {
-        performanceMonitor['collectSystemMetrics']();
-      }).not.toThrow();
-    });
-
-    it('should handle dashboard generation errors', () => {
-      expect(() => {
-        performanceMonitor.getPerformanceDashboard();
-      }).not.toThrow();
-    });
-  });
-
-  describe('Event Emission', () => {
-    beforeEach(() => {
-      performanceMonitor.start();
-    });
-
-    it('should emit agent_execution event', (done) => {
-      performanceMonitor.on('agent_execution', (data) => {
-        expect(data).toMatchObject({
-          agentId: 'enhanced-maria',
-          executionTime: 1200,
-          issuesDetected: 3,
-          qualityScore: 0.95,
-          timestamp: expect.any(Number)
-        });
-        done();
-      });
-
-      performanceMonitor.recordAgentExecution('enhanced-maria', 1200, 3, 0.95);
-    });
-
-    it('should emit system_metrics event', (done) => {
-      performanceMonitor.on('system_metrics', (metrics) => {
-        expect(metrics).toMatchObject({
-          uptime: expect.any(Number),
-          memoryUsage: expect.any(Object),
-          cpuUsage: expect.any(Number),
-          timestamp: expect.any(Number)
-        });
-        done();
-      });
-
-      performanceMonitor['collectSystemMetrics']();
+    it('aggregates declining input quality without inventing a fractional score', () => {
+      record('trend', 1000, 2, 90); record('trend', 2000, 1, 80); record('trend', 3000, 0, 70);
+      expect(monitor.getAgentSummary('trend')).toMatchObject({ averageExecutionTime: 2000, averageQualityScore: 80 });
     });
   });
 });

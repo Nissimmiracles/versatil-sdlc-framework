@@ -40,8 +40,18 @@ jobs:
       - name: Build
         run: pnpm build  # Can use 'pnpm build' or 'pnpm run build'
 
-      - name: Test
-        run: pnpm test  # Can use 'pnpm test' or 'pnpm run test'
+      # Collection disagreements fail explicitly; fixtures stay inventoried.
+      - name: Check runner partition
+        run: node tests/ci/runner-partition.cjs --check
+
+      - name: Test runner contracts
+        run: node --test tests/ci/runner-configuration.test.cjs
+
+      - name: Test Vitest suites
+        run: pnpm exec vitest run --config vitest.config.ts
+
+      - name: Test Jest suites
+        run: pnpm exec jest --config config/jest.config.cjs
 
 # ==============================================================================
 # MATRIX BUILD EXAMPLE
@@ -74,8 +84,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run tests
-        run: pnpm test
+      - name: Check runner partition
+        run: node tests/ci/runner-partition.cjs --check
+
+      - name: Test runner contracts
+        run: node --test tests/ci/runner-configuration.test.cjs
+
+      - name: Test Vitest suites
+        run: pnpm exec vitest run --config vitest.config.ts
+
+      - name: Test Jest suites
+        run: pnpm exec jest --config config/jest.config.cjs
 
 # ==============================================================================
 # SPECIAL CASE: Publishing to npm Registry
@@ -141,8 +160,11 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
+      - name: Check runner partition
+        run: node tests/ci/runner-partition.cjs --check
+
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: pnpm exec playwright test --config playwright.config.ts
 
       - name: Upload test results
         if: always()

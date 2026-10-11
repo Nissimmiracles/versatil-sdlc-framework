@@ -9,6 +9,11 @@
  * - Chrome MCP integration support
  */
 
+const { collectRunnerPartition } = require('../tests/ci/runner-partition.cjs');
+const partition = collectRunnerPartition(require('path').resolve(__dirname, '..'));
+const integrationPaths = /^(tests\/(integration|agents|update|rag|templates|planning)\/)/;
+const jestPaths = paths => paths.map(file => `<rootDir>/${file}`);
+
 module.exports = {
   // Root directory resolution - set to project root, not config dir
   rootDir: require('path').resolve(__dirname, '..'),
@@ -18,16 +23,8 @@ module.exports = {
   roots: ['<rootDir>/src', '<rootDir>/tests'],
 
   // Hybrid test matching - Jest handles unit tests, Playwright handles e2e
-  testMatch: [
-    '**/__tests__/**/*.+(ts|tsx|js)',
-    '**/*.(test|spec).+(ts|tsx|js)',
-    // Exclude Playwright-specific tests from Jest
-    '!**/*.e2e.{ts,js}',
-    '!**/*.playwright.{ts,js}',
-    '!**/*.mcp.{ts,js}',
-    '!**/e2e/**/*',
-    '!**/playwright/**/*'
-  ],
+  // All Jest suites are assigned below, including legacy global-test files.
+  testMatch: jestPaths(partition.byRunner.jest),
 
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
@@ -112,7 +109,10 @@ module.exports = {
 
   // Jest projects for different test types
   projects: [
-    require('path').resolve(__dirname, './jest-unit.config.cjs'),
+    {
+      ...require('./jest-unit.config.cjs'),
+      testMatch: jestPaths(partition.byRunner.jest.filter(file => !file.startsWith('tests/stress/') && !integrationPaths.test(file))),
+    },
     {
       displayName: {
         name: 'STRESS',
@@ -144,9 +144,7 @@ module.exports = {
         '^@/tests/(.*)$': '<rootDir>/tests/$1'
       },
       setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-      testMatch: [
-        '<rootDir>/tests/stress/**/*.{ts,tsx}'
-      ],
+      testMatch: jestPaths(partition.byRunner.jest.filter(file => file.startsWith('tests/stress/'))),
       coverageDirectory: '<rootDir>/coverage/stress',
       maxWorkers: process.env.CI ? 1 : '50%',
       detectOpenHandles: false
@@ -193,18 +191,7 @@ module.exports = {
         '^@/tests/(.*)$': '<rootDir>/tests/$1'
       },
       setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-      testMatch: [
-        '<rootDir>/tests/integration/**/*.{ts,tsx}',
-        '<rootDir>/tests/agents/**/*.{ts,tsx}',
-        '<rootDir>/tests/update/**/*.{ts,tsx}',
-        '<rootDir>/tests/rag/**/*.{ts,tsx}',
-        '<rootDir>/tests/templates/**/*.{ts,tsx}',
-        '<rootDir>/tests/planning/**/*.{ts,tsx}',
-        // Exclude Playwright integration tests and helper files
-        '!<rootDir>/tests/integration/**/*.e2e.{ts,tsx}',
-        '!<rootDir>/tests/integration/**/*.playwright.{ts,tsx}',
-        '!<rootDir>/tests/integration/helpers/**'
-      ],
+      testMatch: jestPaths(partition.byRunner.jest.filter(file => integrationPaths.test(file))),
       coverageDirectory: '<rootDir>/coverage/integration',
       maxWorkers: process.env.CI ? 1 : '50%',
       detectOpenHandles: false  // Disable in normal runs (enable manually for debugging)
@@ -243,3 +230,9 @@ module.exports = {
     }
   }
 };
+// Production sources use import.meta.url; preserve it in the legacy CJS runner.
+for (const project of module.exports.projects) {
+  for (const [, options] of Object.values(project.transform)) {
+    options.astTransformers = { before: [require('path').resolve(__dirname, '../tests/setup/jest-import-meta.cjs')] };
+  }
+}

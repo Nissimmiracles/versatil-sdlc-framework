@@ -259,6 +259,14 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
       searchMethod = 'local-semantic';
     }
     
+    // Apply caller metadata selectors after merging all retrieval paths.
+    if (query.agentId) {
+      documents = documents.filter(document => document.metadata.agentId === query.agentId);
+    }
+    if (query.filters) {
+      documents = this.applyFilters(documents, query.filters);
+    }
+
     // Apply reranking if requested or enabled by default
     let reranked = false;
     if (query.rerank !== false && this.config.rerankingEnabled) {
@@ -267,7 +275,7 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     }
     
     // Limit to topK
-    const topK = query.topK || 10;
+    const topK = query.topK ?? 10;
     const finalDocuments = documents.slice(0, topK);
     
     return {
@@ -907,7 +915,16 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
       this.logger.warn('Error persisting memory', { error });
     }
   }
-  private applyFilters(documents: MemoryDocument[], filters: any): MemoryDocument[] { return documents; }
+  private applyFilters(documents: MemoryDocument[], filters: NonNullable<RAGQuery['filters']>): MemoryDocument[] {
+    return documents.filter(document => {
+      const { metadata } = document;
+      if (filters.contentTypes && !filters.contentTypes.includes(document.contentType)) return false;
+      if (filters.fileTypes && (!metadata.fileType || !filters.fileTypes.includes(metadata.fileType))) return false;
+      if (filters.tags && !filters.tags.every(tag => metadata.tags?.includes(tag))) return false;
+      if (filters.timeRange && !(metadata.timestamp >= filters.timeRange.start && metadata.timestamp <= filters.timeRange.end)) return false;
+      return true;
+    });
+  }
   private cosineSimilarity(vec1: number[], vec2: number[]): number {
     return vec1.reduce((sum, val, i) => sum + val * (vec2[i] || 0), 0);
   }
@@ -1106,7 +1123,7 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     return {
       success: true,
       data: {
-        testPatterns: results.documents,
+        testPatterns: results.documents.map(doc => ({ ...doc, code_content: doc.content, similarity: doc.metadata.relevanceScore })),
         qaBestPractices: [],
         projectStandards: [],
         ragInsights: {
@@ -1143,7 +1160,7 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     return {
       success: true,
       data: {
-        componentPatterns: results.documents,
+        componentPatterns: results.documents.map(doc => ({ ...doc, code_content: doc.content, similarity: doc.metadata.relevanceScore })),
         uiPatterns: [],
         performancePatterns: [],
         ragInsights: {
@@ -1180,7 +1197,7 @@ export class EnhancedVectorMemoryStore extends EventEmitter {
     return {
       success: true,
       data: {
-        apiPatterns: results.documents,
+        apiPatterns: results.documents.map(doc => ({ ...doc, code_content: doc.content, similarity: doc.metadata.relevanceScore })),
         securityPatterns: [],
         performancePatterns: [],
         databaseOptimizations: [],

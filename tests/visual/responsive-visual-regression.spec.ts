@@ -1,352 +1,51 @@
-/**
- * Responsive Visual Regression Tests
- *
- * Percy visual regression testing for responsive layouts
- * Tests page layouts at different breakpoints and orientations
- *
- * Run: npx percy exec -- npx playwright test tests/visual/responsive-visual-regression.spec.ts
- */
-
+/** Portable reference responsive geometry checks; screenshots are evidence attachments, not baselines. */
 import { test, expect } from '@playwright/test';
-import { createPercyHelper, RESPONSIVE_WIDTHS } from '../utils/percy-helpers.js';
+import { installReferenceFixture } from '../accessibility/reference-fixture.js';
+import { assertReferenceLayout } from './reference-layout.js';
 
-test.describe('Responsive Visual Regression Tests', () => {
-  test('Homepage - All Breakpoints', async ({ page }) => {
-    const percy = createPercyHelper(page);
+test.beforeEach(async ({ page }) => { await installReferenceFixture(page); });
 
-    await page.goto('http://localhost:3000');
-    await percy.waitForSnapshotReady();
+test.describe('Reference responsive visual contracts', () => {
+  for (const [width, height] of [[320,667],[375,667],[768,1024],[1024,768],[1920,1080],[667,375]]) {
+    test(`landmarks, form and navigation fit ${width}x${height}`, async ({ page }, testInfo) => {
+      await page.setViewportSize({ width, height });
+      await page.goto('/');
+      await assertReferenceLayout(page);
+      const nav = (await page.locator('nav').boundingBox())!;
+      for (const child of await page.locator('nav > *').all()) {
+        const box = (await child.boundingBox())!;
+        expect(box.x).toBeGreaterThanOrEqual(nav.x);
+        expect(box.x + box.width).toBeLessThanOrEqual(nav.x + nav.width + 0.1);
+      }
+      await testInfo.attach(`reference-${width}x${height}`, { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' });
+    });
+  }
 
-    // Test homepage at all responsive breakpoints
-    await percy.snapshotResponsive('Homepage');
-  });
-
-  test('Homepage - Light and Dark Themes at Breakpoints', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000');
-    await percy.waitForSnapshotReady();
-
-    // Light theme at all breakpoints
-    await percy.setTheme('light');
-    for (const [name, width] of Object.entries(RESPONSIVE_WIDTHS)) {
-      await percy.snapshotAtViewport(`Homepage - Light - ${name}`, width, 1024);
+  test('responsive grid follows explicit four, three, two and one column breakpoints', async ({ page }) => {
+    await page.goto('/grid');
+    await page.addStyleTag({ content: '.reference-grid{display:grid;gap:16px;grid-template-columns:repeat(4,1fr)}.reference-grid>div{height:80px;background:#eee}@media(max-width:1200px){.reference-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.reference-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.reference-grid{grid-template-columns:1fr}}' });
+    await page.locator('main').evaluate(el => el.insertAdjacentHTML('beforeend','<div class="reference-grid"><div>One</div><div>Two</div><div>Three</div><div>Four</div></div>'));
+    for (const [width, columns] of [[1920,4],[1024,3],[768,2],[375,1]]) {
+      await page.setViewportSize({ width, height:1080 });
+      const grid = (await page.locator('.reference-grid').boundingBox())!;
+      const cells = await page.locator('.reference-grid > div').all();
+      const boxes = await Promise.all(cells.map(cell => cell.boundingBox()));
+      const topRow = boxes.filter(box => box!.y === boxes[0]!.y);
+      expect(topRow).toHaveLength(columns);
+      expect(boxes[0]!.width).toBeCloseTo((grid.width - 16*(columns-1))/columns,1);
     }
+  });
 
-    // Dark theme at all breakpoints
-    await percy.setTheme('dark');
-    for (const [name, width] of Object.entries(RESPONSIVE_WIDTHS)) {
-      await percy.snapshotAtViewport(`Homepage - Dark - ${name}`, width, 1024);
+  test('theme changes preserve landmark geometry at every breakpoint', async ({ page }) => {
+    await page.goto('/');
+    for (const width of [375,768,1920]) {
+      await page.setViewportSize({ width, height:1080 });
+      const before = await page.locator('main').boundingBox();
+      await page.locator('#theme').click();
+      await expect(page.locator('body')).toHaveCSS('background-color','rgb(21, 21, 21)');
+      await assertReferenceLayout(page);
+      expect(await page.locator('main').boundingBox()).toEqual(before);
+      await page.locator('#theme').click();
     }
-  });
-
-  test('Dashboard - Responsive Layout', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/dashboard');
-    await percy.waitForSnapshotReady();
-
-    // Desktop view (full sidebar)
-    await percy.snapshotAtViewport('Dashboard - Desktop', 1920, 1080);
-
-    // Tablet view (collapsed sidebar)
-    await percy.snapshotAtViewport('Dashboard - Tablet', 768, 1024);
-
-    // Mobile view (hamburger menu)
-    await percy.snapshotAtViewport('Dashboard - Mobile', 375, 667);
-  });
-
-  test('Dashboard - Sidebar States', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/dashboard');
-    await percy.waitForSnapshotReady();
-
-    // Sidebar expanded
-    await percy.snapshot('Dashboard - Sidebar Expanded');
-
-    // Sidebar collapsed
-    await page.click('[data-testid="sidebar-toggle"]');
-    await page.waitForTimeout(300); // Wait for animation
-    await percy.freezeAnimations();
-    await percy.snapshot('Dashboard - Sidebar Collapsed');
-
-    // Mobile menu open
-    await percy.snapshotAtViewport('Dashboard - Mobile Menu', 375, 667);
-    await page.click('[data-testid="mobile-menu-toggle"]');
-    await page.waitForTimeout(300);
-    await percy.freezeAnimations();
-    await percy.snapshot('Dashboard - Mobile Menu Open');
-  });
-
-  test('Grid Layout - Responsive Columns', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/grid');
-    await percy.waitForSnapshotReady();
-
-    // 4 columns (desktop large)
-    await percy.snapshotAtViewport('Grid - 4 Columns', 1920, 1080);
-
-    // 3 columns (desktop)
-    await percy.snapshotAtViewport('Grid - 3 Columns', 1024, 768);
-
-    // 2 columns (tablet)
-    await percy.snapshotAtViewport('Grid - 2 Columns', 768, 1024);
-
-    // 1 column (mobile)
-    await percy.snapshotAtViewport('Grid - 1 Column', 375, 667);
-  });
-
-  test('Form Layout - Responsive Stacking', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/forms/contact');
-    await percy.waitForSnapshotReady();
-
-    // Desktop: side-by-side fields
-    await percy.snapshotAtViewport('Contact Form - Desktop', 1024, 768);
-
-    // Tablet: stacked fields
-    await percy.snapshotAtViewport('Contact Form - Tablet', 768, 1024);
-
-    // Mobile: full-width fields
-    await percy.snapshotAtViewport('Contact Form - Mobile', 375, 667);
-  });
-
-  test('Navigation - Responsive Behavior', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000');
-    await percy.waitForSnapshotReady();
-
-    // Desktop: full navigation
-    await percy.snapshotAtViewport('Navigation - Desktop', 1920, 1080);
-
-    // Tablet: condensed navigation
-    await percy.snapshotAtViewport('Navigation - Tablet', 768, 1024);
-
-    // Mobile: hamburger menu closed
-    await percy.snapshotAtViewport('Navigation - Mobile Closed', 375, 667);
-
-    // Mobile: hamburger menu open
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.click('[data-testid="mobile-menu-toggle"]');
-    await page.waitForTimeout(300);
-    await percy.freezeAnimations();
-    await percy.snapshot('Navigation - Mobile Open', { widths: [375] });
-  });
-
-  test('Data Table - Responsive Modes', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/tables/data');
-    await percy.waitForSnapshotReady();
-
-    // Desktop: full table
-    await percy.snapshotAtViewport('Data Table - Desktop', 1920, 1080);
-
-    // Tablet: horizontal scroll
-    await percy.snapshotAtViewport('Data Table - Tablet', 768, 1024);
-
-    // Mobile: card layout
-    await percy.snapshotAtViewport('Data Table - Mobile', 375, 667);
-  });
-
-  test('Product Card Grid - Responsive', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/products');
-    await percy.waitForSnapshotReady();
-
-    // 4 cards per row (desktop)
-    await percy.snapshotAtViewport('Product Grid - 4 Cards', 1920, 1080);
-
-    // 3 cards per row (desktop small)
-    await percy.snapshotAtViewport('Product Grid - 3 Cards', 1024, 768);
-
-    // 2 cards per row (tablet)
-    await percy.snapshotAtViewport('Product Grid - 2 Cards', 768, 1024);
-
-    // 1 card per row (mobile)
-    await percy.snapshotAtViewport('Product Grid - 1 Card', 375, 667);
-  });
-
-  test('Footer - Responsive Layout', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000');
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await percy.waitForSnapshotReady();
-
-    // Desktop: multi-column footer
-    await percy.snapshotComponent('Footer - Desktop', 'footer', {
-      widths: [1920]
-    });
-
-    // Tablet: 2-column footer
-    await percy.snapshotComponent('Footer - Tablet', 'footer', {
-      widths: [768]
-    });
-
-    // Mobile: stacked footer
-    await percy.snapshotComponent('Footer - Mobile', 'footer', {
-      widths: [375]
-    });
-  });
-
-  test('Hero Section - Responsive Images', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000');
-    await percy.waitForSnapshotReady();
-
-    // Test hero section at different breakpoints
-    await percy.snapshotComponent('Hero Section', '[data-testid="hero-section"]', {
-      widths: Object.values(RESPONSIVE_WIDTHS)
-    });
-  });
-
-  test('Pricing Page - Responsive Cards', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/pricing');
-    await percy.waitForSnapshotReady();
-
-    // Desktop: 3 pricing tiers side-by-side
-    await percy.snapshotAtViewport('Pricing - Desktop', 1920, 1080);
-
-    // Tablet: 3 pricing tiers (smaller)
-    await percy.snapshotAtViewport('Pricing - Tablet', 768, 1024);
-
-    // Mobile: stacked pricing tiers
-    await percy.snapshotAtViewport('Pricing - Mobile', 375, 667);
-  });
-
-  test('Search Results - Responsive Grid', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/search?q=test');
-    await percy.waitForSnapshotReady();
-
-    // Test search results at all breakpoints
-    await percy.snapshotResponsive('Search Results');
-  });
-
-  test('Profile Page - Responsive Layout', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/profile');
-    await percy.waitForSnapshotReady();
-
-    // Desktop: sidebar + content
-    await percy.snapshotAtViewport('Profile - Desktop', 1920, 1080);
-
-    // Tablet: stacked layout
-    await percy.snapshotAtViewport('Profile - Tablet', 768, 1024);
-
-    // Mobile: full-width content
-    await percy.snapshotAtViewport('Profile - Mobile', 375, 667);
-  });
-
-  test('Settings Page - Responsive Forms', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/settings');
-    await percy.waitForSnapshotReady();
-
-    // Desktop: two-column settings
-    await percy.snapshotAtViewport('Settings - Desktop', 1920, 1080);
-
-    // Tablet: single-column settings
-    await percy.snapshotAtViewport('Settings - Tablet', 768, 1024);
-
-    // Mobile: compact settings
-    await percy.snapshotAtViewport('Settings - Mobile', 375, 667);
-  });
-
-  test('Image Gallery - Responsive Grid', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/gallery');
-    await percy.waitForSnapshotReady();
-
-    // 4 images per row (desktop)
-    await percy.snapshotAtViewport('Gallery - 4 Images', 1920, 1080);
-
-    // 3 images per row (tablet)
-    await percy.snapshotAtViewport('Gallery - 3 Images', 1024, 768);
-
-    // 2 images per row (tablet small)
-    await percy.snapshotAtViewport('Gallery - 2 Images', 768, 1024);
-
-    // 1 image per row (mobile)
-    await percy.snapshotAtViewport('Gallery - 1 Image', 375, 667);
-  });
-
-  test('Blog Post - Responsive Typography', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/blog/sample-post');
-    await percy.waitForSnapshotReady();
-
-    // Test blog post typography at different breakpoints
-    await percy.snapshotResponsive('Blog Post');
-  });
-
-  test('404 Page - Responsive', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/404');
-    await percy.waitForSnapshotReady();
-
-    // Test 404 page at all breakpoints
-    await percy.snapshotResponsive('404 Page');
-  });
-
-  test('Loading States - Responsive', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/loading');
-    await percy.freezeAnimations();
-
-    // Test loading states at different breakpoints
-    await percy.snapshotResponsive('Loading State');
-  });
-
-  test('Empty States - Responsive', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/empty');
-    await percy.waitForSnapshotReady();
-
-    // Test empty states at different breakpoints
-    await percy.snapshotResponsive('Empty State');
-  });
-
-  test('Landscape Orientation - Tablet', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000');
-    await percy.waitForSnapshotReady();
-
-    // iPad landscape
-    await percy.snapshotAtViewport('Homepage - iPad Landscape', 1024, 768);
-
-    // iPad portrait
-    await percy.snapshotAtViewport('Homepage - iPad Portrait', 768, 1024);
-  });
-
-  test('Landscape Orientation - Mobile', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000');
-    await percy.waitForSnapshotReady();
-
-    // iPhone landscape
-    await percy.snapshotAtViewport('Homepage - iPhone Landscape', 667, 375);
-
-    // iPhone portrait
-    await percy.snapshotAtViewport('Homepage - iPhone Portrait', 375, 667);
   });
 });

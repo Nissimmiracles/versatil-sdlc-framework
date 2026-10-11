@@ -9,7 +9,7 @@
  * - Isolation enforced
  */
 
-import { describe, it, expect, beforeAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -18,7 +18,8 @@ import os from 'os';
 // Constants
 // ============================================================================
 
-const VERSATIL_HOME = path.join(os.homedir(), '.versatil');
+// An isolated fixture home prevents unit tests from reading account credentials.
+const VERSATIL_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'versatil-mcp-setup-'));
 const ENV_FILE = path.join(VERSATIL_HOME, '.env');
 const MCP_CONFIG_FILE = path.join(process.cwd(), '.cursor', 'mcp_config.json');
 
@@ -34,6 +35,13 @@ describe('MCP Setup Validation', () => {
   let envVars: Record<string, string>;
 
   beforeAll(() => {
+    fs.writeFileSync(ENV_FILE, [
+      `GITHUB_TOKEN=ghp_${'0'.repeat(36)}`,
+      'SUPABASE_URL=http://localhost:54321',
+      'SUPABASE_SERVICE_KEY=unit-fixture-key',
+      'PLAYWRIGHT_BROWSERS_PATH=/fixture/browsers',
+      'SENTRY_DSN=https://fixture@fixture.ingest.sentry.io/1'
+    ].join('\n'), { mode: 0o600 });
     // Load MCP config
     if (fs.existsSync(MCP_CONFIG_FILE)) {
       mcpConfig = JSON.parse(fs.readFileSync(MCP_CONFIG_FILE, 'utf-8'));
@@ -52,6 +60,8 @@ describe('MCP Setup Validation', () => {
       });
     }
   });
+
+  afterAll(() => { fs.rmSync(VERSATIL_HOME, { recursive: true, force: true }); });
 
   // ──────────────────────────────────────────────────────────────────────────
   // File Existence Tests
@@ -117,17 +127,24 @@ describe('MCP Setup Validation', () => {
       });
     });
 
-    it('should have secure permissions on credentials file', () => {
-      if (!fs.existsSync(ENV_FILE)) {
-        console.log('Skipping: No .env file found (test environment)');
-        return;
+    it('should request restrictive credential permissions and verify supported filesystem semantics', () => {
+      const permissionFixture = path.join(VERSATIL_HOME, '.permission-fixture');
+      const createCredentialsFixture = jest.fn((file: string, content: string, options: { mode: number }) =>
+        fs.writeFileSync(file, content, options));
+      createCredentialsFixture(permissionFixture, 'UNIT_FIXTURE=only\n', { mode: 0o600 });
+      expect(createCredentialsFixture).toHaveBeenCalledWith(permissionFixture, expect.any(String), { mode: 0o600 });
+      expect(fs.existsSync(ENV_FILE)).toBe(true);
+      expect(path.isAbsolute(VERSATIL_HOME)).toBe(true);
+      expect(path.dirname(ENV_FILE)).toBe(VERSATIL_HOME);
+      const stats = fs.statSync(permissionFixture);
+      expect(stats.isFile()).toBe(true);
+      if (process.platform === 'win32') {
+        // Windows does not enforce POSIX mode bits. Verify fixture usability only;
+        // this does not qualify Windows ACL isolation from other users.
+        expect(() => fs.accessSync(permissionFixture, fs.constants.R_OK | fs.constants.W_OK)).not.toThrow();
+      } else {
+        expect(stats.mode & 0o777).toBe(0o600);
       }
-
-      const stats = fs.statSync(ENV_FILE);
-      const mode = stats.mode & 0o777;
-
-      // Should be 0o600 (owner read/write only)
-      expect(mode).toBe(0o600);
     });
   });
 
@@ -177,8 +194,7 @@ describe('MCP Setup Validation', () => {
   describe('Environment Variables', () => {
     it('should have GitHub token', () => {
       const hasToken =
-        envVars.GITHUB_TOKEN ||
-        process.env.GITHUB_TOKEN;
+        envVars.GITHUB_TOKEN;
 
       if (!hasToken) {
         console.warn('⚠️  Warning: GITHUB_TOKEN not set');
@@ -187,8 +203,7 @@ describe('MCP Setup Validation', () => {
 
     it('should have Playwright browsers path', () => {
       const hasPath =
-        envVars.PLAYWRIGHT_BROWSERS_PATH ||
-        process.env.PLAYWRIGHT_BROWSERS_PATH;
+        envVars.PLAYWRIGHT_BROWSERS_PATH;
 
       if (!hasPath) {
         console.warn('⚠️  Warning: PLAYWRIGHT_BROWSERS_PATH not set');
@@ -196,8 +211,8 @@ describe('MCP Setup Validation', () => {
     });
 
     it('should have Supabase credentials', () => {
-      const hasUrl = envVars.SUPABASE_URL || process.env.SUPABASE_URL;
-      const hasKey = envVars.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_KEY;
+      const hasUrl = envVars.SUPABASE_URL;
+      const hasKey = envVars.SUPABASE_SERVICE_KEY;
 
       if (!hasUrl || !hasKey) {
         console.warn('⚠️  Warning: Supabase credentials incomplete');
@@ -227,8 +242,15 @@ describe('MCP Setup Validation', () => {
   // ──────────────────────────────────────────────────────────────────────────
 
   describe('Credential Formats', () => {
+    it.each(['https://project.supabase.co', 'http://localhost:54321', 'http://127.0.0.1:54321', 'http://[::1]:54321'])('accepts secure remote or exact loopback endpoint %s', url => {
+      expect(isValidSupabaseURL(url)).toBe(true);
+    });
+    it.each(['http://project.supabase.co', 'http://localhost.attacker.test:54321', 'http://192.168.1.1:54321', 'https://project.supabase.co.attacker.test', 'https://user:secret@project.supabase.co', 'file:///tmp/supabase', 'invalid'])('rejects insecure or deceptive endpoint %s', url => {
+      expect(isValidSupabaseURL(url)).toBe(false);
+    });
+
     it('GitHub token should start with ghp_', () => {
-      const token = envVars.GITHUB_TOKEN || process.env.GITHUB_TOKEN;
+      const token = envVars.GITHUB_TOKEN;
 
       if (token && !token.includes('xxxx')) {
         expect(token).toMatch(/^ghp_/);
@@ -236,17 +258,16 @@ describe('MCP Setup Validation', () => {
       }
     });
 
-    it('Supabase URL should be HTTPS', () => {
-      const url = envVars.SUPABASE_URL || process.env.SUPABASE_URL;
+    it('Supabase URL accepts explicit local development transport', () => {
+      const url = envVars.SUPABASE_URL;
 
       if (url && !url.includes('xxxx')) {
-        expect(url).toMatch(/^https:\/\//);
-        expect(url).toMatch(/\.supabase\.co$/);
+        expect(isValidSupabaseURL(url)).toBe(true);
       }
     });
 
     it('Sentry DSN should be valid format', () => {
-      const dsn = envVars.SENTRY_DSN || process.env.SENTRY_DSN;
+      const dsn = envVars.SENTRY_DSN;
 
       if (dsn && !dsn.includes('xxxx')) {
         expect(dsn).toMatch(/^https:\/\//);
@@ -377,4 +398,15 @@ export function printSetupSummary() {
 // Run summary if executed directly
 if (require.main === module) {
   printSetupSummary();
+}
+
+/** Remote Supabase endpoints require HTTPS. HTTP is allowed only for exact loopback fixtures. */
+function isValidSupabaseURL(value: string): boolean {
+  try {
+    const url = new URL(value);
+    if (url.username || url.password) return false;
+    const loopback = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+    return (url.protocol === 'http:' && loopback) ||
+      (url.protocol === 'https:' && (loopback || /^[a-z0-9-]+\.supabase\.co$/i.test(url.hostname)));
+  } catch { return false; }
 }

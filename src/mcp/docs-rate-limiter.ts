@@ -75,7 +75,7 @@ export class RateLimiter {
     this.refillTokens(entry, now);
 
     // Check if request is allowed
-    if (entry.tokens > 0) {
+    if (entry.tokens >= 1) {
       entry.tokens--;
       return {
         allowed: true,
@@ -114,7 +114,7 @@ export class RateLimiter {
     this.refillTokens(entry, now);
 
     return {
-      allowed: entry.tokens > 0,
+      allowed: entry.tokens >= 1,
       remaining: Math.floor(entry.tokens),
       resetTime: entry.resetTime,
       retryAfter: entry.tokens === 0

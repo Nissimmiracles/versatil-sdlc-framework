@@ -6,7 +6,7 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import {
   execCommand,
-  execShellCommand,
+  execShellCommand as executeShellCommand,
   setupTestEnvironment,
   cleanupTestEnvironment,
   mockGitHubAPI,
@@ -22,20 +22,27 @@ import {
   CommandResult,
 } from './helpers/test-helpers';
 import * as path from 'path';
+import { pathToFileURL } from 'node:url';
+import { readFileSync } from 'fs';
+const packageVersion = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')).version;
+
+let testEnv: TestEnvironment;
+const fixturePath = path.join(process.cwd(), 'tests/integration/helpers/cli-offline-fixture.mjs');
+const execShellCommand: typeof executeShellCommand = (command, options = {}) => executeShellCommand(command, {
+  ...options,
+  env: { ...process.env, ...testEnv.envVars, ...options.env, VERSATIL_TEST_HOME: testEnv.tempDir,
+    NODE_OPTIONS: `--import=${pathToFileURL(fixturePath).href}` },
+});
+
+beforeEach(async () => {
+  testEnv = await setupTestEnvironment('cli-test');
+});
+afterEach(async () => {
+  if (testEnv) await cleanupTestEnvironment(testEnv);
+});
 
 describe('CLI Commands Integration Tests', () => {
-  let testEnv: TestEnvironment;
   const frameworkRoot = process.cwd();
-
-  beforeEach(async () => {
-    testEnv = await setupTestEnvironment('cli-test');
-  });
-
-  afterEach(async () => {
-    if (testEnv) {
-      await cleanupTestEnvironment(testEnv);
-    }
-  });
 
   describe('versatil --version', () => {
     test('should display correct version', async () => {
@@ -45,7 +52,7 @@ describe('CLI Commands Integration Tests', () => {
 
       assertCommandSuccess(result);
       assertOutputMatches(result, /VERSATIL SDLC Framework v\d+\.\d+\.\d+/);
-      expect(result.stdout).toContain('3.1.10');
+      expect(result.stdout).toContain(packageVersion);
     }, 30000);
 
     test('should work with -v flag', async () => {
@@ -394,7 +401,7 @@ describe('CLI Commands Integration Tests', () => {
       assertCommandSuccess(versionResult);
       const version = versionResult.stdout.match(/v(\d+\.\d+\.\d+)/)?.[1];
       expect(version).toBeDefined();
-      expect(version).toBe('3.0.0');
+      expect(version).toBe(packageVersion);
     }, 30000);
   });
 });

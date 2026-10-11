@@ -96,6 +96,7 @@ class RAGSeparationVerifier {
       ];
 
       let privateDataFound = false;
+      let sampledPatterns = 0;
       const violations: string[] = [];
 
       for (const query of sampleQueries) {
@@ -105,16 +106,16 @@ class RAGSeparationVerifier {
           minRelevance: 0.6
         });
 
-        if (results && results.results) {
-          for (const pattern of results.results) {
-            const text = `${pattern.description} ${pattern.code || ''}`.toLowerCase();
-
-            // Check for private indicators
-            for (const indicator of this.PRIVATE_INDICATORS) {
-              if (text.includes(indicator)) {
-                privateDataFound = true;
-                violations.push(`Pattern "${pattern.description.substring(0, 50)}..." contains "${indicator}"`);
-              }
+        if (!Array.isArray(results)) throw new Error('Invalid Public RAG result shape');
+        for (const result of results) {
+          const pattern = result.pattern?.properties;
+          if (!pattern || typeof pattern.pattern !== 'string') throw new Error('Invalid Public RAG pattern shape');
+          sampledPatterns++;
+          const text = `${pattern.pattern} ${pattern.description || ''} ${pattern.code || ''}`.toLowerCase();
+          for (const indicator of this.PRIVATE_INDICATORS) {
+            if (text.includes(indicator)) {
+              privateDataFound = true;
+              violations.push(`Pattern "${pattern.pattern.substring(0, 50)}..." contains "${indicator}"`);
             }
           }
         }
@@ -122,10 +123,12 @@ class RAGSeparationVerifier {
 
       this.addResult({
         test: 'Public RAG Privacy',
-        passed: !privateDataFound,
+        passed: !privateDataFound && sampledPatterns > 0,
         details: privateDataFound
           ? `CRITICAL: Found ${violations.length} privacy violations:\n${violations.slice(0, 5).join('\n')}`
-          : 'No private data detected in Public RAG (sampled 50 patterns)',
+          : sampledPatterns > 0
+            ? `No private indicators detected in ${sampledPatterns} sampled results`
+            : 'No Public RAG patterns observed; privacy verification unavailable',
         severity: 'critical'
       });
 
@@ -162,7 +165,8 @@ class RAGSeparationVerifier {
           minRelevance: 0.7
         });
 
-        if (results && results.results && results.results.length > 0) {
+        if (!Array.isArray(results)) throw new Error('Invalid Public RAG result shape');
+        if (results.length > 0) {
           publicCorrect++;
         }
       }
@@ -185,7 +189,8 @@ class RAGSeparationVerifier {
         });
 
         // Correct if NOT found in Public RAG
-        if (!results || !results.results || results.results.length === 0) {
+        if (!Array.isArray(results)) throw new Error('Invalid Public RAG result shape');
+        if (results.length === 0) {
           privateCorrect++;
         }
       }

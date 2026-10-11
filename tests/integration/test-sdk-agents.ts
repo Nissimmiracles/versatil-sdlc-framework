@@ -1,181 +1,103 @@
-/**
- * Test SDK-wrapped OPERA Agents
- * Validates that Maria, James, and Marcus SDK agents work correctly
- */
+/** Local wrapper contracts. SDK, legacy analyses and MCP executors are doubles; no provider proof. */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MariaSDKAgent } from './src/agents/opera/maria-qa/maria-sdk-agent.js';
-import { JamesSDKAgent } from './src/agents/opera/james-frontend/james-sdk-agent.js';
-import { MarcusSDKAgent } from './src/agents/opera/marcus-backend/marcus-sdk-agent.js';
-import { EnhancedVectorMemoryStore } from './src/rag/enhanced-vector-memory-store.js';
+const doubles = vi.hoisted(() => ({
+  activate: vi.fn(), configIssue: vi.fn(), dashboard: vi.fn(), navigation: vi.fn(),
+  recommendations: vi.fn(), apiValidation: vi.fn(), security: vi.fn(), priority: vi.fn(),
+  handoffs: vi.fn(), route: vi.fn(), toolCall: vi.fn(), options: [] as any[],
+}));
+vi.mock('../../src/agents/sdk/sdk-agent-adapter.js', () => ({ SDKAgentAdapter: class {
+  constructor(options: any) { doubles.options.push(options); }
+  activate(context: any) { return doubles.activate(context); }
+} }));
+vi.mock('../../src/agents/opera/maria-qa/enhanced-maria.js', () => ({ EnhancedMaria: class {
+  hasConfigurationInconsistencies = doubles.configIssue;
+  generateQualityDashboard = doubles.dashboard;
+  validateRouteNavigationConsistency = doubles.route;
+} }));
+vi.mock('../../src/agents/opera/james-frontend/enhanced-james.js', () => ({ EnhancedJames: class {
+  validateNavigationIntegrity = doubles.navigation;
+  generateActionableRecommendations = doubles.recommendations;
+} }));
+vi.mock('../../src/agents/opera/james-frontend/sub-agents/ux-excellence-reviewer.js', () => ({ UXExcellenceReviewer: class {} }));
+vi.mock('../../src/agents/opera/marcus-backend/enhanced-marcus.js', () => ({ EnhancedMarcus: class {
+  validateAPIIntegration = doubles.apiValidation;
+  checkAPISecurity = doubles.security;
+  calculatePriority = doubles.priority;
+  determineHandoffs = doubles.handoffs;
+} }));
+vi.mock('../../src/mcp/mcp-tool-router.js', () => ({ getMCPToolRouter: () => ({ handleToolCall: doubles.toolCall }) }));
+import { MariaSDKAgent } from '../../src/agents/opera/maria-qa/maria-sdk-agent.js';
+import { JamesSDKAgent } from '../../src/agents/opera/james-frontend/james-sdk-agent.js';
+import { MarcusSDKAgent } from '../../src/agents/opera/marcus-backend/marcus-sdk-agent.js';
 
-async function testSDKAgents() {
-  console.log('🧪 Testing SDK-Wrapped OPERA Agents\n');
-  console.log('=' .repeat(60));
-
-  // Initialize vector store (optional for testing)
-  let vectorStore: EnhancedVectorMemoryStore | undefined;
-  try {
-    vectorStore = new EnhancedVectorMemoryStore();
-    console.log('✅ Vector store initialized for RAG context\n');
-  } catch (error) {
-    console.log('⚠️  Vector store not available, continuing without RAG\n');
-  }
-
-  // Test 1: Maria-QA SDK Agent
-  console.log('\n📋 Test 1: Maria-QA SDK Agent');
-  console.log('-'.repeat(60));
-  try {
-    const maria = new MariaSDKAgent(vectorStore);
-
-    const testCode = `
-      const apiUrl = process.env.API_URL || 'http://localhost:3000';
-
-      function calculateTotal(items) {
-        return items.reduce((sum, item) => sum + item.price, 0);
-      }
-    `;
-
-    console.log('Testing Maria with code that has configuration inconsistencies...');
-
-    const context = {
-      filePath: 'src/api/config.ts',
-      content: testCode,
-      trigger: { type: 'file_change' as const }
-    };
-
-    // Note: actual activation commented out to avoid API calls during testing
-    // const result = await maria.activate(context);
-    // console.log('Result:', JSON.stringify(result, null, 2));
-
-    // Test delegated methods
-    const hasConfigIssue = maria.hasConfigurationInconsistencies(context);
-    console.log(`✅ Configuration inconsistency detection: ${hasConfigIssue ? 'DETECTED' : 'NONE'}`);
-
-    const dashboard = maria.generateQualityDashboard({
-      score: 75,
-      issues: [
-        { severity: 'critical', type: 'security', message: 'SQL injection vulnerability' },
-        { severity: 'high', type: 'testing', message: 'Missing test coverage' }
-      ]
-    });
-    console.log(`✅ Quality dashboard generated: ${dashboard.overallScore}% score`);
-
-    console.log('✅ Maria-QA SDK Agent: PASSED\n');
-  } catch (error) {
-    console.error(`❌ Maria-QA SDK Agent: FAILED - ${error.message}\n`);
-  }
-
-  // Test 2: James-Frontend SDK Agent
-  console.log('\n🎨 Test 2: James-Frontend SDK Agent');
-  console.log('-'.repeat(60));
-  try {
-    const james = new JamesSDKAgent(vectorStore);
-
-    const testComponent = `
-      import React, { useState } from 'react';
-
-      const routes = [
-        { path: '/dashboard', component: Dashboard },
-        { path: '/settings', component: Settings }
-      ];
-
-      const navigation = [
-        { label: 'Dashboard', path: '/dashboard' },
-        { label: 'Profile', path: '/profile' }  // Mismatch!
-      ];
-    `;
-
-    console.log('Testing James with component that has navigation mismatch...');
-
-    const context = {
-      filePath: 'src/components/App.tsx',
-      content: testComponent,
-      trigger: { type: 'file_change' as const }
-    };
-
-    // Test delegated methods
-    const navValidation = james.validateNavigationIntegrity(context);
-    console.log(`✅ Navigation validation: Score ${navValidation.score}/100`);
-    console.log(`   Issues: ${navValidation.issues.length}, Warnings: ${navValidation.warnings.length}`);
-
-    const issues = [
-      { severity: 'high', type: 'route-navigation-mismatch', message: 'Mismatch detected' },
-      { severity: 'medium', type: 'accessibility', message: 'Missing aria-label' }
-    ];
-
-    const recommendations = james.generateActionableRecommendations(issues);
-    console.log(`✅ Generated ${recommendations.length} recommendations`);
-
-    console.log('✅ James-Frontend SDK Agent: PASSED\n');
-  } catch (error) {
-    console.error(`❌ James-Frontend SDK Agent: FAILED - ${error.message}\n`);
-  }
-
-  // Test 3: Marcus-Backend SDK Agent
-  console.log('\n⚙️  Test 3: Marcus-Backend SDK Agent');
-  console.log('-'.repeat(60));
-  try {
-    const marcus = new MarcusSDKAgent(vectorStore);
-
-    const testAPI = `
-      app.post('/api/users', async (req, res) => {
-        const { username, password } = req.body;
-
-        const user = await db.query(
-          'SELECT * FROM users WHERE username = "' + username + '"'
-        );
-
-        res.json(user);
-      });
-    `;
-
-    console.log('Testing Marcus with API code that has security issues...');
-
-    const context = {
-      filePath: 'src/api/users.ts',
-      content: testAPI,
-      trigger: { type: 'file_change' as const }
-    };
-
-    // Test delegated methods
-    const apiValidation = marcus.validateAPIIntegration(context);
-    console.log(`✅ API validation: Score ${apiValidation.score}/100`);
-
-    const securityCheck = marcus.checkAPISecurity(context);
-    console.log(`✅ Security check: ${securityCheck.length} issues found`);
-
-    const issues = [
-      { severity: 'critical', type: 'security', message: 'SQL injection vulnerability' },
-      { severity: 'high', type: 'performance', message: 'Missing database index' }
-    ];
-
-    const priority = marcus.calculatePriority(issues);
-    console.log(`✅ Priority calculation: ${priority}`);
-
-    const handoffs = marcus.determineHandoffs(issues);
-    console.log(`✅ Handoffs determined: ${handoffs.join(', ') || 'none'}`);
-
-    console.log('✅ Marcus-Backend SDK Agent: PASSED\n');
-  } catch (error) {
-    console.error(`❌ Marcus-Backend SDK Agent: FAILED - ${error.message}\n`);
-  }
-
-  // Summary
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 Test Summary');
-  console.log('='.repeat(60));
-  console.log('✅ All SDK-wrapped agents created successfully');
-  console.log('✅ Legacy methods properly delegated');
-  console.log('✅ SDK adapter pattern working correctly');
-  console.log('\n🎯 Next Steps:');
-  console.log('1. Replace references to EnhancedMaria/James/Marcus with SDK versions');
-  console.log('2. Update agent-registry to use SDK agents');
-  console.log('3. Test with actual Claude SDK activation (requires API key)');
-  console.log('4. Benchmark performance vs legacy agents');
-}
-
-// Run tests
-testSDKAgents().catch(error => {
-  console.error('Test suite failed:', error);
-  process.exit(1);
+beforeEach(() => {
+  vi.resetAllMocks(); doubles.options.length = 0;
+  doubles.activate.mockImplementation(async () => ({ priority: 'low', suggestions: [], context: { analysisScore: 75 } }));
+  doubles.configIssue.mockReturnValue(false);
+  doubles.navigation.mockReturnValue({ score: 100, issues: [], warnings: [] });
+  doubles.route.mockReturnValue({ score: 100, issues: [], warnings: [] });
+});
+describe('SDK agent wrappers with isolated collaborators', () => {
+  it('passes agent identity and the supplied vector store to the adapter', () => {
+    const store = {} as any;
+    new MariaSDKAgent(store); new JamesSDKAgent(store); new MarcusSDKAgent(store);
+    expect(doubles.options).toEqual(['maria-qa', 'james-frontend', 'marcus-backend'].map(agentId => ({ agentId, vectorStore: store, model: 'sonnet' })));
+  });
+  it('delegates Maria configuration detection and dashboard without changing inputs', () => {
+    const agent = new MariaSDKAgent(); const context = { content: 'configuration fixture' };
+    const results = { score: 75 }; const dashboard = { overallScore: 75 };
+    doubles.configIssue.mockReturnValue(true); doubles.dashboard.mockReturnValue(dashboard);
+    expect(agent.hasConfigurationInconsistencies(context)).toBe(true);
+    expect(doubles.configIssue).toHaveBeenCalledWith(context);
+    expect(agent.generateQualityDashboard(results)).toBe(dashboard);
+    expect(doubles.dashboard).toHaveBeenCalledWith(results);
+  });
+  it('adds Maria-specific configuration suggestions and escalates an emergency', async () => {
+    doubles.configIssue.mockReturnValue(true);
+    const context = { filePath: 'config.ts', content: 'URGENT', trigger: { type: 'file_change' } } as any;
+    const response = await new MariaSDKAgent().activate(context);
+    expect(doubles.activate).toHaveBeenCalledWith(context);
+    expect(response.priority).toBe('critical');
+    expect(response.suggestions).toContainEqual({ type: 'configuration-inconsistency', message: 'Mixed environment variables and hardcoded values detected', priority: 'high', file: 'config.ts' });
+    expect(response.context).toMatchObject({ qualityScore: 75, emergencyMode: true });
+  });
+  it('does not invent a configuration issue for clean Maria content', async () => {
+    const response = await new MariaSDKAgent().activate({ content: 'ordinary fixture' } as any);
+    expect(response.suggestions).toEqual([]); expect(response.priority).toBe('low');
+  });
+  it('delegates James navigation and recommendations', () => {
+    const agent = new JamesSDKAgent(); const context = { content: 'routes fixture' };
+    const result = { score: 40, issues: [{ type: 'route-navigation-mismatch' }], warnings: [] };
+    doubles.navigation.mockReturnValue(result); doubles.recommendations.mockReturnValue(['repair route']);
+    expect(agent.validateNavigationIntegrity(context)).toBe(result);
+    expect(doubles.navigation).toHaveBeenCalledWith(context);
+    expect(agent.generateActionableRecommendations(result.issues)).toEqual(['repair route']);
+    expect(doubles.recommendations).toHaveBeenCalledWith(result.issues);
+  });
+  it('adds actual James wrapper navigation context and mapped suggestions', async () => {
+    doubles.navigation.mockReturnValue({ score: 40, issues: [{ type: 'route', message: 'missing route', severity: 'high', file: 'App.tsx' }], warnings: [] });
+    const response = await new JamesSDKAgent().activate({ content: 'useState(0)' } as any);
+    expect(response.context).toMatchObject({ frontendHealth: 75, navigationScore: 40, componentType: 'functional-react' });
+    expect(response.suggestions).toContainEqual({ type: 'route', message: 'missing route', priority: 'high', file: 'App.tsx' });
+  });
+  it('delegates Marcus API, security, priority and handoff decisions', () => {
+    const agent = new MarcusSDKAgent(); const context = { content: 'API fixture' }; const issues = [{ severity: 'critical' }];
+    const result = { score: 25, issues }; doubles.apiValidation.mockReturnValue(result);
+    doubles.security.mockReturnValue(issues); doubles.priority.mockReturnValue('critical'); doubles.handoffs.mockReturnValue(['maria-qa']);
+    expect(agent.validateAPIIntegration(context)).toBe(result); expect(doubles.apiValidation).toHaveBeenCalledWith(context);
+    expect(agent.checkAPISecurity(context)).toBe(issues); expect(doubles.security).toHaveBeenCalledWith(context);
+    expect(agent.calculatePriority(issues)).toBe('critical'); expect(doubles.priority).toHaveBeenCalledWith(issues);
+    expect(agent.determineHandoffs(issues)).toEqual(['maria-qa']); expect(doubles.handoffs).toHaveBeenCalledWith(issues);
+  });
+  it('uses actual Marcus wrapper detection without claiming live API security', async () => {
+    doubles.activate.mockResolvedValue({ suggestions: [{ type: 'security', priority: 'critical' }], context: { analysisScore: 75 } });
+    const response = await new MarcusSDKAgent().activate({ content: "app.post('/users'); prisma.user" } as any);
+    expect(response.context).toMatchObject({ backendHealth: 75, apiType: 'rest', dbType: 'prisma', securityScore: 30 });
+  });
+  it('forwards Maria E2E routing and propagates the router failure', async () => {
+    const failure = { success: false, error: 'executor unavailable' }; doubles.toolCall.mockResolvedValue(failure);
+    expect(await new MariaSDKAgent().runE2ETests({ testFile: 'demo.spec.ts' })).toBe(failure);
+    expect(doubles.toolCall).toHaveBeenCalledWith({ tool: 'Playwright', action: 'run_tests', params: { testFile: 'demo.spec.ts', testPattern: undefined, headless: true }, agentId: 'maria-qa' });
+  });
 });

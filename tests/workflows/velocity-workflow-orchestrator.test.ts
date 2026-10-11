@@ -11,16 +11,40 @@
  * @module tests/workflows/velocity-workflow-orchestrator
  */
 
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import VelocityWorkflowOrchestrator from '../../src/workflows/velocity-workflow-orchestrator.js';
-import { EVERYWorkflowStateMachine } from '../../src/workflows/every-workflow-state-machine.js';
-import { EVERYPhaseTransitions } from '../../src/workflows/every-phase-transitions.js';
+import { VelocityWorkflowStateMachine } from '../../src/workflows/velocity-workflow-state-machine.js';
+import { VelocityPhaseTransitions } from '../../src/workflows/velocity-phase-transitions.js';
+
+let storageDir: string;
+let ensureStorage: any;
+beforeEach(async () => {
+  storageDir = await fs.mkdtemp(path.join(os.tmpdir(), 'velocity-state-'));
+  ensureStorage = jest.spyOn(VelocityWorkflowStateMachine.prototype as any, 'ensureStateStorage').mockResolvedValue(undefined);
+});
+afterEach(async () => {
+  ensureStorage.mockRestore();
+  await fs.rm(storageDir, { recursive: true, force: true });
+});
+function isolatedStateMachine() {
+  const machine = new VelocityWorkflowStateMachine();
+  (machine as any).stateStoragePath = storageDir;
+  return machine;
+}
 
 describe('VELOCITY Workflow Orchestrator', () => {
   let orchestrator: VelocityWorkflowOrchestrator;
 
   beforeEach(() => {
     orchestrator = new VelocityWorkflowOrchestrator();
+    (orchestrator as any).stateMachine.stateStoragePath = storageDir;
+    jest.spyOn(orchestrator as any, 'invokePlanCommand').mockResolvedValue({
+      todos: [{ id: 'fixture', description: 'Implement fixture' }],
+      estimates: { total: 1, byPhase: {} }, templates: [], historicalContext: [],
+    });
   });
 
   afterEach(async () => {
@@ -120,11 +144,11 @@ describe('VELOCITY Workflow Orchestrator', () => {
       const context = orchestrator.getWorkflowContext(workflowId);
 
       if (context) {
-        await orchestrator.executePlan(workflowId, context);
+        const result = await orchestrator.executePlan(workflowId, context);
 
         const metrics = orchestrator.getWorkflowMetrics(workflowId);
         expect(metrics).toBeDefined();
-        expect(metrics?.phaseBreakdown.Plan).toBeGreaterThan(0);
+        expect(metrics?.phaseBreakdown.Plan).toBe(result.duration);
       }
     });
   });
@@ -220,10 +244,10 @@ describe('VELOCITY Workflow Orchestrator', () => {
       }
     });
 
-    it('should retrieve workflow context by ID', () => {
+    it('should retrieve workflow context by ID', async () => {
       const workflowId = 'test-retrieve-context';
 
-      orchestrator.startWorkflow({
+      await orchestrator.startWorkflow({
         workflowId,
         target: 'Notification system',
         autoTransition: false,
@@ -246,10 +270,10 @@ describe('VELOCITY Workflow Orchestrator', () => {
 // ============================================================================
 
 describe('VELOCITY Workflow State Machine', () => {
-  let stateMachine: EVERYWorkflowStateMachine;
+  let stateMachine: VelocityWorkflowStateMachine;
 
   beforeEach(() => {
-    stateMachine = new EVERYWorkflowStateMachine();
+    stateMachine = isolatedStateMachine();
   });
 
   describe('State Creation', () => {
@@ -341,7 +365,7 @@ describe('VELOCITY Workflow State Machine', () => {
       await stateMachine.transition('test-persist', 'Assess');
 
       // Create new state machine instance
-      const newStateMachine = new EVERYWorkflowStateMachine();
+      const newStateMachine = isolatedStateMachine();
       const loadedState = await newStateMachine.getState('test-persist');
 
       expect(loadedState).toBeDefined();
@@ -355,10 +379,10 @@ describe('VELOCITY Workflow State Machine', () => {
 // ============================================================================
 
 describe('EVERY Phase Transitions', () => {
-  let transitions: EVERYPhaseTransitions;
+  let transitions: VelocityPhaseTransitions;
 
   beforeEach(() => {
-    transitions = new EVERYPhaseTransitions();
+    transitions = new VelocityPhaseTransitions();
   });
 
   describe('Plan → Assess Transition', () => {

@@ -11,7 +11,10 @@ describe('MCPTaskExecutor', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    executor = new MCPTaskExecutor();
+    executor = new MCPTaskExecutor(async (tool) => {
+      await new Promise(resolve => setTimeout(resolve, 20));
+      return { status: 'success', output: `${tool} fixture result` };
+    });
     await executor.initialize();
   });
 
@@ -25,6 +28,74 @@ describe('MCPTaskExecutor', () => {
   // Task Execution (12 tests)
   // ============================================================================
   describe('Task Execution', () => {
+    it('preserves completed writes and does not retry a structured refusal with read-only opt-in', async () => {
+      const operation = vi.fn(async (tool: string) => tool === 'Read'
+        ? { success: false, error: 'Authentication failed', retryable: false }
+        : { success: true, output: 'written' });
+      const native = new MCPTaskExecutor(operation);
+      try {
+        const task = { id: 'structured-no-retry', name: 'Write then read', type: 'development', files: [] };
+        const inference = { taskId: task.id, inferredTools: ['Write', 'Read'], confidence: 1, reasoning: 'fixture' };
+        const result = await native.executeToolsWithRetry(task, inference, 3, { retrySafeTools: { Read: 'read-only' } });
+        expect(result.success).toBe(false);
+        expect(operation.mock.calls.map(call => call[0])).toEqual(['Write', 'Read']);
+        expect([...result.results.keys()]).toEqual(['Write']);
+        expect(result.errors).toEqual([{ tool: 'Read', error: 'Authentication failed', retryable: false }]);
+      } finally {
+        await native.shutdown();
+      }
+    });
+
+    it('preserves completed writes and never retries an unspecified failed mutation', async () => {
+      const operation = vi.fn(async (tool: string) => {
+        if (tool === 'Bash') throw new Error('Failed after mutation');
+        return { output: tool };
+      });
+      const native = new MCPTaskExecutor(operation);
+      const task = { id: 'no-replay', name: 'Mutations', type: 'development', files: [] };
+      const inference = { taskId: task.id, inferredTools: ['Write', 'GitHub', 'Bash'], confidence: 1, reasoning: 'fixture' };
+      const result = await native.executeToolsWithRetry(task, inference);
+      expect(result.success).toBe(false);
+      expect(operation.mock.calls.map(call => call[0])).toEqual(['Write', 'GitHub', 'Bash']);
+      expect([...result.results.keys()]).toEqual(['Write', 'GitHub']);
+      await native.shutdown();
+    });
+    it('retries only explicitly safe failed tools while preserving completed mutations', async () => {
+      let readAttempts = 0;
+      const operation = vi.fn(async (tool: string) => {
+        if (tool === 'Read' && ++readAttempts === 1) throw new Error('Transient read failure');
+        return { output: tool };
+      });
+      const native = new MCPTaskExecutor(operation);
+      const task = { id: 'safe-read', name: 'Write and read', type: 'development', files: [] };
+      const inference = { taskId: task.id, inferredTools: ['Write', 'Read'], confidence: 1, reasoning: 'fixture' };
+      const result = await native.executeToolsWithRetry(task, inference, 1, { retrySafeTools: { Read: 'read-only' } });
+      expect(result.success).toBe(true);
+      expect(operation.mock.calls.map(call => call[0])).toEqual(['Write', 'Read', 'Read']);
+      expect([...result.results.keys()]).toEqual(['Write', 'Read']);
+      await native.shutdown();
+    });
+    it('never retries tools reporting timeout even with idempotence opt-in', async () => {
+      const operation = vi.fn().mockRejectedValue(new Error('Execution timeout'));
+      const native = new MCPTaskExecutor(operation);
+      const task = { id: 'timeout-no-replay', name: 'Timed out', type: 'development', files: [] };
+      const inference = { taskId: task.id, inferredTools: ['Bash'], confidence: 1, reasoning: 'fixture' };
+      const result = await native.executeToolsWithRetry(task, inference, 3, { retrySafeTools: { Bash: 'idempotent' } });
+      expect(result.success).toBe(false);
+      expect(operation).toHaveBeenCalledTimes(1);
+      await native.shutdown();
+    });
+
+    it('fails closed without an injected tool executor', async () => {
+      const native = new MCPTaskExecutor();
+      const task = { id: 'missing-native', name: 'Read file', type: 'development', files: ['app.ts'] };
+      const result = await native.executeTools(task, await native.inferTools(task));
+      expect(result.success).toBe(false);
+      expect(result.results.size).toBe(0);
+      expect(result.errors.every(error => error.error.includes('No executor registered'))).toBe(true);
+      await native.shutdown();
+    });
+
     it('should execute single task', async () => {
       const task: Task = {
         id: 'task-1',
@@ -188,17 +259,18 @@ describe('MCPTaskExecutor', () => {
       });
 
       const inference = await executor.inferTools(task);
-      const result = await executor.executeToolsWithRetry(task, inference);
+      const result = await executor.executeToolsWithRetry(task, inference, 3, { retrySafeTools: { Bash: 'idempotent' } });
 
       expect(result.success).toBe(true);
       expect(attemptCount).toBe(3);
     });
 
-    it('should emit task_started event', (done) => {
+    it('should emit task_started event', async () => {
+      let eventObserved = false;
       executor.on('task_started', (data) => {
         expect(data).toHaveProperty('taskId');
         expect(data).toHaveProperty('timestamp');
-        done();
+        eventObserved = true;
       });
 
       const task: Task = {
@@ -208,17 +280,17 @@ describe('MCPTaskExecutor', () => {
         files: ['src/app.ts']
       };
 
-      executor.inferTools(task).then(inference =>
-        executor.executeTools(task, inference)
-      );
+      await executor.executeTools(task, await executor.inferTools(task));
+      expect(eventObserved).toBe(true);
     });
 
-    it('should emit task_completed event', (done) => {
+    it('should emit task_completed event', async () => {
+      let eventObserved = false;
       executor.on('task_completed', (data) => {
         expect(data).toHaveProperty('taskId');
         expect(data).toHaveProperty('success');
         expect(data).toHaveProperty('duration');
-        done();
+        eventObserved = true;
       });
 
       const task: Task = {
@@ -228,9 +300,8 @@ describe('MCPTaskExecutor', () => {
         files: ['src/app.ts']
       };
 
-      executor.inferTools(task).then(inference =>
-        executor.executeTools(task, inference)
-      );
+      await executor.executeTools(task, await executor.inferTools(task));
+      expect(eventObserved).toBe(true);
     });
 
     it('should record execution metrics', async () => {
@@ -428,6 +499,21 @@ describe('MCPTaskExecutor', () => {
   // Parallel Execution (8 tests)
   // ============================================================================
   describe('Parallel Execution', () => {
+    it('rejects cycles and missing dependencies', async () => {
+      await expect(executor.executeTasksWithDependencies([{ id: 'a', name: 'A', type: 'development', files: [], dependencies: ['a'] }])).rejects.toThrow('Unresolved or cyclic');
+    });
+    it('does not execute dependents after a failed prerequisite', async () => {
+      const execute = vi.fn().mockRejectedValue(new Error('Unavailable'));
+      const native = new MCPTaskExecutor(execute);
+      const result = await native.executeTasksWithDependencies([
+        { id: 'a', name: 'A', type: 'development', files: [] },
+        { id: 'b', name: 'B', type: 'development', files: [], dependencies: ['a'] }
+      ]);
+      expect(result.map(r => r.success)).toEqual([false, false]);
+      expect(result[1].errors[0].error).toBe('Dependency failed');
+      await native.shutdown();
+    });
+
     it('should execute independent tasks in parallel', async () => {
       const tasks: Task[] = [
         { id: 'par-1', name: 'Task 1', type: 'development', files: ['file1.ts'] },
@@ -726,17 +812,19 @@ describe('MCPTaskExecutor', () => {
       expect(stats.queueSize).toBe(5);
     });
 
-    it('should emit queue_empty event', (done) => {
+    it('should emit queue_empty event', async () => {
+      let eventObserved = false;
       executor.on('queue_empty', () => {
-        done();
+        eventObserved = true;
       });
 
-      executor.queueTask({
+      await executor.queueTask({
         id: 'empty-1',
         name: 'Last task',
         type: 'development',
         files: ['app.ts']
       }).then(() => executor.processQueue());
+      expect(eventObserved).toBe(true);
     });
 
     it('should handle queue overflow', async () => {

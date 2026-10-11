@@ -14,6 +14,9 @@ jobs:
   # Pre-test MCP servers (implements CLAUDE.md rule)
   mcp-health:
     name: MCP Health Check
+    permissions:
+      contents: read
+      actions: read
     uses: ./.github/workflows/mcp-health-check.yml
     with:
       mcp-servers: 'chrome,github'

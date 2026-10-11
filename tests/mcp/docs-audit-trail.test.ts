@@ -22,8 +22,10 @@ describe('AuditTrail - Phase 4.4', () => {
   let securityLogger: SecurityLogger;
   let rateLimiter: RateLimiter;
   let ipAccessControl: IPAccessControl;
+  let extraLimiters: RateLimiter[];
 
   beforeEach(async () => {
+    extraLimiters = [];
     // Create temporary directory for test logs
     tempDir = path.join(process.cwd(), '.versatil', 'test-audit-trail');
     await fs.mkdir(tempDir, { recursive: true });
@@ -51,6 +53,8 @@ describe('AuditTrail - Phase 4.4', () => {
   });
 
   afterEach(async () => {
+    rateLimiter.destroy();
+    for (const limiter of extraLimiters) limiter.destroy();
     // Clean up test logs
     try {
       await securityLogger.clearLogs();
@@ -385,6 +389,7 @@ describe('AuditTrail - Phase 4.4', () => {
         rateLimitConfig: { maxRequests: 10, windowMs: 60000 },
       });
 
+      extraLimiters.push(fullTrail['rateLimiter']!);
       expect(fullTrail).toBeInstanceOf(AuditTrail);
 
       // Test that it works

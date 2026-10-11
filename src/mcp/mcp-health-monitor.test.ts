@@ -11,7 +11,7 @@ describe('MCPHealthMonitor', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    monitor = new MCPHealthMonitor();
+    monitor = new MCPHealthMonitor({ baseDelay: 1, maxDelay: 8 });
   });
 
   afterEach(() => {
@@ -24,19 +24,68 @@ describe('MCPHealthMonitor', () => {
   // Health Check Management (10 tests)
   // ============================================================================
   describe('Health Check Management', () => {
+    it('keeps unconfigured monitoring out of execution metrics and admits real callbacks after five cycles', async () => {
+      vi.useFakeTimers();
+      try {
+        const checked = vi.fn();
+        monitor.on('health:checked', checked);
+        monitor.startMonitoring(100);
+        await vi.advanceTimersByTimeAsync(400); // Initial check plus four periodic checks.
+        expect(checked).toHaveBeenCalledTimes(5);
+        expect(monitor.getHealthStatus('github_mcp')).toMatchObject({
+          status: 'unknown', consecutiveFailures: 0, circuitOpen: false
+        });
+        expect(monitor.getMetrics('github_mcp')).toMatchObject({
+          totalRequests: 0, failedRequests: 0, rejectedRequests: 0
+        });
+
+        const operation = vi.fn().mockResolvedValue({ success: true, data: 'observed' });
+        expect(await monitor.executeMCPWithRetry('github_mcp', operation)).toMatchObject({ success: true, data: 'observed' });
+        expect(operation).toHaveBeenCalledTimes(1);
+        const observedHealth = { ...monitor.getHealthStatus('github_mcp')! };
+        const observedMetrics = { ...monitor.getMetrics('github_mcp')! };
+        await vi.advanceTimersByTimeAsync(100);
+        expect(monitor.getHealthStatus('github_mcp')).toEqual(observedHealth);
+        expect(monitor.getMetrics('github_mcp')).toEqual(observedMetrics);
+
+        const failedOperation = vi.fn().mockRejectedValue(new Error('Observed adapter failure'));
+        for (let attempt = 0; attempt < 5; attempt++) {
+          expect((await monitor.executeMCPWithRetry('github_mcp', failedOperation)).success).toBe(false);
+        }
+        expect(failedOperation).toHaveBeenCalledTimes(5);
+        expect(monitor.getHealthStatus('github_mcp')).toMatchObject({ circuitOpen: true, consecutiveFailures: 5 });
+        expect((await monitor.executeMCPWithRetry('github_mcp', operation)).success).toBe(false);
+        expect(operation).toHaveBeenCalledTimes(1);
+        expect(monitor.getMetrics('github_mcp')).toMatchObject({
+          totalRequests: 7, successfulRequests: 1, failedRequests: 5, rejectedRequests: 1
+        });
+      } finally {
+        monitor.stopMonitoring();
+        vi.useRealTimers();
+      }
+    });
+
+    it('fails closed when no native executor is registered', async () => {
+      const result = await monitor.executeMCPWithRetry('github_mcp', 'health_check');
+      expect(result.success).toBe(false);
+      expect(result.usedFallback).toBe(false);
+      expect(result.error).toContain('No native MCP executor');
+      expect(monitor.getHealthStatus('github_mcp')?.status).toBe('degraded');
+    });
+
     it('should initialize health monitor', () => {
       expect(monitor).toBeDefined();
       expect(monitor instanceof MCPHealthMonitor).toBe(true);
     });
 
-    it('should initialize all 11 MCPs as healthy', () => {
+    it('should initialize all 11 MCPs as unobserved', () => {
       const allHealth = monitor.getAllHealthStatus();
       expect(allHealth.size).toBe(11);
 
       for (const [mcpId, health] of allHealth) {
-        expect(health.status).toBe('healthy');
+        expect(health.status).toBe('unknown');
         expect(health.consecutiveFailures).toBe(0);
-        expect(health.successRate).toBe(100);
+        expect(health.successRate).toBe(0);
         expect(health.circuitOpen).toBe(false);
       }
     });
@@ -84,22 +133,26 @@ describe('MCPHealthMonitor', () => {
       expect(checkSpy).toHaveBeenCalled();
     });
 
-    it('should emit monitoring_started event', (done) => {
+    it('should emit monitoring_started event', () => {
+      let eventObserved = false;
       monitor.on('monitoring_started', (data) => {
         expect(data).toHaveProperty('intervalMs');
-        done();
+        eventObserved = true;
       });
 
       monitor.startMonitoring(5000);
+      expect(eventObserved).toBe(true);
     });
 
-    it('should emit monitoring_stopped event', (done) => {
+    it('should emit monitoring_stopped event', () => {
+      let eventObserved = false;
       monitor.on('monitoring_stopped', () => {
-        done();
+        eventObserved = true;
       });
 
       monitor.startMonitoring(5000);
       monitor.stopMonitoring();
+      expect(eventObserved).toBe(true);
     });
 
     it('should handle monitoring errors gracefully', async () => {
@@ -256,18 +309,20 @@ describe('MCPHealthMonitor', () => {
       expect(health).toBeNull();
     });
 
-    it('should emit health_changed event', (done) => {
+    it('should emit health_changed event', async () => {
+      let eventObserved = false;
       monitor.on('health_changed', (data) => {
         expect(data).toHaveProperty('mcpId');
         expect(data).toHaveProperty('oldStatus');
         expect(data).toHaveProperty('newStatus');
-        done();
+        eventObserved = true;
       });
 
       // Trigger status change
-      monitor.executeMCPWithRetry('sentry_mcp', async () => {
+      await monitor.executeMCPWithRetry('sentry_mcp', async () => {
         throw new Error('Failed');
       });
+      expect(eventObserved).toBe(true);
     });
 
     it('should track health status for all MCPs', () => {
@@ -381,33 +436,37 @@ describe('MCPHealthMonitor', () => {
       expect(health?.circuitOpen).toBe(true);
     });
 
-    it('should emit circuit_opened event', (done) => {
+    it('should emit circuit_opened event', async () => {
+      let eventObserved = false;
       monitor.on('circuit_opened', (data) => {
         expect(data).toHaveProperty('mcpId');
         expect(data).toHaveProperty('consecutiveFailures');
-        done();
+        eventObserved = true;
       });
 
       // Trigger circuit breaker
       const mcpId = 'vertex_ai_mcp';
       for (let i = 0; i < 5; i++) {
-        monitor.executeMCPWithRetry(mcpId, async () => {
+        await monitor.executeMCPWithRetry(mcpId, async () => {
           throw new Error('Failed');
         });
       }
+      expect(eventObserved).toBe(true);
     });
 
-    it('should emit circuit_closed event', (done) => {
+    it('should emit circuit_closed event', async () => {
+      let eventObserved = false;
       const mcpId = 'supabase_mcp';
 
       monitor.on('circuit_closed', (data) => {
         expect(data.mcpId).toBe(mcpId);
-        done();
+        eventObserved = true;
       });
 
       // Open then close
       monitor['openCircuit'](mcpId);
       monitor['closeCircuit'](mcpId);
+      expect(eventObserved).toBe(true);
     });
 
     it('should count rejected requests during open circuit', async () => {
@@ -466,6 +525,25 @@ describe('MCPHealthMonitor', () => {
   // Retry Logic (8 tests)
   // ============================================================================
   describe('Retry Logic', () => {
+    it('does not replay unspecified mutation callbacks after failure', async () => {
+      const operation = vi.fn().mockRejectedValue(new Error('Outcome unknown after write'));
+      const result = await monitor.executeMCPWithRetry('github_mcp', operation);
+      expect(result.success).toBe(false);
+      expect(operation).toHaveBeenCalledTimes(1);
+      expect(result.retriesUsed).toBe(0);
+    });
+    it('does not replay timed-out callbacks even with explicit retry safety', async () => {
+      let finish!: (value: any) => void;
+      const operation = vi.fn(() => new Promise(resolve => { finish = resolve; }));
+      const result = await monitor.executeMCPWithRetry('github_mcp', operation, { timeout: 5, retrySafety: 'idempotent' });
+      expect(result.success).toBe(false);
+      expect(operation).toHaveBeenCalledTimes(1);
+      expect(result.retriesUsed).toBe(0);
+      finish({ success: true });
+      await Promise.resolve();
+      expect(monitor.getMetrics('github_mcp')?.successfulRequests).toBe(0);
+    });
+
     it('should retry failed health checks', async () => {
       const mcpId = 'sentry_mcp';
       let attemptCount = 0;
@@ -476,7 +554,7 @@ describe('MCPHealthMonitor', () => {
           throw new Error('Temporary failure');
         }
         return { success: true, data: 'ok', latency: 50 };
-      });
+      }, { retrySafety: 'read-only' });
 
       expect(result.success).toBe(true);
       expect(result.retriesUsed).toBeGreaterThan(0);
@@ -494,9 +572,10 @@ describe('MCPHealthMonitor', () => {
       await customMonitor.executeMCPWithRetry('versatil_mcp', async () => {
         timestamps.push(Date.now());
         throw new Error('Failed');
-      });
+      }, { retrySafety: 'read-only' });
 
       // Check delays are increasing (100ms, 200ms, 400ms)
+      expect(timestamps).toHaveLength(4);
       if (timestamps.length >= 3) {
         const delay1 = timestamps[1] - timestamps[0];
         const delay2 = timestamps[2] - timestamps[1];
@@ -515,9 +594,9 @@ describe('MCPHealthMonitor', () => {
       await customMonitor.executeMCPWithRetry('chrome_mcp', async () => {
         attemptCount++;
         throw new Error('Always fails');
-      });
+      }, { retrySafety: 'read-only' });
 
-      expect(attemptCount).toBeLessThanOrEqual(3); // 1 initial + 2 retries
+      expect(attemptCount).toBe(3); // 1 initial + 2 explicitly safe retries
     });
 
     it('should timeout long-running checks', async () => {
@@ -547,7 +626,7 @@ describe('MCPHealthMonitor', () => {
           throw new Error('Failed');
         }
         return { success: true, data: 'ok', latency: 50 };
-      });
+      }, { retrySafety: 'read-only' });
 
       expect(result.retriesUsed).toBe(1);
     });
@@ -560,21 +639,33 @@ describe('MCPHealthMonitor', () => {
         const error: any = new Error('Authentication failed');
         error.retryable = false;
         throw error;
-      });
+      }, { retrySafety: 'read-only' });
 
-      expect(attemptCount).toBe(1); // No retries
+      expect(attemptCount).toBe(1); // Adapter refusal overrides the retry opt-in.
     });
 
-    it('should emit retry_attempted event', (done) => {
+    it('does not retry a structured refusal even with idempotence opt-in', async () => {
+      const operation = vi.fn().mockResolvedValue({ success: false, error: 'Authentication failed', retryable: false });
+      const retried = vi.fn();
+      monitor.on('retry_attempted', retried);
+      const result = await monitor.executeMCPWithRetry('exa_mcp', operation, { retrySafety: 'idempotent' });
+      expect(result).toMatchObject({ success: false, error: 'Authentication failed', retriesUsed: 0 });
+      expect(operation).toHaveBeenCalledTimes(1);
+      expect(retried).not.toHaveBeenCalled();
+    });
+
+    it('should emit retry_attempted event', async () => {
+      let eventObserved = false;
       monitor.on('retry_attempted', (data) => {
         expect(data).toHaveProperty('mcpId');
         expect(data).toHaveProperty('attempt');
-        done();
+        eventObserved = true;
       });
 
-      monitor.executeMCPWithRetry('shadcn_mcp', async () => {
+      await monitor.executeMCPWithRetry('shadcn_mcp', async () => {
         throw new Error('Failed');
-      });
+      }, { retrySafety: 'read-only' });
+      expect(eventObserved).toBe(true);
     });
 
     it('should include retry count in result', async () => {
@@ -625,18 +716,20 @@ describe('MCPHealthMonitor', () => {
       expect(score).toBeLessThanOrEqual(100);
     });
 
-    it('should alert on degradation', (done) => {
+    it('should alert on degradation', async () => {
+      let eventObserved = false;
       monitor.on('degradation_alert', (data) => {
         expect(data).toHaveProperty('mcpId');
         expect(data).toHaveProperty('severity');
-        done();
+        eventObserved = true;
       });
 
       // Trigger degradation
       const mcpId = 'n8n_mcp';
-      monitor.executeMCPWithRetry(mcpId, async () => {
+      await monitor.executeMCPWithRetry(mcpId, async () => {
         throw new Error('Degraded');
       });
+      expect(eventObserved).toBe(true);
     });
 
     it('should track total requests per MCP', async () => {

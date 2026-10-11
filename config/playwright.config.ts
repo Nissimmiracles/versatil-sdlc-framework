@@ -1,4 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+
+const loadPartition = createRequire(import.meta.url);
+const runnerPartition = loadPartition('../tests/ci/runner-partition.cjs');
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const partition = runnerPartition.collectRunnerPartition(repoRoot);
+const playwrightTests = [
+  ...partition.byRunner.playwright.map(file => resolve(repoRoot, file)),
+  // Preserve legacy e2e filenames outside the test/spec convention.
+  '**/tests/e2e/**/*.{ts,js}',
+];
 
 /**
  * VERSATIL SDLC Framework - Hybrid Playwright + Chrome MCP Configuration
@@ -15,10 +28,12 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   // Test configuration
-  testDir: './tests',
-  testMatch: [
-    '**/tests/e2e/**/*.{ts,js}'
-  ],
+  testDir: resolve(repoRoot, 'tests'),
+  // Other suites remain visible in the shared partition and run in their own lane.
+  testIgnore: partition.entries
+    .filter(entry => entry.runner !== 'playwright')
+    .map(entry => resolve(repoRoot, entry.path)),
+  testMatch: playwrightTests,
 
   // Global test settings
   fullyParallel: true,
@@ -32,14 +47,13 @@ export default defineConfig({
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/playwright-results.json' }],
     ['junit', { outputFile: 'test-results/playwright-junit.xml' }],
-    process.env.CI ? ['github'] : ['list'],
-    // Percy visual regression reporter (only in CI or when PERCY_TOKEN is set)
-    ...(process.env.CI || process.env.PERCY_TOKEN ? [['@percy/playwright']] : [])
+    process.env.CI ? ['github'] : ['list']
+    // Percy is a snapshot SDK, not a reporter. Keep its existing percy exec lane.
   ],
 
   // Global test setup and teardown
-  globalSetup: './tests/setup/global-setup.ts',
-  globalTeardown: './tests/setup/global-teardown.ts',
+  globalSetup: resolve(repoRoot, 'tests/setup/global-setup.ts'),
+  globalTeardown: resolve(repoRoot, 'tests/setup/global-teardown.ts'),
 
   // Use options
   use: {
@@ -88,13 +102,13 @@ export default defineConfig({
     // Chrome Desktop - Primary testing environment
     {
       name: 'chromium-desktop',
+      // Every explicit Playwright suite has an execution lane, including future src suites.
+      testDir: repoRoot,
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1080 }
       },
-      testMatch: [
-        '**/tests/e2e/**/*.{ts,js}'
-      ]
+      testMatch: playwrightTests
     },
 
     // Context Validation - User flow testing with real-time error capture

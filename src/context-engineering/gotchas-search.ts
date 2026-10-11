@@ -9,7 +9,7 @@
  */
 
 import { readdir, readFile, stat } from 'fs/promises';
-import { join, relative } from 'path';
+import { join, relative, basename } from 'path';
 
 export type GotchaSeverity = 'low' | 'medium' | 'high' | 'critical';
 
@@ -215,7 +215,7 @@ export class GotchasSearchService {
    */
   private async parseGotchaFile(filePath: string): Promise<GotchaEntry[]> {
     const relativePath = relative(this.gotchasDir, filePath);
-    const technology = filePath.split('/').pop()?.replace('.md', '') || 'unknown';
+    const technology = basename(filePath, '.md') || 'unknown';
 
     try {
       const content = await readFile(filePath, 'utf-8');

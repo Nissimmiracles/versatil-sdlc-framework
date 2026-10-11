@@ -84,6 +84,9 @@ export class AdaptiveLearningEngine extends EventEmitter {
   };
   private dataPath: string;
   private isLearning: boolean = false;
+  private analysisTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly interactionListener = (interaction: UserInteraction) => this.handleInteraction(interaction);
+  private readonly patternListener = (pattern: LearningPattern) => this.handlePatternDiscovery(pattern);
 
   constructor() {
     super();
@@ -111,13 +114,13 @@ export class AdaptiveLearningEngine extends EventEmitter {
     this.loadLearningData();
 
     // Start periodic pattern analysis
-    setInterval(() => {
+    this.analysisTimer = setInterval(() => {
       this.analyzePatterns();
     }, this.learningConfig.adaptationInterval);
 
     // Start real-time adaptation
-    this.on('interaction', this.handleInteraction.bind(this));
-    this.on('pattern_discovered', this.handlePatternDiscovery.bind(this));
+    this.on('interaction', this.interactionListener);
+    this.on('pattern_discovered', this.patternListener);
   }
 
   /**
@@ -125,6 +128,10 @@ export class AdaptiveLearningEngine extends EventEmitter {
    */
   public stopLearning(): void {
     this.isLearning = false;
+    if (this.analysisTimer) clearInterval(this.analysisTimer);
+    this.analysisTimer = null;
+    this.off('interaction', this.interactionListener);
+    this.off('pattern_discovered', this.patternListener);
     this.logger.info('Adaptive learning stopped', {}, 'adaptive-learning');
   }
 

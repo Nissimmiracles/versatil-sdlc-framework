@@ -417,6 +417,10 @@ export class MCPSelectionEngine extends EventEmitter {
     // Step 3: Sort by confidence and return
     const sortedRecommendations = recommendations.sort((a, b) => b.confidence - a.confidence);
 
+    if (sortedRecommendations.length === 0) {
+      throw new Error('No supported MCP matches the task requirements');
+    }
+
     const result: MCPSelectionResult = {
       primary: sortedRecommendations[0],
       alternatives: sortedRecommendations.slice(1, 4), // Top 3 alternatives

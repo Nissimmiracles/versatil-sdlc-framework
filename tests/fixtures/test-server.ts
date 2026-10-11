@@ -14,8 +14,9 @@ export class VERSATILTestServer {
   constructor(port: number = 3000) {
     this.port = port;
     this.app = express();
-    this.setupRoutes();
+    this.app.disable('x-powered-by');
     this.setupSecurityHeaders();
+    this.setupRoutes();
   }
 
   private setupSecurityHeaders() {

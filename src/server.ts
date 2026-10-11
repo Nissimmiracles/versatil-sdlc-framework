@@ -9,6 +9,7 @@ import express from 'express';
 import { createServer } from 'http';
 import * as path from 'path';
 import * as fs from 'fs';
+import { tmpdir } from 'node:os';
 import { VERSATILLogger } from './utils/logger.js';
 import { PerformanceMonitor } from './analytics/performance-monitor.js';
 
@@ -148,7 +149,7 @@ app.use((req, res) => {
 // Helper functions for health checks
 function checkFilesystem(): { status: string; message?: string } {
   try {
-    const testFile = path.join('/tmp', `health-check-${Date.now()}`);
+    const testFile = path.join(tmpdir(), `health-check-${Date.now()}`);
     fs.writeFileSync(testFile, 'health-check');
     fs.unlinkSync(testFile);
     return { status: 'ok' };

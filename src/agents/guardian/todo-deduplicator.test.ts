@@ -73,11 +73,18 @@ describe('TodoDeduplicator', () => {
 
     it('should not match TODOs with different titles', () => {
       const todo1 = { title: 'Fix bug A', description: 'Error', file: 'test.ts' };
-      const todo2 = { title: 'Fix bug B', description: 'Error', file: 'test.ts' };
+      const todo2 = { title: 'Add user authentication endpoint', description: 'Error', file: 'test.ts' };
 
       const similar = areTodosSimilar(todo1, todo2);
 
       expect(similar).toBe(false);
+    });
+
+    it('matches minor title variations only above the configured similarity threshold', () => {
+      const first = { title: 'Fix bug A', description: 'Error', file: 'test.ts' };
+      const second = { ...first, title: 'Fix bug B' };
+      expect(areTodosSimilar(first, second)).toBe(true);
+      expect(areTodosSimilar(first, second, 1)).toBe(false);
     });
 
     it('should handle case insensitive matching', () => {

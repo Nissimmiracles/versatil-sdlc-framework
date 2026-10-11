@@ -8,16 +8,21 @@ import { DocsSearchEngine } from '../../src/mcp/docs-search-engine.js';
 import { DocsSearchError, DocsErrorCodes } from '../../src/mcp/docs-errors.js';
 import path from 'path';
 import * as fs from 'fs/promises';
+import { createDocsCorpus } from '../fixtures/docs-corpus/create.js';
 
 describe('DocsSearchEngine - Security', () => {
   let searchEngine: DocsSearchEngine;
-  const projectPath = path.join(process.cwd());
+  const corpus = createDocsCorpus();
+  const projectPath = corpus.root;
   const testDocsPath = path.join(projectPath, 'docs');
 
   beforeAll(async () => {
+    await fs.writeFile(path.join(testDocsPath, 'large.md'), '# Large fixture\n' + 'synthetic documentation '.repeat(100));
     searchEngine = new DocsSearchEngine(projectPath);
     await searchEngine.buildIndex();
+    expect((await searchEngine.getIndex()).length).toBe(corpus.count + 1);
   });
+  afterAll(() => corpus.cleanup());
 
   describe('Path Traversal Protection', () => {
     it('should block path traversal with ../', async () => {
@@ -32,10 +37,8 @@ describe('DocsSearchEngine - Security', () => {
       ).rejects.toThrow('Path traversal not allowed');
     });
 
-    it('should block absolute paths', async () => {
-      await expect(
-        searchEngine.getDocument('/etc/passwd')
-      ).rejects.toThrow('Path traversal not allowed');
+    it.each(['/etc/passwd', '\\etc\\passwd', 'C:\\outside\\secret.md', 'C:/outside/secret.md', '\\\\server\\share\\secret.md', path.resolve(projectPath, 'outside.md')])('should block absolute or rooted path %s', async input => {
+      await expect(searchEngine.getDocument(input)).rejects.toMatchObject({ code: DocsErrorCodes.PATH_TRAVERSAL_BLOCKED });
     });
 
     it('should block Windows-style path traversal', async () => {
@@ -59,6 +62,7 @@ describe('DocsSearchEngine - Security', () => {
     it('should allow valid relative paths', async () => {
       // This should work if the file exists
       const index = await searchEngine.getIndex();
+      expect(index.length).toBeGreaterThan(0);
       if (index.length > 0) {
         const validPath = index[0].relativePath;
         const content = await searchEngine.getDocument(validPath);
@@ -83,10 +87,12 @@ describe('DocsSearchEngine - Security', () => {
       await tinyLimitEngine.buildIndex();
 
       const index = await tinyLimitEngine.getIndex();
+      expect(index.length).toBeGreaterThan(0);
       if (index.length > 0) {
         // Find a document larger than 100 bytes
         const largeDoc = index.find(doc => doc.size > 100);
 
+        expect(largeDoc).toBeDefined();
         if (largeDoc) {
           await expect(
             tinyLimitEngine.getDocument(largeDoc.relativePath)
@@ -105,6 +111,7 @@ describe('DocsSearchEngine - Security', () => {
       const index = await tinyLimitEngine.getIndex();
       const largeDoc = index.find(doc => doc.size > 100);
 
+      expect(largeDoc).toBeDefined();
       if (largeDoc) {
         try {
           await tinyLimitEngine.getDocument(largeDoc.relativePath);
@@ -127,6 +134,7 @@ describe('DocsSearchEngine - Security', () => {
       await largeLimitEngine.buildIndex();
 
       const index = await largeLimitEngine.getIndex();
+      expect(index.length).toBeGreaterThan(0);
       if (index.length > 0) {
         const doc = index[0];
         const content = await largeLimitEngine.getDocument(doc.relativePath);
@@ -141,7 +149,10 @@ describe('DocsSearchEngine - Security', () => {
 
       // All indexed files should be in docs directory
       index.forEach(doc => {
-        expect(doc.filePath).toContain('/docs/');
+        const relative = path.relative(testDocsPath, doc.filePath);
+        expect(path.isAbsolute(relative)).toBe(false);
+        expect(relative.split(path.sep)).not.toContain('..');
+        expect(path.resolve(testDocsPath, relative)).toBe(path.resolve(doc.filePath));
       });
     });
 
@@ -164,6 +175,7 @@ describe('DocsSearchEngine - Security', () => {
     it('should validate file readability', async () => {
       // This test ensures the file exists and is readable
       const index = await searchEngine.getIndex();
+      expect(index.length).toBeGreaterThan(0);
       if (index.length > 0) {
         const doc = index[0];
 
@@ -228,6 +240,7 @@ describe('DocsSearchEngine - Security', () => {
   describe('Concurrent Access Security', () => {
     it('should handle concurrent access attempts safely', async () => {
       const index = await searchEngine.getIndex();
+      expect(index.length).toBeGreaterThanOrEqual(3);
       if (index.length >= 3) {
         const paths = index.slice(0, 3).map(doc => doc.relativePath);
 
@@ -245,6 +258,7 @@ describe('DocsSearchEngine - Security', () => {
 
     it('should handle mixed valid and invalid paths concurrently', async () => {
       const index = await searchEngine.getIndex();
+      expect(index.length).toBeGreaterThan(0);
       if (index.length > 0) {
         const validPath = index[0].relativePath;
 

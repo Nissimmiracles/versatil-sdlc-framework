@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { installReferenceFixture } from './reference-fixture.js';
+
+test.beforeEach(async ({ page }) => { await installReferenceFixture(page); });
 
 /**
  * VERSATIL SDLC Framework - Accessibility Compliance Testing

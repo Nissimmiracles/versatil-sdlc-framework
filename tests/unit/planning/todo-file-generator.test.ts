@@ -3,13 +3,14 @@
  * Tests for todo file creation, numbering, and dependency management
  */
 
-import { TodoFileGenerator, TodoFileSpec, TodoGenerationResult } from '../../src/planning/todo-file-generator';
+import { TodoFileGenerator, TodoFileSpec, TodoGenerationResult } from '../../../src/planning/todo-file-generator';
 import * as fs from 'fs';
 import * as path from 'path';
+import { tmpdir } from 'os';
 
 describe('TodoFileGenerator', () => {
   let generator: TodoFileGenerator;
-  const testTodosDir = path.join(process.cwd(), 'todos-test');
+  const testTodosDir = fs.mkdtempSync(path.join(tmpdir(), 'todo-generator-test-'));
 
   beforeAll(() => {
     // Create test todos directory
@@ -33,15 +34,12 @@ describe('TodoFileGenerator', () => {
   });
 
   beforeEach(() => {
-    // Monkey-patch the todosDir to use test directory
-    generator = new TodoFileGenerator();
-    (generator as any).todosDir = testTodosDir;
-    (generator as any).templatePath = path.join(testTodosDir, '000-pending-p1-TEMPLATE.md');
+    generator = new TodoFileGenerator(testTodosDir);
 
     // Clean up test todos before each test
     const files = fs.readdirSync(testTodosDir);
     files.forEach(file => {
-      if (file.match(/^\d{3}-/) && file.endsWith('.md')) {
+      if (file !== '000-pending-p1-TEMPLATE.md' && file.match(/^\d{3}-/) && file.endsWith('.md')) {
         fs.unlinkSync(path.join(testTodosDir, file));
       }
     });
@@ -271,7 +269,7 @@ describe('TodoFileGenerator', () => {
       const result = await generator.generateTodos([spec]);
 
       expect(result.todowrite_items[0].file_path).toBeDefined();
-      expect(result.todowrite_items[0].file_path).toContain('todos');
+      expect(result.todowrite_items[0].file_path).toBe(path.join(testTodosDir, result.files_created[0]));
       expect(result.todowrite_items[0].file_path).toContain('.md');
     });
 

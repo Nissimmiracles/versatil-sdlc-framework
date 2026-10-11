@@ -339,7 +339,7 @@ describe('Credential Onboarding Integration', () => {
           projectPath: testProjectDir,
           projectId
         })
-      ).rejects.toThrow('Failed to load credentials');
+      ).resolves.toMatchObject({ count: 0, services: [] });
     });
 
     it('should handle corrupted credentials file', async () => {

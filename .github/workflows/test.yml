@@ -182,7 +182,14 @@ jobs:
         run: pnpm run build
 
       - name: Test ${{ matrix.suite }}
+        if: matrix.suite != 'introspective-integration'
         run: pnpm vitest run tests/integration/${{ matrix.suite }}.test.ts --reporter=verbose
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Test introspective integration with Jest
+        if: matrix.suite == 'introspective-integration'
+        run: pnpm exec jest --config config/jest.config.cjs --selectProjects INTEGRATION --runTestsByPath tests/integration/introspective-integration.test.ts
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 

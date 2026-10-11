@@ -161,13 +161,29 @@ describe('AgentIntelligenceManager', () => {
       });
     });
 
-    it('should track performance metrics during activation', async () => {
+    it('tracks supplied elapsed time and the implemented smoothed metric', async () => {
+      const clock = jest.spyOn(Date, 'now').mockReturnValueOnce(1000).mockReturnValue(1020);
       const wrappedAgent = intelligenceManager.wrapAgent(testAgent);
       await wrappedAgent.activate(mockContext);
 
       const wrapper = intelligenceManager['wrappedAgents'].get('test-agent');
       expect(wrapper?.performanceMetrics.activations).toBe(1);
-      expect(wrapper?.performanceMetrics.avgExecutionTime).toBeGreaterThan(0);
+      expect(wrapper?.performanceMetrics.avgExecutionTime).toBe(10);
+      const { usageAnalytics } = require('../../src/intelligence/usage-analytics');
+      expect(usageAnalytics.trackPerformance).toHaveBeenCalledWith('test-agent', 20, 1, 0.8);
+      clock.mockRestore();
+    });
+
+    it('records an exact zero duration when activation completes within one clock tick', async () => {
+      const clock = jest.spyOn(Date, 'now').mockReturnValue(1000);
+      const wrappedAgent = intelligenceManager.wrapAgent(testAgent);
+      await wrappedAgent.activate(mockContext);
+      const wrapper = intelligenceManager['wrappedAgents'].get('test-agent');
+      expect(wrapper?.performanceMetrics.activations).toBe(1);
+      expect(wrapper?.performanceMetrics.avgExecutionTime).toBe(0);
+      const { usageAnalytics } = require('../../src/intelligence/usage-analytics');
+      expect(usageAnalytics.trackPerformance).toHaveBeenCalledWith('test-agent', 0, 1, 0.8);
+      clock.mockRestore();
     });
 
     it('should preserve non-activate method access', () => {

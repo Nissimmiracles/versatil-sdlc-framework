@@ -169,7 +169,7 @@ export class MCPToolRouter extends EventEmitter {
       // Build response
       const response: ToolCallResponse = {
         success: result.success !== false,
-        data: result.data || result,
+        data: result.data !== undefined ? result.data : result,
         error: result.error,
         executionTime: Date.now() - startTime,
         tool: request.tool,
@@ -177,7 +177,7 @@ export class MCPToolRouter extends EventEmitter {
       };
 
       // Update stats
-      this.updateStats(response);
+      this.updateStats(response, request.agentId);
 
       // Emit event
       this.emit('tool-call-complete', {
@@ -199,7 +199,7 @@ export class MCPToolRouter extends EventEmitter {
         action: request.action
       };
 
-      this.stats.failedCalls++;
+      this.updateStats(response, request.agentId);
       this.emit('tool-call-error', { request, error, agentId: request.agentId });
 
       return response;
@@ -427,7 +427,7 @@ export class MCPToolRouter extends EventEmitter {
   /**
    * Update statistics
    */
-  private updateStats(response: ToolCallResponse): void {
+  private updateStats(response: ToolCallResponse, agentId?: string): void {
     this.stats.totalCalls++;
 
     if (response.success) {
@@ -442,13 +442,20 @@ export class MCPToolRouter extends EventEmitter {
 
     // Update calls by tool
     this.stats.callsByTool[response.tool] = (this.stats.callsByTool[response.tool] || 0) + 1;
+    if (agentId) {
+      this.stats.callsByAgent[agentId] = (this.stats.callsByAgent[agentId] || 0) + 1;
+    }
   }
 
   /**
    * Get router statistics
    */
   getStats(): MCPToolStats {
-    return { ...this.stats };
+    return {
+      ...this.stats,
+      callsByTool: { ...this.stats.callsByTool },
+      callsByAgent: { ...this.stats.callsByAgent }
+    };
   }
 
   /**

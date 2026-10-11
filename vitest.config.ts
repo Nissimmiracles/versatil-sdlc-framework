@@ -1,5 +1,13 @@
 import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+
+// Keep the CommonJS AST collector external to Vitest's config bundler.
+const loadPartition = createRequire(import.meta.url);
+const runnerPartition = loadPartition('./tests/ci/runner-partition.cjs');
+const repoRoot = dirname(fileURLToPath(import.meta.url));
+const partition = runnerPartition.collectRunnerPartition(repoRoot);
 
 export default defineConfig({
   test: {
@@ -14,7 +22,8 @@ export default defineConfig({
     testTimeout: process.env.CI ? 30000 : 15000, // Longer timeout in CI (30s) vs local (15s)
     hookTimeout: process.env.CI ? 30000 : 15000, // Increased hook timeout to match test timeout
     teardownTimeout: 10000, // Cleanup timeout
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}', 'tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    // The partition guard reports unknown/mixed suites; it never drops them silently.
+    include: partition.byRunner.vitest,
     exclude: ['node_modules', 'dist', '.claude'],
     coverage: {
       provider: 'v8',
@@ -40,7 +49,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(repoRoot, './src'),
     },
   },
 });

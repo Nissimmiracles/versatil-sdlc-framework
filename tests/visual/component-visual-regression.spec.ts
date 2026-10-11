@@ -1,386 +1,106 @@
-/**
- * Component Visual Regression Tests
- *
- * Percy visual regression testing for critical UI components
- * Tests component appearance, states, and responsive behavior
- *
- * Run: npx percy exec -- npx playwright test tests/visual/component-visual-regression.spec.ts
- */
-
+/** Reference visual harness checks: geometry/style/state baselines, no deployed component claims. */
 import { test, expect } from '@playwright/test';
-import { createPercyHelper, RESPONSIVE_WIDTHS, ComponentState } from '../utils/percy-helpers.js';
+import { installReferenceFixture } from '../accessibility/reference-fixture.js';
 
-test.describe('Component Visual Regression Tests', () => {
-  test.beforeEach(async ({ page }) => {
-    // Navigate to component showcase page
-    // Replace with your actual component showcase URL
-    await page.goto('http://localhost:3000/components');
-    await page.waitForLoadState('networkidle');
+test.beforeEach(async ({ page }) => {
+  await installReferenceFixture(page);
+  await page.goto('/components');
+});
+
+test.describe('Reference component visual contracts', () => {
+  test('button focus changes rendered pixels while preserving geometry', async ({ page }, testInfo) => {
+    const button = page.locator('#activate');
+    const before = await button.boundingBox();
+    const normal = await page.screenshot();
+    await button.focus();
+    await expect(button).toHaveCSS('outline-width', '3px');
+    await expect(button).toHaveCSS('outline-color', 'rgb(0, 95, 204)');
+    expect(await button.boundingBox()).toEqual(before);
+    const focused = await page.screenshot();
+    expect(focused.equals(normal)).toBe(false);
+    await testInfo.attach('reference-button-focus', { body: focused, contentType: 'image/png' });
   });
 
-  test('Button Components - All States', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    // Wait for components to be ready
-    await percy.waitForSnapshotReady();
-
-    // Primary button states
-    const primaryButtonStates: ComponentState[] = ['default', 'hover', 'focus', 'active', 'disabled'];
-    await percy.snapshotStates(
-      'Primary Button',
-      '[data-testid="button-primary"]',
-      primaryButtonStates,
-      { waitForTimeout: 100 }
-    );
-
-    // Secondary button states
-    const secondaryButtonStates: ComponentState[] = ['default', 'hover', 'disabled'];
-    await percy.snapshotStates(
-      'Secondary Button',
-      '[data-testid="button-secondary"]',
-      secondaryButtonStates
-    );
-
-    // Icon button states
-    await percy.snapshotStates(
-      'Icon Button',
-      '[data-testid="button-icon"]',
-      ['default', 'hover', 'active']
-    );
+  test('disabled controls retain readable styling and cannot activate', async ({ page }) => {
+    const button = page.locator('#activate');
+    await button.evaluate(el => { (el as HTMLButtonElement).disabled = true; });
+    await expect(button).toBeDisabled();
+    await expect(button).toHaveCSS('background-color', 'rgb(238, 238, 238)');
+    await button.evaluate(el => (el as HTMLButtonElement).click());
+    await expect(page.locator('#activation')).toHaveText('0');
   });
 
-  test('Button Components - Responsive Breakpoints', async ({ page }) => {
-    const percy = createPercyHelper(page);
+  test('theme variants change foreground, background and focus colors', async ({ page }) => {
+    const button = page.locator('#activate');
+    await expect(button).toHaveCSS('color', 'rgb(17, 17, 17)');
+    await expect(button).toHaveCSS('background-color', 'rgb(238, 238, 238)');
+    await page.locator('#theme').click();
+    await expect(button).toHaveCSS('color', 'rgb(255, 255, 255)');
+    await expect(button).toHaveCSS('background-color', 'rgb(51, 51, 51)');
+    await button.focus();
+    await expect(button).toHaveCSS('outline-color', 'rgb(158, 202, 255)');
+  });
 
-    // Test buttons at all responsive breakpoints
-    await percy.snapshotResponsive('Button Components - Responsive', {
-      waitForTimeout: 100
+  test('labeled form fields share the explicit width and border baseline', async ({ page }) => {
+    for (const id of ['name','email','password','number','tel','message']) {
+      const field = page.locator(`#${id}`);
+      await expect(field).toBeVisible();
+      expect((await field.boundingBox())!.width).toBe(440);
+      await expect(field).toHaveCSS('border-top-width', '2px');
+      await expect(page.locator(`label[for="${id}"]`)).toBeVisible();
+    }
+  });
+
+  test('native checkbox and radio states have observable selection controls', async ({ page }) => {
+    await page.locator('main').evaluate(el => {
+      el.insertAdjacentHTML('beforeend', '<label><input id="check" type="checkbox">Check</label><label><input id="radio" name="group" type="radio">Radio</label>');
     });
+    for (const id of ['check','radio']) {
+      const control = page.locator(`#${id}`);
+      await expect(control).not.toBeChecked();
+      await control.check();
+      await expect(control).toBeChecked();
+    }
   });
 
-  test('Button Components - Theme Variants', async ({ page }) => {
-    const percy = createPercyHelper(page);
+  test('modal visually overlays content and closes without changing layout', async ({ page }, testInfo) => {
+    const original = await page.locator('main').boundingBox();
+    await page.locator('#open-dialog').click();
+    const dialog = page.locator('#dialog');
+    await expect(dialog).toBeVisible();
+    const box = (await dialog.boundingBox())!;
+    const viewport = page.viewportSize()!;
+    expect(box.x).toBeGreaterThan(0);
+    expect(box.x + box.width).toBeLessThan(viewport.width);
+    expect(await dialog.evaluate(el => el.matches(':modal'))).toBe(true);
+    await testInfo.attach('reference-modal', { body: await page.screenshot(), contentType: 'image/png' });
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
+    expect(await page.locator('main').boundingBox()).toEqual(original);
+  });
 
-    // Test buttons in light and dark themes
-    await percy.snapshotThemes('Button Components - Themes', {
-      waitForTimeout: 100
+  test('dropdown and tooltip visibility are reflected in the rendered layout', async ({ page }) => {
+    await expect(page.locator('#menu')).not.toBeVisible();
+    await page.locator('#menu-trigger').click();
+    await expect(page.locator('#menu')).toBeVisible();
+    expect((await page.locator('#menu').boundingBox())!.height).toBeGreaterThan(30);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#menu')).not.toBeVisible();
+    await page.locator('#tooltip-trigger').hover();
+    await expect(page.locator('#tooltip')).toBeVisible();
+    await expect(page.locator('#tooltip')).toHaveCSS('border-top-width', '1px');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#tooltip')).not.toBeVisible();
+  });
+
+  test('table, progress and disclosure reference states render with fixed geometry', async ({ page }) => {
+    await page.locator('main').evaluate(el => {
+      el.insertAdjacentHTML('beforeend', '<table style="width:400px;table-layout:fixed"><caption>Reference data</caption><tr><th>Name</th><th>Status</th></tr><tr><td>A</td><td>Ready</td></tr></table><progress aria-label="Completion" value="50" max="100" style="width:200px"></progress><details><summary>Details</summary><p>Expanded content</p></details>');
     });
-  });
-
-  test('Form Components - Input Fields', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await percy.waitForSnapshotReady();
-
-    // Text input states
-    const inputStates: ComponentState[] = ['default', 'focus', 'error', 'disabled'];
-    await percy.snapshotStates(
-      'Text Input',
-      '[data-testid="input-text"]',
-      inputStates
-    );
-
-    // Textarea states
-    await percy.snapshotStates(
-      'Textarea',
-      '[data-testid="input-textarea"]',
-      inputStates
-    );
-
-    // Select dropdown states
-    await percy.snapshotStates(
-      'Select Dropdown',
-      '[data-testid="input-select"]',
-      ['default', 'focus', 'disabled']
-    );
-  });
-
-  test('Form Components - Checkboxes and Radio Buttons', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await percy.waitForSnapshotReady();
-
-    // Checkbox states
-    await page.goto('http://localhost:3000/components/checkbox');
-    await percy.snapshot('Checkbox - Unchecked');
-
-    // Check the checkbox
-    await page.click('[data-testid="checkbox"]');
-    await percy.snapshot('Checkbox - Checked');
-
-    // Disabled checkbox
-    await page.goto('http://localhost:3000/components/checkbox?disabled=true');
-    await percy.snapshot('Checkbox - Disabled');
-
-    // Radio button group
-    await page.goto('http://localhost:3000/components/radio');
-    await percy.snapshot('Radio Buttons - Group');
-  });
-
-  test('Card Component - Variants', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/card');
-    await percy.waitForSnapshotReady();
-
-    // Default card
-    await percy.snapshot('Card - Default');
-
-    // Card with image
-    await percy.snapshotComponent('Card - With Image', '[data-testid="card-image"]');
-
-    // Card with actions
-    await percy.snapshotComponent('Card - With Actions', '[data-testid="card-actions"]');
-
-    // Card hover state
-    await percy.setComponentState('[data-testid="card-default"]', 'hover');
-    await percy.snapshot('Card - Hover State');
-  });
-
-  test('Modal Component - States', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/modal');
-    await percy.waitForSnapshotReady();
-
-    // Open modal
-    await page.click('[data-testid="open-modal"]');
-    await page.waitForSelector('[data-testid="modal"]', { state: 'visible' });
-
-    // Freeze animations for consistent snapshot
-    await percy.freezeAnimations();
-
-    // Modal in light theme
-    await percy.snapshot('Modal - Light Theme');
-
-    // Modal in dark theme
-    await percy.setTheme('dark');
-    await percy.snapshot('Modal - Dark Theme');
-
-    // Modal at different viewports
-    await percy.setTheme('light');
-    await percy.snapshotAtViewport('Modal - Mobile', 375, 667);
-    await percy.snapshotAtViewport('Modal - Tablet', 768, 1024);
-    await percy.snapshotAtViewport('Modal - Desktop', 1920, 1080);
-  });
-
-  test('Navigation Component - States', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/navigation');
-    await percy.waitForSnapshotReady();
-
-    // Navigation default state
-    await percy.snapshot('Navigation - Default');
-
-    // Navigation with active item
-    await page.click('[data-testid="nav-item-1"]');
-    await percy.snapshot('Navigation - Active Item');
-
-    // Mobile navigation (hamburger menu)
-    await percy.snapshotAtViewport('Navigation - Mobile', 375, 667);
-
-    // Navigation dropdown open
-    await page.hover('[data-testid="nav-dropdown"]');
-    await page.waitForTimeout(200); // Wait for dropdown animation
-    await percy.freezeAnimations();
-    await percy.snapshot('Navigation - Dropdown Open');
-  });
-
-  test('Toast/Alert Component - Variants', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/toast');
-    await percy.waitForSnapshotReady();
-
-    // Success toast
-    await page.click('[data-testid="show-success-toast"]');
-    await page.waitForSelector('[data-testid="toast-success"]', { state: 'visible' });
-    await percy.freezeAnimations();
-    await percy.snapshot('Toast - Success');
-
-    // Error toast
-    await page.click('[data-testid="show-error-toast"]');
-    await page.waitForSelector('[data-testid="toast-error"]', { state: 'visible' });
-    await percy.snapshot('Toast - Error');
-
-    // Warning toast
-    await page.click('[data-testid="show-warning-toast"]');
-    await page.waitForSelector('[data-testid="toast-warning"]', { state: 'visible' });
-    await percy.snapshot('Toast - Warning');
-
-    // Info toast
-    await page.click('[data-testid="show-info-toast"]');
-    await page.waitForSelector('[data-testid="toast-info"]', { state: 'visible' });
-    await percy.snapshot('Toast - Info');
-  });
-
-  test('Loading States - Spinners and Skeletons', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/loading');
-
-    // Spinner loading state
-    await percy.snapshot('Loading - Spinner');
-
-    // Skeleton loading state
-    await page.goto('http://localhost:3000/components/skeleton');
-    await percy.freezeAnimations(); // Freeze skeleton shimmer animation
-    await percy.snapshot('Loading - Skeleton');
-
-    // Progress bar
-    await page.goto('http://localhost:3000/components/progress');
-    await percy.snapshot('Loading - Progress Bar');
-  });
-
-  test('Table Component - States', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/table');
-    await percy.waitForSnapshotReady();
-
-    // Default table
-    await percy.snapshot('Table - Default');
-
-    // Table with sorting
-    await page.click('[data-testid="table-header-name"]');
-    await percy.snapshot('Table - Sorted');
-
-    // Table with selected row
-    await page.click('[data-testid="table-row-1"]');
-    await percy.snapshot('Table - Selected Row');
-
-    // Table responsive (mobile)
-    await percy.snapshotAtViewport('Table - Mobile', 375, 667);
-  });
-
-  test('Tooltip Component - Variants', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/tooltip');
-    await percy.waitForSnapshotReady();
-
-    // Top tooltip
-    await page.hover('[data-testid="tooltip-trigger-top"]');
-    await page.waitForTimeout(200);
-    await percy.snapshot('Tooltip - Top Position');
-
-    // Bottom tooltip
-    await page.hover('[data-testid="tooltip-trigger-bottom"]');
-    await page.waitForTimeout(200);
-    await percy.snapshot('Tooltip - Bottom Position');
-
-    // Left tooltip
-    await page.hover('[data-testid="tooltip-trigger-left"]');
-    await page.waitForTimeout(200);
-    await percy.snapshot('Tooltip - Left Position');
-
-    // Right tooltip
-    await page.hover('[data-testid="tooltip-trigger-right"]');
-    await page.waitForTimeout(200);
-    await percy.snapshot('Tooltip - Right Position');
-  });
-
-  test('Badge Component - Variants', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/badge');
-    await percy.waitForSnapshotReady();
-
-    // All badge variants in one snapshot
-    await percy.snapshot('Badges - All Variants');
-
-    // Theme variations
-    await percy.snapshotThemes('Badges - Theme Variants');
-  });
-
-  test('Pagination Component - States', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/pagination');
-    await percy.waitForSnapshotReady();
-
-    // First page
-    await percy.snapshot('Pagination - First Page');
-
-    // Middle page
-    await page.click('[data-testid="pagination-page-5"]');
-    await percy.snapshot('Pagination - Middle Page');
-
-    // Last page
-    await page.click('[data-testid="pagination-last"]');
-    await percy.snapshot('Pagination - Last Page');
-
-    // Mobile pagination
-    await percy.snapshotAtViewport('Pagination - Mobile', 375, 667);
-  });
-
-  test('Avatar Component - Variants', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/avatar');
-    await percy.waitForSnapshotReady();
-
-    // Avatar with image
-    await percy.snapshotComponent('Avatar - With Image', '[data-testid="avatar-image"]');
-
-    // Avatar with initials
-    await percy.snapshotComponent('Avatar - Initials', '[data-testid="avatar-initials"]');
-
-    // Avatar sizes
-    await percy.snapshot('Avatar - All Sizes');
-  });
-
-  test('Accordion Component - States', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/accordion');
-    await percy.waitForSnapshotReady();
-
-    // All collapsed
-    await percy.snapshot('Accordion - All Collapsed');
-
-    // First item expanded
-    await page.click('[data-testid="accordion-header-1"]');
-    await percy.freezeAnimations();
-    await percy.snapshot('Accordion - First Item Expanded');
-
-    // Multiple items expanded
-    await page.click('[data-testid="accordion-header-2"]');
-    await percy.snapshot('Accordion - Multiple Items Expanded');
-  });
-
-  test('Tabs Component - States', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/tabs');
-    await percy.waitForSnapshotReady();
-
-    // First tab active
-    await percy.snapshot('Tabs - First Tab Active');
-
-    // Second tab active
-    await page.click('[data-testid="tab-2"]');
-    await percy.snapshot('Tabs - Second Tab Active');
-
-    // Tabs responsive
-    await percy.snapshotResponsive('Tabs - Responsive');
-  });
-
-  test('Breadcrumb Component', async ({ page }) => {
-    const percy = createPercyHelper(page);
-
-    await page.goto('http://localhost:3000/components/breadcrumb');
-    await percy.waitForSnapshotReady();
-
-    // Default breadcrumb
-    await percy.snapshot('Breadcrumb - Default');
-
-    // Breadcrumb with icons
-    await page.goto('http://localhost:3000/components/breadcrumb?icons=true');
-    await percy.snapshot('Breadcrumb - With Icons');
-
-    // Mobile breadcrumb
-    await percy.snapshotAtViewport('Breadcrumb - Mobile', 375, 667);
+    expect((await page.locator('table').boundingBox())!.width).toBe(400);
+    expect((await page.locator('progress').boundingBox())!.width).toBe(200);
+    await expect(page.locator('details p')).not.toBeVisible();
+    await page.locator('summary').click();
+    await expect(page.locator('details p')).toBeVisible();
   });
 });

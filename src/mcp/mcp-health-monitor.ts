@@ -1,6 +1,6 @@
 /**
  * VERSATIL Framework - MCP Health Monitoring
- * Ensures 95%+ MCP reliability with auto-retry and fallbacks
+ * Tracks observed MCP execution outcomes with bounded retries and circuit breakers
  *
  * Features:
  * - Health checks for all 11 MCPs
@@ -14,7 +14,7 @@ import { EventEmitter } from 'events';
 
 export interface MCPHealth {
   mcpId: string;
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: 'unknown' | 'healthy' | 'degraded' | 'unhealthy';
   lastCheck: Date;
   consecutiveFailures: number;
   successRate: number;
@@ -72,10 +72,10 @@ export class MCPHealthMonitor extends EventEmitter {
     for (const mcpId of this.MCP_IDS) {
       this.healthStatus.set(mcpId, {
         mcpId,
-        status: 'healthy',
+        status: 'unknown',
         lastCheck: new Date(),
         consecutiveFailures: 0,
-        successRate: 100,
+        successRate: 0,
         averageLatency: 0,
         circuitOpen: false
       });
@@ -93,9 +93,10 @@ export class MCPHealthMonitor extends EventEmitter {
     console.log(`🔍 Starting MCP health monitoring (interval: ${intervalMs}ms)...`);
 
     this.monitoringInterval = setInterval(async () => {
-      await this.checkAllMCPs();
+      await this.checkAllMCPs().catch(error => this.emit("monitoring_error", error));
     }, intervalMs);
 
+    this.emit('monitoring_started', { intervalMs });
     // Initial check
     this.checkAllMCPs().catch(err =>
       console.error('Initial MCP health check failed:', err)
@@ -110,151 +111,77 @@ export class MCPHealthMonitor extends EventEmitter {
       clearInterval(this.monitoringInterval);
       this.monitoringInterval = null;
       console.log('⏹️  Stopped MCP health monitoring');
+      this.emit('monitoring_stopped');
     }
   }
 
   /**
-   * Execute MCP action with retry logic
+   * Execute an adapter action once by default. Callers may declare retrySafety as
+   * 'read-only' or 'idempotent' only when their adapter has that guarantee.
+   * Timeout never permits replay because the original action can remain running.
    */
+  private metrics = new Map<string, { totalRequests: number; successfulRequests: number;
+    failedRequests: number; rejectedRequests: number; averageLatency: number; lastLatency: number }>();
+
+  getMetrics(mcpId: string) {
+    if (!this.healthStatus.has(mcpId)) return null;
+    if (!this.metrics.has(mcpId)) this.metrics.set(mcpId, { totalRequests: 0, successfulRequests: 0,
+      failedRequests: 0, rejectedRequests: 0, averageLatency: 0, lastLatency: 0 });
+    return this.metrics.get(mcpId)!;
+  }
+
   async executeMCPWithRetry(
     mcpId: string,
-    action: string,
+    action: string | (() => Promise<any>),
     params: any = {}
   ): Promise<MCPExecutionResult> {
-    const startTime = Date.now();
+    const started = Date.now();
+    const metrics = this.getMetrics(mcpId);
+    const fail = (error: string, retriesUsed: number): MCPExecutionResult => ({ success: false,
+      error, latency: Date.now() - started, retriesUsed, usedFallback: false });
+    if (!metrics) return fail(`Unknown MCP: ${mcpId}`, 0);
+    metrics.totalRequests++;
+    if (this.healthStatus.get(mcpId)?.circuitOpen) {
+      metrics.rejectedRequests++;
+      return fail(`MCP circuit open: ${mcpId}`, 0);
+    }
+    const retrySafe = params.retrySafety === 'read-only' || params.retrySafety === 'idempotent';
     let lastError: any;
     let retriesUsed = 0;
-
-    // Check circuit breaker
-    const health = this.healthStatus.get(mcpId);
-    if (health?.circuitOpen) {
-      console.warn(`⚠️  Circuit open for ${mcpId}, using fallback`);
-      return this.useFallback(mcpId, action, params, Date.now() - startTime);
-    }
-
-    // Retry loop
     for (let attempt = 0; attempt <= this.retryConfig.maxRetries; attempt++) {
+      retriesUsed = attempt;
+      let timer: ReturnType<typeof setTimeout> | undefined;
       try {
-        const result = await this.executeMCP(mcpId, action, params);
-
-        // Success! Update health status
-        this.recordSuccess(mcpId, Date.now() - startTime);
-
-        return {
-          success: true,
-          data: result,
-          latency: Date.now() - startTime,
-          retriesUsed: attempt,
-          usedFallback: false
-        };
+        const operation = typeof action === 'function' ? action() : this.executeMCP(mcpId, action, params);
+        const result = params.timeout ? await Promise.race([operation, new Promise((_, reject) => {
+          timer = setTimeout(() => reject(Object.assign(new Error('MCP execution timeout'), { retryable: false })), params.timeout);
+        })]) : await operation;
+        if (result?.success === false) {
+          throw Object.assign(new Error(result.error || 'MCP operation failed'), { retryable: result.retryable });
+        }
+        const latency = result?.latency ?? Date.now() - started;
+        metrics.successfulRequests++;
+        metrics.lastLatency = latency;
+        metrics.averageLatency += (latency - metrics.averageLatency) / metrics.successfulRequests;
+        this.recordSuccess(mcpId, latency);
+        return { success: true, data: result?.data ?? result, latency, retriesUsed: attempt, usedFallback: false };
       } catch (error: any) {
         lastError = error;
-        retriesUsed = attempt + 1;
-
-        // Record failure
-        this.recordFailure(mcpId);
-
-        if (attempt < this.retryConfig.maxRetries) {
-          // Calculate backoff delay
-          const delay = this.calculateBackoffDelay(attempt);
-          console.warn(
-            `⚠️  ${mcpId} failed (attempt ${attempt + 1}/${this.retryConfig.maxRetries + 1}), retrying in ${delay}ms...`
-          );
-
-          await this.sleep(delay);
-        }
+        if (!retrySafe || error.retryable === false || attempt === this.retryConfig.maxRetries) break;
+        this.emit('retry_attempted', { mcpId, attempt: attempt + 1 });
+        await this.sleep(this.calculateBackoffDelay(attempt));
+      } finally {
+        if (timer) clearTimeout(timer);
       }
     }
-
-    // All retries exhausted - use fallback
-    console.error(`❌ ${mcpId} exhausted all retries, using fallback`);
-    return this.useFallback(mcpId, action, params, Date.now() - startTime);
+    metrics.failedRequests++;
+    this.recordFailure(mcpId);
+    return fail(lastError?.message || 'MCP unavailable', retriesUsed);
   }
 
-  /**
-   * Execute MCP action (to be implemented by actual MCP executors)
-   */
-  private async executeMCP(mcpId: string, action: string, _params: any): Promise<any> {
-    // This is a placeholder - actual implementation would call the real MCP executor
-    // For now, simulate execution
-    await this.sleep(Math.random() * 100); // Simulate latency
-
-    // Simulate 10% failure rate for testing
-    if (Math.random() < 0.1) {
-      throw new Error(`Simulated ${mcpId} failure`);
-    }
-
-    return {
-      success: true,
-      mcpId,
-      action,
-      result: 'Simulated MCP response'
-    };
-  }
-
-  /**
-   * Use fallback mechanism for MCP
-   */
-  private async useFallback(
-    mcpId: string,
-    action: string,
-    params: any,
-    latency: number
-  ): Promise<MCPExecutionResult> {
-    // Implement graceful degradation based on MCP type
-    let fallbackData: any;
-
-    switch (mcpId) {
-      case 'chrome_mcp':
-      case 'playwright_mcp':
-        fallbackData = {
-          message: 'Browser automation unavailable, using simulated response',
-          simulated: true
-        };
-        break;
-
-      case 'github_mcp':
-        fallbackData = {
-          message: 'GitHub API unavailable, using cached data',
-          cached: true
-        };
-        break;
-
-      case 'vertex_ai_mcp':
-        fallbackData = {
-          message: 'Vertex AI unavailable, using hash-based embeddings',
-          fallbackMode: 'hash-embeddings'
-        };
-        break;
-
-      case 'supabase_mcp':
-        fallbackData = {
-          message: 'Supabase unavailable, using local storage',
-          fallbackMode: 'local'
-        };
-        break;
-
-      default:
-        fallbackData = {
-          message: `${mcpId} unavailable, using generic fallback`,
-          fallbackMode: 'generic'
-        };
-    }
-
-    this.emit('mcp:fallback', {
-      mcpId,
-      action,
-      fallbackData
-    });
-
-    return {
-      success: true,
-      data: fallbackData,
-      error: 'Using fallback due to MCP unavailability',
-      latency,
-      retriesUsed: this.retryConfig.maxRetries + 1,
-      usedFallback: true
-    };
+  private async executeMCP(mcpId: string, _action: string, _params: any): Promise<any> {
+    const error = Object.assign(new Error(`No native MCP executor registered for ${mcpId}`), { retryable: false });
+    throw error;
   }
 
   /**
@@ -274,41 +201,9 @@ export class MCPHealthMonitor extends EventEmitter {
   /**
    * Check health of individual MCP
    */
-  private async checkMCPHealth(mcpId: string): Promise<void> {
-    try {
-      // Simple ping test
-      await this.executeMCP(mcpId, 'health_check', {});
-
-      // Health check passed
-      const health = this.healthStatus.get(mcpId);
-      if (health) {
-        health.status = 'healthy';
-        health.lastCheck = new Date();
-        health.consecutiveFailures = 0;
-        health.circuitOpen = false; // Close circuit on success
-      }
-    } catch (error) {
-      // Health check failed
-      const health = this.healthStatus.get(mcpId);
-      if (health) {
-        health.consecutiveFailures++;
-        health.lastCheck = new Date();
-
-        // Update status based on failures
-        if (health.consecutiveFailures >= 5) {
-          health.status = 'unhealthy';
-          health.circuitOpen = true; // Open circuit breaker
-        } else if (health.consecutiveFailures >= 3) {
-          health.status = 'degraded';
-        }
-
-        this.emit('mcp:unhealthy', {
-          mcpId,
-          consecutiveFailures: health.consecutiveFailures,
-          status: health.status
-        });
-      }
-    }
+  private async checkMCPHealth(_mcpId: string): Promise<void> {
+    // No native health probe is registered. Preserve the last observed state;
+    // missing monitoring configuration is not a failed adapter execution.
   }
 
   /**
@@ -322,11 +217,12 @@ export class MCPHealthMonitor extends EventEmitter {
       health.lastCheck = new Date();
       health.circuitOpen = false; // Close circuit
 
-      // Update average latency (simple moving average)
-      health.averageLatency = health.averageLatency * 0.9 + latency * 0.1;
+      // Average over completed successful operations.
+      health.averageLatency = this.getMetrics(mcpId)?.averageLatency ?? latency;
 
-      // Update success rate (assume 95% weight on old, 5% on new)
-      health.successRate = health.successRate * 0.95 + 100 * 0.05;
+      // Measure completed logical operations rather than retry attempts.
+      const metrics = this.getMetrics(mcpId)!;
+      health.successRate = metrics.successfulRequests / (metrics.successfulRequests + metrics.failedRequests) * 100;
     }
   }
 
@@ -340,15 +236,21 @@ export class MCPHealthMonitor extends EventEmitter {
       health.lastCheck = new Date();
 
       // Update success rate
-      health.successRate = health.successRate * 0.95 + 0 * 0.05;
+      const metrics = this.getMetrics(mcpId)!;
+      health.successRate = metrics.successfulRequests / (metrics.successfulRequests + metrics.failedRequests) * 100;
 
+      const oldStatus = health.status;
       // Update status
       if (health.consecutiveFailures >= 5) {
         health.status = 'unhealthy';
-        health.circuitOpen = true;
+        this.openCircuit(mcpId);
       } else if (health.consecutiveFailures >= 3) {
+        health.status = 'unhealthy';
+      } else {
         health.status = 'degraded';
       }
+      if (oldStatus !== health.status) this.emit('health_changed', { mcpId, oldStatus, newStatus: health.status });
+      this.emit('degradation_alert', { mcpId, severity: health.status });
     }
   }
 
@@ -370,8 +272,8 @@ export class MCPHealthMonitor extends EventEmitter {
   /**
    * Get health status for specific MCP
    */
-  getHealthStatus(mcpId: string): MCPHealth | undefined {
-    return this.healthStatus.get(mcpId);
+  getHealthStatus(mcpId: string): MCPHealth | null {
+    return this.healthStatus.get(mcpId) ?? null;
   }
 
   /**
@@ -429,6 +331,7 @@ export class MCPHealthMonitor extends EventEmitter {
       health.circuitOpen = true;
       health.status = 'unhealthy';
       this.emit('circuit-opened', { mcpId, health });
+      this.emit('circuit_opened', { mcpId, consecutiveFailures: health.consecutiveFailures });
       console.log(`⛔ Circuit opened for ${mcpId}`);
     }
   }
@@ -441,8 +344,9 @@ export class MCPHealthMonitor extends EventEmitter {
     if (health) {
       health.circuitOpen = false;
       health.consecutiveFailures = 0;
-      health.status = 'healthy';
+      health.status = 'unknown';
       this.emit('circuit-closed', { mcpId, health });
+      this.emit('circuit_closed', { mcpId });
       console.log(`✅ Circuit closed for ${mcpId}`);
     }
   }
@@ -463,11 +367,12 @@ export class MCPHealthMonitor extends EventEmitter {
   /**
    * Get circuit breaker statistics
    */
-  getCircuitBreakerStats(): {
+  getCircuitBreakerStats(mcpId?: string): {
     total: number;
     open: number;
     closed: number;
     halfOpen: number;
+    rejectedRequests: number;
   } {
     let open = 0;
     let closed = 0;
@@ -487,7 +392,8 @@ export class MCPHealthMonitor extends EventEmitter {
       total: this.healthStatus.size,
       open,
       closed,
-      halfOpen
+      halfOpen,
+      rejectedRequests: mcpId ? this.getMetrics(mcpId)?.rejectedRequests ?? 0 : [...this.metrics.values()].reduce((sum, m) => sum + m.rejectedRequests, 0)
     };
   }
 
@@ -496,6 +402,10 @@ export class MCPHealthMonitor extends EventEmitter {
    */
   generateHealthReport(): {
     timestamp: Date;
+    totalMCPs: number;
+    healthyCount: number;
+    degradedCount: number;
+    unhealthyCount: number;
     overallHealth: number;
     mcps: MCPHealth[];
     circuitBreakers: ReturnType<typeof this.getCircuitBreakerStats>;
@@ -527,11 +437,23 @@ export class MCPHealthMonitor extends EventEmitter {
 
     return {
       timestamp: new Date(),
+      totalMCPs: mcps.length,
+      healthyCount: mcps.filter(m => m.status === 'healthy').length,
+      degradedCount: mcps.filter(m => m.status === 'degraded').length,
+      unhealthyCount: mcps.filter(m => m.status === 'unhealthy').length,
       overallHealth,
       mcps,
       circuitBreakers,
       recommendations
     };
+  }
+  calculateReliabilityScore(): number { return this.getSystemHealthPercentage(); }
+  exportMetricsJSON(): string { return JSON.stringify({ timestamp: new Date(), mcps: [...this.metrics.entries()] }); }
+  getSummaryStats() {
+    const metrics = [...this.metrics.values()];
+    return { totalMCPs: this.healthStatus.size, overallHealthScore: this.calculateReliabilityScore(),
+      averageLatency: metrics.length ? metrics.reduce((sum, m) => sum + m.averageLatency, 0) / metrics.length : 0,
+      totalRequests: metrics.reduce((sum, m) => sum + m.totalRequests, 0) };
   }
 }
 

@@ -1,343 +1,106 @@
-/**
- * Tests for Adaptive Learning Engine
+/** Implemented learning records, false-positive patterns and preference adaptations.
+ * Success grouping/suggestion analysis remain source stubs; no model/provider executes here.
  */
-
 import { AdaptiveLearningEngine, UserInteraction } from '../../src/intelligence/adaptive-learning';
+import * as fs from 'fs';
 
-// Mock VERSATILLogger
-jest.mock('../../src/utils/logger', () => ({
-  VERSATILLogger: jest.fn().mockImplementation(() => ({
-    info: jest.fn(),
-    debug: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
-  }))
-}));
+jest.mock('../../src/utils/logger', () => ({ VERSATILLogger: jest.fn(() => ({ info: jest.fn(), debug: jest.fn(), warn: jest.fn(), error: jest.fn() })) }));
+jest.mock('fs', () => {
+  const files = new Map<string, string>();
+  return { existsSync: jest.fn((file: string) => files.has(file)), mkdirSync: jest.fn(),
+    readFileSync: jest.fn((file: string) => files.get(file)),
+    writeFileSync: jest.fn((file: string, content: string) => files.set(file, content)), resetFixture: () => files.clear() };
+});
 
-describe('AdaptiveLearningEngine', () => {
-  let learningEngine: AdaptiveLearningEngine;
-  let mockInteraction: UserInteraction;
-
+describe('AdaptiveLearningEngine current contract', () => {
+  let engine: AdaptiveLearningEngine;
+  const interaction = (id = 'sample', agentId = 'maria'): UserInteraction => ({ id, agentId,
+    timestamp: Date.now(), actionType: 'activation', context: { fileType: 'ts', projectType: 'fixture' },
+    outcome: { problemSolved: true, userSatisfaction: 5, agentAccuracy: 0.95 } });
   beforeEach(() => {
-    learningEngine = new AdaptiveLearningEngine();
-    mockInteraction = {
-      id: 'test-interaction-1',
-      timestamp: Date.now(),
-      agentId: 'enhanced-maria',
-      actionType: 'activation',
-      context: {
-        filePath: '/test/file.js',
-        fileType: 'js',
-        projectType: 'javascript'
-      },
-      outcome: {
-        problemSolved: true,
-        timeToResolution: 1000,
-        userSatisfaction: 4,
-        agentAccuracy: 0.9
-      }
-    };
+    jest.useFakeTimers({ now: new Date('2025-02-01T00:00:00Z') });
+    (fs as any).resetFixture();
+    engine = new AdaptiveLearningEngine();
   });
+  afterEach(() => { engine.stopLearning(); jest.clearAllTimers(); jest.useRealTimers(); });
 
-  describe('Initialization', () => {
-    it('should initialize with correct properties', () => {
-      expect(learningEngine).toBeInstanceOf(AdaptiveLearningEngine);
-      expect(learningEngine['patterns']).toBeDefined();
-      expect(learningEngine['interactions']).toBeDefined();
-      expect(learningEngine['isLearning']).toBe(false);
-    });
+  it('starts disabled and exposes empty implemented insights', () => {
+    expect(engine.getLearningInsights()).toMatchObject({ totalInteractions: 0, patternsDiscovered: 0,
+      adaptationsProposed: 0, adaptationsApplied: 0, recentLearnings: [] });
   });
-
-  describe('Learning Management', () => {
-    it('should start learning successfully', () => {
-      learningEngine.startLearning();
-      expect(learningEngine['isLearning']).toBe(true);
-    });
-
-    it('should stop learning successfully', () => {
-      learningEngine.startLearning();
-      learningEngine.stopLearning();
-      expect(learningEngine['isLearning']).toBe(false);
-    });
-
-    it('should handle multiple start calls gracefully', () => {
-      learningEngine.startLearning();
-      learningEngine.startLearning();
-      expect(learningEngine['isLearning']).toBe(true);
-    });
+  it('does not record or persist while learning is disabled', () => {
+    const event = jest.fn(); engine.on('interaction', event);
+    engine.recordInteraction(interaction());
+    expect(engine.getLearningInsights().totalInteractions).toBe(0);
+    expect(event).not.toHaveBeenCalled();
+    expect(fs.writeFileSync).not.toHaveBeenCalled();
   });
-
-  describe('Interaction Recording', () => {
-    beforeEach(() => {
-      learningEngine.startLearning();
-    });
-
-    it('should record interaction when learning is enabled', () => {
-      learningEngine.recordInteraction(mockInteraction);
-
-      const interactions = learningEngine['interactions'].get('enhanced-maria');
-      expect(interactions).toBeDefined();
-      expect(interactions?.length).toBe(1);
-      expect(interactions?.[0]).toEqual(mockInteraction);
-    });
-
-    it('should not record interaction when learning is disabled', () => {
-      learningEngine.stopLearning();
-      learningEngine.recordInteraction(mockInteraction);
-
-      const interactions = learningEngine['interactions'].get('enhanced-maria');
-      expect(interactions).toBeUndefined();
-    });
-
-    it('should group interactions by agent ID', () => {
-      const jamesInteraction = { ...mockInteraction, agentId: 'enhanced-james', id: 'test-2' };
-
-      learningEngine.recordInteraction(mockInteraction);
-      learningEngine.recordInteraction(jamesInteraction);
-
-      expect(learningEngine['interactions'].get('enhanced-maria')?.length).toBe(1);
-      expect(learningEngine['interactions'].get('enhanced-james')?.length).toBe(1);
-    });
-
-    it('should accumulate multiple interactions for same agent', () => {
-      const secondInteraction = { ...mockInteraction, id: 'test-2', timestamp: Date.now() + 1000 };
-
-      learningEngine.recordInteraction(mockInteraction);
-      learningEngine.recordInteraction(secondInteraction);
-
-      const interactions = learningEngine['interactions'].get('enhanced-maria');
-      expect(interactions?.length).toBe(2);
-    });
+  it('records enabled interactions with exact payload and virtual persistence', () => {
+    engine.startLearning(); const event = jest.fn(); engine.on('interaction', event);
+    const input = interaction(); engine.recordInteraction(input);
+    expect(event).toHaveBeenCalledWith(input);
+    expect(engine.getLearningInsights().totalInteractions).toBe(1);
+    expect(JSON.parse((fs.writeFileSync as jest.Mock).mock.calls.at(-1)![1]).maria).toEqual([input]);
   });
-
-  describe('Pattern Analysis', () => {
-    beforeEach(() => {
-      learningEngine.startLearning();
-    });
-
-    it('should analyze patterns when sufficient data is available', () => {
-      // Create 10+ interactions for pattern analysis
-      for (let i = 0; i < 12; i++) {
-        const interaction = {
-          ...mockInteraction,
-          id: `test-${i}`,
-          timestamp: Date.now() + i * 1000,
-          outcome: {
-            ...mockInteraction.outcome,
-            userSatisfaction: Math.random() * 2 + 3 // 3-5 rating
-          }
-        };
-        learningEngine.recordInteraction(interaction);
-      }
-
-      // Trigger pattern analysis manually
-      learningEngine['analyzePatterns']();
-
-      const pattern = learningEngine['patterns'].get('enhanced-maria');
-      expect(pattern).toBeDefined();
-    });
-
-    it('should identify successful patterns', () => {
-      // Create successful interactions
-      for (let i = 0; i < 12; i++) {
-        const interaction = {
-          ...mockInteraction,
-          id: `success-${i}`,
-          timestamp: Date.now() + i * 1000,
-          outcome: {
-            problemSolved: true,
-            timeToResolution: 500,
-            userSatisfaction: 5,
-            agentAccuracy: 0.95
-          }
-        };
-        learningEngine.recordInteraction(interaction);
-      }
-
-      learningEngine['analyzePatterns']();
-
-      const pattern = learningEngine['patterns'].get('enhanced-maria');
-      expect(pattern?.successRate).toBeGreaterThan(0.8);
-    });
-
-    it('should identify problematic patterns', () => {
-      // Create unsuccessful interactions
-      for (let i = 0; i < 12; i++) {
-        const interaction = {
-          ...mockInteraction,
-          id: `failure-${i}`,
-          timestamp: Date.now() + i * 1000,
-          outcome: {
-            problemSolved: false,
-            timeToResolution: 5000,
-            userSatisfaction: 2,
-            agentAccuracy: 0.3
-          }
-        };
-        learningEngine.recordInteraction(interaction);
-      }
-
-      learningEngine['analyzePatterns']();
-
-      const pattern = learningEngine['patterns'].get('enhanced-maria');
-      expect(pattern?.successRate).toBeLessThan(0.5);
-    });
+  it('isolates recorded interactions between agents', () => {
+    engine.startLearning(); engine.recordInteraction(interaction('a')); engine.recordInteraction(interaction('b', 'james'));
+    expect(engine['interactions'].get('maria')).toHaveLength(1);
+    expect(engine['interactions'].get('james')).toHaveLength(1);
   });
-
-  describe('Adaptation Generation', () => {
-    beforeEach(() => {
-      learningEngine.startLearning();
-    });
-
-    it('should propose adaptations for low-performing patterns', () => {
-      // Create pattern with low success rate
-      const pattern = {
-        id: 'pattern-1',
-        agentId: 'enhanced-maria',
-        context: {
-          fileTypes: ['js'],
-          projectTypes: ['javascript'],
-          userTypes: ['mid'],
-          timePatterns: ['morning']
-        },
-        successRate: 0.3,
-        userSatisfaction: 2.0,
-        commonIssues: ['false_positive', 'slow_response'],
-        sampleSize: 15,
-        confidence: 0.9
-      };
-
-      learningEngine['patterns'].set('enhanced-maria', pattern);
-
-      const adaptations = await learningEngine['generateAdaptations'](pattern, [], 'enhanced-maria');
-      expect(adaptations.length).toBeGreaterThan(0);
-      expect(adaptations[0].confidence).toBeGreaterThan(0);
-    });
-
-    it('should not propose adaptations for high-performing patterns', () => {
-      const pattern = {
-        id: 'pattern-1',
-        agentId: 'enhanced-maria',
-        context: {
-          fileTypes: ['js'],
-          projectTypes: ['javascript'],
-          userTypes: ['mid'],
-          timePatterns: ['morning']
-        },
-        successRate: 0.95,
-        userSatisfaction: 4.8,
-        commonIssues: [],
-        sampleSize: 15,
-        confidence: 0.9
-      };
-
-      const adaptations = await learningEngine['generateAdaptations'](pattern, [], 'enhanced-maria');
-      expect(adaptations.length).toBe(0);
-    });
+  it('does not duplicate timers or handlers on repeated start', () => {
+    engine.startLearning(); engine.startLearning();
+    expect(jest.getTimerCount()).toBe(1);
+    expect(engine.listenerCount('interaction')).toBe(1);
+    expect(engine.listenerCount('pattern_discovered')).toBe(1);
   });
-
-  describe('Learning Insights', () => {
-    beforeEach(() => {
-      learningEngine.startLearning();
-    });
-
-    it('should provide learning insights', () => {
-      // Add some test data
-      learningEngine.recordInteraction(mockInteraction);
-
-      const insights = learningEngine.getLearningInsights();
-
-      expect(insights).toMatchObject({
-        totalPatterns: expect.any(Number),
-        adaptationsProposed: expect.any(Number),
-        learningEffectiveness: expect.any(Number),
-        topPerformingAgents: expect.any(Array),
-        improvementAreas: expect.any(Array)
-      });
-    });
-
-    it('should calculate learning effectiveness correctly', () => {
-      // Create interactions with known outcomes
-      for (let i = 0; i < 10; i++) {
-        const interaction = {
-          ...mockInteraction,
-          id: `test-${i}`,
-          outcome: {
-            ...mockInteraction.outcome,
-            problemSolved: i >= 5, // 50% success rate
-            userSatisfaction: i >= 5 ? 4 : 2
-          }
-        };
-        learningEngine.recordInteraction(interaction);
-      }
-
-      const insights = learningEngine.getLearningInsights();
-      expect(insights.learningEffectiveness).toBeGreaterThan(0);
-      expect(insights.learningEffectiveness).toBeLessThanOrEqual(1);
-    });
+  it('clears the analysis timer and its own listeners when stopped', () => {
+    const observer = jest.fn(); engine.on('interaction', observer);
+    engine.startLearning(); engine.stopLearning();
+    expect(jest.getTimerCount()).toBe(0);
+    expect(engine.listeners('interaction')).toEqual([observer]);
+    expect(engine.listenerCount('pattern_discovered')).toBe(0);
+    engine.recordInteraction(interaction());
+    expect(observer).not.toHaveBeenCalled();
   });
-
-  describe('Event Emission', () => {
-    beforeEach(() => {
-      learningEngine.startLearning();
-    });
-
-    it('should emit pattern_discovered event', (done) => {
-      learningEngine.on('pattern_discovered', (pattern) => {
-        expect(pattern).toBeDefined();
-        expect(pattern.agentId).toBe('enhanced-maria');
-        done();
-      });
-
-      // Create enough interactions to trigger pattern discovery
-      for (let i = 0; i < 12; i++) {
-        learningEngine.recordInteraction({
-          ...mockInteraction,
-          id: `test-${i}`,
-          timestamp: Date.now() + i * 1000
-        });
-      }
-
-      learningEngine['analyzePatterns']();
-    });
-
-    it('should emit adaptation_proposed event', (done) => {
-      learningEngine.on('adaptation_proposed', (data) => {
-        expect(data.agentId).toBe('enhanced-maria');
-        expect(data.adaptation).toBeDefined();
-        done();
-      });
-
-      // Create a low-performing pattern
-      const pattern = {
-        id: 'pattern-1',
-        agentId: 'enhanced-maria',
-        context: { fileTypes: ['js'], projectTypes: ['javascript'], userTypes: ['mid'], timePatterns: ['morning'] },
-        successRate: 0.3,
-        userSatisfaction: 2.0,
-        commonIssues: ['false_positive'],
-        sampleSize: 15,
-        confidence: 0.9
-      };
-
-      learningEngine['patterns'].set('enhanced-maria', [pattern]);
-      learningEngine['generateAndProposeAdaptations']();
-    });
+  it('restarts without accumulating analysis schedules or listeners', () => {
+    engine.startLearning(); engine.stopLearning(); engine.startLearning();
+    expect(jest.getTimerCount()).toBe(1);
+    expect(engine.listenerCount('interaction')).toBe(1);
+    expect(engine.listenerCount('pattern_discovered')).toBe(1);
   });
-
-  describe('Error Handling', () => {
-    it('should handle invalid interactions gracefully', () => {
-      learningEngine.startLearning();
-
-      const invalidInteraction = { ...mockInteraction, agentId: '' };
-      expect(() => learningEngine.recordInteraction(invalidInteraction)).not.toThrow();
-    });
-
-    it('should handle pattern analysis with insufficient data', () => {
-      learningEngine.startLearning();
-      learningEngine.recordInteraction(mockInteraction); // Only 1 interaction
-
-      expect(() => learningEngine['analyzePatterns']()).not.toThrow();
-    });
+  it('does not analyze insufficient interactions into patterns', async () => {
+    engine.startLearning(); engine.recordInteraction(interaction());
+    await engine['analyzePatterns']();
+    expect(engine.getLearningInsights().patternsDiscovered).toBe(0);
+  });
+  it('does not advertise success-pattern grouping while that source helper is unimplemented', async () => {
+    engine.startLearning(); for (let i = 0; i < 12; i++) engine.recordInteraction(interaction(`s-${i}`));
+    await engine['analyzePatterns']();
+    expect(engine.getLearningInsights().patternsDiscovered).toBe(0);
+  });
+  it('discovers implemented false-positive patterns and emits their actual payload', async () => {
+    engine.startLearning(); const event = jest.fn(); engine.on('pattern_discovered', event);
+    for (let i = 0; i < 12; i++) engine.recordInteraction({ ...interaction(`f-${i}`),
+      context: { fileType: 'ts', issue: { type: 'fixture', severity: 'low', wasAccurate: false, userVerified: true } },
+      outcome: { problemSolved: false, userSatisfaction: 2 } });
+    await engine['analyzePatterns']();
+    expect(event).toHaveBeenCalledTimes(1);
+    expect(event.mock.calls[0][0]).toMatchObject({ agentId: 'maria', pattern: 'False positive detection pattern', usageCount: 12, successRate: 0 });
+    expect(engine.getLearningInsights().patternsDiscovered).toBe(1);
+  });
+  it('generates no adaptation without supported preference input', async () => {
+    expect(await engine['generateAdaptations']('maria', [], {})).toEqual([]);
+  });
+  it('generates the implemented preference adaptation with exact agent and changes', async () => {
+    expect(await engine['generateAdaptations']('maria', [], { preferredSeverityLevel: 'high', alertPreferences: ['security'] })).toEqual([
+      expect.objectContaining({ agentId: 'maria', adaptationType: 'priority_weighting', changes: { adjustSeverityWeights: 'high', personalizeAlerts: ['security'] }, confidence: 0.9 })
+    ]);
+  });
+  it('emits a proposed adaptation and bounds retained proposals per agent', () => {
+    const event = jest.fn(); engine.on('adaptation_proposed', event);
+    for (let i = 0; i < 6; i++) engine['proposeAdaptation']('maria', { agentId: 'maria', adaptationType: 'priority_weighting', changes: { fixture: i }, confidence: 0.5 + i / 10, expectedImprovement: 0.1 });
+    expect(event).toHaveBeenCalledTimes(6);
+    expect(engine.getLearningInsights().adaptationsProposed).toBe(5);
+    expect(engine['adaptations'].get('maria')![0].changes.fixture).toBe(1);
   });
 });

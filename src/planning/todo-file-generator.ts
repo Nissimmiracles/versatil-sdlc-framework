@@ -329,7 +329,6 @@ export class TodoFileGenerator {
         if (allDepsCompleted) {
           currentWave.push(num);
           waveEffort += this.effortHours[spec.estimated_effort];
-          completed.add(num);
         }
       });
 
@@ -342,6 +341,7 @@ export class TodoFileGenerator {
         estimated_hours: waveEffort
       });
 
+      currentWave.forEach(num => completed.add(num));
       waveNumber++;
     }
 

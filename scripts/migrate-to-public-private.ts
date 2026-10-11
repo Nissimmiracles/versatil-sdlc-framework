@@ -14,7 +14,6 @@
  *   npm run migrate:rag -- --force
  */
 
-import { GraphRAGStore } from '../src/rag/graph-rag.js';
 import { PublicRAGStore } from '../src/rag/public-rag-store.js';
 import { PrivateRAGStore } from '../src/rag/private-rag-store.js';
 import * as fs from 'fs';
@@ -136,40 +135,9 @@ class RAGMigrationService {
    * Load all patterns from existing RAG store
    */
   private async loadExistingPatterns(): Promise<PatternData[]> {
-    try {
-      // Try loading from default GraphRAG location
-      const defaultStore = new GraphRAGStore();
-      const patterns: PatternData[] = [];
-
-      // Query all patterns (using broad search)
-      const result = await defaultStore.query({
-        query: '*', // Match all
-        limit: 10000,
-        minRelevance: 0.0
-      });
-
-      if (result && result.results) {
-        for (const item of result.results) {
-          patterns.push({
-            id: item.id || `pattern-${patterns.length}`,
-            description: item.description || item.content || '',
-            code: item.code,
-            category: item.category,
-            agent: item.agent,
-            tags: item.tags,
-            created_at: item.created_at,
-            effort_hours: item.effort_hours
-          });
-        }
-      }
-
-      console.log(`📥 Loaded ${patterns.length} patterns from existing RAG store`);
-      return patterns;
-
-    } catch (error) {
-      console.error('❌ Error loading existing patterns:', error);
-      return [];
-    }
+    // Canonical GraphRAG query is entity retrieval, not an inventory API.
+    // A wildcard query cannot establish either completeness or source visibility.
+    throw new Error('RAG_MIGRATION_SOURCE_ENUMERATION_UNSUPPORTED: default GraphRAG has no authorized inventory API; migration requires an explicit source inventory and visibility scope');
   }
 
   /**

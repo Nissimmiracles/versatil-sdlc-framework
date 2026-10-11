@@ -1,3 +1,16 @@
+// Keep stress fixtures away from account memory and statistics.
+jest.mock('os', () => {
+  const os = jest.requireActual('os');
+  const fs = jest.requireActual('fs');
+  const path = jest.requireActual('path');
+  const fixtureHome = fs.mkdtempSync(path.join(os.tmpdir(), 'jest-stress-home-'));
+  return { ...os, homedir: () => fixtureHome };
+});
+afterAll(() => {
+  const fs = jest.requireActual('fs');
+  fs.rmSync(require('os').homedir(), { recursive: true, force: true });
+});
+
 /**
  * VERSATIL SDLC Framework - Anti-Hallucination Agents Stress Test
  *
@@ -16,7 +29,7 @@
  * @duration 75min
  */
 
-import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, test, expect, beforeAll, afterAll, jest } from '@jest/globals';
 import { ChainOfVerification, type CoVeResult } from '../../src/agents/verification/chain-of-verification.js';
 import { AntiHallucinationDetector, type HallucinationRisk, FRAMEWORK_KNOWLEDGE_BASE } from '../../src/agents/mcp/anti-hallucination-detector.js';
 import { writeFileSync, mkdirSync, existsSync, readFileSync, rmSync } from 'fs';
@@ -196,6 +209,7 @@ describe('Anti-Hallucination Agents Stress Test', () => {
       for (let i = 0; i < testFrameworks.length; i++) {
         const frameworkKey = testFrameworks[i];
         const framework = FRAMEWORK_KNOWLEDGE_BASE[frameworkKey];
+        jest.spyOn(antiHallucinationDetector as any, 'getDaysSinceCutoff').mockReturnValue(365);
 
         console.log(`\n  [${i + 1}/25] Framework: ${framework.name}`);
         console.log(`  Release frequency: ${framework.releaseFrequency}`);
@@ -244,7 +258,13 @@ describe('Anti-Hallucination Agents Stress Test', () => {
       // - Release frequency changes over time
       // - Knowledge cutoff risk is subjective
       // - 72% observed accuracy is reasonable for risk detection
-      expect(detectionAccuracy).toBeGreaterThanOrEqual(70); // ≥70% match expected risk levels (was 80%)
+      // Metadata cutoff-risk alone is not the computed time/release/cutoff-risk score.
+      for (const risk of riskResults) {
+        const expectedScore = 40 + ({ high: 30, medium: 15, low: 5 }[risk.releaseFrequency]) + ({ high: 30, medium: 15, low: 5 }[risk.expectedRisk]);
+        expect(risk.score).toBe(expectedScore);
+        expect(risk.detectedRisk).toBe(expectedScore >= 70 ? 'high' : 'medium');
+      }
+      jest.restoreAllMocks();
       expect(avgDetectionTime).toBeLessThan(200); // <200ms avg
     }, 300000); // 5min timeout
   });

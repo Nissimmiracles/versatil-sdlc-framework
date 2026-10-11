@@ -14,7 +14,7 @@
  * - Performance benchmarks
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { AutoRemediationEngine } from './auto-remediation-engine.js';
 import type { RemediationIssue, RemediationResult } from './auto-remediation-engine.js';
 import * as fs from 'fs';
@@ -27,12 +27,18 @@ describe('AutoRemediationEngine', () => {
 
   beforeEach(() => {
     engine = AutoRemediationEngine.getInstance();
-    testDir = path.join(os.tmpdir(), 'versatil-test-remediation');
+    testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'versatil-test-remediation-'));
 
     // Create test directory
     if (!fs.existsSync(testDir)) {
       fs.mkdirSync(testDir, { recursive: true });
     }
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    fs.rmSync(testDir, { recursive: true, force: true });
   });
 
   describe('Singleton Pattern', () => {
@@ -325,7 +331,9 @@ describe('AutoRemediationEngine', () => {
       expect(result.next_steps?.[0]).toContain('/learn'); // Check first step contains /learn
     });
 
-    it('should handle Supabase connection loss', async () => {
+    it('waits for the configured 2000 ms before returning the Supabase scenario receipt', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(1000);
       const issue: RemediationIssue = {
         id: 'supabase-1',
         component: 'rag_system',
@@ -335,14 +343,21 @@ describe('AutoRemediationEngine', () => {
       };
 
       const startTime = Date.now();
-      const result = await engine.remediate(issue, testDir);
+      const pending = engine.remediate(issue, testDir);
+      let completed = false;
+      void pending.then(() => { completed = true; });
+      await vi.advanceTimersByTimeAsync(1999);
+      expect(completed).toBe(false);
+      await vi.advanceTimersByTimeAsync(1);
+      const result = await pending;
       const duration = Date.now() - startTime;
 
       expect(result.success).toBe(true);
       expect(result.confidence).toBe(85);
       expect(result.action_taken).toContain('auto-reconnect');
       expect(result.learned).toContain('automatically via retry logic');
-      expect(duration).toBeGreaterThan(2000); // Should wait 2 seconds
+      expect(duration).toBe(2000);
+      expect(result.duration_ms).toBe(2000);
     });
 
     it('should handle vector store connection loss', async () => {
@@ -482,7 +497,18 @@ describe('AutoRemediationEngine', () => {
       expect(duration).toBeLessThan(100); // Should be very fast (no exec)
     });
 
-    it('should track remediation duration', async () => {
+    it('records zero elapsed time for an unmatched issue without scheduling remediation', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(1000);
+      const result = await engine.remediate({ id: 'unmatched', component: 'unknown', severity: 'low', description: 'No registered scenario', context: 'SHARED' }, testDir);
+      expect(result.success).toBe(false);
+      expect(result.duration_ms).toBe(0);
+      expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it('tracks the exact configured wait in the vector scenario receipt', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(1000);
       const issue: RemediationIssue = {
         id: 'perf-2',
         component: 'rag_system',
@@ -491,10 +517,10 @@ describe('AutoRemediationEngine', () => {
         context: 'SHARED'
       };
 
-      const result = await engine.remediate(issue, testDir);
-
-      expect(result.duration_ms).toBeGreaterThan(0);
-      expect(result.duration_ms).toBeGreaterThan(2000); // Includes 2s wait
+      const pending = engine.remediate(issue, testDir);
+      await vi.advanceTimersByTimeAsync(2000);
+      const result = await pending;
+      expect(result.duration_ms).toBe(2000);
     });
   });
 });

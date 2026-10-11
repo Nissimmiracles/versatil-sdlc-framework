@@ -260,6 +260,7 @@ describe('BrowserErrorDetector', () => {
       const evidence = await verifyBrowserErrors('missing.ts', errors);
 
       expect(evidence.fileExistsVerified).toBe(false);
+      expect(evidence.confidence).toBe(75);
     });
 
     it('should verify console errors are not empty', async () => {
@@ -296,6 +297,7 @@ describe('BrowserErrorDetector', () => {
       const evidence = await verifyBrowserErrors('test.ts', errors);
 
       expect(evidence.networkErrorsVerified).toBe(false);
+      expect(evidence.confidence).toBe(75);
     });
 
     it('should calculate confidence score (0-100)', async () => {
@@ -309,6 +311,15 @@ describe('BrowserErrorDetector', () => {
 
       expect(evidence.confidence).toBeGreaterThanOrEqual(0);
       expect(evidence.confidence).toBeLessThanOrEqual(100);
+    });
+
+    it('returns zero confidence when every evidence check fails', async () => {
+      vi.mocked(fs.access).mockRejectedValue(new Error('File not found'));
+      const evidence = await verifyBrowserErrors('missing.ts', [
+        { type: 'console', severity: 'error', message: '', timestamp: '' },
+        { type: 'network', severity: 'error', message: 'GET /api', status: 200, timestamp: '' }
+      ]);
+      expect(evidence.confidence).toBe(0);
     });
 
     it('should return high confidence for all checks passing', async () => {

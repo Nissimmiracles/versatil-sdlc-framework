@@ -87,10 +87,9 @@ export class DailyAuditDaemon extends EventEmitter {
     }
 
     try {
-      this.log('info', 'Starting Daily Audit Daemon');
-
-      // Initialize log stream
+      // Initialize the stream before emitting startup messages so they are persisted.
       await this.initializeLogStream();
+      this.log('info', 'Starting Daily Audit Daemon');
 
       // Write PID file
       await this.writePidFile();

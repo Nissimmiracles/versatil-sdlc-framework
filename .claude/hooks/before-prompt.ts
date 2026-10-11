@@ -17,6 +17,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { homedir } from 'os';
 import { getMetricsService } from '../../src/telemetry/automation-metrics.js';
 import { detectContextIdentity, type ContextIdentity } from '../../src/isolation/context-identity.js';
 
@@ -475,7 +476,7 @@ function generateEnforcementContext(identity: ContextIdentity): string {
  * @returns true if should run full check, false otherwise
  */
 function shouldRunFullHealthCheck(): boolean {
-  const timestampFile = path.join(require('os').homedir(), '.versatil', '.last-guardian-check');
+  const timestampFile = path.join(homedir(), '.versatil', '.last-guardian-check');
 
   try {
     if (!fs.existsSync(timestampFile)) {
@@ -496,7 +497,7 @@ function shouldRunFullHealthCheck(): boolean {
  * Update the timestamp file after running full health check
  */
 function updateHealthCheckTimestamp(): void {
-  const timestampFile = path.join(require('os').homedir(), '.versatil', '.last-guardian-check');
+  const timestampFile = path.join(homedir(), '.versatil', '.last-guardian-check');
 
   try {
     const versatilDir = path.dirname(timestampFile);

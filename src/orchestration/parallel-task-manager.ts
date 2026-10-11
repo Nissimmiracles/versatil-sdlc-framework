@@ -160,6 +160,8 @@ export enum CollisionSeverity {
 export class ParallelTaskManager extends EventEmitter {
   private tasks: Map<string, Task> = new Map();
   private executions: Map<string, TaskExecution> = new Map();
+  private executionPromises: Map<string, Promise<TaskExecution>> = new Map();
+  private pendingTaskAdmissions: Set<string> = new Set();
   private resourcePool: Map<string, Resource> = new Map();
   private agentWorkload: Map<string, number> = new Map();
   private sdlcState: SDLCPhase = SDLCPhase.PLANNING;
@@ -178,6 +180,21 @@ export class ParallelTaskManager extends EventEmitter {
    * Add a task to the execution queue with collision detection
    */
   async addTask(task: Task): Promise<string> {
+    if (this.pendingTaskAdmissions.has(task.id)) {
+      throw new Error(`Task admission already in progress: ${task.id}`);
+    }
+    this.pendingTaskAdmissions.add(task.id);
+    try {
+      return await this.admitTask(task);
+    } finally {
+      this.pendingTaskAdmissions.delete(task.id);
+    }
+  }
+
+  private async admitTask(task: Task): Promise<string> {
+    if (this.executions.get(task.id)?.status === ExecutionStatus.RUNNING) {
+      throw new Error(`Task is already running: ${task.id}`);
+    }
     this.emit('_task:added', { taskId: task.id, task });
 
     // Validate task
@@ -197,6 +214,12 @@ export class ParallelTaskManager extends EventEmitter {
       await this.handleCollision(task, collisionResult);
     }
 
+    // A public parallel retry may have started while admission was awaiting checks.
+    if (this.executions.get(task.id)?.status === ExecutionStatus.RUNNING || this.executionPromises.has(task.id)) {
+      throw new Error(`Task is already running: ${task.id}`);
+    }
+    this.executions.delete(task.id);
+    this.executionPromises.delete(task.id);
     this.tasks.set(task.id, task);
 
     // Try to execute immediately if resources are available
@@ -445,7 +468,17 @@ export class ParallelTaskManager extends EventEmitter {
   /**
    * Execute a single task with resource management
    */
-  private async executeTask(taskId: string): Promise<TaskExecution> {
+  private executeTask(taskId: string): Promise<TaskExecution> {
+    const existing = this.executionPromises.get(taskId);
+    if (existing) return existing;
+    const completed = this.executions.get(taskId);
+    if (completed?.status === ExecutionStatus.COMPLETED) return Promise.resolve(completed);
+    const pending = this.runTask(taskId).finally(() => this.executionPromises.delete(taskId));
+    this.executionPromises.set(taskId, pending);
+    return pending;
+  }
+
+  private async runTask(taskId: string): Promise<TaskExecution> {
     const task = this.tasks.get(taskId);
     if (!task) {
       throw new Error(`Task not found: ${taskId}`);
@@ -654,7 +687,7 @@ export class ParallelTaskManager extends EventEmitter {
         agentWorkload: Array.from(this.agentWorkload.entries()),
         activeTasks: this.executions.size
       });
-    }, 5000);
+    }, 5000).unref();
   }
 
   private getSeverityLevel(severity: CollisionSeverity): number {

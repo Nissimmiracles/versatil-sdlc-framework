@@ -1,6 +1,6 @@
 /**
  * VERSATIL Framework - MCP Health Monitoring
- * Ensures 95%+ MCP reliability with auto-retry and fallbacks
+ * Tracks observed MCP execution outcomes with bounded retries and circuit breakers
  *
  * Features:
  * - Health checks for all 11 MCPs
@@ -12,7 +12,7 @@
 import { EventEmitter } from 'events';
 export interface MCPHealth {
     mcpId: string;
-    status: 'healthy' | 'degraded' | 'unhealthy';
+    status: 'unknown' | 'healthy' | 'degraded' | 'unhealthy';
     lastCheck: Date;
     consecutiveFailures: number;
     successRate: number;
@@ -48,17 +48,21 @@ export declare class MCPHealthMonitor extends EventEmitter {
      */
     stopMonitoring(): void;
     /**
-     * Execute MCP action with retry logic
+     * Execute an adapter action once by default. Callers may declare retrySafety as
+     * 'read-only' or 'idempotent' only when their adapter has that guarantee.
+     * Timeout never permits replay because the original action can remain running.
      */
-    executeMCPWithRetry(mcpId: string, action: string, params?: any): Promise<MCPExecutionResult>;
-    /**
-     * Execute MCP action (to be implemented by actual MCP executors)
-     */
+    private metrics;
+    getMetrics(mcpId: string): {
+        totalRequests: number;
+        successfulRequests: number;
+        failedRequests: number;
+        rejectedRequests: number;
+        averageLatency: number;
+        lastLatency: number;
+    };
+    executeMCPWithRetry(mcpId: string, action: string | (() => Promise<any>), params?: any): Promise<MCPExecutionResult>;
     private executeMCP;
-    /**
-     * Use fallback mechanism for MCP
-     */
-    private useFallback;
     /**
      * Check health of all MCPs
      */
@@ -86,7 +90,7 @@ export declare class MCPHealthMonitor extends EventEmitter {
     /**
      * Get health status for specific MCP
      */
-    getHealthStatus(mcpId: string): MCPHealth | undefined;
+    getHealthStatus(mcpId: string): MCPHealth | null;
     /**
      * Get health status for all MCPs
      */
@@ -124,21 +128,34 @@ export declare class MCPHealthMonitor extends EventEmitter {
     /**
      * Get circuit breaker statistics
      */
-    getCircuitBreakerStats(): {
+    getCircuitBreakerStats(mcpId?: string): {
         total: number;
         open: number;
         closed: number;
         halfOpen: number;
+        rejectedRequests: number;
     };
     /**
      * Generate comprehensive health report
      */
     generateHealthReport(): {
         timestamp: Date;
+        totalMCPs: number;
+        healthyCount: number;
+        degradedCount: number;
+        unhealthyCount: number;
         overallHealth: number;
         mcps: MCPHealth[];
         circuitBreakers: ReturnType<typeof this.getCircuitBreakerStats>;
         recommendations: string[];
+    };
+    calculateReliabilityScore(): number;
+    exportMetricsJSON(): string;
+    getSummaryStats(): {
+        totalMCPs: number;
+        overallHealthScore: number;
+        averageLatency: number;
+        totalRequests: number;
     };
 }
 export declare const globalMCPHealthMonitor: MCPHealthMonitor;

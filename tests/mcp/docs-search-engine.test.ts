@@ -2,13 +2,15 @@
  * Unit tests for DocsSearchEngine
  */
 
-import { describe, it, expect, beforeAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { DocsSearchEngine, DocCategory } from '../../src/mcp/docs-search-engine.js';
-import path from 'path';
+import { createDocsCorpus } from '../fixtures/docs-corpus/create.js';
 
 describe('DocsSearchEngine', () => {
   let searchEngine: DocsSearchEngine;
-  const projectPath = path.join(process.cwd());
+  const corpus = createDocsCorpus();
+  const projectPath = corpus.root;
+  afterAll(() => corpus.cleanup());
 
   beforeAll(async () => {
     searchEngine = new DocsSearchEngine(projectPath);
@@ -19,7 +21,7 @@ describe('DocsSearchEngine', () => {
     it('should build documentation index successfully', async () => {
       const index = await searchEngine.getIndex();
       expect(index).toBeDefined();
-      expect(index.length).toBeGreaterThan(0);
+      expect(index.length).toBe(corpus.count);
     });
 
     it('should index documents with required metadata', async () => {
@@ -69,7 +71,10 @@ describe('DocsSearchEngine', () => {
     it('should find documents by title keywords', async () => {
       const results = await searchEngine.search('maria');
       expect(results.length).toBeGreaterThan(0);
+      expect(results).toHaveLength(2);
       expect(results[0].document.title.toLowerCase()).toContain('maria');
+      expect(results[0].relevanceScore).toBeGreaterThan(results[1].relevanceScore);
+      expect(results[1].document.title).toBe('Application Guide');
     });
 
     it('should find documents by content keywords', async () => {
@@ -80,6 +85,7 @@ describe('DocsSearchEngine', () => {
     it('should return results sorted by relevance', async () => {
       const results = await searchEngine.search('workflow');
 
+      expect(results.length).toBeGreaterThan(1);
       if (results.length > 1) {
         // First result should have higher or equal relevance score
         expect(results[0].relevanceScore).toBeGreaterThanOrEqual(results[1].relevanceScore);
@@ -89,6 +95,7 @@ describe('DocsSearchEngine', () => {
     it('should filter by category when specified', async () => {
       const results = await searchEngine.search('agent', 'agents');
 
+      expect(results).toHaveLength(3);
       if (results.length > 0) {
         results.forEach(result => {
           expect(result.document.category).toBe('agents');
@@ -150,15 +157,16 @@ describe('DocsSearchEngine', () => {
     it('should return all documents in category', async () => {
       const workflows = await searchEngine.getDocumentsByCategory('workflows');
 
+      expect(workflows).toHaveLength(2);
       workflows.forEach(doc => {
         expect(doc.category).toBe('workflows');
       });
     });
 
     it('should return empty array for category with no documents', async () => {
-      // Assuming 'all' is not a real category in the file system
+      // The synthetic corpus deliberately has no testing-category paths.
       const results = await searchEngine.getDocumentsByCategory('testing');
-      expect(Array.isArray(results)).toBe(true);
+      expect(results).toEqual([]);
     });
 
     it('should return all documents when category is "all"', async () => {

@@ -12,10 +12,12 @@
  * 5. Workflow file patterns classified as credentials
  */
 
-import { describe, test, expect, beforeEach } from '@jest/globals';
-import { getPatternSanitizer } from '../../src/rag/pattern-sanitizer.js';
-import { getSanitizationPolicy, PatternClassification } from '../../src/rag/sanitization-policy.js';
-import { StorageDestination } from '../../src/rag/rag-router.js';
+import { describe, test, expect, beforeEach, jest } from '@jest/globals';
+import { getPatternSanitizer, SanitizationDecision, SanitizationLevel } from '../../src/rag/pattern-sanitizer.js';
+import { getSanitizationPolicy, PatternClassification, StorageDestination } from '../../src/rag/sanitization-policy.js';
+
+// Synthetic fingerprint keeps tests away from local account/project discovery.
+jest.mock('../../src/rag/project-detector.js', () => ({ detectProjectFingerprint: jest.fn().mockResolvedValue({ identifiers: ['FIXTURE_CUSTOM_IDENTIFIER'], sources: {}, detectionMethods: ['synthetic-fixture'], confidence: 100 }) }));
 
 describe('RAG Secret Leak Prevention', () => {
   let sanitizer: ReturnType<typeof getPatternSanitizer>;
@@ -104,24 +106,24 @@ describe('RAG Secret Leak Prevention', () => {
 
   describe('GCP Project ID Sanitization', () => {
     test('GCP Project ID is sanitized', async () => {
-      const input = 'gcloud run deploy --project=centering-vine-454613-b3';
+      const input = 'gcloud run deploy --project=fixture-project-123456-ab';
       const result = await sanitizer.sanitize(input);
 
       expect(result.sanitized).toContain('YOUR_PROJECT_ID');
-      expect(result.sanitized).not.toContain('centering-vine-454613-b3');
+      expect(result.sanitized).not.toContain('fixture-project-123456-ab');
       expect(result.redactions.length).toBeGreaterThan(0);
       expect(result.redactions.some(r => r.type === 'gcp_project_id')).toBe(true);
     });
 
     test('Multiple project IDs are sanitized', async () => {
       const input = `
-        Project 1: centering-vine-454613-b3
+        Project 1: fixture-project-123456-ab
         Project 2: my-app-123456-xy
         Project 3: test-project-789012-ab
       `;
       const result = await sanitizer.sanitize(input);
 
-      expect(result.sanitized).not.toContain('centering-vine-454613-b3');
+      expect(result.sanitized).not.toContain('fixture-project-123456-ab');
       expect(result.sanitized).not.toContain('my-app-123456-xy');
       expect(result.sanitized).not.toContain('test-project-789012-ab');
       expect(result.redactions.filter(r => r.type === 'gcp_project_id').length).toBe(3);
@@ -129,13 +131,13 @@ describe('RAG Secret Leak Prevention', () => {
 
     test('Project ID in code is sanitized', async () => {
       const code = `
-        const projectId = 'centering-vine-454613-b3';
+        const projectId = 'fixture-project-123456-ab';
         const db = admin.firestore({ projectId });
       `;
       const result = await sanitizer.sanitize(code);
 
       expect(result.sanitized).toContain('YOUR_PROJECT_ID');
-      expect(result.sanitized).not.toContain('centering-vine-454613-b3');
+      expect(result.sanitized).not.toContain('fixture-project-123456-ab');
     });
   });
 
@@ -153,17 +155,22 @@ describe('RAG Secret Leak Prevention', () => {
       const input = 'DATABASE: versatil-private-rag';
       const result = await sanitizer.sanitize(input);
 
-      expect(result.sanitized).toContain('YOUR_DATABASE_NAME');
-      expect(result.sanitized).not.toContain('versatil-private-rag');
+      expect(result.decision).toBe(SanitizationDecision.REJECT_BUSINESS_LOGIC);
+      expect(result.level).toBe(SanitizationLevel.REJECT);
+      expect(result.sanitized).toBeNull();
+      expect(result.warnings[0]).toContain('Rejected: Contains');
+      expect(result.metadata.sensitivePatterns).toEqual(expect.arrayContaining(['private']));
     });
 
     test('Custom database names are sanitized', async () => {
       const input = 'my-app-public-rag and another-private-rag';
       const result = await sanitizer.sanitize(input);
 
-      expect(result.sanitized).not.toContain('my-app-public-rag');
-      expect(result.sanitized).not.toContain('another-private-rag');
-      expect(result.redactions.filter(r => r.type === 'database_name').length).toBe(2);
+      expect(result.decision).toBe(SanitizationDecision.REJECT_BUSINESS_LOGIC);
+      expect(result.level).toBe(SanitizationLevel.REJECT);
+      expect(result.sanitized).toBeNull();
+      expect(result.warnings[0]).toContain('Rejected: Contains');
+      expect(result.metadata.sensitivePatterns).toEqual(expect.arrayContaining(['private']));
     });
   });
 
@@ -176,16 +183,19 @@ describe('RAG Secret Leak Prevention', () => {
       `;
       const result = await sanitizer.sanitize(yaml);
 
-      expect(result.sanitized).toContain('secrets.YOUR_SECRET');
-      expect(result.redactions.some(r => r.type === 'github_secret_reference')).toBe(true);
+      expect(result.decision).toBe(SanitizationDecision.REJECT_CREDENTIALS);
+      expect(result.level).toBe(SanitizationLevel.REJECT);
+      expect(result.sanitized).toBeNull();
+      expect(result.warnings[0]).toContain('Rejected: Contains');
+      expect(result.metadata.sensitivePatterns).toEqual(expect.arrayContaining(['secret']));
     });
 
     test('Project ID in YAML is sanitized', async () => {
-      const yaml = 'PUBLIC_RAG_PROJECT_ID: centering-vine-454613-b3';
+      const yaml = 'PUBLIC_RAG_PROJECT_ID: fixture-project-123456-ab';
       const result = await sanitizer.sanitize(yaml);
 
       expect(result.sanitized).toContain('YOUR_PROJECT_ID');
-      expect(result.sanitized).not.toContain('centering-vine-454613-b3');
+      expect(result.sanitized).not.toContain('fixture-project-123456-ab');
       expect(result.redactions.some(r => r.type === 'github_secret_project_id')).toBe(true);
     });
 
@@ -209,14 +219,15 @@ jobs:
       PUBLIC_RAG_DATABASE: \${{ secrets.PUBLIC_RAG_DATABASE }}
     runs-on: ubuntu-latest
     steps:
-      - run: gcloud run deploy --project=centering-vine-454613-b3
+      - run: gcloud run deploy --project=fixture-project-123456-ab
       `;
       const result = await sanitizer.sanitize(workflow);
 
-      expect(result.sanitized).not.toContain('centering-vine-454613-b3');
-      expect(result.sanitized).toContain('YOUR_PROJECT_ID');
-      expect(result.sanitized).toContain('secrets.YOUR_SECRET');
-      expect(result.redactions.length).toBeGreaterThan(0);
+      expect(result.decision).toBe(SanitizationDecision.REJECT_CREDENTIALS);
+      expect(result.level).toBe(SanitizationLevel.REJECT);
+      expect(result.sanitized).toBeNull();
+      expect(result.warnings[0]).toContain('Rejected: Contains');
+      expect(result.metadata.sensitivePatterns).toEqual(expect.arrayContaining(['secret']));
     });
   });
 
@@ -235,7 +246,7 @@ jobs:
 
       expect(decision.classification).toBe(PatternClassification.CREDENTIALS);
       expect(decision.destination).toBe(StorageDestination.PRIVATE_ONLY);
-      expect(decision.reasoning).toContain('sensitive security information');
+      expect(decision.reasoning.some(reason => reason.includes('sensitive security information'))).toBe(true);
       expect(decision.recommendations).toContain('Workflow files are blocked at extraction stage');
     });
 
@@ -293,7 +304,7 @@ jobs:
         description: 'Automatically contributes patterns to Public RAG on PR merge',
         code: `
 env:
-  PUBLIC_RAG_PROJECT_ID: centering-vine-454613-b3
+  PUBLIC_RAG_PROJECT_ID: fixture-project-123456-ab
   PUBLIC_RAG_DATABASE: versatil-public-rag
         `,
         filePath: '.github/workflows/rag-contribution.yml',
@@ -310,7 +321,7 @@ env:
       const fullText = `${pattern.pattern} ${pattern.description} ${pattern.code}`;
       const sanitizationResult = await sanitizer.sanitize(fullText);
 
-      expect(sanitizationResult.sanitized).not.toContain('centering-vine-454613-b3');
+      expect(sanitizationResult.sanitized).not.toContain('fixture-project-123456-ab');
       expect(sanitizationResult.sanitized).not.toContain('versatil-public-rag');
       expect(sanitizationResult.sanitized).toContain('YOUR_PROJECT_ID');
       expect(sanitizationResult.sanitized).toContain('YOUR_DATABASE_NAME');
@@ -337,19 +348,34 @@ env:
   });
 
   describe('Edge Cases', () => {
+    test('synthetic detector identifiers are removed from otherwise public-safe output', async () => {
+      const result = await sanitizer.sanitize('Generic helper uses FIXTURE_CUSTOM_IDENTIFIER');
+      expect(result.decision).toBe(SanitizationDecision.ALLOW_AFTER_SANITIZATION);
+      expect(result.sanitized).toBe('Generic helper uses [PROJECT_IDENTIFIER]');
+      expect(result.sanitized).not.toContain('FIXTURE_CUSTOM_IDENTIFIER');
+      expect(result.redactions).toEqual([expect.objectContaining({ type: 'project_identifier', reason: 'Project-specific identifier detected' })]);
+    });
+
+    test('approved generic public control is retained without redactions', async () => {
+      const input = 'Generic framework helper: function add(a, b) { return a + b; }';
+      const result = await sanitizer.sanitize(input);
+      expect(result.decision).toBe(SanitizationDecision.ALLOW_AS_IS);
+      expect(result.sanitized).toBe(input);
+      expect(result.redactions).toEqual([]);
+    });
+
     test('Pattern with no filePath still gets sanitized', async () => {
       const pattern = {
         pattern: 'Configuration',
-        description: 'Project: centering-vine-454613-b3',
+        description: 'Project: fixture-project-123456-ab',
         agent: 'system',
         category: 'config'
       };
 
       const decision = await policy.evaluatePattern(pattern);
 
-      if (decision.sanitizationResult) {
-        expect(decision.sanitizationResult.sanitized).not.toContain('centering-vine-454613-b3');
-      }
+      expect(decision.sanitizationResult).not.toBeNull();
+      expect(decision.sanitizationResult!.sanitized).not.toContain('fixture-project-123456-ab');
     });
 
     test('Empty pattern is handled gracefully', async () => {
@@ -367,7 +393,7 @@ env:
     });
 
     test('Pattern with only project ID gets sanitized', async () => {
-      const input = 'centering-vine-454613-b3';
+      const input = 'fixture-project-123456-ab';
       const result = await sanitizer.sanitize(input);
 
       expect(result.sanitized).toBe('YOUR_PROJECT_ID');

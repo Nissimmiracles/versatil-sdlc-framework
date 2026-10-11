@@ -2,15 +2,19 @@
  * Unit tests for DocsMemoryTracker
  */
 
-import { describe, it, expect, beforeEach } from '@jest/globals';
-import { DocsMemoryTracker, MemoryUsage, MemoryWarning } from '../../src/mcp/docs-memory-tracker.js';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import { DocsMemoryTracker, MemoryUsage } from '../../src/mcp/docs-memory-tracker.js';
 
 describe('DocsMemoryTracker', () => {
   let tracker: DocsMemoryTracker;
 
   beforeEach(() => {
+    jest.useFakeTimers({ now: new Date('2025-02-01T00:00:00Z') });
+    jest.spyOn(process, 'memoryUsage').mockReturnValue({ heapUsed: 10 * 1024 * 1024, heapTotal: 100 * 1024 * 1024, rss: 20 * 1024 * 1024, external: 0, arrayBuffers: 0 });
     tracker = new DocsMemoryTracker();
   });
+
+  afterEach(() => { jest.useRealTimers(); jest.restoreAllMocks(); });
 
   describe('getMemoryUsage', () => {
     it('should return current memory usage with index and cache sizes', () => {
@@ -102,33 +106,14 @@ describe('DocsMemoryTracker', () => {
     });
 
     it('should not detect leak with stable memory', () => {
-      // Note: takeSnapshot uses actual heapUsed from process.memoryUsage()
-      // We can't control heap perfectly, but with same index/cache sizes
-      // and no allocations, heap should be relatively stable
-      for (let i = 0; i < 10; i++) {
-        tracker.takeSnapshot(1000, 2000); // Same index/cache sizes
-      }
-
-      const hasLeak = tracker.detectMemoryLeaks();
-      // Leak detection looks at total = heapUsed + indexSize + cacheSize
-      // With constant index/cache, if heap grows naturally, it may detect false positive
-      // This is acceptable - better safe than sorry
-      // For this test, we just verify it runs without errors
-      expect(typeof hasLeak).toBe('boolean');
+      for (let i = 0; i < 10; i++) tracker.takeSnapshot(1000, 2000);
+      expect(tracker.detectMemoryLeaks()).toBe(false);
     });
 
     it('should not detect leak with fluctuating memory', () => {
-      // Note: takeSnapshot uses actual heapUsed, not our fake values
-      // We can only control indexSize and cacheSize parameters
       const values = [1000, 1200, 1100, 1300, 1150, 1250, 1180, 1220, 1190, 1210];
-      for (const value of values) {
-        tracker.takeSnapshot(value, 2000);
-      }
-
-      const hasLeak = tracker.detectMemoryLeaks();
-      // Same as above - we can't perfectly control heap behavior
-      // Just verify it runs without errors
-      expect(typeof hasLeak).toBe('boolean');
+      for (const value of values) tracker.takeSnapshot(value, 2000);
+      expect(tracker.detectMemoryLeaks()).toBe(false);
     });
   });
 
@@ -140,39 +125,24 @@ describe('DocsMemoryTracker', () => {
       expect(rate).toBeNull();
     });
 
-    it('should calculate growth rate in MB/min', () => {
-      // Take snapshot at time 0
+    it('should calculate exact growth rate in MB/min', () => {
       tracker.takeSnapshot(1000, 2000);
-
-      // Wait 1ms and take another snapshot with 1MB more
-      setTimeout(() => {
-        tracker.takeSnapshot(1000 + 1024 * 1024, 2000);
-      }, 1);
-
-      // Give it time to process
-      setTimeout(() => {
-        const rate = tracker.getMemoryGrowthRate();
-        expect(rate).not.toBeNull();
-        if (rate !== null) {
-          expect(rate).toBeGreaterThan(0);
-        }
-      }, 10);
+      jest.advanceTimersByTime(60000);
+      tracker.takeSnapshot(1000 + 1024 * 1024, 2000);
+      expect(tracker.getMemoryGrowthRate()).toBe(1);
     });
 
     it('should return zero for no growth', () => {
       tracker.takeSnapshot(1000, 2000);
-      // Small delay
-      setTimeout(() => {
-        tracker.takeSnapshot(1000, 2000);
-      }, 1);
+      jest.advanceTimersByTime(60000);
+      tracker.takeSnapshot(1000, 2000);
+      expect(tracker.getMemoryGrowthRate()).toBe(0);
+    });
 
-      setTimeout(() => {
-        const rate = tracker.getMemoryGrowthRate();
-        expect(rate).not.toBeNull();
-        if (rate !== null) {
-          expect(Math.abs(rate)).toBeLessThan(0.01); // Near zero
-        }
-      }, 10);
+    it('should return null for simultaneous samples rather than dividing by zero', () => {
+      tracker.takeSnapshot(1000, 2000);
+      tracker.takeSnapshot(2000, 2000);
+      expect(tracker.getMemoryGrowthRate()).toBeNull();
     });
   });
 
@@ -267,19 +237,14 @@ describe('DocsMemoryTracker', () => {
       expect(series).toHaveLength(3);
     });
 
-    it('should filter by duration', () => {
+    it('should retain only snapshots within the exact duration window', () => {
       tracker.takeSnapshot(1000, 2000);
-
-      // Wait a bit
-      setTimeout(() => {
-        tracker.takeSnapshot(1500, 2500);
-      }, 10);
-
-      setTimeout(() => {
-        const series = tracker.getMemoryTimeSeries(5); // Last 5ms
-        // Should only have recent snapshot
-        expect(series.length).toBeLessThanOrEqual(2);
-      }, 20);
+      jest.advanceTimersByTime(10);
+      tracker.takeSnapshot(1500, 2500);
+      jest.advanceTimersByTime(4);
+      expect(tracker.getMemoryTimeSeries(5).map(snapshot => snapshot.indexSize)).toEqual([1500]);
+      jest.advanceTimersByTime(6);
+      expect(tracker.getMemoryTimeSeries(5)).toEqual([]);
     });
 
     it('should return empty array when no snapshots', () => {
@@ -302,15 +267,16 @@ describe('DocsMemoryTracker', () => {
     it('should calculate statistics from snapshots', () => {
       // Take snapshots with known heap values
       for (let i = 0; i < 5; i++) {
+        (process.memoryUsage as jest.Mock).mockReturnValue({ heapUsed: 1024 * (i + 1), heapTotal: 100 * 1024 * 1024, rss: 20 * 1024 * 1024, external: 0, arrayBuffers: 0 });
         tracker.takeSnapshot(1000 * (i + 1), 2000);
       }
 
       const stats = tracker.getMemoryStats();
 
       expect(stats.totalSnapshots).toBe(5);
-      expect(stats.minHeapUsed).toBeGreaterThan(0);
-      expect(stats.maxHeapUsed).toBeGreaterThan(stats.minHeapUsed);
-      expect(stats.avgHeapUsed).toBeGreaterThan(0);
+      expect(stats.minHeapUsed).toBe(1024);
+      expect(stats.maxHeapUsed).toBe(5120);
+      expect(stats.avgHeapUsed).toBe(3072);
       expect(stats.avgHeapUsed).toBeGreaterThanOrEqual(stats.minHeapUsed);
       expect(stats.avgHeapUsed).toBeLessThanOrEqual(stats.maxHeapUsed);
     });

@@ -9,7 +9,7 @@
  */
 
 import { readdir, readFile, stat } from 'fs/promises';
-import { join, relative } from 'path';
+import { join, relative, basename } from 'path';
 
 export interface ExampleFile {
   file_path: string;
@@ -197,7 +197,7 @@ export class ExamplesSearchService {
    */
   private async parseExampleFile(filePath: string, domain: string): Promise<ExampleFile> {
     const relativePath = relative(this.examplesDir, filePath);
-    const fileName = filePath.split('/').pop() || '';
+    const fileName = basename(filePath);
 
     // Default metadata
     let description = fileName.replace(/\.(ts|tsx|js)$/, '').replace(/-/g, ' ');

@@ -2,7 +2,7 @@
  * RAG Pattern Retrieval Tests
  *
  * Validates similarity search, ranking, filtering, and edge cases
- * for pattern retrieval from the vector database.
+ * for the real in-memory retrieval pipeline with a deterministic embedding fixture.
  *
  * Test Coverage:
  * - Similarity search accuracy
@@ -12,8 +12,33 @@
  * - Performance (< 200ms for 95th percentile)
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@jest/globals';
 import { EnhancedVectorMemoryStore, RAGQuery, RAGResult } from '../../src/rag/enhanced-vector-memory-store.js';
+
+// Exercise the real in-memory store with an explicit deterministic embedding fixture.
+// Backend setup and persistence are isolated; these tests make no provider or semantic-model claim.
+jest.mock('../../src/utils/logger.js', () => ({ VERSATILLogger: jest.fn().mockImplementation(() => ({ info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() })) }));
+jest.mock('../../src/lib/graphrag-store.js', () => ({ graphRAGStore: { initialize: jest.fn().mockRejectedValue(new Error('unit backend disabled')) } }));
+jest.mock('../../src/lib/gcp-vector-store.js', () => ({ gcpVectorStore: { initialize: jest.fn().mockRejectedValue(new Error('unit backend disabled')) } }));
+jest.mock('@supabase/supabase-js', () => ({ createClient: jest.fn(() => { throw new Error('unit backend disabled'); }) }));
+jest.mock('fs', () => {
+  const actual = jest.requireActual<typeof import('fs')>('fs');
+  return { ...actual, promises: { ...actual.promises, mkdir: jest.fn().mockResolvedValue(undefined) } };
+});
+
+function fixtureEmbedding(text: string): number[] {
+  const vector = Array(1536).fill(0);
+  for (let token of text.toLowerCase().match(/[a-z0-9]+/g) || []) {
+    if (['the', 'with', 'for', 'should', 'use', 'and', 'in', 'a', 'after'].includes(token)) continue;
+    if (token === 'auth') token = 'authentication';
+    token = token.replace(/s$/, '');
+    let index = 0;
+    for (const character of token) index = (index * 31 + character.charCodeAt(0)) % vector.length;
+    vector[index] += 1;
+  }
+  const magnitude = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0)) || 1;
+  return vector.map(value => value / magnitude);
+}
 
 describe('RAG Pattern Retrieval Tests', () => {
   let vectorStore: EnhancedVectorMemoryStore;
@@ -115,11 +140,12 @@ describe('RAG Pattern Retrieval Tests', () => {
   beforeAll(async () => {
     vectorStore = new EnhancedVectorMemoryStore();
     await vectorStore.initialize();
+    jest.spyOn(vectorStore as any, 'generateEmbedding').mockImplementation(async (text: string) => fixtureEmbedding(text));
 
     // Store test patterns
     console.log('📝 Storing test patterns for retrieval tests...');
     for (const pattern of testPatterns) {
-      const id = await vectorStore.storeMemory(pattern);
+      const id = await vectorStore.storeMemory({ ...pattern, metadata: { ...pattern.metadata, fileType: pattern.contentType === 'code' ? 'source' : 'guide' } });
       testPatternIds.push(id);
     }
     console.log(`✅ Stored ${testPatternIds.length} test patterns`);
@@ -300,6 +326,7 @@ describe('RAG Pattern Retrieval Tests', () => {
       );
 
       expect(allFromMarcus).toBe(true);
+      expect(result.documents).toHaveLength(3);
     }, 10000);
 
     it('should filter by content type', async () => {
@@ -311,13 +338,15 @@ describe('RAG Pattern Retrieval Tests', () => {
         topK: 10
       });
 
-      if (result.documents.length > 0) {
+      expect(result.documents.length).toBeGreaterThan(0);
+      {
         // All results should be code type
         const allCode = result.documents.every(d =>
           d.contentType === 'code'
         );
 
         expect(allCode).toBe(true);
+        expect(result.documents).toHaveLength(6);
       }
     }, 10000);
 
@@ -330,18 +359,20 @@ describe('RAG Pattern Retrieval Tests', () => {
         topK: 10
       });
 
-      if (result.documents.length > 0) {
+      expect(result.documents.length).toBeGreaterThan(0);
+      {
         // All results should have security tag
         const allHaveSecurityTag = result.documents.every(d =>
           d.metadata.tags?.includes('security')
         );
 
         expect(allHaveSecurityTag).toBe(true);
+        expect(result.documents).toHaveLength(3);
       }
     }, 10000);
 
     it('should filter by time range', async () => {
-      const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000;
+      const threeDaysAgo = testPatterns[2].metadata.timestamp;
       const now = Date.now();
 
       const result = await vectorStore.queryMemories({
@@ -355,7 +386,8 @@ describe('RAG Pattern Retrieval Tests', () => {
         topK: 10
       });
 
-      if (result.documents.length > 0) {
+      expect(result.documents.length).toBeGreaterThan(0);
+      {
         // All results should be within time range
         const allInRange = result.documents.every(d =>
           d.metadata.timestamp >= threeDaysAgo &&
@@ -363,8 +395,32 @@ describe('RAG Pattern Retrieval Tests', () => {
         );
 
         expect(allInRange).toBe(true);
+        expect(result.documents).toHaveLength(3);
       }
     }, 10000);
+
+    it('filters source file types and keeps only fixtures containing every requested tag', async () => {
+      const fileTypes = await vectorStore.queryMemories({ query: 'security', filters: { fileTypes: ['source'] }, topK: 10 });
+      expect(fileTypes.documents).toHaveLength(6);
+      expect(fileTypes.documents.every(document => document.metadata.fileType === 'source')).toBe(true);
+      const tags = await vectorStore.queryMemories({ query: 'security', filters: { tags: ['security', 'authentication'] }, topK: 10 });
+      expect(tags.documents).toHaveLength(2);
+      expect(tags.documents.every(document => document.metadata.tags.includes('authentication'))).toBe(true);
+    });
+
+    it('returns no documents when metadata selectors exclude every fixture', async () => {
+      for (const selectors of [
+        { agentId: 'unknown-agent' },
+        { filters: { tags: ['absent-tag'] } },
+        { filters: { fileTypes: ['unknown-extension'] } },
+        { filters: { contentTypes: ['diagram'] } },
+        { filters: { timeRange: { start: 0, end: 1 } } }
+      ]) {
+        const result = await vectorStore.queryMemories({ query: 'security bcrypt JWT', topK: 10, ...selectors });
+        expect(result.documents).toEqual([]);
+        expect(result.totalMatches).toBe(0);
+      }
+    });
 
     it('should combine multiple filters', async () => {
       const result = await vectorStore.queryMemories({
@@ -377,7 +433,8 @@ describe('RAG Pattern Retrieval Tests', () => {
         topK: 10
       });
 
-      if (result.documents.length > 0) {
+      expect(result.documents.length).toBeGreaterThan(0);
+      {
         // All results should match all filters
         const allMatch = result.documents.every(d =>
           d.metadata.agentId === 'enhanced-marcus' &&
@@ -386,12 +443,13 @@ describe('RAG Pattern Retrieval Tests', () => {
         );
 
         expect(allMatch).toBe(true);
+        expect(result.documents).toHaveLength(3);
       }
     }, 10000);
   });
 
   describe('4. Edge Cases', () => {
-    it('should handle queries with no results gracefully', async () => {
+    it('handles unrelated queries with a bounded result shape', async () => {
       const result = await vectorStore.queryMemories({
         query: 'xyzabc123nonexistentpattern999',
         topK: 5
@@ -464,8 +522,7 @@ describe('RAG Pattern Retrieval Tests', () => {
         return matchCount > 0 && matchCount < terms.length;
       });
 
-      // At least some results should be partial matches
-      expect(result.documents.length).toBeGreaterThan(0);
+      expect(hasPartialMatches).toBe(true);
     }, 10000);
 
     it('should handle topK = 0', async () => {
@@ -574,6 +631,7 @@ describe('RAG Pattern Retrieval Tests', () => {
 
   describe('6. Query Result Metadata', () => {
     it('should include processing time in results', async () => {
+      const now = jest.spyOn(Date, 'now').mockReturnValueOnce(1000).mockReturnValue(1025);
       const result = await vectorStore.queryMemories({
         query: 'test patterns',
         topK: 5
@@ -581,7 +639,8 @@ describe('RAG Pattern Retrieval Tests', () => {
 
       expect(result.processingTime).toBeDefined();
       expect(typeof result.processingTime).toBe('number');
-      expect(result.processingTime).toBeGreaterThan(0);
+      expect(result.processingTime).toBe(25);
+      now.mockRestore();
     }, 10000);
 
     it('should include search method in results', async () => {
@@ -612,7 +671,8 @@ describe('RAG Pattern Retrieval Tests', () => {
         topK: 5
       });
 
-      if (result.documents.length > 0) {
+      expect(result.documents.length).toBeGreaterThan(0);
+      {
         const allHaveScores = result.documents.every(d =>
           d.metadata.relevanceScore !== undefined &&
           typeof d.metadata.relevanceScore === 'number'
@@ -633,7 +693,8 @@ describe('RAG Pattern Retrieval Tests', () => {
         rerank: true
       });
 
-      if (result.documents.length > 0) {
+      expect(result.documents.length).toBeGreaterThan(0);
+      {
         // TypeScript/Express patterns should rank higher
         const tsExpressPatterns = result.documents.filter(d =>
           d.metadata.language === 'typescript' &&
@@ -652,7 +713,8 @@ describe('RAG Pattern Retrieval Tests', () => {
         topK: 10
       });
 
-      if (result.documents.length > 0) {
+      expect(result.documents.length).toBeGreaterThan(0);
+      {
         // All should be from James
         const allFromJames = result.documents.every(d =>
           d.metadata.agentId === 'enhanced-james'

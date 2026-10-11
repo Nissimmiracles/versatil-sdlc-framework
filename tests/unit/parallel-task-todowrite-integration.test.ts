@@ -10,7 +10,7 @@
  * - Statusline formatting
  */
 
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import ParallelTaskManager, {
   Task,
   TaskType,
@@ -54,6 +54,8 @@ describe('ParallelTaskManager - TodoWrite Integration', () => {
       todoWriteEvents.push({ event: 'progress-update', data });
     });
   });
+
+  afterEach(() => { jest.restoreAllMocks(); jest.useRealTimers(); });
 
   describe('Todo Creation on Task Start', () => {
     it('should emit todowrite:task-start event when task begins', async () => {
@@ -261,6 +263,8 @@ describe('ParallelTaskManager - TodoWrite Integration', () => {
         metadata: {}
       };
 
+      jest.useFakeTimers();
+      jest.spyOn(manager as any, 'executeTaskByType').mockImplementation(async () => { jest.setSystemTime(Date.now() + 50); return {status: 'completed'}; });
       await manager.addTask(task);
       await manager.executeParallel(['complete-task']);
 
@@ -271,7 +275,7 @@ describe('ParallelTaskManager - TodoWrite Integration', () => {
       expect(completeEvent.data.taskId).toBe('complete-task');
       expect(completeEvent.data.taskName).toBe('Completion Test');
       expect(completeEvent.data.agentId).toBe('james-frontend');
-      expect(completeEvent.data.duration).toBeGreaterThan(0);
+      expect(completeEvent.data.duration).toBe(50);
       expect(completeEvent.data.result).toBeDefined();
     });
 
@@ -343,7 +347,10 @@ describe('ParallelTaskManager - TodoWrite Integration', () => {
         metadata: {}
       };
 
-      await manager.addTask(task);
+      let finish!: () => void;
+      jest.spyOn(manager as any, 'executeTaskByType').mockImplementation(() => new Promise(resolve => { finish = () => resolve({status: 'completed'}); }));
+      const added = manager.addTask(task);
+      await new Promise(resolve => setImmediate(resolve));
 
       // Start task execution in background
       const execPromise = manager.executeParallel(['running-task']);
@@ -354,6 +361,8 @@ describe('ParallelTaskManager - TodoWrite Integration', () => {
       const progress = manager.getParallelProgress();
       expect(progress.size).toBeGreaterThan(0);
 
+      finish();
+      await added;
       await execPromise; // Wait for completion
     });
 
@@ -452,9 +461,10 @@ describe('ParallelTaskManager - TodoWrite Integration', () => {
         }
       ];
 
-      for (const task of tasks) {
-        await manager.addTask(task);
-      }
+      const finish: Array<() => void> = [];
+      jest.spyOn(manager as any, 'executeTaskByType').mockImplementation(() => new Promise(resolve => { finish.push(() => resolve({status: 'completed'})); }));
+      const additions = tasks.map(task => manager.addTask(task));
+      await new Promise(resolve => setImmediate(resolve));
 
       // Start parallel execution
       const execPromise = manager.executeParallel(['dana-task', 'marcus-task', 'james-task']);
@@ -467,6 +477,8 @@ describe('ParallelTaskManager - TodoWrite Integration', () => {
       // Should show format like "dana-database (30%) + marcus-backend (45%) + james-frontend (60%) working in parallel"
       expect(statusline).toContain('working in parallel');
 
+      finish.forEach(resolve => resolve());
+      await Promise.all(additions);
       await execPromise; // Wait for completion
     });
   });
@@ -557,6 +569,46 @@ describe('ParallelTaskManager - TodoWrite Integration', () => {
 
       // TodoWrite events should be emitted again
       expect(todoWriteEvents.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Execution coalescing and explicit retry', () => {
+    const task = (): Task => ({id: 'coalesced', name: 'Coalesced task', type: TaskType.DEVELOPMENT, priority: Priority.MEDIUM, estimatedDuration: 1, requiredResources: [{type: ResourceType.CPU, name: 'cpu-cores', capacity: 1, exclusive: false}], dependencies: [], agentId: 'fixture-agent', sdlcPhase: SDLCPhase.IMPLEMENTATION, collisionRisk: CollisionRisk.NONE, metadata: {}});
+    it('does not replay a completed task when collecting parallel results', async () => {
+      const execute = jest.spyOn(manager as any, 'executeTaskByType').mockResolvedValue({status: 'completed'});
+      await manager.addTask(task()); await manager.executeParallel(['coalesced']); await manager.executeParallel(['coalesced']); expect(execute).toHaveBeenCalledTimes(1);
+    });
+    it('releases a failed promise so an explicit retry can execute', async () => {
+      const execute = jest.spyOn(manager as any, 'executeTaskByType').mockRejectedValueOnce(new Error('TRANSIENT')).mockResolvedValue({status: 'completed'});
+      await expect(manager.addTask(task())).rejects.toThrow('TRANSIENT'); const result = await manager.executeParallel(['coalesced']); expect(result.get('coalesced')?.status).toBe(ExecutionStatus.COMPLETED); expect(execute).toHaveBeenCalledTimes(2);
+    });
+    it('reserves an ID before asynchronous admission so concurrent submissions cannot duplicate execution', async () => {
+      let finish!: () => void;
+      const execute = jest.spyOn(manager as any, 'executeTaskByType').mockImplementation(() => new Promise(resolve => { finish = () => resolve({status: 'completed'}); }));
+      const first = manager.addTask(task());
+      await expect(manager.addTask(task())).rejects.toThrow('Task admission already in progress');
+      await new Promise(resolve => setImmediate(resolve));
+      finish(); await first; expect(execute).toHaveBeenCalledTimes(1);
+    });
+    it('does not replace a parallel retry that starts while admission checks are awaiting', async () => {
+      const execute = jest.spyOn(manager as any, 'executeTaskByType').mockRejectedValueOnce(new Error('TRANSIENT'));
+      await expect(manager.addTask(task())).rejects.toThrow('TRANSIENT');
+      let finish!: () => void;
+      execute.mockImplementation(() => new Promise(resolve => { finish = () => resolve({status:'completed'}); }));
+      const validate = (manager as any).validateTask.bind(manager);
+      let allowAdmission!: () => void;
+      const admissionGate = new Promise<void>(resolve => { allowAdmission = resolve; });
+      jest.spyOn(manager as any, 'validateTask').mockImplementation(async candidate => { await admissionGate; return validate(candidate); });
+      const replacement = manager.addTask({...task(),name:'Replacement'});
+      const retry = manager.executeParallel(['coalesced']);
+      await new Promise(resolve => setImmediate(resolve));
+      allowAdmission();
+      await expect(replacement).rejects.toThrow('Task is already running');
+      finish(); await retry; expect(execute).toHaveBeenCalledTimes(2);
+    });
+    it('accepts explicit resubmission after a completed execution', async () => {
+      const execute = jest.spyOn(manager as any, 'executeTaskByType').mockResolvedValue({status: 'completed'});
+      await manager.addTask(task()); await manager.addTask({...task(), name: 'Replacement'}); expect(execute).toHaveBeenCalledTimes(2);
     });
   });
 

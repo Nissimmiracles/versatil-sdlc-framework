@@ -160,6 +160,7 @@ export class LearningCodifier {
     let sanitized = 0;
 
     for (const pattern of patterns) {
+      let patternWasStored = false;
       try {
         // Only store high-effectiveness patterns (>= 75)
         if (pattern.effectiveness < 75) {
@@ -206,6 +207,7 @@ export class LearningCodifier {
               code: policyDecision.sanitizationResult?.sanitized || patternData.code,
               description: policyDecision.sanitizationResult?.sanitized || patternData.description
             }, StorageDestination.PUBLIC_ONLY);
+          patternWasStored = true;
             publicStored++;
 
             if (policyDecision.classification === PatternClassification.REQUIRES_SANITIZATION) {
@@ -216,6 +218,7 @@ export class LearningCodifier {
           // Store original in Private RAG (if configured)
           try {
             await this.ragRouter.storePattern(patternData, StorageDestination.PRIVATE_ONLY);
+            patternWasStored = true;
             privateStored++;
           } catch (error) {
             this.logger.warn('Private RAG not configured, skipping private storage', {}, 'learning-codifier');
@@ -239,6 +242,7 @@ export class LearningCodifier {
             code: policyDecision.sanitizationResult?.sanitized || patternData.code,
             description: policyDecision.sanitizationResult?.sanitized || patternData.description
           }, StorageDestination.PUBLIC_ONLY);
+          patternWasStored = true;
           publicStored++;
 
           if (policyDecision.classification === PatternClassification.REQUIRES_SANITIZATION) {
@@ -249,6 +253,7 @@ export class LearningCodifier {
           // Private only (default)
           try {
             await this.ragRouter.storePattern(patternData, StorageDestination.PRIVATE_ONLY);
+            patternWasStored = true;
             privateStored++;
           } catch (error) {
             this.logger.warn('Private RAG not configured', {}, 'learning-codifier');
@@ -271,10 +276,12 @@ export class LearningCodifier {
                   timestamp: new Date().toISOString()
                 }
               });
+              patternWasStored = true;
             }
           }
         }
 
+        if (!patternWasStored) continue;
         patternsStored++;
         this.logger.debug('Pattern stored in RAG', {
           category: pattern.category,
@@ -307,6 +314,7 @@ export class LearningCodifier {
     let stored = 0;
 
     for (const lesson of lessons) {
+      let lessonWasStored = false;
       try {
         // Classify lesson for storage destination
         const policyDecision = await this.sanitizationPolicy.evaluatePattern({
@@ -339,10 +347,12 @@ export class LearningCodifier {
               ...lessonData,
               description: policyDecision.sanitizationResult?.sanitized || lessonData.description
             }, StorageDestination.PUBLIC_ONLY);
+            lessonWasStored = true;
           }
 
           try {
             await this.ragRouter.storePattern(lessonData, StorageDestination.PRIVATE_ONLY);
+            lessonWasStored = true;
           } catch (error) {
             this.logger.warn('Private RAG not configured', {}, 'learning-codifier');
           }
@@ -355,12 +365,14 @@ export class LearningCodifier {
               ...lessonData,
               description: policyDecision.sanitizationResult?.sanitized || lessonData.description
             }, StorageDestination.PUBLIC_ONLY);
+            lessonWasStored = true;
           }
 
         } else {
           // Private only (default) - fallback to vector store if RAG not configured
           try {
             await this.ragRouter.storePattern(lessonData, StorageDestination.PRIVATE_ONLY);
+            lessonWasStored = true;
           } catch (error) {
             if (this.vectorStore) {
               await this.vectorStore.learnFromInteraction({
@@ -377,10 +389,12 @@ export class LearningCodifier {
                   timestamp: new Date().toISOString()
                 }
               });
+              lessonWasStored = true;
             }
           }
         }
 
+        if (!lessonWasStored) continue;
         stored++;
         this.logger.debug('Lesson stored in RAG', {
           title: lesson.title,

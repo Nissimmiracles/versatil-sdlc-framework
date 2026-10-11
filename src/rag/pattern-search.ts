@@ -388,7 +388,7 @@ export class PatternSearchService {
       effort_hours: pattern.properties.timeSaved || 0,
       effort_range: { min: 0, max: pattern.properties.timeSaved || 0 },
       confidence: Math.round(result.relevanceScore * 100),
-      success_score: Math.round(pattern.properties.effectiveness || 0.8) * 100,
+      success_score: Math.round((pattern.properties.effectiveness ?? 0.8) * 100),
       lessons_learned: [],
       code_examples: pattern.properties.code ? [{
         file: result.source,

@@ -144,6 +144,8 @@ describe('VERSATILMCPClient', () => {
     });
 
     it('should return agent response with suggestions', async () => {
+      vi.spyOn(client['agentRegistry'], 'getAgent').mockReturnValue({ id: 'marcus-backend', name: 'Marcus',
+        activate: vi.fn().mockResolvedValue({ agentId: 'marcus-backend', suggestions: ['Validate request input'] }) } as any);
       const request: MCPToolRequest = {
         tool: 'versatil_activate_agent',
         arguments: {

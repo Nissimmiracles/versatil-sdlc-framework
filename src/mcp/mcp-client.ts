@@ -57,42 +57,59 @@ export class VERSATILMCPClient {
    * Execute MCP tool request
    */
   async executeTool(request: MCPToolRequest): Promise<MCPToolResponse> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const response = await this.routeTool(request);
+        return { ...response, metadata: { ...response.metadata, requestId: request.context?.requestId, context: request.context } };
+      } catch (error: any) {
+        // Only replay read-only requests. Retrying mutation tools can duplicate side effects.
+        if (request.tool !== `${this.config.toolPrefix}framework_status` || error.retryable === false ||
+            attempt >= this.config.maxRetries) {
+          if (error.message?.startsWith('Unknown tool:')) throw error;
+          return { success: false, error: error.message || String(error), metadata: { context: request.context } };
+        }
+      }
+    }
+  }
+
+  private async routeTool(request: MCPToolRequest): Promise<MCPToolResponse> {
     try {
       this.logger.info(`Executing MCP tool: ${request.tool}`, { arguments: request.arguments });
 
       // Route to appropriate handler based on tool name
-      const toolName = request.tool.replace(this.config.toolPrefix, '');
+      const toolName = request.tool.startsWith(this.config.toolPrefix) ? request.tool.slice(this.config.toolPrefix.length) : request.tool;
+      const args = { ...request.arguments, context: { ...request.context, ...request.arguments.context } };
 
       switch (toolName) {
         case 'activate_agent':
-          return await this.handleAgentActivation(request.arguments);
+          return await this.handleAgentActivation(args);
 
         case 'orchestrate_sdlc':
-          return await this.handleSDLCOrchestration(request.arguments);
+          return await this.handleSDLCOrchestration(args);
 
         case 'quality_gate':
-          return await this.handleQualityGate(request.arguments);
+          return await this.handleQualityGate(args);
 
         case 'test_suite':
-          return await this.handleTestSuite(request.arguments);
+          return await this.handleTestSuite(args);
 
         case 'architecture_analysis':
-          return await this.handleArchitectureAnalysis(request.arguments);
+          return await this.handleArchitectureAnalysis(args);
 
         case 'deployment_pipeline':
-          return await this.handleDeploymentPipeline(request.arguments);
+          return await this.handleDeploymentPipeline(args);
 
         case 'framework_status':
-          return await this.handleFrameworkStatus(request.arguments);
+          return await this.handleFrameworkStatus(args);
 
         case 'adaptive_insights':
-          return await this.handleAdaptiveInsights(request.arguments);
+          return await this.handleAdaptiveInsights(args);
 
         case 'file_analysis':
-          return await this.handleFileAnalysis(request.arguments);
+          return await this.handleFileAnalysis(args);
 
         case 'performance_report':
-          return await this.handlePerformanceReport(request.arguments);
+          return await this.handlePerformanceReport(args);
 
         default:
           throw new Error(`Unknown tool: ${request.tool}`);
@@ -108,10 +125,7 @@ export class VERSATILMCPClient {
         throw error;
       }
 
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : String(error)
-      };
+      throw error;
     }
   }
 

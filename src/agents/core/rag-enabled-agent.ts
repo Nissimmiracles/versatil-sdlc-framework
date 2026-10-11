@@ -821,7 +821,7 @@ Provide your analysis using the RAG context above as reference.`;
 
       // Store successful solutions for detected issues
       for (const suggestion of response.suggestions) {
-        if (suggestion.priority !== 'low') {
+        if (suggestion.priority !== 'low' && typeof suggestion.action === 'string' && suggestion.action.trim()) {
           const solutionDoc: MemoryDocument = {
             id: `solution_${this.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             content: suggestion.action,

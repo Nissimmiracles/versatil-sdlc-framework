@@ -151,10 +151,11 @@ export class SubAgentSelector {
    */
   private static fallbackSelection(filePath: string): SubAgentSelection {
     const ext = filePath.split('.').pop()?.toLowerCase();
+    const predicatePath = filePath.replace(/\\/g, '/');
 
     // Backend extensions
     if (['ts', 'js', 'mjs', 'cjs'].includes(ext || '')) {
-      if (filePath.includes('/api/') || filePath.includes('/routes/') || filePath.includes('/controllers/')) {
+      if (predicatePath.includes('/api/') || predicatePath.includes('/routes/') || predicatePath.includes('/controllers/')) {
         return {
           subAgentId: 'marcus-node',
           baseAgentId: 'marcus-backend',
@@ -208,7 +209,7 @@ export class SubAgentSelector {
     // Frontend extensions
     if (['tsx', 'jsx'].includes(ext || '')) {
       // Check for Next.js directories
-      if (filePath.includes('/app/') || filePath.includes('/pages/')) {
+      if (predicatePath.includes('/app/') || predicatePath.includes('/pages/')) {
         return {
           subAgentId: 'james-nextjs',
           baseAgentId: 'james-frontend',

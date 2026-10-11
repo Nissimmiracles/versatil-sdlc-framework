@@ -9,12 +9,29 @@ import { createSessionAnalyzer } from '../../src/workflows/session-analyzer.js';
 import { createLearningExtractor } from '../../src/workflows/learning-extractor.js';
 import { createLearningCodifier } from '../../src/workflows/learning-codifier.js';
 import { createSessionReportGenerator } from '../../src/workflows/session-report-generator.js';
+import { StorageDestination } from '../../src/rag/sanitization-policy.js';
 import type { SessionSummary } from '../../src/tracking/session-manager.js';
+
+const fixture = vi.hoisted(() => ({
+  home: `/tmp/versatil-session-${process.pid}-${Math.random().toString(36).slice(2)}`,
+  store: vi.fn(), memory: vi.fn(), execute: vi.fn()
+}));
+vi.mock('os', async original => ({ ...await original<typeof import('os')>(), homedir: () => fixture.home }));
+vi.mock('child_process', () => ({ exec: Object.assign(vi.fn(), { [Symbol.for('nodejs.util.promisify.custom')]: fixture.execute }) }));
+vi.mock('../../src/config/supabase-config.js', () => ({ supabaseConfig: { getAgentConfig: () => ({}) } }));
+vi.mock('../../src/lib/supabase-vector-store.js', () => ({ SupabaseVectorStore: class {} }));
+vi.mock('../../src/rag/rag-router.js', () => ({ RAGRouter: { getInstance: () => ({ storePattern: fixture.store }) } }));
+vi.mock('../../src/memory/memory-tool-handler.js', () => ({ memoryToolHandler: { execute: fixture.memory } }));
+vi.mock('../../src/utils/logger.js', () => ({ VERSATILLogger: class { info() {} warn() {} error() {} debug() {} } }));
+import { promises as fs } from 'fs';
 
 describe('Session Learning Codification Workflow', () => {
   let mockSessionSummary: SessionSummary;
 
   beforeEach(() => {
+    fixture.store.mockReset().mockResolvedValue('fixture-pattern-id');
+    fixture.memory.mockReset().mockResolvedValue({ success: true });
+    fixture.execute.mockReset().mockImplementation(async (command: string) => ({ stdout: command.includes('branch --show-current') ? 'fixture-branch' : '', stderr: '' }));
     mockSessionSummary = {
       sessionId: 'test-session-001',
       startTime: Date.now() - 3600000, // 1 hour ago
@@ -63,13 +80,17 @@ describe('Session Learning Codification Workflow', () => {
     };
   });
 
+  afterEach(async () => {
+    await fs.rm(fixture.home, { recursive: true, force: true });
+  });
+
   describe('SessionAnalyzer', () => {
     it('should analyze session and extract code changes', async () => {
       const analyzer = createSessionAnalyzer();
       const analysis = await analyzer.analyzeSession(mockSessionSummary);
 
       expect(analysis).toBeDefined();
-      expect(analysis.sessionId).toBe('test-session-001');
+      expect(analysis.sessionId).toBe(mockSessionSummary.date);
       expect(analysis.productivity.timeSaved).toBe(104);
       expect(analysis.agentPerformance).toHaveLength(3);
     });
@@ -82,7 +103,7 @@ describe('Session Learning Codification Workflow', () => {
       expect(mariaQA).toBeDefined();
       expect(mariaQA?.activations).toBe(2);
       expect(mariaQA?.timeSaved).toBe(58);
-      expect(mariaQA?.effectiveness).toBe('high'); // >30 min per activation
+      expect(mariaQA?.effectiveness).toBe('medium'); // 58 / 2 = 29 minutes per activation
     });
 
     it('should identify patterns from successful work', async () => {
@@ -98,7 +119,7 @@ describe('Session Learning Codification Workflow', () => {
       const analysis = await analyzer.analyzeSession(mockSessionSummary);
 
       expect(analysis.metadata).toBeDefined();
-      expect(analysis.metadata.branch).toBeDefined();
+      expect(analysis.metadata.branch).toBe('fixture-branch');
     });
   });
 
@@ -111,7 +132,7 @@ describe('Session Learning Codification Workflow', () => {
       const learnings = await extractor.extractLearnings(analysis);
 
       expect(learnings).toBeDefined();
-      expect(learnings.sessionId).toBe('test-session-001');
+      expect(learnings.sessionId).toBe(mockSessionSummary.date);
       expect(learnings.overallEffectiveness).toBeGreaterThan(0);
       expect(learnings.compoundingScore).toBeGreaterThan(0);
     });
@@ -178,7 +199,7 @@ describe('Session Learning Codification Workflow', () => {
 
       const mariaInsight = learnings.agentInsights.find(i => i.agentId === 'maria-qa');
       expect(mariaInsight).toBeDefined();
-      expect(mariaInsight?.effectiveness).toBe('high');
+      expect(mariaInsight?.effectiveness).toBe('medium');
     });
   });
 
@@ -190,25 +211,36 @@ describe('Session Learning Codification Workflow', () => {
       const extractor = createLearningExtractor();
       const learnings = await extractor.extractLearnings(analysis);
 
+      learnings.codePatterns.push({ category: 'test', language: 'typescript', pattern: 'Testing fixture', description: 'Unit testing assertions', codeSnippet: 'expect(value).toBe(true)', effectiveness: 90, tags: ['testing'], usageContext: 'fixture', recommendations: 'Test both outcomes' });
+
       const codifier = createLearningCodifier();
       const result = await codifier.codifyLearnings(learnings);
 
       expect(result).toBeDefined();
-      expect(result.success).toBeDefined();
+      expect(result.success).toBe(true);
+      expect(result.patternsStored).toBe(1);
+      expect(result.privatePatternsStored).toBe(1);
+      expect(result.agentMemoriesUpdated).toBe(4);
+      expect(fixture.memory).toHaveBeenCalledTimes(4);
+      expect(result.ragEntriesCreated).toBe(result.patternsStored + result.lessonsStored);
     });
 
-    it('should handle codification errors gracefully', async () => {
+    it('reports zero successful writes when isolated backends reject them', async () => {
+      fixture.store.mockRejectedValue(new Error('isolated backend unavailable'));
+      fixture.memory.mockResolvedValue({ success: false });
       const analyzer = createSessionAnalyzer();
       const analysis = await analyzer.analyzeSession(mockSessionSummary);
 
       const extractor = createLearningExtractor();
       const learnings = await extractor.extractLearnings(analysis);
 
-      const codifier = createLearningCodifier();
-      const result = await codifier.codifyLearnings(learnings);
+      learnings.codePatterns.push({ category: 'test', language: 'typescript', pattern: 'Testing fixture', description: 'Unit testing assertions', codeSnippet: 'expect(value).toBe(true)', effectiveness: 90, tags: ['testing'], usageContext: 'fixture', recommendations: 'Test both outcomes' });
 
-      // Should not throw, even if RAG unavailable
-      expect(result).toBeDefined();
+      for (const destination of [StorageDestination.PRIVATE_ONLY, StorageDestination.BOTH, StorageDestination.PUBLIC_ONLY]) {
+        const result = await createLearningCodifier().codifyLearnings(learnings, destination);
+        expect(result).toMatchObject({ patternsStored: 0, lessonsStored: 0, agentMemoriesUpdated: 0, ragEntriesCreated: 0 });
+      }
+      expect(fixture.store).toHaveBeenCalled();
     });
   });
 
@@ -227,7 +259,7 @@ describe('Session Learning Codification Workflow', () => {
       const report = await reportGen.generateReport(analysis, learnings, codificationResult);
 
       expect(report).toBeDefined();
-      expect(report.sessionId).toBe('test-session-001');
+      expect(report.sessionId).toBe(mockSessionSummary.date);
       expect(report.markdown).toBeDefined();
       expect(report.brief).toBeDefined();
       expect(report.summary).toBeDefined();

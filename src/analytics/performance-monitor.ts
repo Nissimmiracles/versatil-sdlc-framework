@@ -66,6 +66,7 @@ export class PerformanceMonitor extends EventEmitter {
   private agentPerformance: Map<string, AgentPerformanceData> = new Map();
   private alerts: PerformanceAlert[] = [];
   private isMonitoring: boolean = false;
+  private monitoringTimers: Array<ReturnType<typeof setInterval>> = [];
   private metricsStorePath: string;
   private alertThresholds: Map<string, number> = new Map();
 
@@ -114,19 +115,19 @@ export class PerformanceMonitor extends EventEmitter {
     console.log('🔍 Performance monitoring started');
 
     // Collect system metrics every 30 seconds
-    setInterval(() => {
+    this.monitoringTimers.push(setInterval(() => {
       this.collectSystemMetrics();
-    }, 30000);
+    }, 30000));
 
     // Save metrics every 5 minutes
-    setInterval(() => {
+    this.monitoringTimers.push(setInterval(() => {
       this.saveMetrics();
-    }, 300000);
+    }, 300000));
 
     // Cleanup old metrics every hour
-    setInterval(() => {
+    this.monitoringTimers.push(setInterval(() => {
       this.cleanupOldMetrics();
-    }, 3600000);
+    }, 3600000));
 
     this.emit('monitoring-started');
   }
@@ -136,6 +137,8 @@ export class PerformanceMonitor extends EventEmitter {
    */
   public stopMonitoring(): void {
     this.isMonitoring = false;
+    for (const timer of this.monitoringTimers) clearInterval(timer);
+    this.monitoringTimers = [];
     this.saveMetrics();
     console.log('🛑 Performance monitoring stopped');
     this.emit('monitoring-stopped');

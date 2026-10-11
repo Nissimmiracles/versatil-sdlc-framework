@@ -2,7 +2,7 @@
  * Unit tests for Documentation Streaming
  */
 
-import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import {
   ResultStream,
   StreamManager,
@@ -111,33 +111,47 @@ describe('ResultStream', () => {
   });
 
   describe('delays', () => {
-    it('should support delay between chunks', async () => {
-      const results = [1, 2, 3, 4];
-      const delayMs = 10;
-      const stream = new ResultStream(results, { chunkSize: 2, delayMs });
+    beforeEach(() => jest.useFakeTimers({ now: new Date('2025-02-01T00:00:00Z') }));
+    afterEach(() => { expect(jest.getTimerCount()).toBe(0); jest.useRealTimers(); });
 
-      const startTime = Date.now();
-      await stream.start();
-      const duration = Date.now() - startTime;
-
-      // Should have at least one delay (between two chunks)
-      expect(duration).toBeGreaterThanOrEqual(delayMs);
+    it('delivers the next chunk at 10ms and remains pending at 9ms', async () => {
+      const stream = new ResultStream([1, 2, 3, 4], { chunkSize: 2, delayMs: 10 });
+      const received: number[] = [];
+      stream.subscribe(chunk => received.push(chunk.data));
+      let settled = false;
+      const pending = stream.start().then(() => { settled = true; });
+      expect(received).toEqual([1, 2]);
+      expect(stream.isComplete()).toBe(false);
+      await jest.advanceTimersByTimeAsync(9);
+      expect(received).toEqual([1, 2]);
+      expect(settled).toBe(false);
+      expect(jest.getTimerCount()).toBe(1);
+      await jest.advanceTimersByTimeAsync(1);
+      await pending;
+      expect(received).toEqual([1, 2, 3, 4]);
+      expect(settled).toBe(true);
+      expect(stream.isComplete()).toBe(true);
+      expect(jest.getTimerCount()).toBe(0);
     });
 
-    it('should not delay after last chunk', async () => {
-      const results = [1, 2];
-      const stream = new ResultStream(results, { chunkSize: 1, delayMs: 50 });
-
-      const timestamps: number[] = [];
-      stream.subscribe(() => {
-        timestamps.push(Date.now());
-      });
-
-      await stream.start();
-
-      // Gap between first and second should be >= 50ms
-      const gap = timestamps[1] - timestamps[0];
-      expect(gap).toBeGreaterThanOrEqual(40); // Allow some tolerance
+    it('does not schedule a delay after the last chunk', async () => {
+      const stream = new ResultStream([1, 2], { chunkSize: 1, delayMs: 50 });
+      const chunks: StreamChunk<number>[] = [];
+      stream.subscribe(chunk => chunks.push(chunk));
+      const pending = stream.start();
+      expect(chunks).toHaveLength(1);
+      await jest.advanceTimersByTimeAsync(49);
+      expect(chunks).toHaveLength(1);
+      expect(stream.isComplete()).toBe(false);
+      await jest.advanceTimersByTimeAsync(1);
+      await pending;
+      expect(chunks).toHaveLength(2);
+      expect(chunks[1].timestamp.getTime() - chunks[0].timestamp.getTime()).toBe(50);
+      expect(chunks[1].isLast).toBe(true);
+      expect(stream.isComplete()).toBe(true);
+      expect(jest.getTimerCount()).toBe(0);
+      await jest.advanceTimersByTimeAsync(100);
+      expect(chunks).toHaveLength(2);
     });
   });
 
